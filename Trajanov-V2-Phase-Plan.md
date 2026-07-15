@@ -85,7 +85,7 @@ becomes a placeholder.
 | Concurrent-order test | 1.03, 1.04, re-run 1.08 | 10 orders / 3 units → exactly 3 succeed |
 | Owed-verification register | 1.08 | Must be zero before Part 2 |
 | Placeholder register | 2.05 | Must be zero before cutover |
-| Fresh-session PR review | 1.03, 1.04, 1.06 | `D-0-3` replacement gate; extended to 1.06 by `D-1.06-2` |
+| Fresh-session PR review | 1.03, 1.04 (1.06 waived — `D-1.06-11`) | `D-0-3` replacement gate; extended to 1.06 by `D-1.06-2`, then waived for PR #6 by `D-1.06-11` |
 | UI seen before close | Every UI phase | 1.05, 1.06, 1.07, 2.04 |
 | Native MK review | 2.02 | Before cutover, not after |
 

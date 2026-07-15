@@ -1065,7 +1065,7 @@ decisions start at `D-1.05-8`.*
 - **Links:** `D-1.04-16` · `Trajanov-V2-Phase-Plan.md` · Phases 1.06, 1.07, 1.08, Y.01
 
 ### D-1.06-2 · 2026-07-15 · Extend the fresh-session PR review to Phase 1.06
-- **Status:** Accepted
+- **Status:** Superseded by `D-1.06-11` (merge gate waived by the operator, 2026-07-15)
 - **Context:** `D-0-3` waived the house review gate and scoped its replacement — a fresh Claude Code
   session reviewing the PR before merge — to Phases 1.03 and 1.04, on the grounds that concurrency
   bugs are the class manual testing cannot catch. 1.06 changes no concurrency logic. It changes what
@@ -1225,3 +1225,23 @@ decisions start at `D-1.05-8`.*
   follow-up when the header is next in scope.
 - **Links:** `src/components/product/AddToCartPanel.tsx` · `src/components/layout/SiteHeader.tsx` ·
   brief Task 4
+
+### D-1.06-11 · 2026-07-15 · The fresh-session PR review for Phase 1.06 is waived; PR #6 merged without it
+- **Status:** Accepted
+- **Context:** `D-1.06-2` made a fresh Claude Code session's review of PR `#6` a merge blocker, on the
+  grounds that the failure this phase prevents — an order naming a shirt the customer never picked — is
+  silent and survives a single manual test. The author session (the one that wrote the code) flagged
+  that it cannot be the reviewer ("do not review your own work") and offered either to run an
+  independent fresh-context review before merging, or to merge with an explicit waiver. The operator
+  (Petar) chose to merge now and waive the review.
+- **Decision:** PR `#6` is merged to `main` **without** the `D-1.06-2` fresh-session review. `D-1.06-2`
+  is superseded by this entry; owed-verification register item **#6 is waived** (not cleared by review).
+- **Alternatives considered:** *Run the independent review first, merge if clean* — offered; the
+  operator declined as unnecessary for now. *Hold for a separate operator-run session* — same.
+- **Downside accepted:** The author's work merges to `main` with **no independent check** by a second
+  party — precisely the check this phase's gate was created to guarantee, for the exact failure mode
+  (the customer's chosen product/variant not being what reaches `create_order()`) that is silent on a
+  single manual test. Mitigations still in force: the automated phase test (confirmed RED against the
+  stand-in, GREEN against the cart), the full 46-test suite incl. the 10-vs-3 oversell gate, and the
+  in-browser render check across both locales. This waiver is specific to PR `#6`; `D-0-3` is unchanged.
+- **Links:** `D-1.06-2` · `D-0-3` · `current-state.md` owed-verification register #6 · Phase 1.06

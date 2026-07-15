@@ -70,9 +70,9 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 1 of 2 — Build |
-| Phase | 1.06 complete — PR pending |
-| Branch | `phase-1.06-cart-flow` |
-| Open PR | `#6` → `main` — **pending fresh-session review** (`D-1.06-2`); 1.01–1.05 merged `#1`–`#5` |
+| Phase | 1.06 complete — **merged** (fresh-session review waived, `D-1.06-11`) |
+| Branch | `phase-1.06-cart-flow` (merged to `main`) |
+| Open PR | none — 1.01–1.06 merged `#1`–`#6`; PR `#6`'s `D-1.06-2` review **waived** (`D-1.06-11`) |
 | Deployed | nowhere — Supabase runs **local only** (`D-1.03-5`); Vercel project created in 1.07 (`D-1.06-4`) |
 | Domain | `trajanov.com` — **not purchased** |
 
@@ -241,7 +241,6 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 2 | **IG profile URL click-test.** `@trajanovv2026` handle is VERIFIED and the URL renders/links correctly (verified in-browser this phase: footer, drop-ended banner, **and now Contact**), but a human must click it and confirm it opens **Vladimir's actual profile** (`facts.md` §6). **Merge blocker on 1.05** (`D-1.05-2`). | 1.02 | Lazar click-test, pre-merge |
 | 4 | **Hosted-Supabase parity** (`D-1.03-5`, extended by `D-1.04-1`). Migrations, RLS, real keys, **the pg_cron schedule, and the rate-limit table** are proven only against local Supabase (Colima). A **paused free-tier project silently pauses pg_cron** (reservations stop expiring). Re-confirm all of it on the real project. | 1.03/1.04 | 1.07 (hosted project) |
 | 5 | **Real Turnstile keys.** Siteverify is proven only against Cloudflare's **dummy** keys (`D-1.04-8`); "is Cloudflare actually challenging bots" is unanswerable until real keys. Test keys must never reach production. | 1.04 | 1.07 / 2.05 |
-| 6 | **Fresh-session PR review of PR `#6`** (`D-1.06-2`). A Claude Code session that did not write this code reviews the PR against the 1.06 brief before merge — the silent failure this phase prevents (an order naming a shirt the customer never picked) survives a single manual test. **Merge blocker on 1.06.** | 1.06 | Fresh Claude Code session, pre-merge |
 
 *Code verified directly (not owed) this phase: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
 `npm test` (**46**) all green, incl. the re-run 10-vs-3 oversell gate; the phase test was confirmed to
@@ -252,9 +251,10 @@ cart code path touches `variants`/`orders`/`order_items`); the stand-in grep ret
 `supabase/migrations/` file and neither `create_order` nor `expire_reservations` changed; no new
 dependency (`package.json` unchanged). (Prior direct-verified items carry forward unchanged.)*
 
-*Register is at **5 items**. Item #3 (fresh-session review of PR `#4`) was removed at the PR-#4 merge.
-**#6 is the fresh-session review of PR `#6`** (`D-1.06-2`) — a merge blocker on 1.06, cleared at merge
-as #3 was. **#1 (design sign-off) and #2 (IG click-test)** were merge blockers on 1.05 (`D-1.05-2`);
+*Register is at **4 items**. Item #3 (fresh-session review of PR `#4`) was removed at the PR-#4 merge.
+**Item #6 (fresh-session review of PR `#6`, `D-1.06-2`) was WAIVED by the operator (`D-1.06-11`) and PR
+`#6` merged without it** — waived, not verified, so it is removed here with this note rather than
+silently. **#1 (design sign-off) and #2 (IG click-test)** were merge blockers on 1.05 (`D-1.05-2`);
 **PR `#5` has since merged**, so they were either satisfied at that merge or this file is stale on the
 point — Lazar to confirm and remove if done (not removed here — this session did not perform them).
 **#4 (hosted-Supabase parity) and #5 (real Turnstile keys)** remain deferred to 1.07 by design.

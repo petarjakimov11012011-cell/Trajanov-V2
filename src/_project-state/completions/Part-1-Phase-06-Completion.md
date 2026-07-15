@@ -199,10 +199,14 @@ no form. No console errors.
 
 | # | Item | Steps | What "pass" looks like |
 |---|---|---|---|
-| 6 | **Fresh-session PR review of PR #6** (`D-1.06-2`) | A Claude Code session that did **not** write this code reviews PR #6 against the 1.06 brief before merge | Reviewer confirms the chosen item reaches `order_items`, the stand-in is gone, and only `variant_id`+`qty` cross the boundary |
+| ~~6~~ | ~~Fresh-session PR review of PR #6 (`D-1.06-2`)~~ | **WAIVED by the operator (`D-1.06-11`)** — PR #6 merged without it | n/a — waived, not verified |
 
-Added to the owed-verification register as #6 (merge blocker on 1.06). Registers #1/#2 (1.05
-merge-blockers) and #4/#5 (deferred to 1.07) carry forward unchanged — see the register note.
+**Update (post-report):** the operator chose to **waive** the fresh-session review (`D-1.06-2`) and
+merge PR #6. Logged as `D-1.06-11`; `D-1.06-2` marked superseded; owed-verification register item #6
+removed as *waived* (not verified). The author's work merged with no independent check — mitigations
+that remain: the automated phase test (RED against the stand-in, GREEN against the cart), the 46-test
+suite incl. the oversell gate, and the render check. Registers #1/#2 (1.05 merge-blockers) and #4/#5
+(deferred to 1.07) carry forward unchanged — see the register note.
 
 ---
 
