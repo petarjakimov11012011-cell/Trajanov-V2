@@ -76,6 +76,7 @@ function Colon({accent}: {accent: boolean}) {
 export function Countdown({
   target,
   offsetMs,
+  serverNowMs,
   onComplete,
   className,
 }: {
@@ -83,6 +84,9 @@ export function Countdown({
   target?: number;
   /** Deadline as ms-from-mount; resolved to an absolute target on the client. */
   offsetMs?: number;
+  /** The server's "now" (epoch ms) captured when the page rendered. When given, the countdown is
+   *  anchored to the server clock — a device with a wrong clock still counts down correctly (Task 4). */
+  serverNowMs?: number;
   onComplete?: () => void;
   className?: string;
 }) {
@@ -90,14 +94,18 @@ export function Countdown({
   const [remaining, setRemaining] = useState<number | null>(null);
 
   // Resolve the deadline on the client only — never call Date.now() in render.
-  // Absolute `target` wins; otherwise `offsetMs` is measured from mount.
+  // Absolute `target` wins; otherwise `offsetMs` is measured from mount. If a server "now" is supplied,
+  // measure the skew between it and the device clock at mount and subtract it on every tick, so the
+  // remaining time tracks the SERVER's clock rather than the (possibly wrong) device clock.
   useEffect(() => {
-    const deadline = target ?? Date.now() + (offsetMs ?? 0);
-    const update = () => setRemaining(Math.max(0, deadline - Date.now()));
+    const clientMountNow = Date.now();
+    const skew = serverNowMs !== undefined ? clientMountNow - serverNowMs : 0;
+    const deadline = target ?? clientMountNow + (offsetMs ?? 0);
+    const update = () => setRemaining(Math.max(0, deadline - (Date.now() - skew)));
     update();
     const id = setInterval(update, 250);
     return () => clearInterval(id);
-  }, [target, offsetMs]);
+  }, [target, offsetMs, serverNowMs]);
 
   useEffect(() => {
     if (remaining !== null && remaining <= 0) onComplete?.();

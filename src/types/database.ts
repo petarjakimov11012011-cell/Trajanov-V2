@@ -39,6 +39,7 @@ export type Database = {
           created_at: string
           ends_at: string | null
           id: string
+          rate_limit_per_window: number
           slug: string
           starts_at: string
         }
@@ -46,6 +47,7 @@ export type Database = {
           created_at?: string
           ends_at?: string | null
           id?: string
+          rate_limit_per_window?: number
           slug: string
           starts_at: string
         }
@@ -53,8 +55,27 @@ export type Database = {
           created_at?: string
           ends_at?: string | null
           id?: string
+          rate_limit_per_window?: number
           slug?: string
           starts_at?: string
+        }
+        Relationships: []
+      }
+      order_attempts: {
+        Row: {
+          created_at: string
+          id: number
+          ip_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          ip_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          ip_hash?: string
         }
         Relationships: []
       }
@@ -161,9 +182,9 @@ export type Database = {
           created_at: string
           drop_id: string
           id: string
-          name_en: string
-          name_mk: string
-          price_mkd: number
+          name_en: string | null
+          name_mk: string | null
+          price_mkd: number | null
           slug: string
           sort_order: number
         }
@@ -171,9 +192,9 @@ export type Database = {
           created_at?: string
           drop_id: string
           id?: string
-          name_en: string
-          name_mk: string
-          price_mkd: number
+          name_en?: string | null
+          name_mk?: string | null
+          price_mkd?: number | null
           slug: string
           sort_order?: number
         }
@@ -181,9 +202,9 @@ export type Database = {
           created_at?: string
           drop_id?: string
           id?: string
-          name_en?: string
-          name_mk?: string
-          price_mkd?: number
+          name_en?: string | null
+          name_mk?: string | null
+          price_mkd?: number | null
           slug?: string
           sort_order?: number
         }
@@ -231,6 +252,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_order_rate_limit: {
+        Args: { p_ip_hash: string; p_max: number; p_window_seconds?: number }
+        Returns: boolean
+      }
       create_order: {
         Args: {
           p_address: string

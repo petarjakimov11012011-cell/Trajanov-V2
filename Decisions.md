@@ -488,3 +488,316 @@ before any phase existed use phase `0`.
 - **Downside accepted:** These are DB-integration tests, not pure units — they require a live local
   stack and a superuser DB URL that exists only locally. Adds a devDependency (`postgres`).
 - **Links:** `tests/helpers/db.ts` · `.env.example`
+
+---
+
+## Phase 1.04 — Drop engine
+
+*`D-1.04-1` … `D-1.04-9` are the orchestrator's, appended verbatim before any code was written.
+Executor (Code) decisions start at `D-1.04-10`.*
+
+### D-1.04-1 · 2026-07-15 · Proceed to 1.04 with the owed-verification register at 4 items
+- **Status:** Accepted
+- **Context:** The house rule fires a verification phase at 3+ register items or before any phase
+  building on unverified work. The register stands at 4 after 1.03.
+- **Decision:** 1.04 proceeds as a normal build phase. No verification phase is inserted.
+- **Alternatives considered:** Insert a verification phase now — rejected: item #3 (fresh-session
+  review of PR #3) **clears at merge, which happens before 1.04 starts**, taking the register to 3;
+  item #4 (hosted-Supabase parity) is deferred to 1.07 **by design** (`D-1.03-5`) and 1.04 adds to
+  that same deferral rather than creating a new kind of debt; items #1 and #2 are 1.02 UI/link
+  checks that 1.04 does not build on. None of the four is shaky work this phase stands on.
+- **Consequences accepted:** 1.04's migrations, pg_cron schedule, and Turnstile wiring join 1.03's
+  on the **1.07 hosted-parity debt**, which grows from "schema + 2 functions" to "schema + 3
+  functions + a cron schedule + rate-limit table". **1.07 is now a bigger, riskier phase than it
+  was**, and it is the first time any of this meets real infrastructure. That is the price of
+  staying local, and it is named here so 1.07 is scoped for it rather than surprised by it.
+- **Links:** `D-1.03-5` · Phases 1.07, 1.08
+
+### D-1.04-2 · 2026-07-15 · Schedule `expire_reservations()` with pg_cron inside Supabase
+- **Status:** Accepted
+- **Context:** `expire_reservations()` exists but nothing calls it. An unscheduled sweep means a
+  lapsed 48h hold never returns its unit to stock — the shirt is sold to nobody, forever.
+- **Decision:** pg_cron, scheduled in a migration, inside the database.
+- **Alternatives considered:** **Vercel Cron** hitting an authenticated API route — rejected on two
+  counts. (1) It is Vercel-specific, and the portability rule in `00_stack-and-config.md` exists
+  precisely so that a host migration is a redeploy and not a rebuild; a migration off Vercel would
+  silently take reservation expiry with it. (2) It requires a new public, authenticated route whose
+  only job is to mutate stock — a new attack surface on the one endpoint we most want unreachable.
+  **External HTTP cron (cron-job.org, Crontap)** — rejected: a new third-party vendor and a new
+  free-tier dependency for a job Postgres can run natively.
+- **Consequences accepted:** The schedule lives in a migration, not in application code — a reader
+  of the Next.js repo will not see it unless they look in `supabase/migrations/`. `pg_cron` runs in
+  **UTC**. `cron.job_run_details` grows unboundedly and needs its own cleanup (`D-1.04-3`). And a
+  **paused Supabase free-tier project silently pauses every schedule** — a real forward risk to be
+  carried into 1.07, not solved here.
+- **Links:** `D-1.03-6` · `00_stack-and-config.md` (portability rule) · Phase 1.07
+
+### D-1.04-3 · 2026-07-15 · Sweep every 5 minutes; prune `cron.job_run_details` nightly
+- **Status:** Accepted
+- **Context:** Holds are 48h. Sweep frequency trades staleness against run-log growth.
+- **Decision:** `expire_reservations()` every 5 minutes. A second nightly job deletes
+  `cron.job_run_details` rows older than 7 days.
+- **Alternatives considered:** Every minute — rejected: 1,440 log rows/day for a 48h hold buys
+  nothing, and pg_cron's run-log is documented to grow huge and slow the DB. Hourly — rejected:
+  cheap enough at 5 min that there is no reason to be coarser. No pruning — rejected: it is three
+  lines now and a mystery slowdown later.
+- **Consequences accepted:** A unit can sit dead for up to 5 minutes after its hold lapses. At 40
+  shirts on a drop that lasts hours, this is invisible.
+- **Links:** `D-1.04-2`
+
+### D-1.04-4 · 2026-07-15 · Drop times are Europe/Skopje wall-clock, DST-resolved
+- **Status:** Accepted
+- **Context:** Vladimir will say "Friday, 20:00". North Macedonia is UTC+1 in winter and UTC+2 in
+  summer. A hand-written `+02:00` offset in config is silently wrong for half the year.
+- **Decision:** The drop config carries a naive local wall-clock string (`"2026-08-15T20:00"`) plus
+  the fixed zone `Europe/Skopje`. The sync resolves it to an absolute instant and writes
+  `timestamptz`. Nothing in config ever carries a raw UTC offset.
+- **Alternatives considered:** Explicit ISO offsets in config — rejected: correct only if whoever
+  types it remembers DST, on the one value that must not be wrong. Store the local string in the DB
+  and resolve at read time — rejected: `create_order()` already compares against `now()` in the DB
+  and must keep doing so; the DB must hold an instant.
+- **Consequences accepted:** The sync owns a timezone resolution step that must be tested, including
+  across a DST boundary. Getting it wrong opens the drop an hour early or late.
+- **Links:** `D-1.03-7`
+
+### D-1.04-5 · 2026-07-15 · The sync never writes `stock` on an existing variant
+- **Status:** Accepted
+- **Context:** Config seeds stock; the DB decrements it. If a re-run of the sync wrote config's
+  stock back, a sync during a live drop would reset sold stock to its starting number and the site
+  would sell shirts that do not exist — **a silent oversell, worse than the one 1.03's gate catches.**
+- **Decision:** `stock` is written **only on INSERT** of a new variant. On an existing variant the
+  sync never touches `stock`, under any flag. Every other non-price field may be updated freely. The
+  sync is idempotent. A config deletion never deletes a row that has `order_items` against it.
+- **Alternatives considered:** A `--force-stock` flag — rejected: the flag exists to be used at 19:55
+  on drop night by someone in a hurry. There is no restock requirement (out of scope), so the safe
+  thing is for the capability to not exist.
+- **Consequences accepted:** Fixing a genuinely wrong stock number means a deliberate SQL statement
+  in the Supabase dashboard, by a human who has thought about it. That is the intent.
+
+### D-1.04-6 · 2026-07-15 · `price_mkd` becomes nullable; `TR006 price_missing`; the sync refuses to publish a priceless drop
+- **Status:** Accepted
+- **Context:** No real price exists for any product (`facts.md` §7 — owed by Vladimir). The site must
+  still render browsable-with-placeholders between drops, so a product with no price must be
+  representable. But a `price_mkd NOT NULL` column forces whoever populates config to type a number,
+  and the only numbers available are invented ones. **The schema is currently applying pressure
+  toward fabricating a price.**
+- **Decision:** Three layers. (1) `variants.price_mkd` becomes nullable; the CHECK becomes
+  `price_mkd IS NULL OR price_mkd > 0`. (2) `create_order()` rejects any variant with a null price
+  with a new `TR006 price_missing`, before any decrement. (3) The sync's preflight **refuses to
+  write a drop whose window is open or in the future if any of its variants has a null price**, and
+  says which ones.
+- **Alternatives considered:** Keep `NOT NULL` and omit priceless products from the sync — rejected:
+  the catalog would render empty, which reads as a broken site and creates pressure to "just put
+  something in". A sentinel price (0, -1) — rejected: a sentinel is an invented number that one
+  missing guard renders to a customer.
+- **Consequences accepted:** Touches `create_order()`, which is 1.03's proven code — so the
+  concurrency gate must be re-run and the fresh-session review must cover it. Worth it: after this,
+  **it is not possible to sell a shirt at a price we made up**, because there is nowhere to make one
+  up.
+- **Links:** `facts.md` §7 · `D-1.03-11` (error vocabulary)
+
+### D-1.04-7 · 2026-07-15 · IP rate limit — hashed IP, 20 attempts / 10 min, threshold on the drop row
+- **Status:** Accepted
+- **Context:** Cash on delivery means ordering costs the orderer nothing, so abuse costs nothing.
+- **Decision:** Order-creation attempts are counted per **SHA-256 hash of the IP** (peppered with a
+  server-side secret), never the raw IP. Default **20 attempts per IP per 10 minutes**. The threshold
+  is a column on the `drops` row, so Lazar can change it from the Supabase dashboard mid-drop without
+  a deploy.
+- **Alternatives considered:** Store raw IPs — rejected: the repo is public, the seller is a minor
+  with no registered entity, and a material share of the audience is 12–17. Storing children's IP
+  addresses to do arithmetic a hash does identically is unjustifiable. A tight limit (2–3/hour) —
+  rejected: **Macedonian mobile carriers NAT large numbers of subscribers behind few egress IPs**,
+  so a tight per-IP limit on drop day blocks real buyers in bulk; the control would become the
+  outage. A constant in code — rejected: changing it would need a deploy at the worst moment.
+- **Consequences accepted, stated plainly: this control is a backstop against casual abuse, not a
+  defence against a determined attacker.** Phone numbers are never verified (no OTP), so the
+  one-order-per-phone rule stops accidents, not attacks; anyone with a proxy pool and a Turnstile
+  solver walks through the IP limit too. **The real containment is the 48h hold and Vladimir's
+  confirmation call** — a fake order costs an attacker 48 hours, not the drop. Nobody should read
+  this limit as more than it is. It is also still possible for NAT to bite at a scale larger than
+  expected, which is exactly why the number is a DB value and not a constant.
+- **Links:** `D-0-5` · `D-1.03-4`
+
+### D-1.04-8 · 2026-07-15 · Turnstile against Cloudflare's documented test keys; token minted fresh at submit
+- **Status:** Accepted
+- **Context:** No Cloudflare account or real keys exist yet (they land with the hosted environment).
+  Separately: **Turnstile tokens expire after 300 seconds and are single-use.**
+- **Decision:** Wire the real widget and real server-side Siteverify now, against Cloudflare's
+  published dummy keys, read from env vars. Real keys are a 1.07/2.05 concern, no code change.
+  **The token must be minted or refreshed at submit time, not at page load**, and a
+  `timeout-or-duplicate` response must re-challenge and let the customer retry — never fail silently.
+- **Alternatives considered:** Defer Turnstile to 1.07 — rejected: it would land untested on the one
+  form that matters. Keep the 1.02 `TurnstilePlaceholder` — rejected: it validates nothing.
+  Mint at page load — rejected, and this is the load-bearing part: **a customer who opens checkout at
+  19:50 for a 20:00 drop and submits at 20:01 is holding an 11-minute-old token, which Cloudflare
+  rejects.** That is not an edge case here; it is the *designed* behaviour of a countdown, and it
+  would fail exactly the buyers who showed up early and cared most.
+- **Consequences accepted:** Siteverify is proven only against dummy keys until real keys exist; the
+  success path is real, the "is Cloudflare actually challenging bots" question is unanswerable until
+  1.07. Test keys must never reach production — guarded in the DoD.
+- **Links:** Cloudflare Turnstile testing docs · Phase 1.07
+
+### D-1.04-9 · 2026-07-15 · Drop-state pages are uncached; stock display may be briefly stale; the DB is the gate
+- **Status:** Accepted
+- **Context:** Next.js caches server-rendered routes aggressively by default. A statically cached
+  home page freezes the drop state — **the countdown page would still say "countdown" at 20:05 on
+  drop night, served from a CDN, while the drop is open.** This is the single most likely way for
+  this phase to fail in public.
+- **Decision:** Any route rendering drop state is explicitly dynamic. Stock *display* may be up to
+  60s stale; `create_order()` remains the only authority.
+- **Alternatives considered:** Force-dynamic everything — rejected: the Lighthouse 95+ target
+  (`D-0-8`) is real and the About/legal pages have no reason to be dynamic. Trust the client clock at
+  T-0 — rejected: a client clock is a suggestion, and the client must re-validate with the server
+  rather than unlock its own buy button.
+- **Consequences accepted:** A customer can see "2 left", submit, and get a clean `TR004
+  insufficient_stock` back. **That is correct behaviour and must read as such in MK** — "someone
+  beat you to it", not "error". Drop-state routes give up static caching and cost a DB read per view.
+- **Links:** `D-0-8` · `D-1.03-7`
+
+---
+
+*`D-1.04-10` onward are the executor's (Code), made while building 1.04.*
+
+### D-1.04-10 · 2026-07-15 · Price/name nullability applied to `products`, not `variants`; names also nullable
+- **Status:** Accepted
+- **Context:** `D-1.04-6`/Task 2 say "`variants.price_mkd`". That column does not exist. Price lives on
+  `public.products.price_mkd`; `variants` carry only `(product, size, stock)`, and `create_order()`
+  reads the price by joining variant → product. The brief is wrong about where price lives.
+- **Decision:** Apply the nullable change + the `price_mkd IS NULL OR > 0` CHECK + the `TR006` guard to
+  `products.price_mkd` — the column that actually exists. Also make `products.name_mk`/`name_en`
+  nullable, for the same anti-fabrication reason: a null name renders a neutral slot ("Производ 01"),
+  never a made-up name stored as if real.
+- **Alternatives considered:** Move price onto `variants` to match the brief literally — rejected: a
+  large, risky change to proven concurrency code for no benefit (all sizes of a shirt cost the same).
+  Keep names `NOT NULL` and have the sync write a slot string — rejected: it stores fabricated content
+  that then can't be told apart from a real name.
+- **Consequences accepted:** The code deviates from the brief's literal column name; flagged loudly in
+  the completion report §3 so the orchestrator can correct the brief. Names being nullable is scope the
+  brief did not enumerate (only price), but it is the same decision and the same reasoning.
+- **Links:** `D-1.04-6` · `create_order` migration
+
+### D-1.04-11 · 2026-07-15 · The config→DB sync uses a direct Postgres admin connection, not the service-role client
+- **Status:** Accepted
+- **Context:** Task 3 says the sync "writes via the service-role client". But `D-1.03-9` made
+  `service_role` **SELECT-only** on every table, with all writes going through SECURITY DEFINER
+  functions — precisely so the runtime privileged role can never write stock directly.
+- **Decision:** The sync connects with a **direct Postgres admin URL** (`SUPABASE_DB_URL`), exactly as
+  the test suites do (`D-1.03-12`). It is an operator-run, migration-time tool, not runtime code.
+- **Alternatives considered:** Grant `service_role` INSERT/UPDATE on the catalogue tables — rejected:
+  it re-opens a direct `service_role` write path to `variants.stock`, the one thing `D-1.03-9` closed.
+  Write SECURITY DEFINER upsert functions for the sync — rejected: a lot of SQL to move an operator
+  tool into the database for no safety gain.
+- **Consequences accepted:** The sync needs a superuser DB URL (local: the shared-default; hosted:
+  Supabase's direct connection string, set by the operator in 1.07). It is not exercised by the
+  `service_role` RLS posture, so hosted parity (1.07) must confirm the operator has that URL.
+- **Links:** `D-1.03-9` · `D-1.03-12`
+
+### D-1.04-12 · 2026-07-15 · The committed rehearsal `test-drop` is an ENDED drop
+- **Status:** Accepted
+- **Context:** Task 1 wants one committed rehearsal drop, priced `null`, "so the site has something to
+  render". `D-1.04-6`'s preflight refuses to write any **open or future** drop that has a null price.
+  A null-priced countdown/live drop therefore cannot be synced — the two requirements collide.
+- **Decision:** Commit `test-drop` with a **past** window (ended). The sync accepts it (an ended drop
+  can never be ordered, so a null price is moot), and it renders the ended state by default. All three
+  states are reviewable via the dev-only `?preview` override (`D-1.04-13`).
+- **Alternatives considered:** A future countdown rehearsal — rejected: the preflight refuses it (null
+  price + future). A priced rehearsal — rejected: Task 1 requires `null`, and any price would be
+  invented (`facts.md` §7). Two committed drops — rejected: Task 1 says one.
+- **Consequences accepted:** The default render of the committed config is the "ended" state, which can
+  read as a dead store to a casual viewer. `test-` slugs + the placeholder banner + dev preview make it
+  obviously a rehearsal; the state files say so.
+- **Links:** `D-1.04-6` · `D-1.04-13`
+
+### D-1.04-13 · 2026-07-15 · Server-computed drop state + a dev-only `?preview` override replace the 1.02 client preview switcher
+- **Status:** Accepted
+- **Context:** The 1.02 home carried a client-side "preview states" switcher that faked the drop state
+  in the browser — the exact thing this phase removes (`D-1.04-9`: the browser is not the source of
+  truth). But the DoD still needs all three states reviewable against one committed config.
+- **Decision:** Home/catalog/product read the real state from the server. A `?preview=countdown|live|
+  ended` query param overrides the **displayed** state, honoured only when `NODE_ENV !== 'production'`
+  (double-gated: the page also refuses to wire it in prod, and `src/lib/drop` refuses to parse it).
+  The visible switcher renders only in dev.
+- **Alternatives considered:** Keep the client switcher — rejected: it is a client-side lie about drop
+  state, the thing this phase exists to kill. Require re-syncing config to see each state — rejected:
+  slow and error-prone for review. A production preview mode — rejected: it is an unlocking side door
+  on the one thing that must stay server-authoritative.
+- **Consequences accepted:** The home page loses its visible preview buttons in production (a small
+  visual change to a design-system scaffold the handover itself labels a demo aid). The override forces
+  only *display*; `create_order()` still enforces the real window server-side, so a `?preview=live` on
+  a closed drop correctly still returns `TR002`.
+- **Links:** `D-1.04-9`
+
+### D-1.04-14 · 2026-07-15 · IP hashed in the app (pepper never in the DB); 10-min window is an app constant
+- **Status:** Accepted
+- **Context:** `D-1.04-7` wants a peppered SHA-256 IP hash and the count threshold on the drop row.
+- **Decision:** The IP is hashed in **Node** (`node:crypto`) with a server-side pepper; only the 64-char
+  hex hash reaches Postgres. The pepper never touches the database. The **count threshold** is the DB
+  column (editable per drop); the **window length (10 min)** is a documented app constant. Recording is
+  count-then-insert — best-effort, may overshoot by one under a concurrent race.
+- **Alternatives considered:** Hash in Postgres with pgcrypto — rejected: it would put the pepper in the
+  DB (or in a DB setting), widening where the secret lives. Make the window a DB column too — rejected:
+  `D-1.04-7` only calls for the threshold, and one knob is enough. A strict atomic counter — rejected:
+  overkill for a control `D-1.04-7` itself calls a backstop, not an anti-attack defence.
+- **Consequences accepted:** Two simultaneous attempts on the boundary can both pass (off-by-one). The
+  ledger grows (rows age out of the window but are not swept); acceptable at this scale, noted for 1.07.
+- **Links:** `D-1.04-7`
+
+### D-1.04-15 · 2026-07-15 · `tsx` added (dev) to run the TypeScript sync script
+- **Status:** Accepted
+- **Context:** `npm run sync:drop` runs a TS script that imports `src/config` (extensionless imports)
+  and the `postgres` lib. Node 24's native TS type-stripping requires **explicit `.ts` extensions** on
+  relative imports, which the whole codebase does not use.
+- **Decision:** Add **`tsx`** as a devDependency; `sync:drop` = `tsx scripts/sync-drop.ts`.
+- **Alternatives considered:** Native `node --experimental-strip-types` — rejected: it fails on the
+  codebase's extensionless imports (`Cannot find module './drops'`). Add `"type":"module"` + rewrite
+  imports — rejected: a project-wide change to a Next app for one script. Compile the script — rejected:
+  a build step for an operator tool.
+- **Consequences accepted:** One more devDependency (recorded in `00_stack-and-config.md`). `tsx`
+  transpiles to CJS, so the CLI wraps its top-level `await` in an async `main()`.
+- **Links:** `00_stack-and-config.md`
+
+### D-1.04-16 · 2026-07-15 · The order path is wired end-to-end; a product→cart→checkout item flow is NOT built
+- **Status:** Accepted
+- **Context:** Task 6 wires Turnstile + rate limit + `create_order()` onto the order path. But 1.02
+  never built cart state or a selected-variant flow from product → cart → checkout, and building one is
+  out of scope ("no new components, no improvements to layout").
+- **Decision:** Build the real, tested order Server Action (`placeOrder`) and wire the checkout form to
+  it with a **fresh Turnstile token at submit**. For the *items*, the checkout submits a **stand-in**:
+  the active drop's first in-stock variant, quantity 1 (`getActiveOrderContext`). `create_order()`
+  remains the only authority (window, cap, price, stock).
+- **Alternatives considered:** Build a full cart-state system — rejected: out of scope, and large.
+  Disable the checkout entirely until a cart exists — rejected: the whole point of Task 6 is to prove
+  the guarded order path works, and it now does, end to end (a real order was placed in-browser).
+- **Consequences accepted:** The in-browser checkout orders a stand-in item, not a user-chosen one; a
+  real cart flow (selected product/size/qty flowing to checkout) is future work and must precede a real
+  drop. Flagged in the completion report §3 and the carryovers.
+- **Links:** `D-1.04-8` · `D-1.04-9`
+
+### D-1.04-17 · 2026-07-15 · Turnstile runs in execute/interaction-only mode; Siteverify omits the client IP
+- **Status:** Accepted
+- **Context:** `D-1.04-8` requires the token minted/refreshed at submit, not at page load. Separately,
+  the project stores/transmits no raw IPs (`D-1.04-7`).
+- **Decision:** Render the widget with `execution: 'execute'` + `appearance: 'interaction-only'`; the
+  form calls `turnstile.execute()` on submit to mint a fresh token, and re-challenges on error/expiry.
+  Server-side Siteverify **omits `remoteip`** — Turnstile does not require it, so no raw IP is sent to
+  Cloudflare.
+- **Alternatives considered:** A visible checkbox rendered at load — rejected: `D-1.04-8`'s stale-token
+  trap (an 11-minute-old token on a countdown). Send `remoteip` to Cloudflare — rejected: needless
+  transmission of a raw IP the project otherwise never handles.
+- **Consequences accepted:** The checkout's "verifying" indicator now appears **after** submit (during
+  the mint + Siteverify), not before — a change from the 1.02 placeholder's auto-resolve. This is the
+  designed, correct behaviour for a countdown. Real bot-challenge behaviour is unproven until real keys
+  (1.07); only the success/fail plumbing is proven against dummy keys.
+- **Links:** `D-1.04-8` · `D-1.04-7`
+
+### D-1.04-18 · 2026-07-15 · `LOW_STOCK_THRESHOLD = 5` is a display heuristic constant, not a token or a fact
+- **Status:** Accepted
+- **Context:** The card/product "low stock" badge needs a threshold. It is business/display logic, not
+  a design token (`brand.md`) and not a `facts.md` claim.
+- **Decision:** A documented constant `LOW_STOCK_THRESHOLD = 5` in `src/config/schema.ts`. It affects
+  only the badge; `create_order()` remains the sole stock authority, so the number is safe to tune.
+- **Alternatives considered:** A per-drop DB column — rejected: no requirement, and one more knob to set
+  every drop. Derive it from stock — rejected: invents a rule with no basis. Hardcode inline — rejected:
+  it belongs with the config constants, named.
+- **Consequences accepted:** `5` is a guess about when "low" should shout; if it feels wrong on drop
+  day, it is a one-line change (and not a stock-safety issue).

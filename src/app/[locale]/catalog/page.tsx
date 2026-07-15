@@ -1,11 +1,31 @@
-import {useTranslations} from 'next-intl';
+import {getTranslations} from 'next-intl/server';
 import {ProductCard} from '@/components/product/ProductCard';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
-import {DEMO_PRODUCTS} from '@/lib/demo';
+import {DevPreviewSwitch} from '@/components/system/DevPreviewSwitch';
+import {getActiveDropView, parsePreviewState} from '@/lib/drop/state';
 
-// Catalog grid — the drop's 3–5 pieces, incl. a sold-out card.
-export default function CatalogPage() {
-  const t = useTranslations('Catalog');
+// Catalog grid — the active drop's pieces, read from the DB on every request (D-1.04-9).
+export const dynamic = 'force-dynamic';
+
+export default async function CatalogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{preview?: string}>;
+}) {
+  const {preview} = await searchParams;
+  const previewState = parsePreviewState(preview);
+  const view = await getActiveDropView({preview: previewState});
+  const t = await getTranslations('Catalog');
+
+  const subtitle =
+    view === null
+      ? t('empty')
+      : view.state === 'live'
+        ? t('live')
+        : view.state === 'ended'
+          ? t('ended')
+          : t('countdownIntro');
+
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6">
       <PreviewNotice />
@@ -13,13 +33,16 @@ export default function CatalogPage() {
         <h1 className="font-display text-h1 text-foreground font-extrabold">
           {t('title')}
         </h1>
-        <p className="text-muted-foreground max-w-xl">{t('live')}</p>
+        <p className="text-muted-foreground max-w-xl">{subtitle}</p>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        {DEMO_PRODUCTS.map((p) => (
-          <ProductCard key={p.slug} product={p} />
-        ))}
-      </div>
+      {view && view.products.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          {view.products.map((p) => (
+            <ProductCard key={p.slug} product={p} />
+          ))}
+        </div>
+      )}
+      <DevPreviewSwitch current={previewState} />
     </div>
   );
 }

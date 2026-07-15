@@ -2,7 +2,7 @@
 
 import {useState} from 'react';
 import {cn} from '@/lib/utils';
-import type {DemoSize} from '@/types/drop';
+import type {SizeOption} from '@/types/drop';
 
 // Size picker — available / selected / unavailable.
 //  • available:   1px border-strong, foreground label
@@ -13,7 +13,7 @@ export function SizePicker({
   initial,
   className,
 }: {
-  sizes: DemoSize[];
+  sizes: SizeOption[];
   initial?: string;
   className?: string;
 }) {

@@ -6,7 +6,58 @@ import {ProductCard} from '@/components/product/ProductCard';
 import {BuyButton} from '@/components/product/BuyButton';
 import {SizePicker} from '@/components/product/SizePicker';
 import {CheckoutField} from '@/components/checkout/CheckoutField';
-import {DEMO_PRODUCTS} from '@/lib/demo';
+import type {ProductView} from '@/types/drop';
+
+// Local sample products — the styleguide is a design reference and needs each card state on demand
+// (in-stock / low / sold-out), which real drop data cannot guarantee. Null names/prices render the
+// neutral slot + price placeholder, exactly as a data-less real product would.
+const SAMPLE_PRODUCTS: ProductView[] = [
+  {
+    slug: 'sg-in-stock',
+    index: 1,
+    nameMk: null,
+    nameEn: null,
+    priceMkd: null,
+    stock: 'in-stock',
+    remaining: 12,
+    sizes: [
+      {label: 'S', available: true},
+      {label: 'M', available: true},
+      {label: 'L', available: true},
+      {label: 'XL', available: false},
+    ],
+  },
+  {
+    slug: 'sg-low',
+    index: 2,
+    nameMk: null,
+    nameEn: null,
+    priceMkd: null,
+    stock: 'low',
+    remaining: 2,
+    sizes: [
+      {label: 'S', available: false},
+      {label: 'M', available: true},
+      {label: 'L', available: true},
+      {label: 'XL', available: false},
+    ],
+  },
+  {
+    slug: 'sg-sold-out',
+    index: 3,
+    nameMk: null,
+    nameEn: null,
+    priceMkd: null,
+    stock: 'sold-out',
+    remaining: 0,
+    sizes: [
+      {label: 'S', available: false},
+      {label: 'M', available: false},
+      {label: 'L', available: false},
+      {label: 'XL', available: false},
+    ],
+  },
+];
 
 const SWATCHES: {name: string; varName: string; note: string}[] = [
   {name: 'ground', varName: '--color-ground', note: 'page'},
@@ -101,7 +152,7 @@ export default function StyleguidePage() {
 
       <Section title={t('productCard')}>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {DEMO_PRODUCTS.slice(0, 3).map((p) => (
+          {SAMPLE_PRODUCTS.map((p) => (
             <ProductCard key={p.slug} product={p} />
           ))}
         </div>
