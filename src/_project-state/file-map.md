@@ -6,25 +6,32 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-15** · By: **Claude Code (Phase 1.02 — design system)**
+Last updated: **2026-07-15** · By: **Claude Code (Phase 1.03 — data layer)**
 
 ---
 
 ## Status
 
-**Design system + full clickable site (Phase 1.02).** The tree below is the **real on-disk
-structure**. Notes:
+**Data layer landed (Phase 1.03).** The tree below is the **real on-disk structure**. Zero UI change
+this phase — nothing under `src/app`, `src/components`, or `src/messages` was touched. Notes:
 
-- **Route folders now exist** for the visual pass: `catalog/`, `catalog/[slug]/`, `cart/`,
-  `checkout/`, `styleguide/` under `app/[locale]/`. These use **non-localised slugs** — localised
-  path slugs (katalog|catalog, …) are still Phase 2.01 (`D-1.02-4`).
-- **New component dirs beyond the reserved three** (`D-1.02-6`): `components/{system,cart,checkout,
-  layout,home}`. `components/ui/` is still shadcn-reserved and empty (brand components hand-authored).
-- **Still reserved and empty** (`.gitkeep`): `src/lib/{supabase,drop,orders,email,rate-limit}`,
-  `src/config`, `public/images/{products,lifestyle}`, `supabase/migrations`, `tests/concurrency`.
-- **`src/lib/demo.ts` + `src/types/drop.ts`** are new: placeholder demo drop data + shared UI types
-  for the 1.02 pass (`D-1.02-5`); the real typed drop config replaces `demo.ts` in 1.04.
-- The Phase 1.02 handover is committed at `docs/design-handovers/Part-1-Phase-02-Handover.md`.
+- **Supabase is real (local only, `D-1.03-5`):** `supabase/config.toml`, `supabase/seed.sql`, and
+  three migrations under `supabase/migrations/` (schema, `create_order`, `expire_reservations`).
+  `supabase/.gitignore` was created by `supabase init`.
+- **`src/lib/supabase/{client,server}.ts`** (typed browser + server-only clients),
+  **`src/lib/orders/order-errors.ts`** (the `create_order` error vocabulary), and
+  **`src/types/database.ts`** (generated types) now fill previously-reserved dirs.
+- **Tests are real:** `tests/setup.ts`, `tests/helpers/db.ts`, `tests/concurrency/{oversell,expiry}
+  .test.ts`, `tests/rls/anon-access.test.ts`, `tests/orders/create-order.test.ts`; `vitest.config.ts`
+  at the root.
+- **`.gitkeep` removed** from the now-populated dirs: `supabase/migrations`, `tests/concurrency`,
+  `src/lib/supabase`, `src/lib/orders`, `src/types`.
+- **Still reserved and empty** (`.gitkeep`): `src/lib/{drop,email,rate-limit}`, `src/config`,
+  `public/images/{products,lifestyle}`, `src/components/ui`.
+- Carried from 1.02: route folders (non-localised slugs, `D-1.02-4`), component dirs
+  `components/{system,cart,checkout,layout,home}`, `src/lib/demo.ts` + `src/types/drop.ts` (both
+  throwaway; `demo.ts` dies in 1.04). The Phase 1.02 handover is at
+  `docs/design-handovers/Part-1-Phase-02-Handover.md`.
 
 Carried from 1.01: `src/i18n/` (routing/request/navigation) and `src/proxy.ts` (`D-1.01-2`).
 
@@ -112,11 +119,14 @@ Trajanov-V2/
 │   ├── lib/
 │   │   ├── utils.ts                 # cn() — shadcn helper
 │   │   ├── demo.ts                  # PLACEHOLDER demo drop data (1.02) — replaced by config in 1.04
-│   │   ├── supabase/               # .gitkeep — client + server (1.03)
-│   │   ├── drop/                   # .gitkeep — state calc, reservations — SERVER ONLY
-│   │   ├── orders/                 # .gitkeep — order creation, atomic decrement
-│   │   ├── email/                  # .gitkeep — Resend side channel
-│   │   └── rate-limit/             # .gitkeep
+│   │   ├── supabase/
+│   │   │   ├── client.ts            # browser client, anon key (1.03)
+│   │   │   └── server.ts            # server client, service role — `import "server-only"` (1.03)
+│   │   ├── orders/
+│   │   │   └── order-errors.ts      # create_order() SQLSTATE → identifier vocabulary (1.03)
+│   │   ├── drop/                   # .gitkeep — state calc, reservations — SERVER ONLY (1.04)
+│   │   ├── email/                  # .gitkeep — Resend side channel (1.07)
+│   │   └── rate-limit/             # .gitkeep (1.04)
 │   │
 │   ├── config/                     # .gitkeep — drops.ts, products.ts (1.04)
 │   │
@@ -125,19 +135,35 @@ Trajanov-V2/
 │   │   └── en.json                  # EN parity
 │   │
 │   └── types/
-│       └── drop.ts                  # DropState, StockLevel, DemoProduct/Size
+│       ├── drop.ts                  # DropState, StockLevel, DemoProduct/Size (1.02)
+│       └── database.ts              # GENERATED from local DB — `npm run gen:types` (1.03)
 │
 ├── public/
 │   └── images/
 │       ├── products/               # .gitkeep — REAL photos only — D-0-6
 │       └── lifestyle/              # .gitkeep — the bar shoot — pending permissions
 │
-├── supabase/
-│   └── migrations/                 # .gitkeep — schema. atomic decrement (1.03)
+├── supabase/                       # LOCAL ONLY — no hosted project until 1.07 (D-1.03-5)
+│   ├── config.toml                 # `supabase init`; trimmed stack for 8 GB host (D-1.03-10)
+│   ├── .gitignore                  # created by `supabase init`
+│   ├── seed.sql                    # dev/test fixtures — `test-` slugs, stock=3 target
+│   └── migrations/
+│       ├── 20260715021215_schema.sql              # 5 tables, constraints, indexes, enum, RLS, grants
+│       ├── 20260715021216_create_order.sql        # atomic conditional decrement — the heart
+│       └── 20260715021217_expire_reservations.sql # idempotent hold-release sweep
 │
-└── tests/
-    └── concurrency/                # .gitkeep — 10 orders / 3 units → exactly 3 succeed
+├── tests/                          # Vitest — DB integration; need a live local stack (D-1.03-12)
+│   ├── setup.ts                    # loads .env.local (Node 24 process.loadEnvFile)
+│   ├── helpers/db.ts               # anon/service supabase-js clients + direct pg admin conn
+│   ├── concurrency/
+│   │   ├── oversell.test.ts        # 10 orders / 3 units → exactly 3 succeed, 7 insufficient_stock
+│   │   └── expiry.test.ts          # stock returned exactly once, incl. 2 concurrent sweeps
+│   ├── rls/anon-access.test.ts     # anon wall: orders unreadable, variants readable, no writes/rpc
+│   └── orders/create-order.test.ts # happy path, drop window (D-1.03-7), full error vocabulary
 ```
+
+Root additions (1.03): `vitest.config.ts` (serial file execution — one shared local DB).
+`.env.local` (gitignored) holds the local Supabase URL/keys + `SUPABASE_DB_URL`.
 
 ---
 
@@ -175,3 +201,4 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-14 | — | Template seeded at kickoff. Nothing built. | Claude Chat |
 | 2026-07-14 | 1.01 | Replaced the intended tree with the real on-disk tree. Scaffolded Next.js/TS/Tailwind/shadcn/next-intl. Added `src/i18n/` + `src/proxy.ts` (not in the kickoff sketch). Route folders deferred to 2.01. | Claude Code |
 | 2026-07-15 | 1.02 | Added routes (`catalog`, `catalog/[slug]`, `cart`, `checkout`, `styleguide`), component dirs `{system,cart,checkout,layout,home}`, `lib/demo.ts`, `types/drop.ts`, and the committed handover. Filled `globals.css` from `brand.md`; loaded Rubik+Inter. Non-localised slugs (2.01 localises). `D-1.02-4/5/6`. | Claude Code |
+| 2026-07-15 | 1.03 | Added `supabase/` (config.toml, seed.sql, 3 migrations), `src/lib/supabase/{client,server}.ts`, `src/lib/orders/order-errors.ts`, `src/types/database.ts` (generated), `tests/` suites + `tests/{setup.ts,helpers/db.ts}`, `vitest.config.ts`. Removed now-stale `.gitkeep` from `supabase/migrations`, `tests/concurrency`, `src/lib/{supabase,orders}`, `src/types`. **Zero change under `src/app`/`src/components`/`src/messages`.** `D-1.03-*`. | Claude Code |

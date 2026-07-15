@@ -334,3 +334,157 @@ before any phase existed use phase `0`.
   product — it is removed/replaced when real server drop state lands in 1.04. `file-map.md` updated
   with the new dirs.
 - **Links:** `src/components/` · `file-map.md`
+
+### D-1.03-1 · 2026-07-15 · Stock is per size, on a `variants` table
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.03 Code brief.
+- **Decision:** **Stock is per size, on a `variants` table** — not per product.
+- **Alternative rejected:** Stock column on `products`.
+- **Downside accepted:** One more table before sizes are even VERIFIED in `facts.md`. If Vladimir
+  says one-size-fits-all, `variants` is a table with one row per product.
+- **Links:** `briefs/Part-1-Phase-03-Code.md` · Phase 1.03
+
+### D-1.03-2 · 2026-07-15 · The order *is* the reservation
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.03 Code brief.
+- **Decision:** **The order *is* the reservation.** `status` + `reserved_until` on `orders`. No
+  separate `reservations` table, despite the Phase Plan naming one.
+- **Alternative rejected:** A separate `reservations` table.
+- **Downside accepted:** A reservation cannot exist without a full order, so a future "hold in cart"
+  feature needs a migration.
+- **Links:** `briefs/Part-1-Phase-03-Code.md` · Phase 1.03
+
+### D-1.03-3 · 2026-07-15 · Order creation is one plpgsql function called by RPC
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.03 Code brief.
+- **Decision:** **Order creation is one `plpgsql` function called by RPC.** Never multi-statement
+  application code.
+- **Alternative rejected:** Doing it in the server action with `supabase-js`.
+- **Downside accepted:** Business logic lives in SQL, which neither operator can read, and is harder
+  to unit-test than TypeScript. Accepted because `supabase-js` has no transaction support —
+  multi-step order creation in app code *is* the oversell bug.
+- **Links:** `briefs/Part-1-Phase-03-Code.md` · Phase 1.03
+
+### D-1.03-4 · 2026-07-15 · "One live order per phone per drop" is a partial unique index in the DB
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.03 Code brief.
+- **Decision:** **"One live order per phone per drop" is a partial unique index in the database**,
+  not app-level rate limiting.
+- **Alternative rejected:** App-level only, in 1.04.
+- **Downside accepted:** A legitimate second order from the same phone is impossible until the first
+  is cancelled or expires — and no cancel action exists yet. 1.04 still owes IP limiting and
+  Turnstile; this does not replace them.
+- **Links:** `briefs/Part-1-Phase-03-Code.md` · Phase 1.03
+
+### D-1.03-5 · 2026-07-15 · This phase is 100% local (Supabase via Docker); no hosted project until 1.07
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.03 Code brief.
+- **Decision:** **This phase is 100% local (Supabase via Docker). No hosted project until 1.07.**
+- **Alternative rejected:** Create the hosted project now.
+- **Downside accepted:** Migrations are unproven against hosted Supabase until 1.07; hosted settings
+  and extensions may differ. Accepted because it defers all real secrets out of a public repo and
+  costs Lazar nothing today.
+- **Links:** `briefs/Part-1-Phase-03-Code.md` · Phase 1.03 · 1.07
+
+### D-1.03-6 · 2026-07-15 · `expire_reservations()` ships here; only its schedule is 1.04
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.03 Code brief.
+- **Decision:** **`expire_reservations()` ships here; only its schedule is 1.04.**
+- **Alternative rejected:** Both in 1.04.
+- **Downside accepted:** 1.03 grows slightly past its Phase Plan line. Accepted because a function
+  without a test is a guess, and the test harness is being built here anyway.
+- **Links:** `briefs/Part-1-Phase-03-Code.md` · Phase 1.03 · 1.04
+
+### D-1.03-7 · 2026-07-15 · `create_order()` itself enforces the drop window as the last line of defence
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.03 Code brief.
+- **Decision:** **`create_order()` itself enforces the drop window** (`now()` inside
+  `[starts_at, ends_at]`) as the last line of defence.
+- **Alternative rejected:** Rely on 1.04's drop-state computation.
+- **Downside accepted:** The window rule will exist in two places once 1.04 lands, and they must
+  agree. Accepted because the browser must never be what decides whether a drop is open, and a
+  client clock is a suggestion.
+- **Links:** `briefs/Part-1-Phase-03-Code.md` · Phase 1.03 · 1.04
+
+### D-1.03-8 · 2026-07-15 · Colima (not Docker Desktop) as the local Docker runtime
+- **Status:** Accepted
+- **Context:** The brief assumes "Docker Desktop is installed and running (Lazar's step, done before
+  you start)." On this machine (Petar's) Docker was **not installed at all**, and both the Homebrew
+  cask install and Docker Desktop's first launch require the operator's macOS admin password and a
+  GUI licence click — neither of which a non-interactive session can supply (the cask install failed
+  on `sudo mkdir /usr/local/bin`). The operator was asked and chose Colima from the offered options.
+- **Decision:** Use **Colima** (userspace Lima VM, Apple Virtualization backend) as the local Docker
+  runtime, installed via Homebrew with no `sudo`. `supabase` reaches it via `DOCKER_HOST` pointed at
+  `~/.colima/default/docker.sock`.
+- **Alternative rejected:** Docker Desktop (the runtime the brief names) — blocked on the operator's
+  password/licence, which this session cannot provide.
+- **Downside accepted:** Deviates from the brief's named tool; the two operators may run different
+  container runtimes. Immaterial to the deliverable — the migrations, functions, and tests are
+  identical regardless of which daemon provides Docker. Lazar can use Docker Desktop unchanged.
+- **Links:** `00_stack-and-config.md` · Phase 1.03
+
+### D-1.03-9 · 2026-07-15 · Functions are SECURITY DEFINER; EXECUTE revoked from PUBLIC; service_role is SELECT-only
+- **Status:** Accepted
+- **Context:** Two gaps between the brief's literal wording and how Postgres/Supabase actually behave:
+  (a) Postgres grants function `EXECUTE` to `PUBLIC` by default, so the brief's "revoke execute from
+  anon, authenticated" alone would leave anon **still able** to execute via `PUBLIC` — the
+  anon-access test (`create_order` denied) would fail. (b) Local Supabase does **not** auto-expose new
+  `public` tables to any Data API role (the modern cloud default), so a plain (INVOKER) function
+  called by `service_role` would lack the table privileges to insert orders / decrement stock.
+- **Decision:** `create_order()` and `expire_reservations()` are **SECURITY DEFINER** (owned by
+  `postgres`, `set search_path = ''`, every object schema-qualified). `EXECUTE` is revoked from
+  `PUBLIC` (and explicitly `anon`, `authenticated`) and granted to `service_role` only. `service_role`
+  gets **SELECT-only** on the tables — no direct INSERT/UPDATE — so every write goes through the
+  definer functions, keeping "no read-then-write on stock in app code" true even for the server role.
+- **Alternative rejected:** The brief's literal "revoke from anon, authenticated" (leaves the PUBLIC
+  hole); INVOKER functions with broad `service_role` table writes (reintroduces direct stock writes
+  in the privileged role — the exact risk the design removes).
+- **Downside accepted:** SECURITY DEFINER bodies run with the owner's (superuser) rights, so they must
+  be trusted and `search_path`-pinned (they are). Business logic living in SQL neither operator reads
+  easily was already accepted in `D-1.03-3`.
+- **Links:** `supabase/migrations/*_schema.sql` · `*_create_order.sql` · `tests/rls/anon-access.test.ts`
+
+### D-1.03-10 · 2026-07-15 · Trimmed the local Supabase stack in config.toml
+- **Status:** Accepted
+- **Context:** 8 GB host, 4 GB Colima VM. The full default local stack (Studio, Realtime, Storage,
+  Analytics = Logflare + Vector, email, edge runtime) is heavy and **none** of it is exercised by the
+  data-layer tests, which need only Postgres + PostgREST + the API gateway.
+- **Decision:** Disable `studio`, `realtime`, `storage`, `local_smtp`, `edge_runtime`, and `analytics`
+  in `supabase/config.toml`. Keep `db`, `api`, and `auth`.
+- **Alternative rejected:** Run the full default stack (risks memory pressure / swap on 8 GB while the
+  host also runs the Next build + Vitest).
+- **Downside accepted:** A later phase that needs Storage/Realtime/Studio locally must re-enable them
+  in the committed `config.toml`. No effect on hosted Supabase (1.07).
+- **Links:** `supabase/config.toml`
+
+### D-1.03-11 · 2026-07-15 · Error vocabulary via custom SQLSTATE `TR001`–`TR005` (not PostgREST `PT###`)
+- **Status:** Accepted
+- **Context:** Callers must switch on a machine identifier, not a human message (brief §3). PostgREST
+  surfaces the PL/pgSQL SQLSTATE as `error.code`, but its `PT<nnn>` convention hijacks `nnn` as the
+  **HTTP status** — a code below 100 (`PT001`, `PT004`, …) produces an invalid HTTP response that
+  Node's `fetch` rejects with "fetch failed". Verified empirically against the running stack.
+- **Decision:** Raise a distinct custom SQLSTATE per failure — `TR001` drop_not_found, `TR002`
+  drop_not_open, `TR003` quantity_cap_violated, `TR004` insufficient_stock, `TR005` duplicate_phone —
+  surfaced as `error.code` (all HTTP 400). The message mirrors the identifier for logs. Documented in
+  the migration header and `src/lib/orders/order-errors.ts`.
+- **Alternative rejected:** PostgREST's `PT<http-status>` codes (semantic HTTP but the distinct
+  identifier collapses onto shared statuses like 409, and any `PT<100>` breaks the response entirely);
+  matching `error.message` strings (the brief forbids matching human-readable messages).
+- **Downside accepted:** All five business errors are HTTP 400 rather than semantically-varied 4xx.
+  1.04's server action switches on `error.code`, not the HTTP status, so this is immaterial there.
+- **Links:** `supabase/migrations/*_create_order.sql` · `src/lib/orders/order-errors.ts`
+
+### D-1.03-12 · 2026-07-15 · Tests use a direct Postgres admin connection for arrange/assert
+- **Status:** Accepted
+- **Context:** The suites must reset stock, clear orders, backdate a hold, and read internal state.
+  Doing that through `service_role` would require granting it direct table writes — widening the
+  privileged surface and contradicting "every write goes through the functions" (`D-1.03-9`).
+- **Decision:** The suites use a direct Postgres connection (`postgres` npm lib, `SUPABASE_DB_URL` =
+  the local superuser URL) for setup/teardown/asserts, while the **behaviour under test** is driven
+  only through the anon/`service_role` supabase-js clients (RPC + REST). `SUPABASE_DB_URL` is
+  local/test-only, lives in gitignored `.env.local`, and its **name** is documented in `.env.example`.
+- **Alternative rejected:** Grant `service_role` INSERT/UPDATE for test setup (reintroduces direct
+  stock writes in the privileged role); ship test-only helper RPCs (extra SQL surface in production).
+- **Downside accepted:** These are DB-integration tests, not pure units — they require a live local
+  stack and a superuser DB URL that exists only locally. Adds a devDependency (`postgres`).
+- **Links:** `tests/helpers/db.ts` · `.env.example`

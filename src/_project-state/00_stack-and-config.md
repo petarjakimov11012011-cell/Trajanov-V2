@@ -21,8 +21,8 @@ Code fills it with what actually installed.
 | **Animation** | Motion | `12.42.2` | The countdown and the drop reveal are the product. |
 | **Icons** | Lucide | `lucide-react 1.24.0` | MIT. Pairs with shadcn. |
 | **i18n** | next-intl | `4.13.2` | MK/EN with real indexed URLs. |
-| **Database** | **Supabase (Postgres)** | *1.03* | **The reason `D-0-5` works.** Atomic stock decrement — two people cannot buy the last shirt. Free tier is far beyond this scale. |
-| **Orders** | Server Actions → Supabase | *1.03* | The order lands in a table Vladimir can work from, not an inbox he has to excavate. |
+| **Database** | **Supabase (Postgres)** | CLI `2.109.1` · `supabase-js 2.110.5` — **local only** (`D-1.03-5`) | **The reason `D-0-5` works.** Atomic stock decrement — two people cannot buy the last shirt. Free tier is far beyond this scale. Schema + `create_order()`/`expire_reservations()` live in `supabase/migrations/`. |
+| **Orders** | Server Actions → Supabase | `create_order()` RPC + typed clients landed 1.03; server action 1.04 | The order lands in a table Vladimir can work from, not an inbox he has to excavate. |
 | **Email** | Resend | *1.07* | Order notification + customer confirmation. Free to 3,000/month — unreachable here. **A side channel, never the record.** |
 | **Bot protection** | Cloudflare Turnstile | *1.04* | Free, invisible. **Not optional** — see the COD risk below. |
 | **Products / drop config** | Typed files in-repo | *1.04* | No CMS (`D-0-4`). 3–5 products per drop; each drop is a small deploy. |
@@ -84,6 +84,7 @@ If a free tier is ever outgrown, that is a decision entry and a phase — never 
 | `NEXT_PUBLIC_SUPABASE_URL` | client + server | Vercel |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client | Vercel |
 | `SUPABASE_SERVICE_ROLE_KEY` | **server only — never expose** | Vercel |
+| `SUPABASE_DB_URL` | **local/test only** — Vitest DB suites (`D-1.03-12`) | `.env.local` (not a hosted var) |
 | `RESEND_API_KEY` | server | Vercel |
 | `ORDER_NOTIFICATION_EMAIL` | server | Vercel |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | client | Vercel |
@@ -105,3 +106,4 @@ Append. Never rewrite.
 | 2026-07-14 | 1.01 | Scaffolded. Pinned: `next 16.2.10`, `react/react-dom 19.2.4`, `typescript 5.9.3`, `tailwindcss 4.3.2` + `@tailwindcss/postcss 4.3.2`, `shadcn 4.13.0`, `motion 12.42.2`, `lucide-react 1.24.0`, `next-intl 4.13.2`. shadcn support deps: `@base-ui/react 1.6.0`, `class-variance-authority 0.7.1`, `clsx 2.1.1`, `tailwind-merge 3.6.0`, `tw-animate-css 1.4.0`. **Toolchain: Node `v24.17.0`, npm `11.13.0`.** | Claude Code |
 | 2026-07-14 | 1.01 | **shadcn default style is now `base-nova`, built on `@base-ui/react`, not Radix** — the "(Radix)" note in the stack table is historical. Kept the default per brief. See `D-1.01-1`. | Claude Code |
 | 2026-07-15 | 1.02 | **No new npm deps.** Fonts **Rubik** (display) + **Inter** (body) added via `next/font/google` (self-hosted at build, `cyrillic` subset) — SIL OFL, commercial web use OK; no runtime Google request (portability + privacy). `brand.md` filled and wired into `globals.css` as a **dark-only** theme (shadcn semantic vars remapped onto brand tokens; no light mode). See `D-1.02-1/2/3`. | Claude Code |
+| 2026-07-15 | 1.03 | **Data layer (local only, no deploy — `D-1.03-5`).** Toolchain added: **Supabase CLI `2.109.1`** (Homebrew), local Docker via **Colima `0.10.3`** + **Lima `2.1.4`** + **docker CLI `29.6.1`** instead of Docker Desktop (`D-1.03-8`; server: Docker `29.5.2`, Ubuntu 24.04). npm deps: **`@supabase/supabase-js 2.110.5`** (runtime), **`server-only 0.0.1`** (runtime — makes `server.ts` a build error in client code), **`vitest 4.1.10`** + **`postgres 3.4.9`** (dev — DB integration tests, `D-1.03-12`). New scripts: `test` = `vitest run`; `gen:types` = `supabase gen types typescript --local > src/types/database.ts`. `supabase init` created `supabase/config.toml`; **trimmed for an 8 GB host** — `studio/realtime/storage/local_smtp/edge_runtime/analytics` disabled, `db/api/auth` kept (`D-1.03-10`). New env names (values in gitignored `.env.local`): `SUPABASE_DB_URL` (local/test-only). `major_version = 17` (local Postgres). Known: 2 moderate `npm audit` advisories in `postcss@8.4.31` (transitive via `next@16.2.10`, build-time; pre-existing, not introduced here; "fix" downgrades Next to 9.3.3 — not applied). | Claude Code |
