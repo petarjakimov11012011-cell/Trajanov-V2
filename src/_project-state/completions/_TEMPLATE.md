@@ -1,6 +1,6 @@
 # Completion report — Part X Phase YY: <name>
 
-> **Copy this file to `Part-X-Phase-YY.md` and fill it in. Do not edit the template itself.**
+> **Copy this file to `Part-X-Phase-YY-Completion.md` and fill it in. Do not edit the template itself.**
 >
 > The orchestrator **fetches this file by raw GitHub URL** — it does not get pasted into chat.
 > Write it for a reader who was not there and has no memory of the work.

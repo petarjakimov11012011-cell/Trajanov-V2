@@ -6,11 +6,17 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-15** · By: **Claude Code (Phase 1.04 — drop engine)**
+Last updated: **2026-07-15** · By: **Claude Code (Phase 1.05 — About + Contact)**
 
 ---
 
 ## Status
+
+**About + Contact landed (Phase 1.05).** Two **static** editorial pages (`about/`, `contact/`) join the
+tree, plus the two root planning docs the operator committed (`Trajanov-V2-Plan.md`,
+`Trajanov-V2-Phase-Plan.md` — `D-1.05-1`). `src/lib/social.ts` gained the phone constants; the footer
+and Home each gained a couple of links. No `src/lib/{drop,orders}`, `src/config/`, `supabase/`, or
+`tests/` file changed. See the 1.04 note below for the drop engine.
 
 **Drop engine landed (Phase 1.04).** The catalogue, countdown, and buy path are now driven by the
 **database, on the server** — `src/lib/demo.ts` is deleted. The tree below is the real on-disk
@@ -53,6 +59,8 @@ Carried from 1.01: `src/i18n/` (routing/request/navigation) and `src/proxy.ts` (
 | `brand.md` | Design tokens — **only source** (root) |
 | `Decisions.md` | Append-only decision log (root) |
 | `CLAUDE.md` | Code's standing rules (root) |
+| `Trajanov-V2-Plan.md` | Aspirational build plan (root). Live code wins on conflict. Committed 1.05 (`D-1.05-1`). |
+| `Trajanov-V2-Phase-Plan.md` | Phase-by-phase plan (root). Live status lives in `current-state.md`. Committed 1.05 (`D-1.05-1`). |
 
 ---
 
@@ -66,6 +74,8 @@ Trajanov-V2/
 ├── facts.md                        # verified facts — only source
 ├── brand.md                        # design tokens — only source (SEED — filled 1.02)
 ├── Decisions.md                    # append-only decision log
+├── Trajanov-V2-Plan.md             # aspirational build plan (root, committed 1.05) — live code wins
+├── Trajanov-V2-Phase-Plan.md       # phase-by-phase plan (root, committed 1.05) — status in current-state.md
 ├── README.md                       # short. points at the docs. no spec.
 ├── .env.example                    # KEY NAMES ONLY — never values
 ├── .gitignore                      # covers .env* (with !.env.example) — verified in 1.01
@@ -97,7 +107,9 @@ Trajanov-V2/
 │   │   ├── globals.css              # brand.md tokens + shadcn semantic map (dark-only)
 │   │   └── [locale]/               # mk (default, /) | en (/en/)
 │   │       ├── layout.tsx           # <html>, Rubik+Inter fonts, header/footer, provider
-│   │       ├── page.tsx             # home → HomeExperience (countdown / LIVE)
+│   │       ├── page.tsx             # home → HomeExperience (countdown / LIVE) + Home→About link (1.05)
+│   │       ├── about/page.tsx       # STATIC — press story, facts.md §3/§4; setRequestLocale (1.05)
+│   │       ├── contact/page.tsx     # STATIC — phone/IG + email placeholder, no form/address (1.05)
 │   │       ├── catalog/page.tsx     # drop grid
 │   │       ├── catalog/[slug]/page.tsx  # product page
 │   │       ├── cart/page.tsx        # cart at 2-unit cap
@@ -123,7 +135,7 @@ Trajanov-V2/
 │   │
 │   ├── lib/
 │   │   ├── utils.ts                 # cn() — shadcn helper
-│   │   ├── social.ts                # facts-backed IG handle/URL (1.04; moved off the deleted demo.ts)
+│   │   ├── social.ts                # facts-backed public contact constants: IG handle/URL + phone (1.04/1.05)
 │   │   ├── format.ts                # formatMkd() price formatter (1.04)
 │   │   ├── supabase/
 │   │   │   ├── client.ts            # browser client, anon key (1.03)
@@ -150,8 +162,8 @@ Trajanov-V2/
 │   │   └── index.ts                 # joins drops+products; re-exports config surface
 │   │
 │   ├── messages/
-│   │   ├── mk.json                  # default language — all 1.02 UI strings
-│   │   └── en.json                  # EN parity
+│   │   ├── mk.json                  # default language — UI strings + About/Contact namespaces (1.05)
+│   │   └── en.json                  # EN parity (identical key sets — verified)
 │   │
 │   └── types/
 │       ├── drop.ts                  # DropState, StockLevel, ProductView/SizeOption (1.04; demo shapes retired)
@@ -237,4 +249,5 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-14 | 1.01 | Replaced the intended tree with the real on-disk tree. Scaffolded Next.js/TS/Tailwind/shadcn/next-intl. Added `src/i18n/` + `src/proxy.ts` (not in the kickoff sketch). Route folders deferred to 2.01. | Claude Code |
 | 2026-07-15 | 1.02 | Added routes (`catalog`, `catalog/[slug]`, `cart`, `checkout`, `styleguide`), component dirs `{system,cart,checkout,layout,home}`, `lib/demo.ts`, `types/drop.ts`, and the committed handover. Filled `globals.css` from `brand.md`; loaded Rubik+Inter. Non-localised slugs (2.01 localises). `D-1.02-4/5/6`. | Claude Code |
 | 2026-07-15 | 1.03 | Added `supabase/` (config.toml, seed.sql, 3 migrations), `src/lib/supabase/{client,server}.ts`, `src/lib/orders/order-errors.ts`, `src/types/database.ts` (generated), `tests/` suites + `tests/{setup.ts,helpers/db.ts}`, `vitest.config.ts`. Removed now-stale `.gitkeep` from `supabase/migrations`, `tests/concurrency`, `src/lib/{supabase,orders}`, `src/types`. **Zero change under `src/app`/`src/components`/`src/messages`.** `D-1.03-*`. | Claude Code |
+| 2026-07-15 | 1.05 | Added `src/app/[locale]/{about,contact}/page.tsx` (both STATIC via `setRequestLocale`). Added `Trajanov-V2-Plan.md` + `Trajanov-V2-Phase-Plan.md` at root (operator-committed, `D-1.05-1`) + to reserved paths. Extended `src/lib/social.ts` (phone constants). Modified `SiteFooter.tsx` (About/Contact links + translated location + phone import), `HomeExperience.tsx` (Home→About link in countdown/ended), `src/messages/{mk,en}.json` (About/Contact/Nav/Placeholder keys), `completions/_TEMPLATE.md` (filename fix). **No `src/lib/{drop,orders}`, `src/config/`, `supabase/`, `tests/` change.** `D-1.05-*`. | Claude Code |
 | 2026-07-15 | 1.04 | Added `src/config/` (5 files), `src/lib/drop/state.ts`, `src/lib/orders/{process-order,actions,phone}.ts`, `src/lib/rate-limit/{hash,ip}.ts`, `src/lib/turnstile/verify.ts`, `src/lib/{social,format}.ts`, `scripts/{sync-core,sync-drop}.ts`, 4 migrations, `src/components/checkout/Turnstile.tsx`, `src/components/system/DevPreviewSwitch.tsx`, 6 test files under `tests/{config,orders}/`. **Deleted** `src/lib/demo.ts` and `src/components/checkout/TurnstilePlaceholder.tsx`. Rewired `src/app/[locale]/{page,catalog,catalog/[slug],checkout,styleguide}` + several components to real DB data. Removed `.gitkeep` from `src/config`, `src/lib/{drop,rate-limit}`. `D-1.04-*`. | Claude Code |

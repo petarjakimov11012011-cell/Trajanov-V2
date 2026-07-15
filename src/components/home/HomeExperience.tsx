@@ -65,6 +65,12 @@ export function HomeExperience({view}: {view: DropView | null}) {
             {t('headline')}
           </h1>
           <p className="text-muted-foreground max-w-md text-balance">{t('sub')}</p>
+          <Link
+            href="/about"
+            className="text-muted-foreground hover:text-foreground text-small underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:underline"
+          >
+            {t('aboutLink')} →
+          </Link>
         </section>
       ) : (
         <section className="flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center">
@@ -92,6 +98,12 @@ export function HomeExperience({view}: {view: DropView | null}) {
                 className="text-mustard hover:text-mustard-hover font-display font-semibold underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:underline"
               >
                 {t('browseWhileWait')} →
+              </Link>
+              <Link
+                href="/about"
+                className="text-muted-foreground hover:text-foreground text-small underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:underline"
+              >
+                {t('aboutLink')} →
               </Link>
             </>
           )}

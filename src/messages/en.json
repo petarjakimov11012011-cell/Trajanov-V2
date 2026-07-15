@@ -3,6 +3,9 @@
     "home": "Home",
     "catalog": "Catalog",
     "cart": "Cart",
+    "about": "About",
+    "contact": "Contact",
+    "location": "Strumica, North Macedonia",
     "brand": "TRAJANOV"
   },
   "Home": {
@@ -12,7 +15,29 @@
     "headline": "When the timer hits zero, the drop is live.",
     "sub": "3 to 5 pieces. Real, limited stock. Cash on delivery.",
     "browseWhileWait": "Browse while you wait",
+    "aboutLink": "First place in a design competition",
     "opening": "Opening…"
+  },
+  "About": {
+    "eyebrow": "Strumica · 2026",
+    "h1": "One brand, one designer.",
+    "body1": "Trajanov is a clothing brand from Strumica, founded in 2026. One person runs it: Vladimir Trajanov, founder and designer. He’s a student at SOU “Nikola Karev” in Strumica, training as a clothing design technician. No team. The brand makes oversized unisex t-shirts.",
+    "body2": "In June 2026, Vladimir won first place in a t-shirt design competition for secondary-school students from the fashion and textile schools of North Macedonia. It was organised by Kreativen den, Božilović produkcija, SOU “Taki Daskalo” and the textile company EAM of Štip, and judged by a professional jury of representatives from Kreativen den and EAM. The aim was to let students show their ideas and talent through visual expression, and to give them a reference for a professional portfolio.",
+    "body3": "The prize was 30 t-shirts made with his design, plus a visit to the EAM factory. Trajanov sells in drops of 3 to 5 pieces, with real, limited stock. Shipping within North Macedonia only, cash on delivery.",
+    "quote": "“My plan is to start my own brand with the prize from EAM.”",
+    "quoteAttribution": "Vladimir Trajanov, Trn.mk, 12 June 2026",
+    "quoteNote": "Translated from Macedonian",
+    "pressHeading": "In the press",
+    "toCatalog": "Browse the catalog"
+  },
+  "Contact": {
+    "eyebrow": "Contact",
+    "h1": "Get in touch.",
+    "phoneLabel": "Phone",
+    "instagramLabel": "Instagram",
+    "instagramNote": "Drops are announced here. This is the main channel.",
+    "emailLabel": "Email",
+    "context": "Strumica, North Macedonia · Ships within North Macedonia only · Cash on delivery."
   },
   "Drop": {
     "days": "DAYS",
@@ -114,6 +139,7 @@
     "price": "[PLACEHOLDER: price MKD]",
     "sizesSample": "sizes — sample, pending Vladimir",
     "composition": "[PLACEHOLDER: composition & care — from the label]",
+    "email": "[PLACEHOLDER: email — Vladimir]",
     "notice": "Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase."
   },
   "Styleguide": {
