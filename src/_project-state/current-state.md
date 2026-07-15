@@ -1,4 +1,4 @@
-NEXT: 1.03 — Data layer (Supabase schema + atomic stock)
+NEXT: 1.04 — Drop engine (config→DB sync, server drop-state, schedule expire_reservations, Turnstile, IP rate-limit)
 
 # Current state — Trajanov-V2
 
@@ -6,27 +6,35 @@ NEXT: 1.03 — Data layer (Supabase schema + atomic stock)
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-15** · By: **Claude Code (Phase 1.02 — design system)**
+Last updated: **2026-07-15** · By: **Claude Code (Phase 1.03 — data layer)**
 
 ---
 
 ## Status
 
-**Design system built + full clickable site.** `brand.md` is filled (palette derived from the
-handover ledger, verified WCAG 2.2 AA pair-by-pair; type Rubik + Inter, Cyrillic-checked) and wired
-into `globals.css`. All 10 handover components are built with every state, and every mockup screen is
-a real route — home (countdown + LIVE), catalog, product, cart-at-cap, checkout, plus `/styleguide`.
-MK default + EN parity; live ticking countdown. **No real data yet:** stock/drop/order truth is
-server-side and deferred to 1.03/1.04; product data is placeholder pending Vladimir. Rendered and
-verified in-browser (desktop + 375px mobile). Branch `phase-1.02-design-system`; PR to `main`.
+**Data layer landed — "SOLD OUT" is now true, server-side.** Postgres schema (`drops` → `products`
+→ `variants`, with stock **per size**; `orders` → `order_items`, the order *is* the reservation).
+`create_order()` decrements stock with a **single conditional UPDATE** (never read-then-write), in
+deterministic variant order (no deadlocks), and enforces the drop window (`D-1.03-7`), the 1–2 unit
+cap, and one-live-order-per-phone-per-drop. `expire_reservations()` releases lapsed holds and returns
+stock **exactly once**, safe under concurrency. RLS: orders/order_items are **deny-all** to anon;
+catalog is read-only public; the two functions are `service_role`-only. Typed clients shipped
+(`client.ts` anon, `server.ts` service-role behind `import "server-only"`), types generated.
+**13 Vitest tests pass — including the gate: 10 orders vs 3 units → exactly 3 succeed, 7
+insufficient_stock, stock 0** (watched failing against a naive read-then-write first). **Local only:
+no hosted Supabase, no deploy (`D-1.03-5`); Docker via Colima (`D-1.03-8`). Zero UI change.** Branch
+`phase-1.03-data-layer`; PR to `main`.
+
+Prior (1.02): design system + full clickable site, MK default + EN, all product data placeholder
+(`src/lib/demo.ts`, throwaway — dies in 1.04).
 
 | | |
 |---|---|
 | Part | 1 of 2 — Build |
-| Phase | 1.02 complete — PR open |
-| Branch | `phase-1.02-design-system` |
-| Open PR | `#2` → `main` (1.01 `#1` merged) |
-| Deployed | nowhere |
+| Phase | 1.03 complete — PR open |
+| Branch | `phase-1.03-data-layer` |
+| Open PR | `#3` → `main` (1.01 `#1`, 1.02 `#2` merged) |
+| Deployed | nowhere — Supabase runs **local only** (`D-1.03-5`) |
 | Domain | `trajanov.com` — **not purchased** |
 
 ---
@@ -41,6 +49,24 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### Data layer (1.03) — Supabase, local only
+
+- **Schema** (`supabase/migrations/`): `drops`, `products`, `variants` (stock per size, `stock >= 0`
+  backstop), `orders` (enum `order_status`, `TRJ-####` sequence, phone `^\+389\d{8}$` — `TODO(2.02)`,
+  partial unique index for one-live-order-per-phone-per-drop, expiry-sweep index), `order_items`
+  (qty 1–2, `unit_price_mkd` **price snapshot**). Every table commented.
+- **`create_order()`** — the only path that creates an order. Atomic conditional decrement, sorted by
+  `variant_id`, drop-window + cap + duplicate-phone enforcement. Distinct error codes `TR001`–`TR005`
+  on `error.code` (`src/lib/orders/order-errors.ts`); `D-1.03-11`.
+- **`expire_reservations()`** — releases lapsed holds, returns stock exactly once, concurrency-safe
+  (`FOR UPDATE SKIP LOCKED` + conditional claim). Ships now; **scheduling is 1.04** (`D-1.03-6`).
+- **RLS + grants**: catalog read-only public; `orders`/`order_items` deny-all; functions
+  `service_role`-only (`SECURITY DEFINER`, execute revoked from `PUBLIC`; `D-1.03-9`).
+- **Typed clients**: `src/lib/supabase/client.ts` (anon), `server.ts` (service-role + `server-only`),
+  generated `src/types/database.ts` (`npm run gen:types`).
+- **Tests** (`npm test`, Vitest): 13 pass — oversell gate, expiry (incl. concurrent double-return),
+  anon RLS wall, drop window + full error vocabulary.
 
 ### Design tokens
 - **`brand.md` filled** (source of truth) and mirrored into `src/app/globals.css`: full dark palette
@@ -73,7 +99,7 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 
 | Integration | Status |
 |---|---|
-| Supabase | Not created |
+| Supabase | **Local only (Docker/Colima)** — schema + `create_order` + `expire_reservations` + RLS + 13 tests. **No hosted project** (1.07). |
 | Resend | Not created |
 | Turnstile | **Placeholder UI only** (real widget 1.04) |
 | Cloudflare DNS | Not configured |
@@ -92,10 +118,16 @@ or before any phase that builds on unverified work, the next phase is a verifica
 |---|---|---|---|
 | 1 | **Design direction sign-off.** Palette + fonts were *derived* from the handover ledger, not from a delivered filled `brand.md` (`D-1.02-1`). Lazar must eyeball the rendered site and approve/adjust the tokens. | 1.02 | Lazar review of PR `#2` |
 | 2 | **IG profile URL click-test.** `@trajanovv2026` handle is VERIFIED but the URL must be click-tested live before it ships (`facts.md` §6). It now appears in the footer + drop-ended banner. | 1.02 | Before cutover (2.05) |
+| 3 | **Fresh-session review of PR `#3`** (`D-0-3`). A Claude Code session that did **not** write this code reviews the PR against the 1.03 brief before merge. **This is a downgrade on a real automated review gate**, not an equal substitute — it is the one replacement item with a chance of catching a concurrency bug the operators cannot. Clears at merge. | 1.03 | Fresh Claude Code session, pre-merge |
+| 4 | **Migrations / RLS / keys unproven against *hosted* Supabase** (`D-1.03-5`). Everything is proven only against local Supabase (Colima). Hosted settings, extensions, and real keys may differ; the RLS wall and `create_order`/`expire_reservations` must be re-confirmed on the real project. | 1.03 | 1.07 (hosted project) |
 
-*Code verified directly (not owed): build/lint/types green; all pages rendered in-browser (desktop
-+ 375px mobile); Cyrillic checked at display size; every contrast pair computed against AA. At 2
-items — below the 3-item threshold that would force a verification phase.*
+*Code verified directly (not owed): `supabase db reset` clean from scratch; `npm run build`,
+`npx tsc --noEmit`, `npm run lint`, `npm test` (13) all green; the 10-vs-3 concurrency gate proven
+(and watched failing against a naive impl first); `server-only` guard proven by a failing build.*
+
+*Register is now at **4 items** (was 2), crossing the 3-item line. But #3 clears at merge and #4 is
+deferred to 1.07 **by design** (`D-1.03-5`) — neither is shaky work 1.04 builds on. Orchestrator to
+decide whether any 1.04 scope becomes verification; nothing here blocks starting 1.04.*
 
 ---
 
