@@ -6,25 +6,27 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-14** · By: **Claude Code (Phase 1.01 — scaffold)**
+Last updated: **2026-07-15** · By: **Claude Code (Phase 1.02 — design system)**
 
 ---
 
 ## Status
 
-**Scaffold built (Phase 1.01).** The tree below is the **real on-disk structure**, not an intended
-template. Two things to know when reading it:
+**Design system + full clickable site (Phase 1.02).** The tree below is the **real on-disk
+structure**. Notes:
 
-- **Route folders are not created yet.** Catalogue, product, cart, checkout, about, contact and
-  legal routes are Phase 2.01 (localised slugs) and later. Only the `[locale]/` home placeholder
-  exists.
-- **Feature directories are reserved and empty** (`.gitkeep`): `src/components/{drop,product,ui}`,
-  `src/lib/{supabase,drop,orders,email,rate-limit}`, `src/config`, `src/types`,
-  `public/images/{products,lifestyle}`, `supabase/migrations`, `tests/concurrency`,
-  `docs/design-handovers`. They fill in their phases.
+- **Route folders now exist** for the visual pass: `catalog/`, `catalog/[slug]/`, `cart/`,
+  `checkout/`, `styleguide/` under `app/[locale]/`. These use **non-localised slugs** — localised
+  path slugs (katalog|catalog, …) are still Phase 2.01 (`D-1.02-4`).
+- **New component dirs beyond the reserved three** (`D-1.02-6`): `components/{system,cart,checkout,
+  layout,home}`. `components/ui/` is still shadcn-reserved and empty (brand components hand-authored).
+- **Still reserved and empty** (`.gitkeep`): `src/lib/{supabase,drop,orders,email,rate-limit}`,
+  `src/config`, `public/images/{products,lifestyle}`, `supabase/migrations`, `tests/concurrency`.
+- **`src/lib/demo.ts` + `src/types/drop.ts`** are new: placeholder demo drop data + shared UI types
+  for the 1.02 pass (`D-1.02-5`); the real typed drop config replaces `demo.ts` in 1.04.
+- The Phase 1.02 handover is committed at `docs/design-handovers/Part-1-Phase-02-Handover.md`.
 
-Added beyond the kickoff sketch (next-intl needs them): `src/i18n/` (routing/request/navigation)
-and `src/proxy.ts` (the i18n request handler — `proxy`, not `middleware`; `D-1.01-2`).
+Carried from 1.01: `src/i18n/` (routing/request/navigation) and `src/proxy.ts` (`D-1.01-2`).
 
 ---
 
@@ -67,7 +69,8 @@ Trajanov-V2/
 ├── briefs/
 │   └── Part-1-Phase-01-Code.md     # this phase's brief
 ├── docs/
-│   └── design-handovers/           # .gitkeep — handovers land per UI phase
+│   └── design-handovers/
+│       └── Part-1-Phase-02-Handover.md  # current UI spec — read before UI work
 │
 ├── src/
 │   ├── _project-state/
@@ -79,10 +82,15 @@ Trajanov-V2/
 │   │
 │   ├── app/
 │   │   ├── favicon.ico
-│   │   ├── globals.css              # Tailwind + shadcn theme (defaults)
+│   │   ├── globals.css              # brand.md tokens + shadcn semantic map (dark-only)
 │   │   └── [locale]/               # mk (default, /) | en (/en/)
-│   │       ├── layout.tsx           # <html>, fonts, NextIntlClientProvider
-│   │       └── page.tsx             # placeholder home
+│   │       ├── layout.tsx           # <html>, Rubik+Inter fonts, header/footer, provider
+│   │       ├── page.tsx             # home → HomeExperience (countdown / LIVE)
+│   │       ├── catalog/page.tsx     # drop grid
+│   │       ├── catalog/[slug]/page.tsx  # product page
+│   │       ├── cart/page.tsx        # cart at 2-unit cap
+│   │       ├── checkout/page.tsx    # one-screen checkout
+│   │       └── styleguide/page.tsx  # component-state strip (review aid)
 │   │
 │   ├── i18n/                        # next-intl config (added 1.01)
 │   │   ├── routing.ts               # locales, defaultLocale, as-needed prefix
@@ -92,12 +100,18 @@ Trajanov-V2/
 │   ├── proxy.ts                     # next-intl request handler (D-1.01-2)
 │   │
 │   ├── components/                  # one component per file, PascalCase
-│   │   ├── ui/                     # .gitkeep — shadcn-generated (none yet)
-│   │   ├── drop/                   # .gitkeep — Countdown, DropState, StockBadge
-│   │   └── product/                # .gitkeep — ProductCard, Gallery, SizePicker
+│   │   ├── ui/                     # .gitkeep — shadcn-reserved, still empty
+│   │   ├── drop/                   # Countdown, DropBanner, StockBadge
+│   │   ├── product/                # ProductCard, BuyButton, SizePicker
+│   │   ├── cart/                   # CartView
+│   │   ├── checkout/               # CheckoutField, CheckoutForm, TurnstilePlaceholder
+│   │   ├── layout/                 # SiteHeader, SiteFooter, LanguageSwitch
+│   │   ├── home/                   # HomeExperience
+│   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice
 │   │
 │   ├── lib/
 │   │   ├── utils.ts                 # cn() — shadcn helper
+│   │   ├── demo.ts                  # PLACEHOLDER demo drop data (1.02) — replaced by config in 1.04
 │   │   ├── supabase/               # .gitkeep — client + server (1.03)
 │   │   ├── drop/                   # .gitkeep — state calc, reservations — SERVER ONLY
 │   │   ├── orders/                 # .gitkeep — order creation, atomic decrement
@@ -107,10 +121,11 @@ Trajanov-V2/
 │   ├── config/                     # .gitkeep — drops.ts, products.ts (1.04)
 │   │
 │   ├── messages/
-│   │   ├── mk.json                  # default language (stub)
-│   │   └── en.json                  # stub
+│   │   ├── mk.json                  # default language — all 1.02 UI strings
+│   │   └── en.json                  # EN parity
 │   │
-│   └── types/                      # .gitkeep
+│   └── types/
+│       └── drop.ts                  # DropState, StockLevel, DemoProduct/Size
 │
 ├── public/
 │   └── images/
@@ -159,3 +174,4 @@ On every phase that adds, moves, or deletes a file:
 |---|---|---|---|
 | 2026-07-14 | — | Template seeded at kickoff. Nothing built. | Claude Chat |
 | 2026-07-14 | 1.01 | Replaced the intended tree with the real on-disk tree. Scaffolded Next.js/TS/Tailwind/shadcn/next-intl. Added `src/i18n/` + `src/proxy.ts` (not in the kickoff sketch). Route folders deferred to 2.01. | Claude Code |
+| 2026-07-15 | 1.02 | Added routes (`catalog`, `catalog/[slug]`, `cart`, `checkout`, `styleguide`), component dirs `{system,cart,checkout,layout,home}`, `lib/demo.ts`, `types/drop.ts`, and the committed handover. Filled `globals.css` from `brand.md`; loaded Rubik+Inter. Non-localised slugs (2.01 localises). `D-1.02-4/5/6`. | Claude Code |

@@ -1,4 +1,4 @@
-NEXT: 1.02 — Design system
+NEXT: 1.03 — Data layer (Supabase schema + atomic stock)
 
 # Current state — Trajanov-V2
 
@@ -6,23 +6,26 @@ NEXT: 1.02 — Design system
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-14** · By: **Claude Code (Phase 1.01 — scaffold)**
+Last updated: **2026-07-15** · By: **Claude Code (Phase 1.02 — design system)**
 
 ---
 
 ## Status
 
-**Scaffold built.** Next.js (App Router) + TypeScript + Tailwind + shadcn/ui + next-intl + Motion +
-Lucide are installed, pinned, and wired. The app builds clean and serves a bilingual placeholder
-home (MK at `/`, EN at `/en/`). No real pages, no data layer, no drop engine yet. Branch
-`phase-1.01-scaffold` pushed; PR open to `main`, awaiting review + merge.
+**Design system built + full clickable site.** `brand.md` is filled (palette derived from the
+handover ledger, verified WCAG 2.2 AA pair-by-pair; type Rubik + Inter, Cyrillic-checked) and wired
+into `globals.css`. All 10 handover components are built with every state, and every mockup screen is
+a real route — home (countdown + LIVE), catalog, product, cart-at-cap, checkout, plus `/styleguide`.
+MK default + EN parity; live ticking countdown. **No real data yet:** stock/drop/order truth is
+server-side and deferred to 1.03/1.04; product data is placeholder pending Vladimir. Rendered and
+verified in-browser (desktop + 375px mobile). Branch `phase-1.02-design-system`; PR to `main`.
 
 | | |
 |---|---|
 | Part | 1 of 2 — Build |
-| Phase | 1.01 complete — PR open, not yet merged |
-| Branch | `phase-1.01-scaffold` |
-| Open PR | `#1` → `main` |
+| Phase | 1.02 complete — PR open |
+| Branch | `phase-1.02-design-system` |
+| Open PR | `#2` → `main` (1.01 `#1` merged) |
 | Deployed | nowhere |
 | Domain | `trajanov.com` — **not purchased** |
 
@@ -39,23 +42,40 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 
 ## Built
 
-### Pages
-- Placeholder home at `/[locale]` (MK `/`, EN `/en/`) — brand name + neutral "coming soon". No
-  facts.md content. Real home is a later phase.
+### Design tokens
+- **`brand.md` filled** (source of truth) and mirrored into `src/app/globals.css`: full dark palette
+  (ground/surface/surface-2, foreground/muted, mustard + hover + on-mustard, accent red + on-accent,
+  live, soldout, error, border/border-strong, focus-ring, mustard tints), type scale, radius, shadow,
+  motion. **Every colour pair computed against WCAG 2.2 AA — all pass** (`brand.md` §3 ledger).
+- **Fonts:** Rubik (display) + Inter (body), OFL, self-hosted via `next/font` with the `cyrillic`
+  subset; MK glyphs verified at display size in-browser.
 
-### Components
-None. (`src/components/{ui,drop,product}/` are reserved, empty.)
+### Pages (MK default `/`, EN `/en/`)
+- **Home** `/[locale]` — hero countdown (loudest object; <1h + <1min thresholds + zero→LIVE) that
+  switches to the LIVE drop grid; a preview switcher mirrors the handover's demo buttons.
+- **Catalog** `/catalog` — 4-piece grid incl. a sold-out card.
+- **Product** `/catalog/[slug]` — buy path above the fold, detail below.
+- **Cart** `/cart` — shown at the 2-unit cap (disabled `+`, cap notice); remove to reach empty state.
+- **Checkout** `/checkout` — one screen, fields + error validation, Turnstile-resolving gate, COD.
+- **Styleguide** `/styleguide` — component-state strip + colour/type reference (review aid).
+
+### Components (all handover states)
+- `drop/` — Countdown, DropBanner (live/ended/countdown-eyebrow), StockBadge.
+- `product/` — ProductCard, BuyButton (6 states), SizePicker.
+- `cart/` — CartView (steppers, cap, empty). `checkout/` — CheckoutField, TurnstilePlaceholder,
+  CheckoutForm. `layout/` — SiteHeader, SiteFooter, LanguageSwitch. `system/` — Placeholder,
+  PhotoSlot, PreviewNotice. `home/` — HomeExperience. (`components/ui/` still shadcn-reserved, empty.)
 
 ### Integrations wired
-- **next-intl** — MK default (`/`), EN (`/en/`), `localePrefix: as-needed`; `src/i18n/*` +
-  `src/proxy.ts`. Stub messages only; full string extraction + hreflang is 2.01.
-- **shadcn/ui** — initialised (config + `cn()` helper); no components generated.
+- **next-intl** — MK default (`/`), EN (`/en/`), `localePrefix: as-needed`; message catalogs
+  expanded for all UI strings (full extraction/hreflang still 2.01).
+- **shadcn/ui** — config + `cn()` only; brand components hand-authored (`D-1.02-6`). No `ui/` yet.
 
 | Integration | Status |
 |---|---|
 | Supabase | Not created |
 | Resend | Not created |
-| Turnstile | Not created |
+| Turnstile | **Placeholder UI only** (real widget 1.04) |
 | Cloudflare DNS | Not configured |
 | Cloudflare Analytics | Not configured |
 | Vercel project | Not created |
@@ -70,10 +90,12 @@ or before any phase that builds on unverified work, the next phase is a verifica
 
 | # | Item | Owed since | Phase that verifies |
 |---|---|---|---|
-| — | *(empty)* | | |
+| 1 | **Design direction sign-off.** Palette + fonts were *derived* from the handover ledger, not from a delivered filled `brand.md` (`D-1.02-1`). Lazar must eyeball the rendered site and approve/adjust the tokens. | 1.02 | Lazar review of PR `#2` |
+| 2 | **IG profile URL click-test.** `@trajanovv2026` handle is VERIFIED but the URL must be click-tested live before it ships (`facts.md` §6). It now appears in the footer + drop-ended banner. | 1.02 | Before cutover (2.05) |
 
-*Scaffold outputs (build/lint/types green, routing served, PR open) were verified by Code directly
-— see the completion report. Nothing owed.*
+*Code verified directly (not owed): build/lint/types green; all pages rendered in-browser (desktop
++ 375px mobile); Cyrillic checked at display size; every contrast pair computed against AA. At 2
+items — below the 3-item threshold that would force a verification phase.*
 
 ---
 
@@ -84,7 +106,14 @@ blocker.**
 
 | # | Placeholder | Page | Waiting on | Owner |
 |---|---|---|---|---|
-| — | *(none yet — placeholder home carries no facts.md content)* | | | |
+| 1 | `[PLACEHOLDER: цена MKD]` (product price) | Catalog cards, Product, Cart, Checkout | Real MKD prices per drop | Vladimir |
+| 2 | `[PLACEHOLDER: фотографија — Владимир]` (product photo) | Catalog cards, Product | Real product photos (`D-0-6`) | Vladimir |
+| 3 | `[PLACEHOLDER: состав и нега — од етикетата]` (fabric/care) | Product | Composition from the labels | Vladimir |
+| 4 | Product **names** render as neutral slots ("Производ 01…"); sizes shown are a flagged **sample** | Catalog, Product | Real names + sizes/measurements | Vladimir |
+
+*All four are placeholder-by-design for the 1.02 visual pass and are driven by `src/lib/demo.ts`
+(throwaway). They are replaced by the real typed drop config in 1.04 and photos in 1.06. **The
+register must be empty before cutover (2.05).***
 
 **Already known to be coming** (from `facts.md`, will become entries the moment the relevant page
 is built):

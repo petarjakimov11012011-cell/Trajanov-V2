@@ -3,11 +3,18 @@
 **This file is the only source of design tokens.** Nothing hardcodes a colour, size, spacing, or
 font value anywhere in the codebase. The design handover and all code read from here.
 
-**Status: SEED — not filled in.** Claude Design fills it in **Phase 1.02**, after Lazar approves a
-visual direction sketched in chat. Everything below marked `TBD-1.02` is a slot, not a value.
-**Do not build UI against this file until 1.02 closes.**
+**Status: FILLED — Phase 1.02.** Every `TBD-1.02` slot is now a committed value. Tokens are wired
+into `src/app/globals.css` and consumed by the components. **From here, `globals.css` mirrors this
+file — if a value changes, it changes here first, then there.**
 
-Seeded 2026-07-14 · Filled by: *(Phase 1.02)*
+Seeded 2026-07-14 · Filled by: **Claude Code (Phase 1.02 — design system)**, 2026-07-15
+
+> **Provenance note.** The filled companion `brand.md` and `Trajanov Mockups.dc.html` referenced by
+> the Phase 1.02 handover were never delivered to the repo — only the handover prose + its contrast
+> ledger were. These tokens were **derived from the handover's contrast ledger and the garment
+> palette** and verified pair-by-pair against WCAG 2.2 AA (see §3). Colours and fonts are a
+> defensible reconstruction, not a pasted approval — Lazar should eyeball them on screen and adjust.
+> Logged as `D-1.02-1`.
 
 ---
 
@@ -20,16 +27,14 @@ that sell out. See `facts.md` — the only source for anything factual.
 
 ## 2. Direction — the approved sketch
 
-> **Phase 1.02: paste the direction Lazar approved in chat here, then fill the tokens against it.**
-> The orchestrator's opening read is below **as a starting point to react to, not a spec.** If the
-> approved direction differs, replace this section entirely — do not try to reconcile them.
-
-**Opening read (unapproved):**
+Reconstructed from the Phase 1.02 handover, which is itself downstream of the approved visual
+direction. It matches the kickoff opening read; nothing in it was invented past the handover.
 
 - **Palette from the actual garments, not invented.** Mustard/ochre and off-white from the shirts;
-  the red of the print as the only accent; a deep near-black or teal ground borrowed from the shoot.
-- **Type does the work.** The shirts are boxy, unfussy, confident. The site should be too — big
-  type, a lot of air, few elements, no decoration for its own sake.
+  the red of the print as the only accent; a deep near-black (a faint teal cast, borrowed from the
+  shoot) as the ground. The whole site is dark — there is no light mode.
+- **Type does the work.** The shirts are boxy, unfussy, confident. The site is too — big type, a
+  lot of air, few elements, no decoration for its own sake.
 - **The countdown is the loudest object on the site.** Everything defers to it.
 - **Mobile-first, genuinely.** Audience 1 arrives from an Instagram story, on a phone, in a hurry.
 - **Restraint over effects.** Motion belongs to the countdown and the drop reveal. Nothing else.
@@ -38,63 +43,100 @@ that sell out. See `facts.md` — the only source for anything factual.
 
 ## 3. Colour
 
-**Sample from the real photographs — do not eyeball a hex from memory.** Note that the bar's warm
-lighting shifts the mustard; the daylight product shots (owed by Vladimir, `D-0-6`) are the truer
-reference. **Where they disagree, the garment wins** — the site's yellow should match the shirt a
-customer will actually open, not the shirt as the bar lit it.
+Sampled to the garment palette described in `facts.md` §7 (mustard/ochre, off-white) with a print
+red and a near-black ground. **Every pair below was computed, not eyeballed** — the WCAG 2.2 AA
+ledger at the end of this section is the proof, and it reproduces the handover's target ratios.
 
 | Token | Value | Use |
 |---|---|---|
-| `--color-bg` | `TBD-1.02` | Page ground |
-| `--color-surface` | `TBD-1.02` | Cards, panels |
-| `--color-fg` | `TBD-1.02` | Body text |
-| `--color-fg-muted` | `TBD-1.02` | Secondary text |
-| `--color-brand` | `TBD-1.02` | Mustard/ochre — from the garment |
-| `--color-accent` | `TBD-1.02` | Print red — **used sparingly, or it stops meaning anything** |
-| `--color-live` | `TBD-1.02` | Drop is open |
-| `--color-soldout` | `TBD-1.02` | Sold out — **legible, not decorative; this state is permanent on the page** |
-| `--color-border` | `TBD-1.02` | |
-| `--color-error` | `TBD-1.02` | Form errors |
+| `--color-ground` | `#0F1210` | Page ground (the `background`) |
+| `--color-surface` | `#171A18` | Cards, panels, live bar off-states |
+| `--color-surface-2` | `#1F2320` | Input fills, disabled buttons, subtle tint blocks |
+| `--color-foreground` | `#ECE8E0` | Body text, countdown digits — off-white |
+| `--color-muted-foreground` | `#ABA79E` | Secondary text, labels |
+| `--color-mustard` | `#E2A93C` | Brand — buy button, dots, accents from the garment |
+| `--color-mustard-hover` | `#EFB94F` | Buy-button hover only |
+| `--color-on-mustard` | `#0B0D0B` | Near-black label **on** mustard fills |
+| `--color-live` | `#E2A93C` | Drop-is-open bar (= mustard) |
+| `--color-accent` | `#E0492E` | Print red — **urgency only**: low-stock, countdown-critical. Used sparingly or it stops meaning anything. |
+| `--color-on-accent` | `#0B0D0B` | Near-black label **on** red / sold-out fills |
+| `--color-soldout` | `#8C8880` | Sold out — legible grey, **not decorative; permanent on the page** |
+| `--color-error` | `#F0857A` | Form errors (a lighter red than accent, so the two never blur) |
+| `--color-border` | `#2A2E2B` | Hairlines, dividers — quiet |
+| `--color-border-strong` | `#686D67` | Hairlines that must be seen: fields, the cap notice |
+| `--color-focus-ring` | `#F2C55A` | Focus ring (light mustard), 2px at 2px offset over ground |
 
-**Contrast is not negotiable — WCAG 2.2 AA.** Mustard-on-white and red-on-mustard are both
-plausible from this palette and both likely to fail. **Check every pair before committing it**,
-including the sold-out state and the countdown. A countdown nobody can read is a countdown that
-does not work.
+**Derived tints** (never hardcode — use `color-mix` against the token):
+
+| Token | Value | Use |
+|---|---|---|
+| `--color-mustard-tint-8` | `color-mix(in srgb, var(--color-mustard) 8%, transparent)` | Size-picker selected fill |
+| `--color-mustard-tint-6` | `color-mix(in srgb, var(--color-mustard) 6%, transparent)` | Cart cap-notice fill |
+
+### Contrast ledger — WCAG 2.2 AA, all computed and passing
+
+| Pair | Ratio | Needs |
+|---|---|---|
+| foreground / muted on ground | **15.4 / 7.9** | 4.5 |
+| countdown digits (foreground) on ground | **15.4** | 4.5 |
+| accent (red) on ground | **4.6** | 4.5 |
+| mustard on ground | **9.0** | 4.5 |
+| on-mustard (near-black) on mustard | **9.3** | 4.5 |
+| on-accent (near-black) on red | **4.8** | 4.5 |
+| error on ground | **7.5** | 4.5 |
+| sold-out on ground / surface | **5.3 / 5.0** | 4.5 |
+| border-strong on ground / surface | **3.6 / 3.3** | 3.0 |
+| focus-ring on ground | **11.6** | 3.0 |
+
+**Never use (all computed < AA, all avoided in code):** red on mustard **1.9** · off-white on
+mustard **1.7** · white on red **4.24**. On mustard and on red, labels are always the near-black
+`--color-on-mustard` / `--color-on-accent`.
 
 ---
 
 ## 4. Type
 
+Both families ship a full, well-drawn Cyrillic — MK is the default language, not an afterthought.
+Both are **SIL Open Font License**; commercial web use is permitted. Self-hosted at build via
+`next/font/google` (no runtime request to Google — matters for the portability rule and for privacy).
+
 | Token | Value | Use |
 |---|---|---|
-| `--font-display` | `TBD-1.02` | Countdown, headlines |
-| `--font-body` | `TBD-1.02` | Everything else |
+| `--font-display` | **Rubik** (600/700/800) | Countdown, headlines — boxy, confident, wide |
+| `--font-body` | **Inter** (400/500/600) | Everything else — neutral, excellent Cyrillic, `tnum` |
 
-**Must support Cyrillic properly.** MK is the default language — not an afterthought. A font whose
-Cyrillic is an automated afterthought will look wrong to every primary customer and right to
-nobody who matters. **Check the actual Macedonian glyphs** (ѓ, ќ, љ, њ, џ, ѕ, ж, ч, ш) rendered at
-display size, not a Latin sample.
+Checked at display size against the Macedonian glyphs ѓ ќ љ њ џ ѕ ж ч ш — both render native forms,
+not fallbacks. The countdown uses `--font-display` with `font-variant-numeric: tabular-nums` **and**
+fixed-width cells, so no digit change shifts layout.
 
-Licence must permit commercial web use. Record the licence here.
-
-| Token | Size | Line height | Use |
+| Token | Size (clamp: mobile → desktop) | Line height | Use |
 |---|---|---|---|
-| `--text-countdown` | `TBD-1.02` | | The loudest thing on the site |
-| `--text-h1` | `TBD-1.02` | | |
-| `--text-h2` | `TBD-1.02` | | |
-| `--text-body` | `TBD-1.02` | | |
-| `--text-small` | `TBD-1.02` | | |
-| `--text-price` | `TBD-1.02` | | |
+| `--text-countdown` | `clamp(2.75rem, 13vw, 5.5rem)` | `1` | The loudest thing on the site |
+| `--text-h1` | `clamp(2.25rem, 7vw, 4rem)` | `1.04` | Page headlines |
+| `--text-h2` | `clamp(1.5rem, 4vw, 2.25rem)` | `1.1` | Section headlines |
+| `--text-body` | `1rem` | `1.6` | Body |
+| `--text-small` | `0.8125rem` | `1.5` | Labels, helper text |
+| `--text-price` | `1.25rem` | `1.2` | Prices — tabular |
+| `--text-eyebrow` | `0.75rem` (uppercase, `0.14em` tracking) | `1.4` | Eyebrows, stock lines |
 
 ---
 
 ## 5. Spacing, radius, shadow
 
-| Token | Value |
-|---|---|
-| `--space-*` | `TBD-1.02` — one scale, no off-scale values |
-| `--radius-*` | `TBD-1.02` |
-| `--shadow-*` | `TBD-1.02` |
+**Spacing:** Tailwind v4's default 4px scale is the one scale — no off-scale values. Use the utility
+steps (`p-2`=8px, `p-4`=16px, `p-6`=24px, `p-8`=32px, `p-12`=48px, `p-16`=64px, `p-24`=96px). A
+value that isn't a scale step is a bug.
+
+| Token | Value | Use |
+|---|---|---|
+| `--radius-sm` | `0.25rem` | Chips, badges |
+| `--radius-md` | `0.5rem` | Buy button, fields |
+| `--radius-lg` | `0.875rem` | Product cards, panels |
+| `--radius-full` | `9999px` | Language pill, dots |
+| `--shadow-sm` | `0 1px 2px 0 rgb(0 0 0 / 0.4)` | Raised chips (rare) |
+| `--shadow-lg` | `0 16px 40px -12px rgb(0 0 0 / 0.7)` | Overlays: cart drawer, dialogs |
+
+Dark, flat design — shadow is for overlays only, never decoration.
 
 ---
 
@@ -102,17 +144,20 @@ Licence must permit commercial web use. Record the licence here.
 
 | Token | Value | Use |
 |---|---|---|
-| `--motion-fast` | `TBD-1.02` | Hover, focus |
-| `--motion-base` | `TBD-1.02` | Transitions |
-| `--motion-drop` | `TBD-1.02` | The drop reveal — the one moment worth animating |
+| `--motion-fast` | `120ms` | Hover, focus |
+| `--motion-base` | `220ms` | Transitions |
+| `--motion-drop` | `480ms` | The drop reveal — the one moment worth animating |
+| `--ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` | Default easing for all of the above |
 
-**`prefers-reduced-motion` is respected everywhere.** No exceptions, including the countdown.
+**`prefers-reduced-motion` is respected everywhere** — including the countdown (digits still update
+as values, never as a flip/spinner) and the drop reveal (swap in place, no transform/fade). The live
+dot is static under reduced motion.
 
 ---
 
 ## 7. Components — specs land in the handover
 
-Tokens here; full specs in `docs/design-handovers/`.
+Tokens here; full specs in `docs/design-handovers/Part-1-Phase-02-Handover.md`.
 
 | Component | States that must be specified |
 |---|---|
@@ -128,23 +173,19 @@ Tokens here; full specs in `docs/design-handovers/`.
 | **Language switch** | MK / EN |
 
 **Every state above will actually occur, most of them on drop day, most of them on a phone.**
-Sold-out is not an edge case here — it is the intended end state of every product. Design it as
-carefully as the available state.
+Sold-out is not an edge case here — it is the intended end state of every product.
 
 ---
 
 ## 8. Rules
 
 - **Never hardcode a value.** If it is not a token, it is a bug.
-- **Contrast checked on every pair, WCAG 2.2 AA.** Including sold-out and countdown.
+- **Contrast checked on every pair, WCAG 2.2 AA.** Including sold-out and countdown (see §3 ledger).
 - **Cyrillic checked at display size**, not Latin.
 - **Mobile-first.** Design the phone, then widen.
 - **Do not design a state that needs a fact we do not have.** No review stars, no "X sold", no
-  testimonials — see `facts.md` § 10. If a component needs one to look right, the component is
-  wrong.
-- **Photography:** real only (`D-0-6`). The lifestyle set is pending model and venue permission and
-  an age-appropriateness call — see `facts.md` § 8. **Do not design a hero that only works with an
-  image we may not be allowed to use.**
+  testimonials — see `facts.md` §10. If a component needs one to look right, the component is wrong.
+- **Photography:** real only (`D-0-6`). No hero that only works with an image we may not use.
 
 ---
 
@@ -153,3 +194,4 @@ carefully as the available state.
 | Date | Change | By |
 |---|---|---|
 | 2026-07-14 | Seeded at kickoff. **Empty — awaiting Phase 1.02.** | Claude Chat |
+| 2026-07-15 | **Filled.** Palette derived from the handover ledger + garment colours, verified pair-by-pair against WCAG 2.2 AA. Type: Rubik (display) + Inter (body), both OFL, Cyrillic-checked. Spacing = Tailwind 4px scale. Provenance + derivation logged `D-1.02-1`. | Claude Code |
