@@ -1,4 +1,4 @@
-NEXT: 1.06 — Catalog + Product
+NEXT: 1.07 — Deploy + hosted Supabase + Resend + real keys
 
 # Current state — Trajanov-V2
 
@@ -6,11 +6,30 @@ NEXT: 1.06 — Catalog + Product
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-15** · By: **Claude Code (Phase 1.05 — About + Contact)**
+Last updated: **2026-07-15** · By: **Claude Code (Phase 1.06 — Cart flow)**
 
 ---
 
 ## Status
+
+**The cart flow is real — checkout now orders what the customer actually chose (`D-1.04-16` closed).**
+A client-side cart (a pure reducer in `src/lib/cart/cart.ts` + a sessionStorage `useSyncExternalStore`
+store in `src/components/cart/cart-store.ts`) carries the chosen **(product, variant, qty)** from the
+product page through the cart to checkout and into `create_order()`. The **stand-in** that submitted
+the active drop's first in-stock variant is **deleted** (`getActiveOrderContext` gone; grep clean); the
+client sends **`variant_id` + `qty` only** — never a price or a name. `SizePicker`/`BuyButton` are
+wired via a new `AddToCartPanel` (size required before Add; sold-out sizes unselectable; the six buy
+states); `CartView` and `CheckoutForm` read real cart state; empty checkout is rejected before
+`create_order()` (client empty state + `processOrder` `"empty"` guard). The cart **never** writes to
+`variants`/`orders`/`order_items` and never reserves stock. The cap mirrors what `create_order()`
+enforces — **2 total units per order** (not per line), which agrees with the Plan. **No new dependency;
+no `supabase/migrations/` file touched; `create_order`/`expire_reservations` unchanged.** `seed.sql`
+gained a second product (`test-tee-two`) so a test can prove the *chosen* product (not the drop's
+first) reaches the order row. **46 Vitest tests pass** (31 + 15 new), incl. the re-run 10-vs-3 oversell
+gate; the phase test was confirmed to fail against the stand-in before it was deleted. Pages rendered
+in-browser both locales at 390px + 1180px. Branch `phase-1.06-cart-flow`; PR `#6` to `main`.
+
+Prior (1.05): About + Contact —
 
 **About + Contact are live, sourced entirely from `facts.md`.** Two **static** editorial pages
 (`/about`, `/contact`, both locales, prerendered `●`/SSG via `setRequestLocale`) join the site. About
@@ -51,10 +70,10 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 1 of 2 — Build |
-| Phase | 1.05 complete — PR pending |
-| Branch | `phase-1.05-about-contact` |
-| Open PR | `#5` → `main` — **pending push/open** (1.01–1.04 merged `#1`–`#4`) |
-| Deployed | nowhere — Supabase runs **local only** (`D-1.03-5`) |
+| Phase | 1.06 complete — PR pending |
+| Branch | `phase-1.06-cart-flow` |
+| Open PR | `#6` → `main` — **pending fresh-session review** (`D-1.06-2`); 1.01–1.05 merged `#1`–`#5` |
+| Deployed | nowhere — Supabase runs **local only** (`D-1.03-5`); Vercel project created in 1.07 (`D-1.06-4`) |
 | Domain | `trajanov.com` — **not purchased** |
 
 ---
@@ -69,6 +88,34 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### Cart flow (1.06) — the customer's choice reaches the order row
+
+- **Pure cart** `src/lib/cart/cart.ts` — React-free reducer: `addItem`/`setItemQty`/`removeItem`/
+  `toOrderItems` + `MAX_UNITS_PER_ORDER = 2` (total units, mirrors `create_order()` step 3, `D-1.06-6`).
+  Node-testable; never touches the DB.
+- **Cart store** `src/components/cart/cart-store.ts` — a module-singleton external store via
+  `useSyncExternalStore`, **sessionStorage**-backed (`D-1.06-5`): survives refresh + in-session
+  navigation, dies with the tab. Null server snapshot → a clean `hydrated` flag, no hydration flash, no
+  setState-in-effect. No new dependency.
+- **Add to cart** `src/components/product/AddToCartPanel.tsx` — owns the selected variant; wires
+  `SizePicker` (available/selected/unavailable) + `BuyButton` (six states). Size required before Add
+  (`Product.chooseSize`), sold-out sizes unselectable, cap enforced, inline `aria-live` feedback
+  ("Added. — View cart"), header cart badge left unwired (header out of scope, `D-1.06-10`).
+- **Wiring**: `SizePicker` (controllable) + `BuyButton` (real `onClick`) wired without breaking the
+  styleguide; `CartView` reads the store (steppers/cap/empty); `catalog/[slug]` passes
+  `variantId`/`dropSlug`; `cart`/`checkout` pages read real state; `CheckoutForm` submits
+  `variant_id`+`qty` only.
+- **Stand-in deleted**: `getActiveOrderContext`/`CheckoutContext` removed from `src/lib/drop/state.ts`
+  (now exposes `variantId` on `SizeOption` + `dropSlug` on the product view, `D-1.06-7`); grep clean.
+- **Empty-cart guard**: `processOrder` rejects `items: []` with `"empty"` before `create_order()`
+  (`D-1.06-8`), plus the client's own empty checkout state.
+- **Tests**: `tests/cart/cart.test.ts` (pure reducer) + `tests/orders/checkout-items.test.ts` (chosen
+  variant → order_items, two items, cap client+server, TR004 sellout) + empty-cart case in
+  `process-order.test.ts`. `seed.sql` gained `test-tee-two` (`D-1.06-9`). **46 pass; the phase test
+  confirmed to fail against the stand-in (RED captured), then pass against the cart.**
+- **Strings**: `Buy.added`, `Buy.viewCart`, `Order.emptyCart` in both catalogs (**130 keys each,
+  identical**). Humanizer pass run.
 
 ### About + Contact (1.05) — static editorial pages
 
@@ -194,20 +241,24 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 2 | **IG profile URL click-test.** `@trajanovv2026` handle is VERIFIED and the URL renders/links correctly (verified in-browser this phase: footer, drop-ended banner, **and now Contact**), but a human must click it and confirm it opens **Vladimir's actual profile** (`facts.md` §6). **Merge blocker on 1.05** (`D-1.05-2`). | 1.02 | Lazar click-test, pre-merge |
 | 4 | **Hosted-Supabase parity** (`D-1.03-5`, extended by `D-1.04-1`). Migrations, RLS, real keys, **the pg_cron schedule, and the rate-limit table** are proven only against local Supabase (Colima). A **paused free-tier project silently pauses pg_cron** (reservations stop expiring). Re-confirm all of it on the real project. | 1.03/1.04 | 1.07 (hosted project) |
 | 5 | **Real Turnstile keys.** Siteverify is proven only against Cloudflare's **dummy** keys (`D-1.04-8`); "is Cloudflare actually challenging bots" is unanswerable until real keys. Test keys must never reach production. | 1.04 | 1.07 / 2.05 |
+| 6 | **Fresh-session PR review of PR `#6`** (`D-1.06-2`). A Claude Code session that did not write this code reviews the PR against the 1.06 brief before merge — the silent failure this phase prevents (an order naming a shirt the customer never picked) survives a single manual test. **Merge blocker on 1.06.** | 1.06 | Fresh Claude Code session, pre-merge |
 
 *Code verified directly (not owed) this phase: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
-`npm test` (**31**) all green; About + Contact render at 390px + 1180px, both locales; the five press
-URLs match `facts.md` §4 character-for-character and each returns HTTP 200 (trn.mk + republika
-confirmed as the competition article); Home About link present in countdown + ended, absent in live;
-phone/IG tap targets ≥44px. (1.04 direct-verified items — pg_cron schedule, concurrency gate,
-`server-only` guard, end-to-end order — carry forward unchanged; nothing in this phase touched them.)*
+`npm test` (**46**) all green, incl. the re-run 10-vs-3 oversell gate; the phase test was confirmed to
+**fail against the stand-in** (RED captured) before the stand-in was deleted; `/catalog`,
+`/catalog/[slug]`, `/cart`, `/checkout` rendered in-browser at 390px + 1180px, both locales, against
+the 1.02 handover; the cart writes to **no** DB table and reserves no stock (verified by reading — no
+cart code path touches `variants`/`orders`/`order_items`); the stand-in grep returns nothing; no
+`supabase/migrations/` file and neither `create_order` nor `expire_reservations` changed; no new
+dependency (`package.json` unchanged). (Prior direct-verified items carry forward unchanged.)*
 
-*Register is at **4 items**. **Item #3 (fresh-session review of PR `#4`) is removed — cleared at the
-PR-#4 merge** (as 1.03's PR-#3 review was). Per `D-1.05-2`: **#1 (design sign-off) and #2 (IG URL
-click-test) are merge blockers on 1.05** — the PR does not merge until Lazar does both; **#4
-(hosted-Supabase parity) and #5 (real Turnstile keys) are deferred to 1.07 by design**. The 3-item
-rule has now not fired twice consecutively (`D-1.04-1`, `D-1.05-2`); **1.08 remains the hard gate.**
-Numbers 1/2/4/5 are kept (not renumbered) so `D-1.05-2`'s references stay valid.*
+*Register is at **5 items**. Item #3 (fresh-session review of PR `#4`) was removed at the PR-#4 merge.
+**#6 is the fresh-session review of PR `#6`** (`D-1.06-2`) — a merge blocker on 1.06, cleared at merge
+as #3 was. **#1 (design sign-off) and #2 (IG click-test)** were merge blockers on 1.05 (`D-1.05-2`);
+**PR `#5` has since merged**, so they were either satisfied at that merge or this file is stale on the
+point — Lazar to confirm and remove if done (not removed here — this session did not perform them).
+**#4 (hosted-Supabase parity) and #5 (real Turnstile keys)** remain deferred to 1.07 by design.
+Numbers are not renumbered (keeps `D-1.05-2`'s references valid); **1.08 remains the hard gate.**
 
 ---
 
@@ -228,7 +279,9 @@ blocker.**
 (`D-1.05-3`) — it also gates the order-confirmation sender/recipient (`facts.md` §5, Phase 1.08).
 #1–#4 are now driven by the **DB via the typed drop config** (not `demo.ts`, deleted): a null
 `price_mkd`/`name_*` renders the price/name placeholder (`D-1.04-6/10`); photo + fabric/care have **no
-DB column yet** (they land with 1.06 photos / a later phase) and render as pure UI placeholders. When
+DB column yet** — those columns land with **`Y.01 — Drop content load`** (`D-1.06-3`), not 1.06 — and
+render as pure UI placeholders. The price (#1) and neutral-name (#4) placeholders also surface on the
+new **Cart** rows (existing placeholders, no new one shipped by 1.06). When
 Vladimir supplies real prices/names, filling `src/config/products.ts` + `npm run sync:drop` clears #1
 and #4 (for a drop). Sizes for a real drop come from config (the rehearsal's are a flagged sample).
 **The register must be empty before cutover (2.05).***
@@ -249,11 +302,9 @@ no placeholder (`D-1.05-5`).*
 
 ## Carryovers
 
-- **No real product→cart→checkout item flow** (`D-1.04-16`). 1.02 never built cart state, and 1.04 did
-  not add it (out of scope). The order Server Action + all its guards are real and tested, and the
-  checkout submits a **stand-in** item (the active drop's first in-stock variant). A real cart flow
-  (selected product/size/qty flowing to checkout) must be built before a real drop can sell what a
-  customer actually chose. Owner: a future phase.
+- **None.** `D-1.04-16` (no real product→cart→checkout item flow) is **closed by Phase 1.06**: the
+  cart flow is built, the stand-in is deleted, and an automated test proves the customer's chosen
+  product+variant reaches the `order_items` row.
 
 ---
 

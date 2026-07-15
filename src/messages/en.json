@@ -61,7 +61,9 @@
     "adding": "Adding…",
     "comingSoon": "Coming soon",
     "soldOut": "Sold out",
-    "viewProduct": "View"
+    "viewProduct": "View",
+    "added": "Added.",
+    "viewCart": "View cart"
   },
   "Catalog": {
     "title": "Catalog",
@@ -117,6 +119,7 @@
   "Order": {
     "protected": "Bot protection.",
     "noDrop": "No active drop right now.",
+    "emptyCart": "Your cart is empty.",
     "success": "Order {orderNumber} received. Reserved for 48 hours.",
     "turnstileFailed": "That check didn't pass. Try again.",
     "rateLimited": "Too many attempts from this network. Wait a moment and try again.",

@@ -26,13 +26,9 @@ export interface PlaceOrderInput {
 export type PlaceOrderResult = OrderOutcome | { status: "invalid"; field: "phone" | "form" };
 
 export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResult> {
-  // Server-side re-validation of the basics (the client validates too, but must not be trusted).
-  if (
-    !input.customerName?.trim() ||
-    !input.address?.trim() ||
-    !input.city?.trim() ||
-    input.items.length === 0
-  ) {
+  // Server-side re-validation of the basics (the client validates too, but must not be trusted). The
+  // empty-cart case is owned by processOrder (returns "empty" before create_order — brief Task 7).
+  if (!input.customerName?.trim() || !input.address?.trim() || !input.city?.trim()) {
     return { status: "invalid", field: "form" };
   }
   const phoneNormalized = normalizeMkPhone(input.phone ?? "");

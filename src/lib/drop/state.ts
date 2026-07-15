@@ -97,7 +97,7 @@ function toProductView(p: RawProduct): ProductView {
   const sizes: SizeOption[] = p.variants
     .slice()
     .sort((a, b) => a.size.localeCompare(b.size))
-    .map((v) => ({ label: v.size, available: v.stock > 0 }));
+    .map((v) => ({ variantId: v.id, label: v.size, available: v.stock > 0 }));
   return {
     slug: p.slug,
     index: p.sort_order,
@@ -165,9 +165,11 @@ export async function getActiveDropView(
   };
 }
 
-/** A single product plus the state of the drop it belongs to (for the product page). */
+/** A single product, the drop it belongs to, and that drop's state (for the product page). The slug
+ *  is what a cart line records so the checkout can name the drop to create_order() (Phase 1.06). */
 export interface ProductPageView {
   product: ProductView;
+  dropSlug: string;
   dropState: DropState;
 }
 
@@ -180,36 +182,12 @@ export async function getProductView(
   for (const drop of drops) {
     const raw = drop.products.find((p) => p.slug === slug);
     if (raw) {
-      return { product: toProductView(raw), dropState: opts.preview ?? computeState(drop, now) };
+      return {
+        product: toProductView(raw),
+        dropSlug: drop.slug,
+        dropState: opts.preview ?? computeState(drop, now),
+      };
     }
   }
   return null;
-}
-
-/** What the checkout submits to create_order(). */
-export interface CheckoutContext {
-  dropSlug: string;
-  items: { variantId: string; quantity: number }[];
-}
-
-/**
- * A stand-in for a real cart→checkout flow (which does not exist yet — see the Phase 1.04 completion
- * report §3): the active drop's first product, its first in-stock size (or its first size), quantity 1.
- * This is what the checkout form submits so the WHOLE order path — Turnstile → rate limit → create_order
- * (with its window/stock/price gates) — runs for real end to end. create_order remains the only authority;
- * for the committed ended rehearsal drop it correctly returns TR002 (drop_not_open). Returns null when
- * there is no drop with any variant to order.
- */
-export async function getActiveOrderContext(): Promise<CheckoutContext | null> {
-  const now = new Date();
-  const drops = await fetchDrops();
-  const drop = pickActiveDrop(drops, now);
-  if (!drop) return null;
-
-  const firstProduct = drop.products.slice().sort((a, b) => a.sort_order - b.sort_order)[0];
-  if (!firstProduct || firstProduct.variants.length === 0) return null;
-
-  const variant =
-    firstProduct.variants.find((v) => v.stock > 0) ?? firstProduct.variants[0];
-  return { dropSlug: drop.slug, items: [{ variantId: variant.id, quantity: 1 }] };
 }

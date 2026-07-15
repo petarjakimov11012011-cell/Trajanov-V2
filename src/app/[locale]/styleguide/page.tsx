@@ -21,10 +21,10 @@ const SAMPLE_PRODUCTS: ProductView[] = [
     stock: 'in-stock',
     remaining: 12,
     sizes: [
-      {label: 'S', available: true},
-      {label: 'M', available: true},
-      {label: 'L', available: true},
-      {label: 'XL', available: false},
+      {variantId: 'sg-in-s', label: 'S', available: true},
+      {variantId: 'sg-in-m', label: 'M', available: true},
+      {variantId: 'sg-in-l', label: 'L', available: true},
+      {variantId: 'sg-in-xl', label: 'XL', available: false},
     ],
   },
   {
@@ -36,10 +36,10 @@ const SAMPLE_PRODUCTS: ProductView[] = [
     stock: 'low',
     remaining: 2,
     sizes: [
-      {label: 'S', available: false},
-      {label: 'M', available: true},
-      {label: 'L', available: true},
-      {label: 'XL', available: false},
+      {variantId: 'sg-low-s', label: 'S', available: false},
+      {variantId: 'sg-low-m', label: 'M', available: true},
+      {variantId: 'sg-low-l', label: 'L', available: true},
+      {variantId: 'sg-low-xl', label: 'XL', available: false},
     ],
   },
   {
@@ -51,10 +51,10 @@ const SAMPLE_PRODUCTS: ProductView[] = [
     stock: 'sold-out',
     remaining: 0,
     sizes: [
-      {label: 'S', available: false},
-      {label: 'M', available: false},
-      {label: 'L', available: false},
-      {label: 'XL', available: false},
+      {variantId: 'sg-out-s', label: 'S', available: false},
+      {variantId: 'sg-out-m', label: 'M', available: false},
+      {variantId: 'sg-out-l', label: 'L', available: false},
+      {variantId: 'sg-out-xl', label: 'XL', available: false},
     ],
   },
 ];
@@ -170,10 +170,10 @@ export default function StyleguidePage() {
       <Section title={t('sizePicker')}>
         <SizePicker
           sizes={[
-            {label: 'S', available: true},
-            {label: 'M', available: true},
-            {label: 'L', available: true},
-            {label: 'XL', available: false},
+            {variantId: 'sg-s', label: 'S', available: true},
+            {variantId: 'sg-m', label: 'M', available: true},
+            {variantId: 'sg-l', label: 'L', available: true},
+            {variantId: 'sg-xl', label: 'XL', available: false},
           ]}
           initial="M"
         />

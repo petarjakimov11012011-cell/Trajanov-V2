@@ -4,33 +4,34 @@ import {useRef, useState} from 'react';
 import {useTranslations} from 'next-intl';
 import {ShieldCheck} from 'lucide-react';
 import {cn} from '@/lib/utils';
+import {Link} from '@/i18n/navigation';
 import {CheckoutField} from './CheckoutField';
 import {Turnstile, type TurnstileHandle} from './Turnstile';
 import {Placeholder} from '@/components/system/Placeholder';
+import {useCart} from '@/components/cart/cart-store';
+import {toOrderItems, cartDropSlug} from '@/lib/cart/cart';
 import {placeOrder, type PlaceOrderResult} from '@/lib/orders/actions';
-import type {CheckoutContext} from '@/lib/drop/state';
 
 type Errors = Partial<Record<'name' | 'phone' | 'city' | 'address', string>>;
 
-// One-screen checkout wired to the real order path (Task 6). On submit it mints a FRESH Turnstile token
-// (D-1.04-8) and calls the placeOrder server action, which runs Siteverify → IP rate limit → create_order
-// on the server. create_order is the only authority; the browser never decides anything here.
-export function CheckoutForm({
-  context,
-  siteKey,
-}: {
-  context: CheckoutContext | null;
-  siteKey: string;
-}) {
+// One-screen checkout wired to the real order path (Task 6). It reads the customer's cart (client
+// state) for what to submit — variant_id + qty only, never a price or a name (brief Task 6). On submit
+// it mints a FRESH Turnstile token (D-1.04-8) and calls placeOrder, which runs Siteverify → IP rate
+// limit → create_order on the server. create_order is the only authority; the browser decides nothing.
+export function CheckoutForm({siteKey}: {siteKey: string}) {
   const t = useTranslations('Checkout');
   const to = useTranslations('Order');
   const tp = useTranslations('Placeholder');
+  const tc = useTranslations('Cart');
+  const {cart, hydrated} = useCart();
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<PlaceOrderResult | null>(null);
   const turnstileRef = useRef<TurnstileHandle>(null);
 
-  const orderable = context !== null;
+  const items = toOrderItems(cart);
+  const dropSlug = cartDropSlug(cart);
+  const orderable = items.length > 0 && dropSlug !== null;
 
   function validate(form: HTMLFormElement): Errors {
     const data = new FormData(form);
@@ -50,7 +51,7 @@ export function CheckoutForm({
     const form = e.currentTarget;
     const next = validate(form);
     setErrors(next);
-    if (Object.keys(next).length > 0 || !context) return;
+    if (Object.keys(next).length > 0 || !dropSlug || items.length === 0) return;
 
     const data = new FormData(form);
     setSubmitting(true);
@@ -67,8 +68,8 @@ export function CheckoutForm({
 
     const res = await placeOrder({
       token,
-      dropSlug: context.dropSlug,
-      items: context.items,
+      dropSlug,
+      items,
       customerName: String(data.get('name') ?? ''),
       phone: String(data.get('phone') ?? ''),
       city: String(data.get('city') ?? ''),
@@ -80,6 +81,27 @@ export function CheckoutForm({
     if (res.status === 'invalid' && res.field === 'phone') {
       setErrors((p) => ({...p, phone: t('errorPhone')}));
     }
+  }
+
+  // Before the sessionStorage read has run, hold the space rather than flash the empty state.
+  if (!hydrated) {
+    return <div className="min-h-[40vh]" aria-busy aria-hidden />;
+  }
+
+  // Empty cart: no form, no submit — checkout cannot reach create_order() with nothing to order
+  // (brief Task 7). The server backstops this too (processOrder → "empty").
+  if (!orderable) {
+    return (
+      <div className="flex flex-col items-center gap-4 py-24 text-center">
+        <p className="text-muted-foreground text-lg">{tc('empty')}</p>
+        <Link
+          href="/catalog"
+          className="text-mustard hover:text-mustard-hover font-display font-semibold underline-offset-4 hover:underline"
+        >
+          {tc('backToDrop')}
+        </Link>
+      </div>
+    );
   }
 
   const message = result ? orderMessage(result, to) : null;
@@ -131,22 +153,16 @@ export function CheckoutForm({
 
         <button
           type="submit"
-          disabled={submitting || !orderable}
+          disabled={submitting}
           className={cn(
             'font-display inline-flex w-full items-center justify-center rounded-[var(--radius-md)] px-5 py-3 font-bold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ground',
-            submitting || !orderable
+            submitting
               ? 'bg-surface-2 text-muted-foreground cursor-not-allowed'
               : 'bg-mustard hover:bg-mustard-hover text-on-mustard',
           )}
         >
           {t('placeOrder')}
         </button>
-
-        {!orderable && (
-          <p className="text-muted-foreground text-small" role="status">
-            {to('noDrop')}
-          </p>
-        )}
 
         {message && (
           <p
@@ -173,6 +189,8 @@ function orderMessage(
   switch (res.status) {
     case 'ok':
       return {text: to('success', {orderNumber: res.orderNumber}), tone: 'ok'};
+    case 'empty':
+      return {text: to('emptyCart'), tone: 'neutral'};
     case 'turnstile':
       return {text: to('turnstileFailed'), tone: 'error'};
     case 'rate_limited':

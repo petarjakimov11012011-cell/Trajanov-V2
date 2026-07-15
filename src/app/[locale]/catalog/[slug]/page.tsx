@@ -6,8 +6,8 @@ import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {Placeholder} from '@/components/system/Placeholder';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {StockBadge} from '@/components/drop/StockBadge';
-import {SizePicker} from '@/components/product/SizePicker';
-import {BuyButton, type BuyState} from '@/components/product/BuyButton';
+import {AddToCartPanel} from '@/components/product/AddToCartPanel';
+import {type BuyState} from '@/components/product/BuyButton';
 import {formatMkd} from '@/lib/format';
 import {getProductView, parsePreviewState} from '@/lib/drop/state';
 
@@ -28,7 +28,7 @@ export default async function ProductPage({
   const result = await getProductView(slug, {preview: parsePreviewState(preview)});
   if (!result) notFound();
 
-  const {product, dropState} = result;
+  const {product, dropSlug, dropState} = result;
   const t = await getTranslations();
   const locale = await getLocale();
 
@@ -88,20 +88,13 @@ export default async function ProductPage({
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <span className="text-small text-muted-foreground font-medium">
-              {t('Product.size')}
-            </span>
-            <SizePicker sizes={product.sizes} />
-            <span className="text-muted-foreground text-xs">
-              {t('Placeholder.sizesSample')}
-            </span>
-          </div>
-
-          <BuyButton state={buyState} />
-          <p className="text-muted-foreground text-small">
-            {t('Product.oneUnitLimit')}
-          </p>
+          <AddToCartPanel
+            sizes={product.sizes}
+            dropSlug={dropSlug}
+            productSlug={product.slug}
+            productIndex={product.index}
+            buyState={buyState}
+          />
         </div>
       </div>
 

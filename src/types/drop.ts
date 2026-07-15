@@ -7,6 +7,9 @@ export type DropState = "countdown" | "live" | "ended";
 export type StockLevel = "in-stock" | "low" | "sold-out";
 
 export interface SizeOption {
+  /** The variant id — a product-and-size pair. What the cart carries and the server needs (with qty).
+   *  Not a secret: the catalog is public-read (RLS), so exposing it to the client is safe (D-1.06-8). */
+  variantId: string;
   label: string;
   /** Derived server-side from variant stock > 0. */
   available: boolean;

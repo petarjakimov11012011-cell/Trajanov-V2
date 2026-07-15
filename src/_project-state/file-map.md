@@ -6,17 +6,20 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-15** · By: **Claude Code (Phase 1.05 — About + Contact)**
+Last updated: **2026-07-15** · By: **Claude Code (Phase 1.06 — Cart flow)**
 
 ---
 
 ## Status
 
-**About + Contact landed (Phase 1.05).** Two **static** editorial pages (`about/`, `contact/`) join the
-tree, plus the two root planning docs the operator committed (`Trajanov-V2-Plan.md`,
-`Trajanov-V2-Phase-Plan.md` — `D-1.05-1`). `src/lib/social.ts` gained the phone constants; the footer
-and Home each gained a couple of links. No `src/lib/{drop,orders}`, `src/config/`, `supabase/`, or
-`tests/` file changed. See the 1.04 note below for the drop engine.
+**Cart flow landed (Phase 1.06).** New: `src/lib/cart/cart.ts` (pure reducer + 2-unit cap),
+`src/components/cart/cart-store.ts` (sessionStorage `useSyncExternalStore`), and
+`src/components/product/AddToCartPanel.tsx` (size → variant → add). `SizePicker`/`BuyButton` are now
+wire-able; `CartView`, `checkout/CheckoutForm`, the cart/checkout pages read real cart state. The
+`getActiveOrderContext` **stand-in** was deleted from `src/lib/drop/state.ts` (which now exposes
+`variantId`/`dropSlug`); `processOrder` gained an empty-cart guard. Tests: `tests/cart/cart.test.ts`
+and `tests/orders/checkout-items.test.ts` (+ empty-cart case). `seed.sql` gained a second product.
+**No new dependency; no `supabase/migrations/` file touched.** See the 1.05/1.04 notes below.
 
 **Drop engine landed (Phase 1.04).** The catalogue, countdown, and buy path are now driven by the
 **database, on the server** — `src/lib/demo.ts` is deleted. The tree below is the real on-disk
@@ -126,8 +129,8 @@ Trajanov-V2/
 │   ├── components/                  # one component per file, PascalCase
 │   │   ├── ui/                     # .gitkeep — shadcn-reserved, still empty
 │   │   ├── drop/                   # Countdown, DropBanner, StockBadge
-│   │   ├── product/                # ProductCard, BuyButton, SizePicker
-│   │   ├── cart/                   # CartView
+│   │   ├── product/                # ProductCard, BuyButton, SizePicker, AddToCartPanel (add-to-cart, 1.06)
+│   │   ├── cart/                   # CartView, cart-store (sessionStorage useSyncExternalStore, 1.06)
 │   │   ├── checkout/               # CheckoutField, CheckoutForm, Turnstile (real widget, 1.04)
 │   │   ├── layout/                 # SiteHeader, SiteFooter, LanguageSwitch
 │   │   ├── home/                   # HomeExperience (props-driven from server drop state, 1.04)
@@ -137,11 +140,13 @@ Trajanov-V2/
 │   │   ├── utils.ts                 # cn() — shadcn helper
 │   │   ├── social.ts                # facts-backed public contact constants: IG handle/URL + phone (1.04/1.05)
 │   │   ├── format.ts                # formatMkd() price formatter (1.04)
+│   │   ├── cart/
+│   │   │   └── cart.ts              # PURE cart reducer + 2-unit cap + toOrderItems (React-free, testable, 1.06)
 │   │   ├── supabase/
 │   │   │   ├── client.ts            # browser client, anon key (1.03)
 │   │   │   └── server.ts            # server client, service role — `import "server-only"` (1.03)
 │   │   ├── drop/
-│   │   │   └── state.ts             # SERVER-ONLY drop state + product mapping + order context (1.04)
+│   │   │   └── state.ts             # SERVER-ONLY drop state + product mapping incl. variantId/dropSlug (1.04; stand-in order context removed 1.06)
 │   │   ├── orders/
 │   │   │   ├── order-errors.ts      # create_order() SQLSTATE → identifier vocabulary (1.03, +TR006)
 │   │   │   ├── process-order.ts     # testable order pipeline core (turnstile→ratelimit→create_order)
@@ -177,7 +182,7 @@ Trajanov-V2/
 ├── supabase/                       # LOCAL ONLY — no hosted project until 1.07 (D-1.03-5)
 │   ├── config.toml                 # `supabase init`; trimmed stack for 8 GB host (D-1.03-10)
 │   ├── .gitignore                  # created by `supabase init`
-│   ├── seed.sql                    # dev/test fixtures — `test-` slugs, stock=3 target
+│   ├── seed.sql                    # dev/test fixtures — `test-` slugs, stock=3 target; 2 products in test-open-drop (test-tee-two added 1.06, D-1.06-9)
 │   └── migrations/
 │       ├── 20260715021215_schema.sql              # 5 tables, constraints, indexes, enum, RLS, grants
 │       ├── 20260715021216_create_order.sql        # atomic conditional decrement — the heart
@@ -194,6 +199,8 @@ Trajanov-V2/
 ├── tests/                          # Vitest — DB integration; need a live local stack (D-1.03-12)
 │   ├── setup.ts                    # loads .env.local (Node 24 process.loadEnvFile)
 │   ├── helpers/db.ts               # anon/service supabase-js clients + direct pg admin conn
+│   ├── cart/
+│   │   └── cart.test.ts            # PURE cart reducer: choice recorded, 2-unit cap, toOrderItems boundary (1.06)
 │   ├── concurrency/
 │   │   ├── oversell.test.ts        # 10 orders / 3 units → exactly 3 succeed, 7 insufficient_stock
 │   │   └── expiry.test.ts          # stock returned exactly once, incl. 2 concurrent sweeps
@@ -204,9 +211,10 @@ Trajanov-V2/
 │   ├── rls/anon-access.test.ts     # anon wall: orders unreadable, variants readable, no writes/rpc
 │   └── orders/
 │       ├── create-order.test.ts    # happy path, drop window (D-1.03-7), full error vocabulary
+│       ├── checkout-items.test.ts  # cart→create_order: chosen variant reaches order_items, 2-items, cap, TR004 (1.06)
 │       ├── price-missing.test.ts   # TR006 rejects null price, no decrement (D-1.04-6)
 │       ├── rate-limit.test.ts      # 20 ok / 21st rejected; stored value is a hash, not an IP
-│       └── process-order.test.ts   # turnstile/ratelimit gate create_order (Task 6)
+│       └── process-order.test.ts   # turnstile/ratelimit/empty-cart gate create_order (Task 6, +empty 1.06)
 ```
 
 Root additions (1.03): `vitest.config.ts` (serial file execution — one shared local DB).
