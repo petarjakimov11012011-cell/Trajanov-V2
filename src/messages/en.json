@@ -12,11 +12,7 @@
     "headline": "When the timer hits zero, the drop is live.",
     "sub": "3 to 5 pieces. Real, limited stock. Cash on delivery.",
     "browseWhileWait": "Browse while you wait",
-    "previewLabel": "Preview states",
-    "preview2d": "2 days",
-    "previewHour": "under 1 hour",
-    "previewMin": "under 1 min",
-    "previewLive": "live"
+    "opening": "Opening…"
   },
   "Drop": {
     "days": "DAYS",
@@ -46,6 +42,7 @@
     "title": "Catalog",
     "live": "The drop is live — stock is real and limited.",
     "countdownIntro": "The drop isn't open yet. Browse now; buying unlocks when the timer hits zero.",
+    "ended": "This drop has ended.",
     "empty": "No active drop right now."
   },
   "Product": {
@@ -91,6 +88,19 @@
     "placeOrder": "Place order",
     "codSummary": "You pay cash on delivery. No online payment.",
     "reserveNote": "Your order reserves stock for 48 hours."
+  },
+  "Order": {
+    "protected": "Bot protection.",
+    "noDrop": "No active drop right now.",
+    "success": "Order {orderNumber} received. Reserved for 48 hours.",
+    "turnstileFailed": "That check didn't pass. Try again.",
+    "rateLimited": "Too many attempts from this network. Wait a moment and try again.",
+    "genericError": "Something went wrong. Try again.",
+    "soldOut": "Someone got there first. The last one just went.",
+    "notOpen": "The drop isn't open right now.",
+    "capViolated": "Max 2 items per order.",
+    "duplicatePhone": "You already have a live order with this number for this drop.",
+    "priceMissing": "Our mistake: no price is set. You weren't charged. Try later."
   },
   "Common": {
     "currency": "MKD",

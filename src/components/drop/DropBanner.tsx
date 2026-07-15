@@ -1,6 +1,6 @@
 import {useTranslations} from 'next-intl';
 import {cn} from '@/lib/utils';
-import {INSTAGRAM_HANDLE, INSTAGRAM_URL} from '@/lib/demo';
+import {INSTAGRAM_HANDLE, INSTAGRAM_URL} from '@/lib/social';
 
 // LIVE bar — full-width mustard, near-black text, a pulsing near-black dot,
 // remaining count right-aligned and tabular. Pulse is disabled under

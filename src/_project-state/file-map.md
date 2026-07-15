@@ -6,31 +6,36 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-15** · By: **Claude Code (Phase 1.03 — data layer)**
+Last updated: **2026-07-15** · By: **Claude Code (Phase 1.04 — drop engine)**
 
 ---
 
 ## Status
 
-**Data layer landed (Phase 1.03).** The tree below is the **real on-disk structure**. Zero UI change
-this phase — nothing under `src/app`, `src/components`, or `src/messages` was touched. Notes:
+**Drop engine landed (Phase 1.04).** The catalogue, countdown, and buy path are now driven by the
+**database, on the server** — `src/lib/demo.ts` is deleted. The tree below is the real on-disk
+structure. Notes:
 
-- **Supabase is real (local only, `D-1.03-5`):** `supabase/config.toml`, `supabase/seed.sql`, and
-  three migrations under `supabase/migrations/` (schema, `create_order`, `expire_reservations`).
-  `supabase/.gitignore` was created by `supabase init`.
-- **`src/lib/supabase/{client,server}.ts`** (typed browser + server-only clients),
-  **`src/lib/orders/order-errors.ts`** (the `create_order` error vocabulary), and
-  **`src/types/database.ts`** (generated types) now fill previously-reserved dirs.
-- **Tests are real:** `tests/setup.ts`, `tests/helpers/db.ts`, `tests/concurrency/{oversell,expiry}
-  .test.ts`, `tests/rls/anon-access.test.ts`, `tests/orders/create-order.test.ts`; `vitest.config.ts`
-  at the root.
-- **`.gitkeep` removed** from the now-populated dirs: `supabase/migrations`, `tests/concurrency`,
-  `src/lib/supabase`, `src/lib/orders`, `src/types`.
-- **Still reserved and empty** (`.gitkeep`): `src/lib/{drop,email,rate-limit}`, `src/config`,
-  `public/images/{products,lifestyle}`, `src/components/ui`.
-- Carried from 1.02: route folders (non-localised slugs, `D-1.02-4`), component dirs
-  `components/{system,cart,checkout,layout,home}`, `src/lib/demo.ts` + `src/types/drop.ts` (both
-  throwaway; `demo.ts` dies in 1.04). The Phase 1.02 handover is at
+- **Typed drop config in `src/config/`** (`D-0-4`): `schema.ts` (types + validators + constants),
+  `time.ts` (DST-aware Europe/Skopje resolver), `drops.ts` (schedule) + `products.ts` (catalogue),
+  `index.ts` (join). Committed rehearsal: one **ended, null-priced** `test-drop` (`D-1.04-12`).
+- **Config→DB sync** at `scripts/{sync-core.ts,sync-drop.ts}` — `npm run sync:drop`, a direct
+  Postgres admin tool (`D-1.04-11`), not runtime code.
+- **Server-only drop state** `src/lib/drop/state.ts` (`import "server-only"`, proven a client-import
+  build error). **`src/lib/orders/`**: `process-order.ts` (testable pipeline core), `actions.ts`
+  (`placeOrder` Server Action), `phone.ts`. **`src/lib/rate-limit/`**: `hash.ts` (pure, testable) +
+  `ip.ts` (server-only). **`src/lib/turnstile/verify.ts`** (server-only Siteverify).
+  **`src/lib/{social,format}.ts`** (facts-backed IG constants moved off `demo.ts`; MKD formatter).
+- **UI now reads real data** (same components, same handover): home/catalog/product/checkout are
+  `force-dynamic` (`D-1.04-9`). New `src/components/checkout/Turnstile.tsx` (real widget, replaces
+  `TurnstilePlaceholder.tsx`, deleted) and `src/components/system/DevPreviewSwitch.tsx` (dev-only
+  `?preview` state switch replacing the 1.02 client switcher, `D-1.04-13`).
+- **4 migrations** under `supabase/migrations/` (price/name nullable, `create_order` `TR006`,
+  rate-limit table + fn, `pg_cron`). **6 new test files** under `tests/{config,orders}/`.
+- **`.gitkeep` removed** from now-populated dirs: `src/config`, `src/lib/drop`, `src/lib/rate-limit`.
+- **Still reserved and empty** (`.gitkeep`): `src/lib/email` (1.07), `src/components/ui`.
+- Carried from 1.02/1.03: route folders (non-localised slugs, `D-1.02-4`), component dirs, the typed
+  Supabase clients + `order-errors.ts`, the test harness. The Phase 1.02 handover is at
   `docs/design-handovers/Part-1-Phase-02-Handover.md`.
 
 Carried from 1.01: `src/i18n/` (routing/request/navigation) and `src/proxy.ts` (`D-1.01-2`).
@@ -111,32 +116,46 @@ Trajanov-V2/
 │   │   ├── drop/                   # Countdown, DropBanner, StockBadge
 │   │   ├── product/                # ProductCard, BuyButton, SizePicker
 │   │   ├── cart/                   # CartView
-│   │   ├── checkout/               # CheckoutField, CheckoutForm, TurnstilePlaceholder
+│   │   ├── checkout/               # CheckoutField, CheckoutForm, Turnstile (real widget, 1.04)
 │   │   ├── layout/                 # SiteHeader, SiteFooter, LanguageSwitch
-│   │   ├── home/                   # HomeExperience
-│   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice
+│   │   ├── home/                   # HomeExperience (props-driven from server drop state, 1.04)
+│   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice, DevPreviewSwitch (1.04)
 │   │
 │   ├── lib/
 │   │   ├── utils.ts                 # cn() — shadcn helper
-│   │   ├── demo.ts                  # PLACEHOLDER demo drop data (1.02) — replaced by config in 1.04
+│   │   ├── social.ts                # facts-backed IG handle/URL (1.04; moved off the deleted demo.ts)
+│   │   ├── format.ts                # formatMkd() price formatter (1.04)
 │   │   ├── supabase/
 │   │   │   ├── client.ts            # browser client, anon key (1.03)
 │   │   │   └── server.ts            # server client, service role — `import "server-only"` (1.03)
+│   │   ├── drop/
+│   │   │   └── state.ts             # SERVER-ONLY drop state + product mapping + order context (1.04)
 │   │   ├── orders/
-│   │   │   └── order-errors.ts      # create_order() SQLSTATE → identifier vocabulary (1.03)
-│   │   ├── drop/                   # .gitkeep — state calc, reservations — SERVER ONLY (1.04)
-│   │   ├── email/                  # .gitkeep — Resend side channel (1.07)
-│   │   └── rate-limit/             # .gitkeep (1.04)
+│   │   │   ├── order-errors.ts      # create_order() SQLSTATE → identifier vocabulary (1.03, +TR006)
+│   │   │   ├── process-order.ts     # testable order pipeline core (turnstile→ratelimit→create_order)
+│   │   │   ├── actions.ts           # "use server" placeOrder Server Action (1.04)
+│   │   │   └── phone.ts             # MK phone → +389######## normaliser (1.04)
+│   │   ├── rate-limit/
+│   │   │   ├── hash.ts              # pure peppered SHA-256 IP hash — testable (1.04)
+│   │   │   └── ip.ts                # server-only rate-limit RPC call (1.04)
+│   │   ├── turnstile/
+│   │   │   └── verify.ts            # server-only Cloudflare Siteverify (1.04)
+│   │   └── email/                  # .gitkeep — Resend side channel (1.07)
 │   │
-│   ├── config/                     # .gitkeep — drops.ts, products.ts (1.04)
+│   ├── config/                     # typed drop config (1.04, D-0-4)
+│   │   ├── schema.ts                # DropConfig/ProductConfig types + validators + constants
+│   │   ├── time.ts                  # Europe/Skopje wall-clock → UTC instant, DST-aware (D-1.04-4)
+│   │   ├── drops.ts                 # the schedule — the switch Lazar flips
+│   │   ├── products.ts              # the catalogue — prices, names, stock
+│   │   └── index.ts                 # joins drops+products; re-exports config surface
 │   │
 │   ├── messages/
 │   │   ├── mk.json                  # default language — all 1.02 UI strings
 │   │   └── en.json                  # EN parity
 │   │
 │   └── types/
-│       ├── drop.ts                  # DropState, StockLevel, DemoProduct/Size (1.02)
-│       └── database.ts              # GENERATED from local DB — `npm run gen:types` (1.03)
+│       ├── drop.ts                  # DropState, StockLevel, ProductView/SizeOption (1.04; demo shapes retired)
+│       └── database.ts              # GENERATED from local DB — `npm run gen:types` (1.03, regen 1.04)
 │
 ├── public/
 │   └── images/
@@ -150,7 +169,15 @@ Trajanov-V2/
 │   └── migrations/
 │       ├── 20260715021215_schema.sql              # 5 tables, constraints, indexes, enum, RLS, grants
 │       ├── 20260715021216_create_order.sql        # atomic conditional decrement — the heart
-│       └── 20260715021217_expire_reservations.sql # idempotent hold-release sweep
+│       ├── 20260715021217_expire_reservations.sql # idempotent hold-release sweep
+│       ├── 20260715120000_price_name_nullable.sql # products.price_mkd/name_* nullable (D-1.04-6/10)
+│       ├── 20260715120001_create_order_tr006.sql  # +TR006 price_missing before any decrement
+│       ├── 20260715120002_rate_limit.sql          # drops.rate_limit col + order_attempts + fn (D-1.04-7)
+│       └── 20260715120003_pg_cron.sql             # enable pg_cron; sweep + run-log prune (D-1.04-2/3)
+│
+├── scripts/                        # operator tooling (1.04) — direct-Postgres, not runtime code
+│   ├── sync-core.ts                # config→DB sync logic (testable): idempotent, stock insert-only
+│   └── sync-drop.ts                # `npm run sync:drop` CLI wrapper (tsx)
 │
 ├── tests/                          # Vitest — DB integration; need a live local stack (D-1.03-12)
 │   ├── setup.ts                    # loads .env.local (Node 24 process.loadEnvFile)
@@ -158,8 +185,16 @@ Trajanov-V2/
 │   ├── concurrency/
 │   │   ├── oversell.test.ts        # 10 orders / 3 units → exactly 3 succeed, 7 insufficient_stock
 │   │   └── expiry.test.ts          # stock returned exactly once, incl. 2 concurrent sweeps
+│   ├── config/
+│   │   ├── time.test.ts            # DST resolver — summer 18:00Z + winter 19:00Z (D-1.04-4)
+│   │   ├── sync.test.ts            # no-reset-stock, idempotent, refuses null price / price-after-open
+│   │   └── cron.test.ts            # both pg_cron jobs scheduled + active from db reset
 │   ├── rls/anon-access.test.ts     # anon wall: orders unreadable, variants readable, no writes/rpc
-│   └── orders/create-order.test.ts # happy path, drop window (D-1.03-7), full error vocabulary
+│   └── orders/
+│       ├── create-order.test.ts    # happy path, drop window (D-1.03-7), full error vocabulary
+│       ├── price-missing.test.ts   # TR006 rejects null price, no decrement (D-1.04-6)
+│       ├── rate-limit.test.ts      # 20 ok / 21st rejected; stored value is a hash, not an IP
+│       └── process-order.test.ts   # turnstile/ratelimit gate create_order (Task 6)
 ```
 
 Root additions (1.03): `vitest.config.ts` (serial file execution — one shared local DB).
@@ -202,3 +237,4 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-14 | 1.01 | Replaced the intended tree with the real on-disk tree. Scaffolded Next.js/TS/Tailwind/shadcn/next-intl. Added `src/i18n/` + `src/proxy.ts` (not in the kickoff sketch). Route folders deferred to 2.01. | Claude Code |
 | 2026-07-15 | 1.02 | Added routes (`catalog`, `catalog/[slug]`, `cart`, `checkout`, `styleguide`), component dirs `{system,cart,checkout,layout,home}`, `lib/demo.ts`, `types/drop.ts`, and the committed handover. Filled `globals.css` from `brand.md`; loaded Rubik+Inter. Non-localised slugs (2.01 localises). `D-1.02-4/5/6`. | Claude Code |
 | 2026-07-15 | 1.03 | Added `supabase/` (config.toml, seed.sql, 3 migrations), `src/lib/supabase/{client,server}.ts`, `src/lib/orders/order-errors.ts`, `src/types/database.ts` (generated), `tests/` suites + `tests/{setup.ts,helpers/db.ts}`, `vitest.config.ts`. Removed now-stale `.gitkeep` from `supabase/migrations`, `tests/concurrency`, `src/lib/{supabase,orders}`, `src/types`. **Zero change under `src/app`/`src/components`/`src/messages`.** `D-1.03-*`. | Claude Code |
+| 2026-07-15 | 1.04 | Added `src/config/` (5 files), `src/lib/drop/state.ts`, `src/lib/orders/{process-order,actions,phone}.ts`, `src/lib/rate-limit/{hash,ip}.ts`, `src/lib/turnstile/verify.ts`, `src/lib/{social,format}.ts`, `scripts/{sync-core,sync-drop}.ts`, 4 migrations, `src/components/checkout/Turnstile.tsx`, `src/components/system/DevPreviewSwitch.tsx`, 6 test files under `tests/{config,orders}/`. **Deleted** `src/lib/demo.ts` and `src/components/checkout/TurnstilePlaceholder.tsx`. Rewired `src/app/[locale]/{page,catalog,catalog/[slug],checkout,styleguide}` + several components to real DB data. Removed `.gitkeep` from `src/config`, `src/lib/{drop,rate-limit}`. `D-1.04-*`. | Claude Code |

@@ -16,6 +16,7 @@ export const ORDER_ERROR_CODES = {
   QUANTITY_CAP_VIOLATED: "TR003",
   INSUFFICIENT_STOCK: "TR004",
   DUPLICATE_PHONE: "TR005",
+  PRICE_MISSING: "TR006",
 } as const;
 
 export type OrderErrorCode = (typeof ORDER_ERROR_CODES)[keyof typeof ORDER_ERROR_CODES];
@@ -27,4 +28,13 @@ export const ORDER_ERROR_IDENTIFIER: Record<OrderErrorCode, string> = {
   TR003: "quantity_cap_violated",
   TR004: "insufficient_stock",
   TR005: "duplicate_phone",
+  // TR006: an ordered variant's product has no price yet (D-1.04-6). Guards against OUR mistake
+  // (publishing a priceless product), never something the customer did — see the honest copy in
+  // src/messages. Checked before any decrement, so a null-priced order never touches stock.
+  TR006: "price_missing",
 };
+
+/** True when `code` is one of the documented create_order() business errors (vs an infra failure). */
+export function isOrderErrorCode(code: unknown): code is OrderErrorCode {
+  return typeof code === "string" && code in ORDER_ERROR_IDENTIFIER;
+}

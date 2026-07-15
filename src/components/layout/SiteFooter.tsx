@@ -1,5 +1,5 @@
 import {useTranslations} from 'next-intl';
-import {INSTAGRAM_HANDLE, INSTAGRAM_URL} from '@/lib/demo';
+import {INSTAGRAM_HANDLE, INSTAGRAM_URL} from '@/lib/social';
 
 // Minimal footer. Only facts.md-VERIFIED content: phone + the single Instagram
 // account. No address (there is none), no invented socials, no email yet.

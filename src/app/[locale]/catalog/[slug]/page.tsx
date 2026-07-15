@@ -1,4 +1,4 @@
-import {getTranslations} from 'next-intl/server';
+import {getTranslations, getLocale} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {ArrowLeft} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
@@ -7,27 +7,45 @@ import {Placeholder} from '@/components/system/Placeholder';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {StockBadge} from '@/components/drop/StockBadge';
 import {SizePicker} from '@/components/product/SizePicker';
-import {BuyButton} from '@/components/product/BuyButton';
-import {DEMO_PRODUCTS, getDemoProduct} from '@/lib/demo';
+import {BuyButton, type BuyState} from '@/components/product/BuyButton';
+import {formatMkd} from '@/lib/format';
+import {getProductView, parsePreviewState} from '@/lib/drop/state';
+
+// Product data is read from the DB per request (D-1.04-9); no static params.
+export const dynamic = 'force-dynamic';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
-export function generateStaticParams() {
-  return DEMO_PRODUCTS.map((p) => ({slug: p.slug}));
-}
-
 export default async function ProductPage({
   params,
+  searchParams,
 }: {
   params: Promise<{locale: string; slug: string}>;
+  searchParams: Promise<{preview?: string}>;
 }) {
   const {slug} = await params;
-  const product = getDemoProduct(slug);
-  if (!product) notFound();
+  const {preview} = await searchParams;
+  const result = await getProductView(slug, {preview: parsePreviewState(preview)});
+  if (!result) notFound();
 
+  const {product, dropState} = result;
   const t = await getTranslations();
+  const locale = await getLocale();
+
   const soldOut = product.stock === 'sold-out';
-  const title = `${t('Placeholder.productName')} ${pad2(product.index)}`;
+  const realName = locale === 'mk' ? product.nameMk : product.nameEn;
+  const title = realName ?? `${t('Placeholder.productName')} ${pad2(product.index)}`;
+
+  // Buy state from the SERVER's drop state + stock (the 6 handover states — no new ones):
+  //  sold out → sold-out · pre-drop → disabled/"coming soon" · live → default · ended (with stock) →
+  //  sold-out (non-interactive; the drop is over — the closest of the available states).
+  const buyState: BuyState = soldOut
+    ? 'sold-out'
+    : dropState === 'countdown'
+      ? 'disabled'
+      : dropState === 'ended'
+        ? 'sold-out'
+        : 'default';
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6">
@@ -53,7 +71,13 @@ export default async function ProductPage({
               {title}
             </h1>
             <div className="text-price tabular">
-              <Placeholder>{t('Placeholder.price')}</Placeholder>
+              {product.priceMkd != null ? (
+                <span className="text-foreground">
+                  {formatMkd(product.priceMkd, t('Common.currency'))}
+                </span>
+              ) : (
+                <Placeholder>{t('Placeholder.price')}</Placeholder>
+              )}
             </div>
             <div>
               {product.stock === 'in-stock' && <StockBadge level="in-stock" />}
@@ -74,7 +98,7 @@ export default async function ProductPage({
             </span>
           </div>
 
-          <BuyButton state={soldOut ? 'sold-out' : 'default'} />
+          <BuyButton state={buyState} />
           <p className="text-muted-foreground text-small">
             {t('Product.oneUnitLimit')}
           </p>

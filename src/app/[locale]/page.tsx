@@ -1,8 +1,24 @@
 import {HomeExperience} from '@/components/home/HomeExperience';
+import {DevPreviewSwitch} from '@/components/system/DevPreviewSwitch';
+import {getActiveDropView, parsePreviewState} from '@/lib/drop/state';
 
-// Home — the countdown is the loudest object; switches to the LIVE drop grid
-// when the timer hits zero. Real drop state is server-computed in 1.04; this
-// pass drives it client-side with a preview switcher (see the handover).
-export default function HomePage() {
-  return <HomeExperience />;
+// Drop state is computed on the server from the DB on every request — never cached, never client-decided
+// (D-1.04-9). A CDN-frozen home page would still say "countdown" after the drop opened.
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{preview?: string}>;
+}) {
+  const {preview} = await searchParams;
+  const previewState = parsePreviewState(preview); // undefined in production
+  const view = await getActiveDropView({preview: previewState});
+
+  return (
+    <>
+      <HomeExperience view={view} />
+      <DevPreviewSwitch current={previewState} />
+    </>
+  );
 }
