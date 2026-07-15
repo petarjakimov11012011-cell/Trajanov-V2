@@ -1,6 +1,123 @@
 {
+  "Nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "cart": "Cart",
+    "brand": "TRAJANOV"
+  },
   "Home": {
     "title": "Trajanov",
-    "tagline": "Coming soon."
+    "tagline": "Coming soon.",
+    "eyebrow": "Next drop",
+    "headline": "When the timer hits zero, the drop is live.",
+    "sub": "3 to 5 pieces. Real, limited stock. Cash on delivery.",
+    "browseWhileWait": "Browse while you wait",
+    "previewLabel": "Preview states",
+    "preview2d": "2 days",
+    "previewHour": "under 1 hour",
+    "previewMin": "under 1 min",
+    "previewLive": "live"
+  },
+  "Drop": {
+    "days": "DAYS",
+    "hours": "HRS",
+    "minutes": "MIN",
+    "seconds": "SEC",
+    "nextDrop": "Next drop",
+    "live": "DROP IS LIVE",
+    "remaining": "{count} left",
+    "ended": "Drop ended",
+    "endedFollow": "Follow {handle} for the next one.",
+    "liveNow": "Live now"
+  },
+  "Stock": {
+    "inStock": "In stock",
+    "low": "{count} left",
+    "soldOut": "Sold out"
+  },
+  "Buy": {
+    "add": "Add to cart",
+    "adding": "Adding…",
+    "comingSoon": "Coming soon",
+    "soldOut": "Sold out",
+    "viewProduct": "View"
+  },
+  "Catalog": {
+    "title": "Catalog",
+    "live": "The drop is live — stock is real and limited.",
+    "countdownIntro": "The drop isn't open yet. Browse now; buying unlocks when the timer hits zero.",
+    "empty": "No active drop right now."
+  },
+  "Product": {
+    "back": "Back to catalog",
+    "size": "Size",
+    "sizeGuide": "Size guide",
+    "details": "Details",
+    "composition": "Composition & care",
+    "shipping": "Shipping",
+    "shippingBody": "North Macedonia only. Cash on delivery.",
+    "chooseSize": "Choose a size",
+    "oneUnitLimit": "Max 2 items per order."
+  },
+  "Cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty.",
+    "backToDrop": "Back to the drop",
+    "size": "Size",
+    "qty": "Qty",
+    "remove": "Remove",
+    "capNotice": "Max 2 items per order — stock is limited and reserved when you order.",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "shippingValue": "calculated on delivery",
+    "total": "Total",
+    "codNote": "Cash on delivery.",
+    "checkout": "Checkout"
+  },
+  "Checkout": {
+    "title": "Checkout",
+    "contact": "Your details",
+    "name": "Full name",
+    "phone": "Phone",
+    "city": "City",
+    "address": "Address",
+    "note": "Note (optional)",
+    "notePlaceholder": "Entrance, floor, landmark…",
+    "errorRequired": "This field is required.",
+    "errorPhone": "Enter a valid phone number.",
+    "verifying": "verifying",
+    "botCheck": "Confirm you're not a robot",
+    "summary": "Order summary",
+    "placeOrder": "Place order",
+    "codSummary": "You pay cash on delivery. No online payment.",
+    "reserveNote": "Your order reserves stock for 48 hours."
+  },
+  "Common": {
+    "currency": "MKD",
+    "languageMk": "МК",
+    "languageEn": "EN",
+    "switchLanguage": "Change language"
+  },
+  "Placeholder": {
+    "productPhoto": "[PLACEHOLDER: product photo — Vladimir]",
+    "productName": "Product",
+    "price": "[PLACEHOLDER: price MKD]",
+    "sizesSample": "sizes — sample, pending Vladimir",
+    "composition": "[PLACEHOLDER: composition & care — from the label]",
+    "notice": "Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase."
+  },
+  "Styleguide": {
+    "title": "Design system",
+    "intro": "Every state from the handover, live, driven by brand.md tokens.",
+    "colors": "Colour",
+    "type": "Type",
+    "countdown": "Countdown",
+    "dropBanner": "Drop banner",
+    "productCard": "Product card",
+    "buyButton": "Buy button",
+    "sizePicker": "Size picker",
+    "stockBadge": "Stock badge",
+    "field": "Checkout field",
+    "sampleNote": "Sample to show the token — not a real price."
   }
 }

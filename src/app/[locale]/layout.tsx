@@ -1,25 +1,34 @@
 import type {Metadata} from 'next';
-import {Geist, Geist_Mono} from 'next/font/google';
+import {Rubik, Inter} from 'next/font/google';
 import {notFound} from 'next/navigation';
 import {NextIntlClientProvider, hasLocale} from 'next-intl';
 import {routing} from '@/i18n/routing';
+import {SiteHeader} from '@/components/layout/SiteHeader';
+import {SiteFooter} from '@/components/layout/SiteFooter';
 import '../globals.css';
 
-// Placeholder metadata for the scaffold. Real, localised metadata + hreflang
-// land in Phase 2.01.
+// Placeholder metadata for the design system. Real, localised metadata +
+// hreflang + OG land in Phase 2.01.
 export const metadata: Metadata = {
   title: 'Trajanov',
   description: 'Trajanov',
 };
 
-const geistSans = Geist({
-  variable: '--font-sans',
-  subsets: ['latin'],
+// Display face — boxy, confident. Cyrillic subset requested so the build
+// fails loudly if the family ever drops MK glyph coverage (brand.md §4).
+const rubik = Rubik({
+  variable: '--font-rubik',
+  subsets: ['latin', 'cyrillic'],
+  weight: ['600', '700', '800'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+// Body — neutral, tabular numerals for prices and the countdown.
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
 });
 
 export function generateStaticParams() {
@@ -41,10 +50,14 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${rubik.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      <body className="bg-ground text-foreground flex min-h-full flex-col">
+        <NextIntlClientProvider>
+          <SiteHeader />
+          <main className="flex flex-1 flex-col">{children}</main>
+          <SiteFooter />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

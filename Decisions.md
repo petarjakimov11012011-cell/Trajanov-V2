@@ -238,3 +238,99 @@ before any phase existed use phase `0`.
 - **Consequences:** The on-disk tree matches `file-map.md` more closely. Any future need for an
   `AGENTS.md` or a `button` component is a one-command regeneration.
 - **Links:** `file-map.md` · `CLAUDE.md`
+
+### D-1.02-1 · 2026-07-15 · brand.md tokens derived from the handover ledger (no filled brand.md delivered)
+- **Status:** Accepted
+- **Context:** The Phase 1.02 handover names a filled companion `brand.md` and
+  `Trajanov Mockups.dc.html` as the source of the real token values. **Neither was delivered** — the
+  repo held only the seed `brand.md` (all `TBD-1.02`) and the handover prose + its contrast ledger.
+  Petar (operator) instructed: fill `brand.md` myself rather than wait.
+- **Decision:** Derive the whole palette from the handover's contrast ledger + the garment colours
+  (near-black ground, mustard/ochre, off-white, print red), verify **every pair** against WCAG 2.2
+  AA with a computed check (all pass; forbidden pairs confirmed < AA), and write the values into
+  `brand.md` as the source of truth.
+- **Alternatives considered:** Block and wait for the design companion files — rejected by the
+  operator (they don't exist). Eyeball hexes from memory — rejected: `brand.md` §3 forbids it and
+  contrast would be unverified.
+- **Consequences:** The exact colours and fonts are my reconstruction, not a pasted Lazar/Claude
+  Design-approved artifact. **Lazar should eyeball the rendered site and adjust** — a token tweak in
+  `brand.md` propagates everywhere. Ratios match the handover ledger, so the relationships are safe.
+- **Links:** `brand.md` · `docs/design-handovers/Part-1-Phase-02-Handover.md`
+
+### D-1.02-2 · 2026-07-15 · Type: Rubik (display) + Inter (body), self-hosted via next/font
+- **Status:** Accepted
+- **Context:** `brand.md` §4 requires two families with well-drawn Cyrillic (MK is default),
+  commercial-use licence, tabular numerals for the countdown, and a "boxy, confident" display voice.
+- **Decision:** Display = **Rubik** (600/700/800), Body = **Inter** (400/500/600). Both SIL OFL,
+  both self-hosted at build by `next/font/google` with the `cyrillic` subset requested (so the build
+  fails loudly if MK coverage is ever dropped). Cyrillic checked at display size in-browser
+  (ѓ ќ љ њ џ ѕ ж ч ш render native, not fallback).
+- **Alternatives considered:** A single family for tightness — rejected: display/body contrast helps
+  hierarchy. A more distinctive display face (Unbounded/Oswald) — rejected: Rubik's boxy skeleton
+  matches "boxy, unfussy" and its Cyrillic is unambiguous; Oswald is condensed (fights "boxy").
+- **Consequences:** Both are widely used, so the wordmark reads less bespoke than a custom face. Easy
+  to swap — it's two `brand.md` tokens + the `next/font` call in the layout.
+- **Links:** `brand.md` · `src/app/[locale]/layout.tsx`
+
+### D-1.02-3 · 2026-07-15 · Dark-only theme; :root is the ground, shadcn vars remapped onto brand tokens
+- **Status:** Accepted
+- **Context:** The direction is an intentionally dark brand (near-black ground). The scaffold shipped
+  shadcn's light/dark neutral theme in `globals.css`.
+- **Decision:** No light mode. `:root` carries the brand tokens directly and IS the dark ground;
+  shadcn's semantic vars (`--background`, `--primary`, `--muted-foreground`, …) are remapped onto the
+  brand tokens so any future shadcn primitive inherits the brand. `@theme inline` exposes brand
+  utilities (`bg-mustard`, `text-accent`, `border-border-strong`, …). shadcn's `--accent` stays a
+  grey hover, distinct from the brand print-red `--color-accent`.
+- **Alternatives considered:** Keep shadcn's dual light/dark theme — rejected: there is no light
+  surface in the design and maintaining an unused mode invites drift.
+- **Consequences:** If a light surface is ever needed it is net-new work. All colour lives in one
+  `:root` block mirroring `brand.md`.
+- **Links:** `src/app/globals.css` · `brand.md`
+
+### D-1.02-4 · 2026-07-15 · Built the full clickable site now (ahead of phases 1.03–1.06)
+- **Status:** Accepted
+- **Context:** Phase 1.02's formal remit is the design system (tokens + components + a styleguide).
+  The operator asked to "make this the real website" — the full set of mockup screens, browsable.
+- **Decision:** Build every handover screen as a real route (home countdown + LIVE, catalog,
+  product, cart-at-cap, checkout) plus a `/styleguide`, wired to the design system, with a live
+  ticking countdown and clearly-placeholder data. Real stock/drop/order **truth** stays server-side
+  and deferred to 1.03/1.04.
+- **Alternatives considered:** Scope to tokens + components + styleguide only (the phase's formal
+  remit) — rejected by the operator's explicit instruction.
+- **Consequences:** Route layouts (home/catalog/product/cart/checkout) are built ahead of their own
+  phases (1.05/1.06+). Their client-side placeholder state (countdown, stock, order submit) **will be
+  replaced by server-computed truth in 1.03/1.04** — if those phases restructure the layouts, part of
+  this is rework. The visual layer, tokens, and components carry forward regardless.
+- **Links:** `src/app/[locale]/` · `src/lib/demo.ts`
+
+### D-1.02-5 · 2026-07-15 · Placeholder demo content; no owed fact invented
+- **Status:** Accepted
+- **Context:** The data-driven screens need stand-in products, but `facts.md` marks prices, sizes,
+  fabric, product names, photos and the email as UNVERIFIED/OWED, and forbids inventing them.
+- **Decision:** `src/lib/demo.ts` holds a clearly-marked placeholder 4-piece drop (shows
+  available/low/sold-out). Product names render as neutral slot labels ("Производ 01"); **every owed
+  fact renders as a visible `[PLACEHOLDER: …]`** (price, photo, fabric, sizes-are-a-sample) and is
+  logged in the placeholder register; one honest preview notice sits on each data page. The verified
+  phone (078 820 520) and IG handle (@trajanovv2026) are the only real facts shown.
+- **Alternatives considered:** Invent plausible prices/names to look finished — rejected outright
+  (`facts.md`, CLAUDE.md content-truth). Show only a styleguide with no page data — rejected: the
+  operator wanted the real pages.
+- **Consequences:** The pages read as "designed, awaiting data" (which is true). `demo.ts` and the
+  demo state are throwaway — replaced by the real typed drop config in 1.04 and photos in 1.06.
+- **Links:** `src/lib/demo.ts` · `facts.md` · placeholder register in `current-state.md`
+
+### D-1.02-6 · 2026-07-15 · Hand-authored brand components + new feature dirs; ui/ left untouched
+- **Status:** Accepted
+- **Context:** The handover specifies bespoke states (6-state buy button, sold-out card, cap notice,
+  Turnstile-resolving) that are not shadcn defaults. The reserved tree has only `components/{ui,drop,
+  product}`. `file-map.md` says `ui/` is shadcn-generated and not hand-edited.
+- **Decision:** Author the brand components by hand in feature dirs and **add** `components/{system,
+  cart,checkout,layout,home}`, leaving `components/ui/` empty/untouched. A home-page **preview
+  switcher** (and `Countdown`'s `offsetMs`) mirrors the handover's demo buttons so the countdown
+  thresholds + LIVE are demonstrable without a server clock.
+- **Alternatives considered:** Generate shadcn primitives into `ui/` — rejected: the required states
+  are bespoke and shadcn generation needs the registry/network; hand-authoring keeps full control.
+- **Consequences:** We own more component code. The preview switcher is a design-pass affordance, not
+  product — it is removed/replaced when real server drop state lands in 1.04. `file-map.md` updated
+  with the new dirs.
+- **Links:** `src/components/` · `file-map.md`
