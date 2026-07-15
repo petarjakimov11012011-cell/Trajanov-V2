@@ -22,13 +22,13 @@ Goal: a working drop store on a preview URL, with one real order proven end-to-e
 | **1.03** | Data layer | Code | Supabase schema: products, stock, orders, reservations. **Atomic decrement.** RLS. Typed client. **DoD: concurrent-order test — 10 orders / 3 units → exactly 3 succeed.** Fresh-session PR review (`D-0-3`). | 1.01 |
 | **1.04** | Drop engine | Code | Server-computed drop state. Countdown. 48h reservations + server-side expiry. Turnstile. Rate limits (IP + phone). 2-unit cap. Drop config format. **DoD: concurrent test re-run + expiry proven.** Fresh-session PR review (`D-0-3`). | 1.03 |
 | **1.05** | Home + About | Code | Countdown/LIVE home. Hero. The press story, sourced from `facts.md` § 3. **Blocked on: model/venue permission; 3 unverified press links.** Placeholders + register entries if unresolved. | 1.02, 1.04 |
-| **1.06** | Catalog + Product | Code | Product listing, product detail, real photos, real prices, sizes, fabric, live stock, sold-out states. **Blocked on: product photos, prices, sizes, fabric — all owed by Vladimir.** | 1.02, 1.03 |
-| **1.07** | Cart + Checkout + email | Code | Cart, one-screen checkout, server action, Resend to Vladimir + customer. **Email is a side channel; the DB is the record.** **Blocked on: Vladimir's email.** | 1.04, 1.06 |
+| **1.06** | Cart flow | Code | The `D-1.04-16` carryover: real product → cart → checkout item flow. Client-side cart state; the customer's chosen (product, variant, qty) reaches `create_order()`; the stand-in is deleted. Fresh-session PR review (`D-1.06-2`). | 1.04 |
+| **1.07** | Deploy + hosted Supabase + Resend + real keys | Cowork + Code | Create the Vercel Hobby project (`D-1.06-4`), the hosted Supabase project, Resend, and real Turnstile keys. Cowork creates the accounts + sets env vars in the dashboards; Code wires + verifies. Order-confirmation email via Resend. **Blocked on: Vladimir's email for the notification recipient.** | 1.06 |
 | **1.08** | **VERIFICATION GATE** | Code + Lazar | **No new features.** One real order, real phone, real email, end to end. Concurrent test re-run. Reservation expiry observed. Turnstile + rate limits confirmed live. Owed-verification register cleared to zero. | 1.07 |
 
-**Batching candidate:** 1.05 + 1.06 — same templates, low decisions. **Only batch if the parallel-track
-assets (photos, prices, sizes, fabric, permissions) have landed.** Batching a phase that is blocked
-on missing assets produces one large PR full of placeholders, which is worse than two small ones.
+**1.06 re-scoped (`D-1.06-1`):** the catalogue + product pages already shipped in 1.02/1.04, so 1.06
+became the **cart flow** (the `D-1.04-16` carryover) and the content load became on-demand **`Y.01`**.
+1.05 shipped solo. 1.07 absorbed deploy + hosted Supabase + real keys (`D-1.06-4`).
 
 **1.08 is a hard gate.** Part 2 does not start until the owed-verification register is empty.
 Verification debt does not accumulate silently on this project.
@@ -53,6 +53,7 @@ Goal: bilingual, legal, fast, on the real domain, with a drop-day plan.
 | # | Name | Type | Trigger |
 |---|---|---|---|
 | **X.01** | Migrate to Vercel Pro | Code | A Vercel notice arrives, or a drop spikes, or Lazar decides. Written in advance so it is an afternoon, not a scramble. See `D-0-2`. |
+| **Y.01** | Drop content load | Code | Vladimir delivers photos, prices, names, sizes, fabric. Loads them into `src/config/products.ts`, adds the photo + fabric/care DB columns (`D-1.06-3`), drops images into `public/images/products/`, runs `npm run sync:drop`. **Mandatory before 2.05 — clears placeholder register rows #1–#4; the register must be empty before cutover.** |
 
 ---
 
@@ -60,15 +61,17 @@ Goal: bilingual, legal, fast, on the real domain, with a drop-day plan.
 
 ```
 1.01 → 1.02 → 1.03 → 1.04 → 1.06 → 1.07 → 1.08 → 2.01 → 2.02 → 2.03 → 2.04 → 2.05 → 2.06
-                                    ↑
-                        PRODUCT PHOTOS (Vladimir)
-                        prices · sizes · fabric
-                        ── the real critical path ──
+                                                                                  ↑
+                                                                       Y.01 — Drop content load
+                                                                       PRODUCT PHOTOS (Vladimir)
+                                                                       prices · sizes · fabric
+                                                                       ── the real critical path ──
 ```
 
-**The build is not the bottleneck. Vladimir is.** 1.06 cannot close without photos, prices, sizes,
-and fabric, and 1.07 cannot be verified without his email. Every one of those is his to supply and
-none of them can be worked around, invented, or generated (`D-0-6`).
+**The build is not the bottleneck. Vladimir is.** `Y.01` cannot close without photos, prices, names,
+sizes, and fabric, and it is **mandatory before 2.05**; 1.07 cannot be verified without his email.
+Every one of those is his to supply and none of them can be worked around, invented, or generated
+(`D-0-6`). The cart flow (1.06) is unblocked and closes without any of them.
 
 **Escalate at the first slip, not the third.** A phase that sits blocked is a phase that quietly
 becomes a placeholder.
@@ -82,7 +85,7 @@ becomes a placeholder.
 | Concurrent-order test | 1.03, 1.04, re-run 1.08 | 10 orders / 3 units → exactly 3 succeed |
 | Owed-verification register | 1.08 | Must be zero before Part 2 |
 | Placeholder register | 2.05 | Must be zero before cutover |
-| Fresh-session PR review | 1.03, 1.04 | `D-0-3` replacement gate |
+| Fresh-session PR review | 1.03, 1.04 (1.06 waived — `D-1.06-11`) | `D-0-3` replacement gate; extended to 1.06 by `D-1.06-2`, then waived for PR #6 by `D-1.06-11` |
 | UI seen before close | Every UI phase | 1.05, 1.06, 1.07, 2.04 |
 | Native MK review | 2.02 | Before cutover, not after |
 

@@ -26,6 +26,14 @@ function makeDeps(over: Partial<ProcessDeps> = {}) {
 }
 
 describe("processOrder — Turnstile gates create_order", () => {
+  it("rejects an EMPTY cart before create_order() is reached (brief Task 7)", async () => {
+    // A valid token, so it is the emptiness — not the token — that rejects it.
+    const deps = makeDeps();
+    const out = await processOrder("good", { ...INPUT, items: [] }, deps);
+    expect(out).toEqual({ status: "empty" });
+    expect(deps.createOrder).not.toHaveBeenCalled();
+  });
+
   it("rejects a MISSING token before create_order() is reached", async () => {
     const deps = makeDeps();
     const out = await processOrder("", INPUT, deps);

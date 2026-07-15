@@ -1,21 +1,13 @@
 'use client';
 
-import {useState} from 'react';
 import {useTranslations} from 'next-intl';
 import {Minus, Plus, X} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
 import {cn} from '@/lib/utils';
 import {Placeholder} from '@/components/system/Placeholder';
+import {useCart} from './cart-store';
 
-const MAX_UNITS = 2; // Hard cap: max 2 units per order (CLAUDE.md — COD abuse).
 const pad2 = (n: number) => String(n).padStart(2, '0');
-
-interface Line {
-  id: string;
-  index: number;
-  size: string;
-  qty: number;
-}
 
 function IconBtn({
   label,
@@ -46,22 +38,20 @@ function IconBtn({
   );
 }
 
-export function CartView({initial}: {initial: Line[]}) {
+// The cart, wired to real client cart state (brief Task 5). Steppers, the cap notice, and the empty
+// state are the 1.02 handover §7 — connected here, not redesigned. Prices are still OWED (facts.md §7),
+// so the row/summary prices remain placeholders; the cart computes no total and holds no price.
+export function CartView() {
   const t = useTranslations('Cart');
   const tp = useTranslations('Placeholder');
-  const [lines, setLines] = useState<Line[]>(initial);
+  const {cart, hydrated, setQty, remove, atCap} = useCart();
+  const lines = cart.items;
 
-  const totalUnits = lines.reduce((n, l) => n + l.qty, 0);
-  const atCap = totalUnits >= MAX_UNITS;
-
-  const setQty = (id: string, delta: number) =>
-    setLines((prev) =>
-      prev.map((l) =>
-        l.id === id ? {...l, qty: Math.max(1, l.qty + delta)} : l,
-      ),
-    );
-  const remove = (id: string) =>
-    setLines((prev) => prev.filter((l) => l.id !== id));
+  // Before the sessionStorage read has run, the cart is unknown. Hold the space rather than flash the
+  // empty state and then the items.
+  if (!hydrated) {
+    return <div className="min-h-[40vh]" aria-busy aria-hidden />;
+  }
 
   if (lines.length === 0) {
     return (
@@ -82,7 +72,7 @@ export function CartView({initial}: {initial: Line[]}) {
       {/* lines */}
       <ul className="flex flex-col divide-y divide-[var(--color-border)]">
         {lines.map((l) => (
-          <li key={l.id} className="flex gap-4 py-4">
+          <li key={l.variantId} className="flex gap-4 py-4">
             <div
               className="bg-surface-2 h-20 w-16 shrink-0 rounded-[var(--radius-md)]"
               style={{
@@ -93,7 +83,7 @@ export function CartView({initial}: {initial: Line[]}) {
             />
             <div className="flex flex-1 flex-col gap-1">
               <h3 className="font-display text-foreground font-semibold">
-                {tp('productName')} {pad2(l.index)}
+                {tp('productName')} {pad2(l.productIndex)}
               </h3>
               <p className="text-muted-foreground text-sm">
                 {t('size')}: {l.size}
@@ -106,7 +96,7 @@ export function CartView({initial}: {initial: Line[]}) {
               <button
                 type="button"
                 aria-label={t('remove')}
-                onClick={() => remove(l.id)}
+                onClick={() => remove(l.variantId)}
                 className="text-muted-foreground hover:text-foreground transition-colors duration-[var(--motion-fast)]"
               >
                 <X className="h-4 w-4" />
@@ -115,14 +105,18 @@ export function CartView({initial}: {initial: Line[]}) {
                 <IconBtn
                   label="−"
                   disabled={l.qty <= 1}
-                  onClick={() => setQty(l.id, -1)}
+                  onClick={() => setQty(l.variantId, l.qty - 1)}
                 >
                   <Minus className="h-4 w-4" />
                 </IconBtn>
                 <span className="tabular text-foreground w-5 text-center font-semibold">
                   {l.qty}
                 </span>
-                <IconBtn label="+" disabled={atCap} onClick={() => setQty(l.id, +1)}>
+                <IconBtn
+                  label="+"
+                  disabled={atCap}
+                  onClick={() => setQty(l.variantId, l.qty + 1)}
+                >
                   <Plus className="h-4 w-4" />
                 </IconBtn>
               </div>

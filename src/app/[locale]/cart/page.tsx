@@ -1,8 +1,8 @@
 import {useTranslations} from 'next-intl';
 import {CartView} from '@/components/cart/CartView';
 
-// Cart shown at the 2-unit cap (two units in the basket) so the cap notice and
-// the disabled "+" stepper are visible. Remove items to reach the empty state.
+// The cart reads real client cart state (sessionStorage-backed store). Empty, items, and the 2-unit
+// cap are all driven by what the customer actually added (brief Task 5).
 export default function CartPage() {
   const t = useTranslations('Cart');
   return (
@@ -10,12 +10,7 @@ export default function CartPage() {
       <h1 className="font-display text-h1 text-foreground font-extrabold">
         {t('title')}
       </h1>
-      <CartView
-        initial={[
-          {id: 'l1', index: 1, size: 'M', qty: 1},
-          {id: 'l2', index: 3, size: 'L', qty: 1},
-        ]}
-      />
+      <CartView />
     </div>
   );
 }

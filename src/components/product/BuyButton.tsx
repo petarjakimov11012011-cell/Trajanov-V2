@@ -12,14 +12,17 @@ const base =
 /**
  * Buy button — the six handover states.
  *  default | (hover / focus are CSS) | loading | disabled (pre-drop) | sold-out
- * Pass `state` to force one (styleguide); otherwise `default` runs a short
- * loading transition on click so the demo feels real.
+ * Pass `state` to force one. Pass `onClick` to wire a real add-to-cart (the AddToCartPanel drives the
+ * `loading` state itself). With no `onClick`, `default` runs a short fake loading transition on click
+ * so the styleguide demo feels real.
  */
 export function BuyButton({
   state = 'default',
+  onClick,
   className,
 }: {
   state?: BuyState;
+  onClick?: () => void;
   className?: string;
 }) {
   const t = useTranslations('Buy');
@@ -75,10 +78,14 @@ export function BuyButton({
   return (
     <button
       type="button"
-      onClick={() => {
-        setBusy(true);
-        setTimeout(() => setBusy(false), 1200);
-      }}
+      onClick={
+        onClick ??
+        (() => {
+          // Demo fallback (styleguide): no real cart wired, so fake a short loading transition.
+          setBusy(true);
+          setTimeout(() => setBusy(false), 1200);
+        })
+      }
       className={cn(base, 'bg-mustard hover:bg-mustard-hover text-on-mustard', className)}
     >
       {t('add')}

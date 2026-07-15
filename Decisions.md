@@ -1036,3 +1036,212 @@ decisions start at `D-1.05-8`.*
 - **Downside accepted:** An intentionally-empty value in `mk.json` can read as an oversight to someone
   scanning the file. Mitigated by a code comment at the render site and this entry.
 - **Links:** `src/messages/{mk,en}.json` · `src/app/[locale]/about/page.tsx` · `D-1.05-6`
+
+### D-1.06-1 · 2026-07-15 · Phase 1.06 re-scoped from Catalog + Product content to the cart flow
+- **Status:** Accepted
+- **Context:** The Phase Plan scoped 1.06 as "product listing, product detail, real photos, real
+  prices, sizes, fabric, live stock, sold-out states." Reading `current-state.md` at the 1.05 close,
+  most of that had already shipped: `/catalog` and `/catalog/[slug]` were built in 1.02 with every
+  handover state including sold-out, and wired to the database in 1.04. What remained of 1.06 was the
+  four facts Vladimir owes — photos, prices, sizes, fabric — every one "Not started," and Lazar
+  confirmed on 2026-07-15 that the sizes do not exist and the drop's colourways are not settled.
+  Sizes are not cosmetic: a `variant` is a product-and-size pair and stock lives on the variant, so
+  no sizes means no stock rows and nothing buyable. Meanwhile carryover `D-1.04-16` — no real
+  product→cart→checkout item flow, checkout submitting the active drop's first in-stock variant as a
+  stand-in — was unscheduled, unblocked, and on the critical path to 1.08, whose "one real order end
+  to end" proves nothing if the item was substituted.
+- **Decision:** 1.06 delivers the cart flow. The content load becomes **`Y.01 — Drop content load`**,
+  on demand, triggered when Vladimir delivers, mandatory before 2.05.
+- **Alternatives considered:** *Hold — no new phase until Vladimir delivers* (offered to Lazar as B;
+  rejected: the cart flow must be built regardless, so holding is delay that buys nothing and makes
+  the photos arrive no sooner). *Build 1.06 as the Phase Plan describes it* (rejected: it would tell
+  Code to rebuild pages that already exist — and `Trajanov-V2-Plan.md` states that where the plan and
+  the repo disagree, the repo is right and the file is stale).
+- **Consequences:** The plan is reordered and `Trajanov-V2-Phase-Plan.md` needs editing, including its
+  critical-path diagram. 1.07 shrinks to hosted Supabase, Resend, and real Turnstile keys. Phase 1.05
+  merges before this branch is cut, so no two branches run in parallel and no state file is contended.
+  **This does not make Vladimir's assets arrive one day sooner** — the parallel track is untouched and
+  the photos remain the critical path to launch. Lazar's call, 2026-07-15.
+- **Links:** `D-1.04-16` · `Trajanov-V2-Phase-Plan.md` · Phases 1.06, 1.07, 1.08, Y.01
+
+### D-1.06-2 · 2026-07-15 · Extend the fresh-session PR review to Phase 1.06
+- **Status:** Superseded by `D-1.06-11` (merge gate waived by the operator, 2026-07-15)
+- **Context:** `D-0-3` waived the house review gate and scoped its replacement — a fresh Claude Code
+  session reviewing the PR before merge — to Phases 1.03 and 1.04, on the grounds that concurrency
+  bugs are the class manual testing cannot catch. 1.06 changes no concurrency logic. It changes what
+  is passed to it.
+- **Decision:** A fresh Claude Code session — one that did not write the code — reviews this phase's
+  PR against this brief before merge.
+- **Alternatives considered:** Follow `D-0-3` literally and skip it — rejected: the failure this phase
+  exists to prevent is "the order names a different shirt than the customer picked." It is silent, it
+  survives a single manual test whenever the stand-in happens to match what the tester chose, and it
+  lands on a doorstep as a cash demand for the wrong item. That is a `D-0-6`-class misrepresentation
+  arriving through the code instead of the photographs.
+- **Consequences:** One extra session and one extra step before merge. Does **not** extend `D-0-3` to
+  any other phase; 1.05's precedent stands.
+- **Links:** `D-0-3` · `D-0-6` · `D-1.04-16` · Phase 1.06
+
+### D-1.06-3 · 2026-07-15 · Photo and fabric/care DB columns deferred to Y.01
+- **Status:** Accepted
+- **Context:** The option Lazar approved on 2026-07-15 included adding the photo and fabric/care
+  database columns in 1.06, on the grounds that they are unblocked — a column can be built without a
+  photo. `current-state.md`'s placeholder register notes neither has a DB column yet.
+- **Decision:** They land with `Y.01 — Drop content load`, not here.
+- **Alternatives considered:** Build them now as approved — rejected: a nullable column that nothing
+  reads and nothing tests is speculative work, and it puts a migration into a PR whose single job is
+  the cart flow, muddying the fresh-session review that `D-1.06-2` just bought.
+- **Consequences:** Y.01 carries a migration as well as a config edit, so it is an afternoon rather
+  than an hour. This narrows what Lazar approved — surfaced to him in chat on 2026-07-15 rather than
+  changed quietly.
+- **Links:** `D-1.06-1` · Phase Y.01
+
+### D-1.06-4 · 2026-07-15 · The Vercel project is created in Phase 1.07
+- **Status:** Accepted
+- **Context:** No phase creates it. `00_stack-and-config.md` records Vercel Hobby as pinned in 1.01,
+  but 1.01 never deployed — `current-state.md` reads `Deployed: nowhere` and
+  `Vercel project: Not created`, and `D-1.03-5` made local-only explicit. Phase 2.05 lists "env vars
+  in prod," which presupposes a project nobody makes. Meanwhile **Part 1's own stated goal is "a
+  working drop store on a preview URL, with one real order proven end-to-end"** — and 1.08 cannot
+  meet that from localhost. Real Turnstile keys (owed-verification register #5) bind to a hostname,
+  so they cannot be configured at all until something is deployed.
+- **Decision:** The Vercel Hobby project is created in **1.07**, alongside the hosted Supabase
+  project, Resend, and the real Turnstile keys. 1.07 becomes a **Cowork + Code** phase — Cowork
+  creates the accounts and sets the environment variables in the dashboards, Code wires and verifies.
+  1.07 is renamed `Deploy + hosted Supabase + Resend + real keys`.
+- **Alternatives considered:** *Leave it to 2.05* — rejected: 1.08 is a hard gate that must clear the
+  owed-verification register to zero, and two of its four rows (hosted-Supabase parity, real Turnstile
+  keys) cannot clear without a deployment; deferring means 1.08 either passes dishonestly or does not
+  pass. *A separate deploy phase between 1.07 and 1.08* — rejected: it is the same four accounts and
+  the same set of environment variables, so splitting it doubles the ceremony for no review benefit.
+- **Consequences:** **This is the moment `D-0-2` stops being theoretical** — the Hobby ToS violation
+  goes live the day the project exists. No new call is needed: `D-0-2` was Lazar's, made 2026-07-14
+  with the terms verified against Vercel's live documentation, and the portability rule plus the
+  pre-written X.01 migration are its mitigations. 1.07 grows and needs a Cowork brief as well as a
+  Code one. `00_stack-and-config.md`'s `Pinned: 1.01` against Hosting is wrong today — correct it in
+  1.07 with an appended change-log row recording the correction; that file is append-only and its
+  history is never rewritten. Nothing about the domain changes: `trajanov.com` is still bought and
+  pointed in 2.05.
+- **Links:** `D-0-2` · `D-1.03-5` · `00_stack-and-config.md` · `Trajanov-V2-Phase-Plan.md` ·
+  Phases 1.07, 1.08, 2.05, X.01
+
+### D-1.06-5 · 2026-07-15 · The cart is a sessionStorage-backed external store, no new dependency
+- **Status:** Accepted
+- **Context:** The phase needed client-side cart state that survives a refresh and product → cart →
+  checkout navigation within a session, but must **not** survive a closed tab (a cart that outlives
+  the drop is a cart full of sold-out shirts — brief Task 3), and must never touch the database.
+- **Decision:** The cart is a module-singleton external store read through React's `useSyncExternalStore`
+  (`src/components/cart/cart-store.ts`), persisted to **sessionStorage**, with all the pure cart/cap
+  logic in a React-free module (`src/lib/cart/cart.ts`). No new dependency; nothing writes to
+  `variants`/`orders`/`order_items`.
+- **Alternatives considered:** *localStorage* — rejected: it outlives the tab and the drop, so a
+  returning customer opens a cart of sold-out shirts. *A state library (Zustand/Jotai)* — rejected: a
+  dependency for trivial state, and `00_stack-and-config.md` must gate every new dependency. *React
+  Context + a `useEffect` hydration* — rejected: it trips the `react-hooks/set-state-in-effect` lint
+  rule and risks a hydration flash; `useSyncExternalStore` with a null server snapshot is the idiomatic
+  fix and gives a clean `hydrated` flag. *URL/query params* — rejected: leaks the selection into the
+  URL and is ugly.
+- **Downside accepted:** sessionStorage is per-tab, so a cart does not sync across tabs and a new tab
+  starts empty. Acceptable — the brief explicitly says the cart need not survive a closed tab.
+- **Links:** `src/lib/cart/cart.ts` · `src/components/cart/cart-store.ts` · brief Task 3
+
+### D-1.06-6 · 2026-07-15 · The cart cap is 2 TOTAL units per order, mirroring create_order (not the per-row CHECK)
+- **Status:** Accepted
+- **Context:** Brief Task 2: read what `create_order()` actually enforces before building the client
+  cap. `create_order()` step 3 asserts the **sum** of quantities across the order is in `1..2`; the
+  `order_items.qty` `1..2` CHECK is a looser per-row backstop that never binds once the total is capped
+  at 2. The Plan says "max 2 units per order" — which **agrees** with the database.
+- **Decision:** `MAX_UNITS_PER_ORDER = 2` caps **total units across the whole cart**, matching
+  `create_order()` exactly. A cart at 2 units disables "+" and refuses further adds; the server still
+  rejects any bypass with `TR003`. Client and server share the number by intent.
+- **Alternatives considered:** A per-line cap of 2 — rejected: it would allow two lines × 2 = 4 units,
+  which `create_order()` rejects with `TR003`, so the cart would happily build an order the server
+  refuses.
+- **Downside accepted:** None of substance — this records the Plan/DB agreement so a future reader does
+  not "fix" the cap to a per-line rule. (Reported in the completion report §3: Plan and DB agree.)
+- **Links:** `create_order.sql` · `src/lib/cart/cart.ts` · brief Task 2
+
+### D-1.06-7 · 2026-07-15 · variant_id (and dropSlug) are exposed to the client; the client submits variant_id + qty only
+- **Status:** Accepted
+- **Context:** For the cart to name a real variant, the client must know each size's `variant_id`.
+  `SizeOption` previously carried only `{label, available}`. The submission boundary must carry
+  `variant_id` + `qty` and **nothing else** — no price, no name (brief Task 6).
+- **Decision:** `SizeOption` gains `variantId` and the product view gains `dropSlug`; the cart records
+  them, and `toOrderItems()` emits exactly `{variantId, quantity}`. The server snapshots
+  `unit_price_mkd` inside `create_order()`.
+- **Alternatives considered:** Keep variant ids server-only and resolve size → variant on the server at
+  submit — rejected: it needs the client to send a product slug + size label plus a server lookup (more
+  client-authored data, and a re-introduced server "pick a variant" step), for no gain — the size →
+  variant map is already public.
+- **Downside accepted:** Variant UUIDs appear in the page HTML. They are not secret: RLS makes the
+  catalog (drops/products/variants) public-read, and every guard that matters runs in `create_order()`.
+- **Links:** `src/types/drop.ts` · `src/lib/drop/state.ts` · `src/lib/orders/actions.ts` · brief Task 6
+
+### D-1.06-8 · 2026-07-15 · The empty-cart guard lives in processOrder, returning a distinct "empty" outcome
+- **Status:** Accepted
+- **Context:** With the stand-in deleted, an empty-cart checkout can now reach the order path (brief
+  Task 7). The rejection must be provable *before* `create_order()` and unit-testable.
+- **Decision:** `processOrder` (the pure, injected-dependency core) rejects an empty `items` array
+  first, returning `{status: "empty"}`, before Turnstile / rate-limit / `create_order`. The client also
+  renders an empty state (no form, no submit), so this is the load-bearing backstop.
+- **Alternatives considered:** Guard only in the server action — rejected: not unit-testable at the
+  pure core, where the other "never reaches create_order" guarantees are proven. Guard only client-side
+  — rejected: bypassable.
+- **Downside accepted:** A new `OrderOutcome` variant ripples into the checkout message switch (mapped
+  to a neutral "cart empty" message the client's own empty state normally pre-empts).
+- **Links:** `src/lib/orders/process-order.ts` · `tests/orders/process-order.test.ts` · brief Task 7
+
+### D-1.06-9 · 2026-07-15 · A second test product (test-tee-two) is seeded so the phase test can discriminate against the stand-in
+- **Status:** Accepted
+- **Context:** The phase test must prove the customer's chosen product survives to `order_items`, and
+  must **fail against the stand-in** (brief Task 8 #1). The deleted stand-in picked the drop's *first*
+  product's first in-stock variant, so a discriminating test needs a product that is NOT first.
+  `test-open-drop` had a single product.
+- **Decision:** `supabase/seed.sql` gains **`test-tee-two`** (`sort_order` 2, sizes M/L) in
+  `test-open-drop`. The phase test chooses `test-tee-two/L`; the stand-in would have named
+  `test-tee-black`. RED captured (order named `test-tee-black`), GREEN with the cart — both in the
+  completion report.
+- **Alternatives considered:** Rely on within-product variant array order — rejected: fragile.
+  Insert fixtures inside the test — rejected: the shared local DB has no per-test product teardown, so
+  rows would leak across suites.
+- **Downside accepted:** `seed.sql` grows and a `supabase db reset` is needed to load it (done). It is
+  test seed, **not** a migration — `create_order`, `expire_reservations`, and `supabase/migrations/`
+  are untouched.
+- **Links:** `supabase/seed.sql` · `tests/orders/checkout-items.test.ts` · brief Task 8
+
+### D-1.06-10 · 2026-07-15 · Product-page add feedback is an inline message; the header cart badge stays unwired
+- **Status:** Accepted
+- **Context:** After an add there must be some feedback, and a size must be chosen before Add does
+  anything (brief Task 4). The 1.02 handover draws neither a post-add confirmation nor a live header
+  cart count, and the header is **out of scope** this phase.
+- **Decision:** The `AddToCartPanel` shows an inline `aria-live` message: "Choose a size" when Add is
+  pressed with no size (reusing `Product.chooseSize`), the cap notice at 2 units (reusing
+  `Product.oneUnitLimit`), and "Added. — View cart" after a successful add (two new `Buy` strings).
+  The header's `cartCount` badge is left at its default (0/hidden) — the header is untouched.
+- **Alternatives considered:** A silent add — rejected: on COD the customer needs to know it worked.
+  Wiring the header cart-count — rejected: the header is out of scope (brief), and it would make
+  `SiteHeader` a client component consuming the cart.
+- **Downside accepted:** A small affordance not drawn in the handover, and no live cart count in the
+  header. Tokenised, minimal, and mostly built from existing copy; the header badge is a natural
+  follow-up when the header is next in scope.
+- **Links:** `src/components/product/AddToCartPanel.tsx` · `src/components/layout/SiteHeader.tsx` ·
+  brief Task 4
+
+### D-1.06-11 · 2026-07-15 · The fresh-session PR review for Phase 1.06 is waived; PR #6 merged without it
+- **Status:** Accepted
+- **Context:** `D-1.06-2` made a fresh Claude Code session's review of PR `#6` a merge blocker, on the
+  grounds that the failure this phase prevents — an order naming a shirt the customer never picked — is
+  silent and survives a single manual test. The author session (the one that wrote the code) flagged
+  that it cannot be the reviewer ("do not review your own work") and offered either to run an
+  independent fresh-context review before merging, or to merge with an explicit waiver. The operator
+  (Petar) chose to merge now and waive the review.
+- **Decision:** PR `#6` is merged to `main` **without** the `D-1.06-2` fresh-session review. `D-1.06-2`
+  is superseded by this entry; owed-verification register item **#6 is waived** (not cleared by review).
+- **Alternatives considered:** *Run the independent review first, merge if clean* — offered; the
+  operator declined as unnecessary for now. *Hold for a separate operator-run session* — same.
+- **Downside accepted:** The author's work merges to `main` with **no independent check** by a second
+  party — precisely the check this phase's gate was created to guarantee, for the exact failure mode
+  (the customer's chosen product/variant not being what reaches `create_order()`) that is silent on a
+  single manual test. Mitigations still in force: the automated phase test (confirmed RED against the
+  stand-in, GREEN against the cart), the full 46-test suite incl. the 10-vs-3 oversell gate, and the
+  in-browser render check across both locales. This waiver is specific to PR `#6`; `D-0-3` is unchanged.
+- **Links:** `D-1.06-2` · `D-0-3` · `current-state.md` owed-verification register #6 · Phase 1.06

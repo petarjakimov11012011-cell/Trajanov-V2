@@ -29,6 +29,7 @@ export interface ProcessDeps {
 
 export type OrderOutcome =
   | { status: "ok"; orderNumber: string }
+  | { status: "empty" } // nothing in the cart — never reaches create_order (brief Task 7)
   | { status: "turnstile"; retry: boolean } // verification missing/failed
   | { status: "rate_limited" }
   | { status: "order_error"; code: OrderErrorCode } // a documented TR00x from create_order
@@ -44,6 +45,11 @@ export async function processOrder(
   input: OrderInput,
   deps: ProcessDeps,
 ): Promise<OrderOutcome> {
+  // 0. Empty cart — nothing to order. Reject before Turnstile, the rate limit, or create_order (brief
+  // Task 7). This became reachable the moment the stand-in item was deleted; the client's own empty
+  // state should prevent it, so this is the load-bearing backstop.
+  if (input.items.length === 0) return { status: "empty" };
+
   // 1. Turnstile — before anything else touches the rate-limit table or the database.
   if (!token) return { status: "turnstile", retry: true };
   const verdict = await deps.verifyTurnstile(token);
