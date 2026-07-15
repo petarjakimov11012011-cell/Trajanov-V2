@@ -9,7 +9,7 @@ in `src/_project-state/current-state.md`. The register must be empty before cuto
 No exceptions. No inventing. No "it's probably fine." This file is the only legal source for
 factual claims on the site.
 
-Last updated: 2026-07-14 · Maintained by: Lazar (orchestrator turn) — executors propose additions
+Last updated: 2026-07-15 · Maintained by: Lazar (orchestrator turn) — executors propose additions
 via completion reports, they do not silently add.
 
 ---
@@ -77,24 +77,47 @@ recognition, or imply the 30 prize shirts are a "collection". One win, one prize
 
 ## 4. Press
 
+**All five fetched and read in full, 2026-07-15. All five are cleared to be cited on the site.**
+
 | Outlet | URL | Status |
 |---|---|---|
-| Трн.мк | https://trn.mk/vladimir-trajanov-pobednik-kreativen-den-eam-konkurs-dizajn-maica/ | **VERIFIED** — fetched and read in full, 2026-07-14 |
-| Струмица Денес | https://strumicadenes.mk/opstini/strumica/vladimir-trajanov-od-strumica-pobednik-na-konkursot-na-kreativen-den-i-eam/ | Provided by owner. **NOT independently verified** |
-| Бизнис Вести | https://biznisvesti.mk/vladimir-trajanov-od-strumitsa-pobednik-na-konkursot-na-kreativen-den-i-eam/ | Provided by owner. **NOT independently verified** |
-| Cultural Chat | https://culturalchat.org/mk/владимир-трајанов-од-струмица-победн/ | Provided by owner. **NOT independently verified** |
+| **Трн.мк** | `https://trn.mk/vladimir-trajanov-pobednik-kreativen-den-eam-konkurs-dizajn-maica/` | **VERIFIED** — read in full 2026-07-14, re-read 2026-07-15. Published 12.06.2026, by Редакција Трн. |
+| **Струмица Денес** | `https://strumicadenes.mk/opstini/strumica/vladimir-trajanov-od-strumica-pobednik-na-konkursot-na-kreativen-den-i-eam/` | **VERIFIED** — fetched and read 2026-07-15. Published 12.06.2026. |
+| **Бизнис Вести** | `https://biznisvesti.mk/vladimir-trajanov-od-strumitsa-pobednik-na-konkursot-na-kreativen-den-i-eam/` | **VERIFIED** — fetched and read 2026-07-15. Published 11.06.2026, by Toni Ivanoski. |
+| **Cultural Chat** | `https://culturalchat.org/mk/владимир-трајанов-од-струмица-победн/` | **VERIFIED** — fetched and read 2026-07-15. Published 11.06.2026. `fbclid` already stripped — keep it stripped. |
+| **Република** | `https://republika.mk/zhivot/moda-i-ubavina/kreativen-den-odrzha-mladinski-kreativen-konkurs-za-dizajn-na-maicza-najdobar-beshe-vladimir-trajanov-od-strumicza/` | **VERIFIED** — fetched and read 2026-07-15. Published 12.06.2026, section „Мода и убавина". **Not supplied at intake — found 2026-07-15.** |
 
-**Rule:** only the Трн.мк link may be cited on the site today. The other three must be fetched,
-confirmed live, and confirmed to be about this competition **before** they appear as links or are
-counted in any "as seen in" strip. A dead link or a misattributed outlet on an About page is the
-cheapest possible way to look careless.
+**The count is five, not four.** The earlier rule ("only Трн.мк may be cited today") is **retired** —
+it existed because three links were unverified. They are verified now. Република was not in the
+intake list and was found by searching; there may be more.
 
-**Never state a press count** ("featured in 4 outlets") until all four are verified. Then it is 4.
+**One original, four syndications — say it accurately.** Трн.мк wrote its own piece. Струмица Денес,
+Бизнис Вести, Cultural Chat and Република all run the **same supplied text**, near-verbatim, with the
+same photographs. That is five real outlets and it is worth showing — but it is **one story that
+travelled**, not five independent reports. So: **list the coverage, never characterise it.** No
+"featured in five major outlets", no "widely covered", no "national press acclaim". A list of links
+under a plain heading is true; an adjective in front of it is not.
 
-**Note:** the Cultural Chat URL was supplied with Facebook click-tracking parameters attached.
-Strip everything from `?fbclid=` onward before use.
+**If a count is ever stated, it is five.** Re-check before stating one — a link that dies later makes
+a printed count wrong.
 
----
+**The press photographs are not ours.** Every outlet carries images of Vladimir and the winning
+design (`img_6500`–`img_6505`). They belong to the outlets or the organisers. **Do not copy them onto
+the site** — not for the About page, not as an OG image, not as a stand-in for the product shots
+still owed (`D-0-6`, § 8).
+
+### Quote integrity — checked 2026-07-15
+
+The approved quote in § 3 is Трн.мк's wording and is **correct as written there.** The four
+syndicated versions transcribe the same sentence slightly differently:
+
+| Source | Wording |
+|---|---|
+| **Трн.мк** (what § 3 quotes, and what the site cites) | „…да започнам со **свој** бренд со наградата од **ЕАМ**" |
+| The other four | „…да започнам со **својот** бренд со наградата од **EAM**" (Latin *EAM*) |
+
+**This is recorded so nobody 'corrects' § 3 later.** The quote on the site is attributed to Трн.мк, so
+it must match Трн.мк — which it does. Do not silently harmonise it to the other four.
 
 ## 5. Contact
 
@@ -221,3 +244,4 @@ Say so in the completion report and it comes back to the orchestrator.
 | Date | Change | By |
 |---|---|---|
 | 2026-07-14 | Created from intake. trn.mk fetched and verified in full. | Claude Chat (orchestrator) |
+| 2026-07-15 | **§ 4 rewritten.** All three outstanding press links fetched, read, and VERIFIED. A **fifth outlet (Република)** found and verified — it was not in the intake list. Recorded that four of the five are syndications of one supplied text, that press photos are not ours to use, and that the § 3 quote matches Трн.мк exactly (the syndications differ by one word — do not "fix" it). The "only Трн.мк may be cited" rule is retired as satisfied. | Claude Chat (orchestrator) |

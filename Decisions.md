@@ -801,3 +801,238 @@ Executor (Code) decisions start at `D-1.04-10`.*
   it belongs with the config constants, named.
 - **Consequences accepted:** `5` is a guess about when "low" should shout; if it feels wrong on drop
   day, it is a one-line change (and not a stock-safety issue).
+
+---
+
+## Phase 1.05 — About + Contact
+
+*`D-1.05-1` … `D-1.05-7` are the orchestrator's, made in chat and appended verbatim. Executor (Code)
+decisions start at `D-1.05-8`.*
+
+### D-1.05-1 · 2026-07-15 · Commit `Trajanov-V2-Plan.md` **and** `Trajanov-V2-Phase-Plan.md` to the repo root
+- **Status:** Accepted
+- **Context:** Phase 1.04's Task 0 flagged that `Trajanov-V2-Plan.md` is referenced by five tracked
+  files but does not exist in the repo: `Decisions.md`, `briefs/Part-1-Phase-03-Code.md`,
+  `src/_project-state/current-state.md`, and the 1.03 and 1.04 completion reports. Checking further,
+  **`Trajanov-V2-Phase-Plan.md` has the same defect** — `Decisions.md` (`D-0-8`) links to it and it is
+  not in the repo either. Both live only in the orchestrator's Claude Project knowledge, which no
+  executor can read. Every reference is a 404 for anyone who follows it.
+- **Decision:** Both files are committed to the repo root by the operator. The references resolve.
+- **Alternatives considered:** Edit the references out of the tracked files — **rejected, and it is not
+  actually available:** `Decisions.md` is append-only and "never edit or delete a past entry" is a
+  standing rule, so its references cannot be removed without breaking a rule that exists to keep the
+  decision history trustworthy. Completion reports are historical records and are not rewritten either.
+  Both files have to exist. Leave them in Claude Project knowledge only — rejected: Claude Code cannot
+  read that; the repo is the only place both audiences share.
+- **Downside accepted:** Two more long documents in the repo that can go stale. Mitigated by their own
+  opening lines — the Plan says "This document is aspirational. Live code wins on conflict", the Phase
+  Plan says live status lives in `current-state.md` — and by the fact that neither restates facts,
+  tokens, decisions, or status; they link. **They must now be deleted from Claude Project knowledge**,
+  or the project has two copies of each and the duplicate is what goes stale.
+- **Links:** `Trajanov-V2-Plan.md` · `Trajanov-V2-Phase-Plan.md` · `D-0-8` · 1.04 completion report §0
+
+### D-1.05-2 · 2026-07-15 · Proceed with the owed-verification register at 4; clear #1 and #2 as merge blockers on this phase
+- **Status:** Accepted
+- **Context:** The house rule fires a verification phase at 3+ register items. After PR #4 merged
+  (clearing item #3), the register stands at **4**. `D-1.04-1` already declined to fire this rule once.
+  **Declining twice in a row is how a gate quietly dies**, so this entry is deliberately stricter than
+  its predecessor rather than a repeat of it.
+- **Decision:** No separate verification phase. Instead, register items **#1 (design direction
+  sign-off) and #2 (Instagram URL click-test)** become **merge blockers on Phase 1.05** — the PR does
+  not merge until Lazar has done both. Items **#4 (hosted-Supabase parity)** and **#5 (real Turnstile
+  keys)** remain deferred to **1.07 by design** (`D-1.03-5`, `D-1.04-1`) and are re-confirmed as
+  scheduled work, not debt.
+- **Alternatives considered:** Insert a verification phase now — rejected: its entire content would be
+  two browser checks that take ten minutes, and #4/#5 **cannot** clear before 1.07 exists because there
+  is no hosted Supabase project to check. A phase that cannot clear its own items is process theatre,
+  and theatre is how a real gate loses its meaning. Proceed and say nothing — rejected: that is exactly
+  the silent accumulation the rule exists to prevent.
+- **Downside accepted:** The 3-item rule has now not fired twice consecutively. If Lazar does not do
+  the two checks, 1.05 merges on a promise — which is why they are written into the Definition of Done
+  as merge blockers rather than left as register rows. **1.08 remains the hard gate; nothing here
+  weakens it.**
+- **Links:** `D-1.04-1` · `D-1.03-5` · `current-state.md` register · Phases 1.07, 1.08
+
+### D-1.05-3 · 2026-07-15 · The Contact page joins Phase 1.05
+- **Status:** Accepted
+- **Context:** Contact is in the information architecture (`Trajanov-V2-Plan.md` §4) but **no phase
+  owns it**. The phase plan gives 1.05 "Home + About"; 1.06 is Catalog + Product; 1.07 is Cart +
+  Checkout + email. Contact has been homeless since kickoff.
+- **Decision:** Contact is built in 1.05. It is the same shape of work as About — a static page whose
+  content comes entirely from `facts.md`, needing the same humanizer pass, the same facts audit, and
+  the same footer link.
+- **Alternatives considered:** Give it to 1.07 — rejected: 1.07 already carries the hosted Supabase
+  project, real keys, Resend, and hosted-parity re-verification, making it the riskiest phase in Part 1;
+  adding an editorial page to it is how a big phase becomes an unreviewable one. Give it its own phase
+  — rejected: a whole phase for one page of text is overhead with no benefit.
+- **Downside accepted:** 1.05 grows from one page to two, and Contact ships with a visible email
+  placeholder from day one — a new row on the placeholder register, and therefore a new cutover
+  blocker, on a page that would otherwise not exist yet. That is the honest state of the world:
+  Vladimir's email is owed and the register is where owed things live.
+- **Links:** `Trajanov-V2-Plan.md` §4 · `facts.md` §5 · Phase 1.07
+
+### D-1.05-4 · 2026-07-15 · No photo hero on Home, and no photo slot either
+- **Status:** Accepted
+- **Context:** The phase plan lists "Hero" under 1.05. The only photography that exists is the
+  lifestyle set from the bar shoot, and it is blocked twice over (`facts.md` §8): model and venue
+  permission are unconfirmed, and whether an alcohol backdrop is right for a brand whose audience
+  starts at age 12 is an unmade owner call. The photos are not in the repo. `brand.md` §8: "Do not
+  design a hero that only works with an image we may not be allowed to use." The 1.02 handover
+  describes the Home countdown as **"type-led, works with no photo."**
+- **Decision:** Home keeps the existing type-led countdown hero, unchanged. **No photo, and no empty
+  photo slot.**
+- **Alternatives considered:** Ship a `PhotoSlot` on the hero so an image can drop in later —
+  **rejected:** it would put a visible `[PLACEHOLDER: …]` on the site's front door, the exact surface
+  every Instagram link lands on, and add a cutover blocker for an image we may never be permitted to
+  use. Wait for the permissions before building 1.05 — rejected: a blocked phase quietly becomes a
+  placeholder, and the About page does not need the photo.
+- **Downside accepted:** The site launches with no photography above the fold; it is type and a
+  countdown. If the permissions land later, adding an image is a small, separate change — deliberately
+  cheaper than removing one we should not have shipped.
+- **Links:** `facts.md` §8 · `brand.md` §8 · `D-0-6` · handover "Screen mocks delivered"
+
+### D-1.05-5 · 2026-07-15 · Cite all five verified outlets; list the coverage, never characterise it
+- **Status:** Accepted
+- **Context:** At intake, `facts.md` § 4 held one verified press link (Трн.мк) and three unverified
+  ones, and the phase plan said "placeholders + register entries if unresolved." **On 2026-07-15 the
+  orchestrator fetched and read all three. All three are live and about this competition. A fifth
+  outlet — Република — was found that was never in the intake list and is also verified.** § 4 has been
+  rewritten; the old "only Трн.мк may be cited" rule is retired as satisfied.
+- **Decision:** About lists **all five** outlets as links: Трн.мк, Струмица Денес, Бизнис Вести,
+  Cultural Chat, Република. Under a plain heading. **With no adjective in front of them.**
+- **Alternatives considered:** Cite only Трн.мк — rejected: that rule existed solely because the others
+  were unverified, and they are not any more; a brand whose only asset is real press should show the
+  real press. Add an "as seen in" strip with logos — **rejected: the logos are the outlets' trademarks
+  and we have no licence**, and a logo wall implies a relationship that does not exist. State a count
+  ("featured in 5 outlets") — rejected, see the downside.
+- **Downside accepted:** **Four of the five are syndications of the same supplied text**, with the same
+  photographs — one story that travelled, not five independent reports. Listing five links is true;
+  *characterising* them ("widely covered", "national acclaim", "featured in five outlets") reads as
+  five newsrooms independently deciding this mattered, which is not what happened. So the page lists
+  and stays silent. That is a weaker-sounding page than the marketing version, and it is the only
+  version that is true. A link can also die later, which is why no count is printed and why 2.03
+  re-checks.
+- **Links:** `facts.md` § 4 (rewritten 2026-07-15) · Phase 2.03
+
+### D-1.05-6 · 2026-07-15 · The press quote renders in Macedonian on MK, and as a marked translation on EN
+- **Status:** Accepted
+- **Context:** `facts.md` §3 approves exactly one quote, in Macedonian, with attribution. Vladimir
+  never said it in English.
+- **Decision:** MK renders the original. EN renders an English translation, explicitly marked as
+  translated from Macedonian, with the same attribution (name, outlet, date).
+- **Alternatives considered:** Print the MK original untranslated on the EN page — rejected: audience 3
+  is press-curious and does not read Macedonian; an unreadable quote is not a quote. Print an English
+  version with no translation note — rejected: it presents words as his that he never said in that
+  language, which is exactly the kind of small untruth this project does not do.
+- **Downside accepted:** The EN pull-quote carries a note, which is slightly less clean typographically
+  than a bare quote. **Preferred long-term fix, on the parallel track:** ask Vladimir for a fresh quote
+  written by him, for this site, in both languages — his own words beat a press quote and carry no
+  attribution constraint (`facts.md` §3).
+- **Links:** `facts.md` §3
+
+### D-1.05-7 · 2026-07-15 · About and Contact live in the footer; the header does not change
+- **Status:** Accepted
+- **Context:** The header at 390px already carries wordmark + Catalog + language pill + cart. Adding
+  two links breaks the row or forces a hamburger menu, which is a new component nobody designed.
+- **Decision:** The header is untouched. About and Contact are linked from the footer, which exists and
+  has room. Home carries **one** quiet link to About in its countdown and ended states — satisfying the
+  plan's "the press win, once" — and **nothing** in its live state.
+- **Alternatives considered:** Add both to the header — rejected: audience 1 arrives from an Instagram
+  story to buy in seconds; the header is the buy path and everything else is a tax on it. Build a
+  mobile menu — rejected: a new component, unspecified in the handover, for two links.
+- **Downside accepted:** About and Contact are one scroll away, so press and diaspora visitors (audience
+  3) reach the story less directly than a header link would give them. The Home link and the fact that
+  press traffic lands via a link *to* the story mitigate it. Revisit in 2.04 if the analytics say so.
+- **Links:** `Trajanov-V2-Plan.md` §3, §4 · handover §10
+
+---
+
+*`D-1.05-8` onward are the executor's (Code), made while building 1.05.*
+
+### D-1.05-8 · 2026-07-15 · About/Contact are statically prerendered via `setRequestLocale`; they show as `●` (SSG), not `○`
+- **Status:** Accepted
+- **Context:** The DoD asks the four new routes to build as **static `○`**, not dynamic `ƒ`. Two facts
+  collide: (1) under next-intl, a page that never calls `setRequestLocale(locale)` is opted **into
+  dynamic rendering** — the existing `styleguide` route proves it (`ƒ`, though it sets no
+  `force-dynamic`). (2) Because the routes sit under the `[locale]` **dynamic segment** and rely on the
+  layout's `generateStaticParams`, Next marks a statically-prerendered route `●` (SSG), not plain `○`.
+- **Decision:** Both pages call `setRequestLocale(locale)` (and set no `force-dynamic`), so the build
+  **prerenders `/mk/about`, `/en/about`, `/mk/contact`, `/en/contact` at build time**. They report as
+  `●` (SSG) — "prerendered as static HTML" — which is the localised-route equivalent of `○` and the
+  actual outcome the DoD wants: no per-request DB read, no per-request compute, cached static HTML.
+- **Alternatives considered:** Force a plain `○` — **rejected/unavailable:** a route under a dynamic
+  segment with `generateStaticParams` is `●` by construction; there is no `○` to reach without removing
+  the `[locale]` segment. Omit `setRequestLocale` — rejected: that ships them as `ƒ` (dynamic), the one
+  thing the DoD forbids.
+- **Downside accepted:** The build marker is `●`, not the literal `○` the brief names. This is a
+  wording gap in the DoD, not a miss: `●` **is** static prerender. Flagged in the completion report §3.
+- **Links:** `src/app/[locale]/about/page.tsx` · `src/app/[locale]/contact/page.tsx` · `D-1.01-3`
+
+### D-1.05-9 · 2026-07-15 · The phone joins `src/lib/social.ts` as a shared constant; footer + Contact import it
+- **Status:** Accepted
+- **Context:** Task 6 states the phone and the IG handle "both come from `facts.md` §5/§6 and
+  `src/lib/social.ts`" and must be imported, never retyped. But `social.ts` held only the IG constants;
+  the 1.02/1.04 footer **hard-coded** the phone (`078 820 520` / `tel:+38978820520`). The brief's
+  premise — phone already in `social.ts` — was not true on disk.
+- **Decision:** Add `PHONE_DISPLAY` + `PHONE_TEL` to `src/lib/social.ts` (verified once against
+  `facts.md` §5), broaden its header comment to "public contact constants", and import them in **both**
+  the footer and the new Contact page. The footer's retyped phone is removed.
+- **Alternatives considered:** A separate `src/lib/contact.ts` — rejected: the brief names `social.ts`,
+  and a second facts-constants file to hold one phone number is overhead. Leave the phone hard-coded in
+  each place — rejected outright: "one typo in a phone number multiplies across every page and sends a
+  real customer to a stranger" is the exact risk the brief calls out.
+- **Downside accepted:** `social.ts` now carries a non-"social" fact (a phone), stretching its name.
+  Mitigated by the broadened header comment. Renaming the file was rejected as needless churn to an
+  import used across the app.
+- **Links:** `src/lib/social.ts` · `facts.md` §5 · Task 6
+
+### D-1.05-10 · 2026-07-15 · Fixed the footer's hard-coded English "Strumica, North Macedonia" to a translated string
+- **Status:** Accepted
+- **Context:** The 1.02/1.04 footer rendered a literal English `"Strumica, North Macedonia"` on **every
+  page, in both locales** — an English string in the MK build, which `CLAUDE.md` forbids ("never ship
+  an English string into the MK build"). This phase edits the footer (adding the About/Contact links)
+  and adds a *translated* Strumica line to the new Contact page, making the untranslated footer version
+  stand out directly beside it.
+- **Decision:** Add a `Nav.location` key (MK "Струмица, Северна Македонија" / EN "Strumica, North
+  Macedonia") and render it in the footer, replacing the hard-coded English string.
+- **Alternatives considered:** Leave it — rejected: it is a standing-rule violation (`CLAUDE.md`
+  content/i18n), pre-existing but now directly adjacent to translated copy I am adding. Defer it to the
+  MK copy-review phase (2.02) — rejected: it is a one-line fix in a file I am already touching, and
+  2.02 reviews *copy*, not un-internationalised strings.
+- **Downside accepted:** A footer change slightly beyond the brief's stated footer scope ("add two
+  links; keep the phone/IG block as is"). The change is in the *left* block, not the phone/IG block,
+  and is the safest possible i18n fix. Flagged in the completion report §3.
+- **Links:** `src/components/layout/SiteFooter.tsx` · `CLAUDE.md` (content truth / MK default)
+
+### D-1.05-11 · 2026-07-15 · Coverage dates render via the next-intl formatter (long month); the quote keeps its verbatim per-locale date
+- **Status:** Accepted
+- **Context:** Task 3 asks each coverage entry to show "outlet name + date". Dates must read natively in
+  both locales. The quote attribution, separately, is specified **verbatim**: MK `12.06.2026`
+  (`facts.md` §3), EN `12 June 2026` (Task 2).
+- **Decision:** The five coverage dates are rendered with `next-intl`'s formatter using
+  `{day:'numeric', month:'long', year:'numeric', timeZone:'UTC'}` — MK "12 јуни 2026 г.", EN "12 June
+  2026". The **pull-quote attribution keeps its exact per-locale string** (MK numeric `12.06.2026`, EN
+  `12 June 2026`), unchanged from the source.
+- **Alternatives considered:** Numeric dates everywhere — rejected: `Intl('en')` numeric is `6/12/2026`
+  (ambiguous MM/DD) for the press/diaspora EN reader. Hard-code date strings per locale — rejected: not
+  locale-aware and re-types data. Harmonise the quote's date to the list format — rejected: the quote
+  attribution is verbatim from `facts.md` §3 and must not be "corrected".
+- **Downside accepted:** The MK coverage dates carry Intl's native "г." suffix and differ in format from
+  the MK quote's numeric `12.06.2026`. Both are valid Macedonian; a citation using a numeric date beside
+  a list using a spelled month is normal and not an inconsistency worth eliminating.
+- **Links:** `src/app/[locale]/about/page.tsx` · `facts.md` §3, §4
+
+### D-1.05-12 · 2026-07-15 · `About.quoteNote` is empty on MK, non-empty on EN; rendered only when present
+- **Status:** Accepted
+- **Context:** `D-1.05-6` requires the EN quote to be explicitly marked "translated from Macedonian",
+  while the MK quote (the original) needs no such note. The two message catalogs must keep **identical
+  key sets** (DoD).
+- **Decision:** `About.quoteNote` exists in both catalogs: EN = "Translated from Macedonian", MK = ""
+  (empty). The component renders the note only when the value is truthy, so EN shows it and MK shows
+  nothing. Key parity holds; the MK reader sees no redundant note.
+- **Alternatives considered:** Give MK a real note too ("original in Macedonian") — rejected: redundant
+  and mildly clumsy for a MK reader who is already reading Macedonian. Branch on locale in the component
+  and omit the key from MK — rejected: it breaks the identical-key-sets rule.
+- **Downside accepted:** An intentionally-empty value in `mk.json` can read as an oversight to someone
+  scanning the file. Mitigated by a code comment at the render site and this entry.
+- **Links:** `src/messages/{mk,en}.json` · `src/app/[locale]/about/page.tsx` · `D-1.05-6`

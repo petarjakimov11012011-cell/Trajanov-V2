@@ -1,4 +1,4 @@
-NEXT: PR #4 fresh-session review (required, D-0-3) before merge → then Part 1 Phase 05
+NEXT: 1.06 — Catalog + Product
 
 # Current state — Trajanov-V2
 
@@ -6,11 +6,27 @@ NEXT: PR #4 fresh-session review (required, D-0-3) before merge → then Part 1 
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-15** · By: **Claude Code (Phase 1.04 — drop engine)**
+Last updated: **2026-07-15** · By: **Claude Code (Phase 1.05 — About + Contact)**
 
 ---
 
 ## Status
+
+**About + Contact are live, sourced entirely from `facts.md`.** Two **static** editorial pages
+(`/about`, `/contact`, both locales, prerendered `●`/SSG via `setRequestLocale`) join the site. About
+tells the competition story from `facts.md` §3 and lists **all five** press outlets as links (Трн.мк,
+Струмица Денес, Бизнис Вести, Cultural Chat, Република) under a plain heading — no count, no adjective
+(`D-1.05-5`); the one approved quote renders in MK and as a marked EN translation (`D-1.05-6`). Contact
+carries the phone (`078 820 520` → `tel:+38978820520`), the single Instagram account, and a visible
+email `[PLACEHOLDER]` — **no form, no address** (`facts.md` §1). The phone joined `src/lib/social.ts`
+as a shared constant (`D-1.05-9`); the footer now links About + Contact and shows a **translated**
+location (fixed a pre-existing EN-in-MK leak, `D-1.05-10`); Home shows one quiet About link in its
+**countdown** and **ended** states only (`D-1.05-7`). **No hero photo and no photo slot** (`D-1.05-4`).
+The header is unchanged. **31 tests still pass; build/tsc/lint clean.** Branch
+`phase-1.05-about-contact`. **No `src/lib/{drop,orders}`, `src/config/`, `supabase/`, or `tests/` file
+was touched.**
+
+Prior (1.04): the drop engine —
 
 **Drop engine landed — the site is DB-driven and a drop can open and close on its own.** The
 catalogue, countdown, and buy path now come from the **database, computed on the server**;
@@ -35,9 +51,9 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 1 of 2 — Build |
-| Phase | 1.04 complete — PR open |
-| Branch | `phase-1.04-drop-engine` |
-| Open PR | `#4` → `main` (1.01 `#1`, 1.02 `#2`, 1.03 `#3` merged) |
+| Phase | 1.05 complete — PR pending |
+| Branch | `phase-1.05-about-contact` |
+| Open PR | `#5` → `main` — **pending push/open** (1.01–1.04 merged `#1`–`#4`) |
 | Deployed | nowhere — Supabase runs **local only** (`D-1.03-5`) |
 | Domain | `trajanov.com` — **not purchased** |
 
@@ -53,6 +69,30 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### About + Contact (1.05) — static editorial pages
+
+- **About** `src/app/[locale]/about/page.tsx` — **static** (`setRequestLocale`, no `force-dynamic`).
+  Eyebrow → H1 → 3 body paragraphs (brand, competition, prize) → pull-quote → coverage list → link to
+  `/catalog`. Every claim traced to `facts.md` §1/§2/§3/§4/§7. Quote renders in MK (original) and EN
+  (marked translation, `D-1.05-6`). Coverage = all five outlets as links, dates via the next-intl
+  formatter, **no count/adjective** (`D-1.05-5`, `D-1.05-11`). Press URLs copied character-exact from
+  `facts.md` §4 (Cultural Chat's Cyrillic path keeps its stripped `fbclid`); all five verified live
+  (HTTP 200) and confirmed as the competition article.
+- **Contact** `src/app/[locale]/contact/page.tsx` — **static**. Phone (`078 820 520` →
+  `tel:+38978820520`, ≥44px tap target), Instagram (`@trajanovv2026`, ≥44px), email
+  `[PLACEHOLDER]` via the `<Placeholder>` component. Context line (Strumica · ships NMK only · COD).
+  **No form, no address.**
+- **`src/lib/social.ts`** gained `PHONE_DISPLAY` + `PHONE_TEL` (`D-1.05-9`) — single source for the
+  phone, imported by the footer + Contact, never retyped.
+- **`SiteFooter.tsx`** — About + Contact links (locale-aware `Link`), phone imported from `social.ts`,
+  location now translated via `Nav.location` (`D-1.05-10`). Header untouched (`D-1.05-7`).
+- **`HomeExperience.tsx`** — one quiet About link in the **countdown** and **ended** states; **none** in
+  live/opening (verified in-browser).
+- **Strings**: new `About` + `Contact` namespaces and `Nav.about/contact/location`, `Placeholder.email`
+  in **both** catalogs — **identical key sets (126 each), verified**. Humanizer pass run.
+- Rendered in-browser at 390px + 1180px, both locales (Task 8). `completions/_TEMPLATE.md` filename
+  corrected to `Part-X-Phase-YY-Completion.md`.
 
 ### Drop engine (1.04) — server-driven, local only
 
@@ -150,22 +190,24 @@ or before any phase that builds on unverified work, the next phase is a verifica
 
 | # | Item | Owed since | Phase that verifies |
 |---|---|---|---|
-| 1 | **Design direction sign-off.** Palette + fonts were *derived* from the handover ledger, not from a delivered filled `brand.md` (`D-1.02-1`). Lazar must eyeball the rendered site and approve/adjust the tokens. | 1.02 | Lazar review of the live site |
-| 2 | **IG profile URL click-test.** `@trajanovv2026` handle is VERIFIED but the URL must be click-tested live before it ships (`facts.md` §6). It appears in the footer + drop-ended banner. | 1.02 | Before cutover (2.05) |
-| 3 | **Fresh-session review of PR `#4`** (`D-0-3`). A Claude Code session that did **not** write this code reviews the PR against the 1.04 brief before merge. **A downgrade on a real automated review gate**, not an equal substitute. **Required for 1.04**; must specifically cover the **modified `create_order()` (TR006)** and the **sync's stock behaviour** (`D-1.04-5`). Clears at merge. | 1.04 | Fresh Claude Code session, pre-merge |
+| 1 | **Design direction sign-off.** Palette + fonts were *derived* from the handover ledger, not from a delivered filled `brand.md` (`D-1.02-1`). Lazar must eyeball the rendered site (now incl. `/about`, `/contact`) and approve/adjust the tokens. **Merge blocker on 1.05** (`D-1.05-2`). | 1.02 | Lazar review of the live site |
+| 2 | **IG profile URL click-test.** `@trajanovv2026` handle is VERIFIED and the URL renders/links correctly (verified in-browser this phase: footer, drop-ended banner, **and now Contact**), but a human must click it and confirm it opens **Vladimir's actual profile** (`facts.md` §6). **Merge blocker on 1.05** (`D-1.05-2`). | 1.02 | Lazar click-test, pre-merge |
 | 4 | **Hosted-Supabase parity** (`D-1.03-5`, extended by `D-1.04-1`). Migrations, RLS, real keys, **the pg_cron schedule, and the rate-limit table** are proven only against local Supabase (Colima). A **paused free-tier project silently pauses pg_cron** (reservations stop expiring). Re-confirm all of it on the real project. | 1.03/1.04 | 1.07 (hosted project) |
 | 5 | **Real Turnstile keys.** Siteverify is proven only against Cloudflare's **dummy** keys (`D-1.04-8`); "is Cloudflare actually challenging bots" is unanswerable until real keys. Test keys must never reach production. | 1.04 | 1.07 / 2.05 |
 
-*Code verified directly (not owed): `supabase db reset` clean from scratch (incl. a working pg_cron
-schedule — `cron.job` shows 2 jobs); `npm run build`, `npx tsc --noEmit`, `npm run lint`, `npm test`
-(31) all green; the re-run 10-vs-3 concurrency gate proven (3 succeed, 7 TR004, stock 0); the
-sync-never-resets-stock test; the `server-only` guard on `src/lib/drop` proven by a failing build; a
-full order placed end-to-end in-browser (Turnstile → Siteverify → rate limit → `create_order`).*
+*Code verified directly (not owed) this phase: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
+`npm test` (**31**) all green; About + Contact render at 390px + 1180px, both locales; the five press
+URLs match `facts.md` §4 character-for-character and each returns HTTP 200 (trn.mk + republika
+confirmed as the competition article); Home About link present in countdown + ended, absent in live;
+phone/IG tap targets ≥44px. (1.04 direct-verified items — pg_cron schedule, concurrency gate,
+`server-only` guard, end-to-end order — carry forward unchanged; nothing in this phase touched them.)*
 
-*Register is at **5 items**. **#3 clears at merge** (as 1.03's did — 1.03's PR-#3 review is now
-resolved and removed). After merge the register is 4: #1/#2 are 1.02 UI checks 1.05+ does not build
-on, and #4/#5 are deferred to 1.07 **by design**. None is shaky work the next phase stands on, but the
-count is above the 3-item line — **orchestrator to decide** whether 1.05 absorbs a verification pass.*
+*Register is at **4 items**. **Item #3 (fresh-session review of PR `#4`) is removed — cleared at the
+PR-#4 merge** (as 1.03's PR-#3 review was). Per `D-1.05-2`: **#1 (design sign-off) and #2 (IG URL
+click-test) are merge blockers on 1.05** — the PR does not merge until Lazar does both; **#4
+(hosted-Supabase parity) and #5 (real Turnstile keys) are deferred to 1.07 by design**. The 3-item
+rule has now not fired twice consecutively (`D-1.04-1`, `D-1.05-2`); **1.08 remains the hard gate.**
+Numbers 1/2/4/5 are kept (not renumbered) so `D-1.05-2`'s references stay valid.*
 
 ---
 
@@ -180,8 +222,11 @@ blocker.**
 | 2 | `[PLACEHOLDER: фотографија — Владимир]` (product photo) | Catalog cards, Product | Real product photos (`D-0-6`) | Vladimir |
 | 3 | `[PLACEHOLDER: состав и нега — од етикетата]` (fabric/care) | Product | Composition from the labels | Vladimir |
 | 4 | Product **names** render as neutral slots ("Производ 01…"); sizes shown are a flagged **sample** | Catalog, Product | Real names + sizes/measurements | Vladimir |
+| 5 | `[PLACEHOLDER: е-пошта — Владимир]` (contact email) | **Contact** (1.05) | Vladimir's email (`facts.md` §5) | Lazar → Vladimir |
 
-*All four are now driven by the **DB via the typed drop config** (not `demo.ts`, deleted): a null
+*#5 (email) is a pure UI placeholder via `<Placeholder>` (`Placeholder.email` key), shipped by 1.05
+(`D-1.05-3`) — it also gates the order-confirmation sender/recipient (`facts.md` §5, Phase 1.08).
+#1–#4 are now driven by the **DB via the typed drop config** (not `demo.ts`, deleted): a null
 `price_mkd`/`name_*` renders the price/name placeholder (`D-1.04-6/10`); photo + fabric/care have **no
 DB column yet** (they land with 1.06 photos / a later phase) and render as pure UI placeholders. When
 Vladimir supplies real prices/names, filling `src/config/products.ts` + `npm run sync:drop` clears #1
@@ -191,12 +236,14 @@ and #4 (for a drop). Sizes for a real drop come from config (the rehearsal's are
 **Already known to be coming** (from `facts.md`, will become entries the moment the relevant page
 is built):
 
-- Vladimir's email → Contact page, order emails
 - Real prices in MKD → Product pages
 - Sizes / measurements → Product pages
 - Fabric composition + care → Product pages
 - Product photos → Catalog, Product
-- 3 unverified press links → About
+
+*Resolved this phase: **Vladimir's email** is now a live register row (#5). The **press links** are no
+longer "coming" — all five are VERIFIED (`facts.md` §4, 2026-07-15) and cited on About as links, with
+no placeholder (`D-1.05-5`).*
 
 ---
 
@@ -219,7 +266,7 @@ is built):
 | 3 | **Public repo.** One committed secret is scraped before you notice. | `D-0-1` | Live. Mitigation: hard rule in `CLAUDE.md`. Rotate, never just delete. |
 | 4 | **Legal responsibility unconfirmed.** Minor, no registered entity, collecting consumer PII. | `facts.md` § 1 | **Cutover blocker.** Owner: Vladimir + parents. |
 | 5 | **Product photos do not exist.** | `D-0-6` | **Blocks 1.06.** Owner: Vladimir. Critical path. |
-| 6 | **Bar photos: model + venue permission unconfirmed**, and age-appropriateness of an alcohol backdrop for a 12+ audience is an open owner call. | `facts.md` § 8 | Blocks 1.05 hero. Owner: Vladimir. |
+| 6 | **Bar photos: model + venue permission unconfirmed**, and age-appropriateness of an alcohol backdrop for a 12+ audience is an open owner call. | `facts.md` § 8 | **No longer blocks 1.05** — `D-1.05-4` shipped Home + About with **no photo and no photo slot**. Still blocks any future photo hero / lifestyle imagery. Owner: Vladimir. |
 
 ---
 
@@ -236,7 +283,7 @@ Canonical table with gates: `Trajanov-V2-Plan.md` § 13. Status only:
 | Sizes + fabric (read the labels) | Vladimir | Not started |
 | Legal responsibility w/ parents | Vladimir | Not started |
 | Model + venue permission | Vladimir | Not started |
-| Verify 3 press links | Lazar | Not started |
+| Verify press links | Lazar | **Done** — all 5 fetched, read, VERIFIED 2026-07-15 (`facts.md` §4); cited on About (`D-1.05-5`) |
 | First drop date + products | Vladimir | Not started |
 | MK copy review | Lazar + Petar | Scheduled — Phase 2.02 |
 
