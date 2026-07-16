@@ -1300,3 +1300,270 @@ decisions, if any, continue from `D-1.07-4`.*
   migrations run, that `orders`/`order_items` are not reachable by the anon key** on the hosted project
   — exactly owed item #4's parity check.
 - **Links:** `D-1.03-9` (RLS/grants posture) · owed-verification #4 · `completions/Part-1-Phase-07-Cowork-Completion.md` §3
+
+### D-1.07-4 · 2026-07-16 · Hosted parity is proven by running the real test suite against the hosted database, once, while it is empty — then resetting it
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.07 Code brief
+- **Context:** Owed-verification #4 (hosted-Supabase parity) has been open since 1.03. The schema,
+  `create_order()`, `expire_reservations()`, the pg_cron schedule and the rate-limit table are proven
+  only against local Supabase (Colima). Inspection alone cannot prove that the atomic decrement holds
+  on the real host under real concurrency.
+- **Decision:** Export the hosted credentials and run the **real** 46-test suite against Frankfurt,
+  once, while the database is still empty — including the 10-vs-3 oversell gate — then reset the hosted
+  database so the `TRJ-####` sequence starts at 1 again.
+- **Alternatives considered:** Prove parity by inspection only (`cron.job` count, a few RLS probes) —
+  rejected: it would confirm the objects exist without ever exercising the one behaviour that matters,
+  the atomic decrement under concurrency.
+- **Downside accepted:** Test rows and an advanced `TRJ-####` sequence briefly exist on the production
+  database. Mitigated by doing it before any real data exists and resetting afterwards — **this window
+  does not come back.**
+- **Links:** owed-verification #4 · `D-1.03-5` · `D-1.04-1` · Phase 1.07 Code brief
+
+### D-1.07-5 · 2026-07-16 · Production is verified from a CLI deploy of the phase branch, before the PR merges
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.07 Code brief
+- **Context:** The six Vercel env vars do not take effect until a deploy happens. Verifying them
+  requires production to be serving this phase's code, but this phase's code is not yet reviewed.
+- **Decision:** Verify production from `npx vercel --prod` run on the phase branch, **before** the PR
+  merges — not from a preview URL (Turnstile will not accept preview hostnames, `D-1.07-6`) and not
+  after the merge.
+- **Alternatives considered:** Merge first, verify after — rejected: it would put unverified real-key
+  behaviour on `main` and make the verification a post-hoc formality.
+- **Downside accepted:** Unreviewed branch code serves the production URL for the length of this phase.
+  Acceptable while the site has no domain, no customers, and one ended test drop; the merge redeploys
+  the same commit.
+- **Links:** `D-1.07-6` · owed-verification #5 · Phase 1.07 Code brief
+
+### D-1.07-6 · 2026-07-16 · Turnstile hostnames stay `trajanov-v2.vercel.app` + `localhost`; bare `vercel.app` is not added
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.07 Code brief
+- **Context:** Vercel preview deployments get random `*.vercel.app` subdomains. The Turnstile widget
+  "Trajanov store" accepts only `trajanov-v2.vercel.app` and `localhost`, so a preview URL cannot pass
+  the bot check (flagged by Cowork, `completions/Part-1-Phase-07-Cowork-Completion.md` §3.5).
+- **Decision:** Leave the hostname list exactly as it is.
+- **Alternatives considered:** Add bare `vercel.app` so preview deployments pass — rejected: it would
+  let **any** `*.vercel.app` host on the internet use this widget.
+- **Downside accepted:** Turnstile cannot be exercised on preview URLs at all — every Turnstile check
+  happens on production or localhost. This is what forces `D-1.07-5` (verify from a production CLI
+  deploy rather than a preview).
+- **Links:** `D-1.07-2` · `D-1.07-5` · owed-verification #5 · Phase 1.07 Code brief
+
+### D-1.07-7 · 2026-07-16 · Owed item #5 (real Turnstile keys) narrows rather than closes in 1.07
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.07 Code brief
+- **Context:** 1.07 can prove the production build serves the real site key and that the real secret
+  authenticates against Cloudflare's Siteverify. It cannot prove that Cloudflare actually challenges a
+  bot on a real order — that needs a **live** drop, and 1.07 deliberately does not create one (the only
+  committed drop is `test-drop`, ended and null-priced, `D-1.04-12`).
+- **Decision:** Rewrite register row #5 to say exactly what is proven and what is not, and carry the
+  remainder to **1.08**. **Do not delete the row.**
+- **Alternatives considered:** Close #5 on the strength of the site-key + Siteverify evidence —
+  rejected: it would mark "bot protection works" verified on evidence that never involved a bot, which
+  is exactly the kind of debt 1.08 exists to catch.
+- **Downside accepted:** The register does not shrink by this item in 1.07, and 1.08's clearing job is
+  correspondingly larger.
+- **Links:** `D-1.04-8` · `D-1.04-12` · owed-verification #5 · Phase 1.07 Code brief
+
+### D-1.07-8 · 2026-07-16 · 1.07 ships without Resend; order email becomes on-demand phase `Z.01`, mandatory before 1.08
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.07 Code brief
+- **Context:** Resend was scoped into 1.07 by the Phase Plan, and the Cowork half assumed it would fold
+  into 1.08. It is blocked on Vladimir's email address, which does not exist (`facts.md` §5;
+  placeholder register #5). No `RESEND_API_KEY` / `ORDER_NOTIFICATION_EMAIL` was set in Vercel.
+- **Decision:** Strike Resend and order email from 1.07 entirely — no key, no send code, no stub. Create
+  on-demand phase **`Z.01 — Order email (Resend)`**, triggered by Vladimir's email address arriving,
+  **mandatory before 1.08**, and put it on the critical path.
+- **Alternatives considered:** Fold Resend into 1.08 (what the Cowork report assumed) — rejected: 1.08
+  is explicitly a **no-new-features** gate whose own DoD is a real order end to end, and **a gate that
+  builds the feature it then verifies is not a gate.**
+- **Downside accepted:** One more phase and one more PR, and **1.08 now has a hard dependency on a phone
+  call nobody has made yet** — the project's critical path now runs through Vladimir's email address.
+- **Links:** `facts.md` §5 · placeholder register #5 · `Trajanov-V2-Phase-Plan.md` (`Z.01`, critical path) · Phase 1.07 Code brief
+
+### D-1.07-9 · 2026-07-16 · Hosted credentials live in a separate gitignored `.env.hosted`, not in `.env.local`
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly, this phase)
+- **Context:** The brief's Task 2 says to fill `.env.local` with the **hosted** values. But Task 5 also
+  requires running the suite against hosted **and then re-running it against local** to confirm 46 still
+  pass. `tests/setup.ts` loads `.env.local` via `process.loadEnvFile`, so a `.env.local` holding hosted
+  values makes the local re-run impossible without editing the file back — mid-phase, by hand, under no
+  test. Verified empirically that **exported env vars take precedence over `process.loadEnvFile`**, so
+  both targets can coexist.
+- **Decision:** Keep `.env.local` as the **local** (Colima) config it already is, and put the hosted
+  values in a **separate gitignored `.env.hosted`** (covered by `.gitignore:34` `.env*`; proven with
+  `git check-ignore -v`). The hosted parity run sources `.env.hosted` and exports; the local re-run is
+  the default with nothing exported.
+- **Alternatives considered:** (a) Follow the brief literally and overwrite `.env.local` with hosted
+  values — rejected: it silently points `npm run dev`, `npm test` and `npm run sync:drop` at the
+  **production** database by default, which is how a stray local test run writes a row to Frankfurt.
+  (b) Swap the file back and forth between the two runs — rejected: a hand-edit of a secret file, twice,
+  in the middle of the one phase that must not leak a secret.
+- **Downside accepted:** One more untracked file on the operator's machine, and one more thing to keep
+  out of git (mitigated: `.env*` already covers it, and it is proven ignored). `.env.example` is not
+  updated to mention it, since `.env.example` documents the app's own variables and `.env.hosted` is an
+  admin convenience, not a runtime input.
+- **Links:** `D-0-1` (public repo / secrets rule) · `D-1.03-12` (`SUPABASE_DB_URL` is local/test only) · `tests/setup.ts`
+
+### D-1.07-10 · 2026-07-16 · The hosted parity run exports all four Supabase vars, not just `SUPABASE_DB_URL`
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly, this phase)
+- **Context:** The brief's Task 5 says "Export the hosted `SUPABASE_DB_URL` and run `npm test`." But
+  `tests/helpers/db.ts` builds its anon client from `NEXT_PUBLIC_SUPABASE_URL` +
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY` and its admin client from `NEXT_PUBLIC_SUPABASE_URL` +
+  `SUPABASE_SERVICE_ROLE_KEY` — only the raw-SQL suites use `SUPABASE_DB_URL`. Exporting the DB URL
+  alone would run the SQL suites against **Frankfurt** while the RLS/PostgREST suites quietly ran
+  against **local**, and report 46/46.
+- **Decision:** Export all four hosted values together for the parity run, and assert inside the run
+  that the anon/service clients are pointed at the hosted host before trusting the result.
+- **Alternatives considered:** Follow Task 5 literally — rejected: it produces a **false pass** on the
+  exact item (#4) this phase exists to close, and the RLS check (Task 6) is the half that would have
+  been skipped.
+- **Downside accepted:** A deviation from the brief's literal wording, recorded here and in §3/§4 of the
+  completion report. None technically — this is strictly more of the suite hitting hosted, which is what
+  the brief's own DoD ("All 46 must pass against hosted") requires.
+- **Links:** `D-1.07-4` · `tests/helpers/db.ts` · `tests/setup.ts` · owed-verification #4
+
+### D-1.07-11 · 2026-07-16 · The hosted `SUPABASE_DB_URL` uses the SESSION pooler, not the direct connection the brief specifies
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly, this phase)
+- **Context:** The brief's credentials table says to take the **direct** Postgres URL from Supabase →
+  Connect. `db.kmuocwmevyyuhcvwoebf.supabase.co` publishes **only an AAAA record — it is IPv6-only**, and
+  the operator's machine has **no global IPv6 address** (only VPN link-local `utun` default routes).
+  macOS `getaddrinfo` therefore suppresses the AAAA, so `dns.resolve6` finds the address while
+  `dns.lookup`, `nc`, `psql`, `postgres.js` and `supabase db push` all fail identically with `ENOTFOUND`.
+  A control lookup of `google.com` returned **zero** IPv6 addresses, confirming the cause is the host's
+  lack of IPv6 rather than anything about this project. Supabase's own Connect dialog labels the Session
+  pooler: *"Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."*
+- **Decision:** Use the **session** pooler —
+  `postgresql://postgres.kmuocwmevyyuhcvwoebf@aws-0-eu-central-1.pooler.supabase.com:5432/postgres` —
+  for `SUPABASE_DB_URL` in `.env.hosted`. Verified: it resolves to real IPv4 addresses, connects, reports
+  PostgreSQL 17.6, and **supports prepared statements** (which `postgres.js` uses by default).
+- **Alternatives considered:** (a) The **transaction** pooler on **6543** — rejected: transaction mode does
+  not support prepared statements, so `postgres.js` would need `prepare: false`, which means **editing the
+  test helpers to suit the host** — the brief explicitly forbids changing code to make hosted pass. (b) Get
+  IPv6 working on the operator's machine (or a tunnel) — rejected: it makes the phase depend on the
+  operator's ISP/VPN, and every future operator would hit the same wall. (c) The IPv4 add-on — rejected:
+  paid, and `D-0-2`/cost discipline says a paid tier is a decision and a phase, never a silent upgrade.
+- **Downside accepted:** The parity run reaches Postgres through **Supavisor** rather than a raw socket, so
+  it proves the schema/functions/RLS but not the direct-connection path itself. This is acceptable because
+  **the app never uses `SUPABASE_DB_URL` at all** — the runtime talks PostgREST over HTTPS
+  (`D-1.03-12`: this var is local/test only). The pooler is an admin/test transport, not a production one,
+  so nothing about the deployed store depends on this choice. Also: the pooler's connection limit (pool
+  size 15, Nano compute) sits under the 10-vs-3 oversell test's concurrency — watched, and it passed.
+- **Links:** `D-1.03-12` · `D-1.07-4` · `D-1.07-9` · `D-0-2`
+
+### D-1.07-12 · 2026-07-16 · The Supabase DB password was reset, and an account access token minted, to unblock the Code half
+- **Status:** Accepted
+- **Decided by:** Petar (operator) — chosen explicitly in-session after the alternatives were put to him
+- **Context:** The Cowork half left the DB password only in the operator's password manager, and marked all
+  six Vercel env vars **Sensitive** — which makes them **write-only**: `vercel env pull` returns every one
+  as an empty string. So the Code half could not obtain a single credential from Vercel, and Cowork's §3.4
+  claim that Sensitive was "cosmetic only, no functional impact" is **true for the deployed build but false
+  for the Code half**. `supabase login` additionally refuses its browser flow in a non-TTY shell
+  (`LegacyLoginMissingTokenError`), requiring an access token instead.
+- **Decision:** Mint a Supabase **personal access token** (`claude-code-phase-1.07`, 30-day expiry, expires
+  2026-08-15) to drive `link`/`db push`/`gen types --linked`, and **reset the project DB password** to a
+  locally-generated 48-char hex value written only to gitignored `.env.hosted`.
+- **Alternatives considered:** Have the operator paste the existing password from his password manager —
+  **recommended by Code and rejected by the operator.** It would have kept the password-manager entry valid
+  and left Lazar's owed item #3 as "confirm it is saved" rather than "save the new one."
+- **Downside accepted:** (1) **Lazar's owed item #3 changes meaning** — the password in the password manager
+  is now **stale and wrong**; the new one exists only in `.env.hosted` on Petar's machine and must be saved,
+  or it is unrecoverable. (2) The access token controls the whole Supabase account and **appeared in a
+  screenshot in the working session transcript** — it must be revoked at phase close. (3) Nothing else used
+  the old password (no Vercel var, no CI), so the reset broke no live connection.
+- **Links:** `D-0-1` · `D-1.07-9` · owed-to-Lazar #3 · `completions/Part-1-Phase-07-Cowork-Completion.md` §3.4
+
+### D-1.07-13 · 2026-07-16 · `seed.sql` is applied to the hosted database for the parity run, against its own header warning, then removed by the reset
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly, this phase)
+- **Context:** The brief's DoD requires "`npm test` against the hosted `SUPABASE_DB_URL` → **46 pass**".
+  Those tests resolve fixtures through `getVariantId('test-tee-black','M')` etc., which only exist in
+  `supabase/seed.sql`. **`supabase db push` does not apply `seed.sql`** — only a local `supabase start` /
+  `db reset` does. So against hosted the suite cannot even reach its assertions; it fails on fixture
+  lookup, for reasons that say nothing about parity. The brief did not anticipate this.
+  **`seed.sql`'s own first line says: "NEVER runs against a deployed database (`D-1.03-5`); local
+  `db reset` only."**
+- **Decision:** Apply `seed.sql` to hosted **only** for the duration of the parity run, then remove it with
+  the reset that `D-1.07-4` already mandates. The seed's warning is respected in substance: it exists to
+  stop invented prices/names (`999 MKD`, "ТЕСТ — Маица 01") being mistaken for real content on a **live**
+  store. Here the database has **no real data**, the store has no domain and no customers, every slug is
+  `test-`-prefixed by deliberate design ("instantly obvious rather than plausible"), and the rows are gone
+  minutes later. `D-1.03-5` — the decision that warning cites — is the "local only, no deploy" decision that
+  **this phase supersedes**.
+- **Alternatives considered:** (a) Skip the hosted suite and prove parity by inspection — rejected: that is
+  exactly the alternative `D-1.07-4` already rejected, and it would leave the atomic decrement unproven on
+  the real host. (b) Write a separate hosted-only fixture — rejected: a second fixture that drifts from
+  `seed.sql` would make the hosted run test something the local run doesn't, defeating the point of a
+  **parity** check. (c) Point the tests at real drop config — rejected: the only committed drop is
+  `test-drop`, ended and null-priced (`D-1.04-12`); the concurrency test needs an **open** drop with stock 3.
+- **Downside accepted:** Invented test prices/names touch the production database for a few minutes, and
+  the `TRJ-####` sequence advances. Both are erased by the reset, which is verified afterwards. **If the
+  reset had failed, `test-` rows would sit in production** — which is why the reset is verified explicitly
+  rather than assumed.
+- **Links:** `D-1.07-4` · `D-1.03-5` (superseded by this phase) · `D-1.04-12` · `supabase/seed.sql`
+
+### D-1.07-14 · 2026-07-16 · A new migration explicitly REVOKEs write privileges on the catalog tables, closing a hosted-only defence-in-depth gap
+- **Status:** Accepted
+- **Decided by:** Petar (operator) — chosen explicitly in-session after the finding and both options were put to him
+- **Context:** The hosted parity run (`D-1.07-4`) failed **1 of 46**: `tests/rls/anon-access.test.ts >
+  cannot UPDATE variants stock`. Root cause, measured on both environments:
+  hosted `anon` held `DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE` on
+  `drops`/`products`/`variants`; local `anon` held only `REFERENCES,SELECT,TRIGGER,TRUNCATE`.
+  `schema.sql:150-152` states the assumption — *"Local Supabase does NOT auto-expose new public tables
+  ... a table is unreachable ... until GRANTed here. We grant deliberately and narrowly"* — which is true
+  locally (`auto_expose_new_tables` unset in `config.toml`) and false on hosted, where Cowork left the
+  creation-time **"Automatically expose new tables" toggle ON** (`D-1.07-3`). The tables were therefore
+  created with anon already holding everything, so `grant select` added nothing and nothing removed the
+  rest. **The pattern is exact: every object the migrations REVOKE explicitly (orders, order_items,
+  order_attempts, and all three functions) matched local perfectly; the catalog — the only object trusting
+  the default to be empty — was the only one that diverged.**
+- **No data was ever exposed.** RLS was on with SELECT-only policies, so every anon write matched no policy
+  and touched 0 rows. Verified empirically on hosted before the fix: `stock 5 -> 5`, row count unchanged,
+  INSERT rejected `42501`, `orders`/`order_items` denied `42501` on every verb, all three functions
+  `anon=false`. The defect was **depth, not a hole**: hosted had ONE barrier where local has two.
+- **Decision:** Add `20260716120000_catalog_grant_hardening.sql` — `revoke insert, update, delete, truncate`
+  on the three catalog tables from `anon`, `authenticated`, **and `public`** — then re-assert `grant select`.
+  Applied to local via `db reset` (46 pass) and pushed to hosted (46 pass). Both now report
+  `REFERENCES,SELECT,TRIGGER`.
+- **Alternatives considered:** (a) **Report only and ship 45/46** — rejected by the operator: it leaves
+  production one RLS toggle or one stray permissive policy away from anon writing the catalog, and
+  `schema.sql:162` already names the consequence ("anybody on the internet set stock to whatever they
+  like"). (b) **Turn the dashboard toggle off instead** — rejected: it does **not** retroactively revoke
+  privileges already granted, so it fixes nothing on these three tables; a migration also survives the
+  toggle being flipped back, and a step living only in a dashboard is a step that gets lost. (c) **Edit the
+  failing test to accept "0 rows" as a pass** — rejected outright: that is editing the test to suit the
+  host, which is what the brief forbids, and it would have deleted the only evidence of the gap.
+- **Downside accepted:** The phase's scope grew by one migration and a re-push — the brief did not ask for a
+  schema change. Justified because the fix makes hosted match `schema.sql`'s **own stated intent** rather
+  than bending code to suit a host, and because the test now passes for the **right reason** (the grant
+  denies the write) rather than being made to go green.
+- **STILL OPEN — the toggle:** "Automatically expose new tables" remains **ON** on hosted. This migration
+  fixes today's tables; **any future table** (e.g. `Y.01`'s photo/fabric work) will again be created with
+  anon holding everything. On the register for Lazar.
+- **Links:** `D-1.07-3` · `D-1.07-4` · `D-1.03-9` · `schema.sql:150-152,162` · `supabase/config.toml` (`auto_expose_new_tables`)
+
+### D-1.07-15 · 2026-07-16 · `supabase db reset --linked` is broken against this schema; the reset was completed by hand
+- **Status:** Accepted (finding — no code change)
+- **Decided by:** Claude Code (on-the-fly, this phase)
+- **Context:** `D-1.07-4` mandates resetting the hosted database after the parity run.
+  `npx supabase db reset --linked --yes` **failed halfway**: it dropped every table, type, function and the
+  `pg_cron` extension, then failed re-applying `schema.sql` with
+  `ERROR: relation "order_number_seq" already exists (SQLSTATE 42P07)`. **The reset drops tables and types
+  but not sequences**, so its own re-apply hits the sequence it left behind. It left the database wiped,
+  with migration history empty and one orphan sequence — i.e. **the CLI's reset cannot reset this schema**.
+- **Decision:** Recover by hand: `drop sequence public.order_number_seq cascade`, then
+  `supabase db push --linked --include-all` to rebuild all 8 migrations from an empty history. Verified
+  afterwards: **0 rows in all 6 tables, `order_number_seq` last_value=1 is_called=false (next order
+  TRJ-0001), 2 active cron jobs, all functions present, anon grants narrowed.**
+- **Alternatives considered:** (a) Leave the hosted database in the half-reset state — rejected: it was
+  wiped and unusable; the store would not have rendered. (b) Re-run `db reset --linked` — rejected: it fails
+  the same way every time; the orphan sequence is deterministic. (c) Report it and stop the phase —
+  rejected: nothing real was lost (the database was deliberately empty, `D-1.07-4`), and the recovery is two
+  well-understood commands whose result is verified.
+- **Downside accepted:** The documented reset path does not work on this project, so **anyone who runs
+  `supabase db reset --linked` in future gets a wiped database and a failed rebuild.** Recorded here rather
+  than worked around silently. It cost nothing this time only because the reset was performed against an
+  empty database, exactly as `D-1.07-4` designed — **on a database with real orders this would have been a
+  data-loss event with no backup on the free tier.** Do not run it against a live database.
+- **Links:** `D-1.07-4` · `D-1.07-13` · Supabase CLI `2.109.1`

@@ -23,7 +23,7 @@ Goal: a working drop store on a preview URL, with one real order proven end-to-e
 | **1.04** | Drop engine | Code | Server-computed drop state. Countdown. 48h reservations + server-side expiry. Turnstile. Rate limits (IP + phone). 2-unit cap. Drop config format. **DoD: concurrent test re-run + expiry proven.** Fresh-session PR review (`D-0-3`). | 1.03 |
 | **1.05** | Home + About | Code | Countdown/LIVE home. Hero. The press story, sourced from `facts.md` § 3. **Blocked on: model/venue permission; 3 unverified press links.** Placeholders + register entries if unresolved. | 1.02, 1.04 |
 | **1.06** | Cart flow | Code | The `D-1.04-16` carryover: real product → cart → checkout item flow. Client-side cart state; the customer's chosen (product, variant, qty) reaches `create_order()`; the stand-in is deleted. Fresh-session PR review (`D-1.06-2`). | 1.04 |
-| **1.07** | Deploy + hosted Supabase + Resend + real keys | Cowork + Code | Create the Vercel Hobby project (`D-1.06-4`), the hosted Supabase project, Resend, and real Turnstile keys. Cowork creates the accounts + sets env vars in the dashboards; Code wires + verifies. Order-confirmation email via Resend. **Blocked on: Vladimir's email for the notification recipient.** | 1.06 |
+| **1.07** | Deploy + hosted Supabase + real keys | Cowork + Code | Create the Vercel Hobby project (`D-1.06-4`), the hosted Supabase project, and real Turnstile keys. Cowork creates the accounts + sets env vars in the dashboards; Code pushes the schema to Frankfurt, deploys, and verifies hosted parity + real-key behaviour. **Resend/order email struck from this phase (`D-1.07-8`) → on-demand `Z.01`, since it is blocked on Vladimir's email and 1.08 is a no-new-features gate.** | 1.06 |
 | **1.08** | **VERIFICATION GATE** | Code + Lazar | **No new features.** One real order, real phone, real email, end to end. Concurrent test re-run. Reservation expiry observed. Turnstile + rate limits confirmed live. Owed-verification register cleared to zero. | 1.07 |
 
 **1.06 re-scoped (`D-1.06-1`):** the catalogue + product pages already shipped in 1.02/1.04, so 1.06
@@ -54,22 +54,26 @@ Goal: bilingual, legal, fast, on the real domain, with a drop-day plan.
 |---|---|---|---|
 | **X.01** | Migrate to Vercel Pro | Code | A Vercel notice arrives, or a drop spikes, or Lazar decides. Written in advance so it is an afternoon, not a scramble. See `D-0-2`. |
 | **Y.01** | Drop content load | Code | Vladimir delivers photos, prices, names, sizes, fabric. Loads them into `src/config/products.ts`, adds the photo + fabric/care DB columns (`D-1.06-3`), drops images into `public/images/products/`, runs `npm run sync:drop`. **Mandatory before 2.05 — clears placeholder register rows #1–#4; the register must be empty before cutover.** |
+| **Z.01** | Order email (Resend) | Code | **Trigger: Vladimir's email address exists** (`facts.md` §5; placeholder register #5). Wires Resend: order notification to Vladimir, confirmation to the customer. **Email is a side channel; the DB is the record.** Struck from 1.07 by `D-1.07-8`. **Mandatory before 1.08 — 1.08's DoD is a real order with a real email, end to end.** |
 
 ---
 
 ## Critical path
 
 ```
-1.01 → 1.02 → 1.03 → 1.04 → 1.06 → 1.07 → 1.08 → 2.01 → 2.02 → 2.03 → 2.04 → 2.05 → 2.06
-                                                                                  ↑
-                                                                       Y.01 — Drop content load
-                                                                       PRODUCT PHOTOS (Vladimir)
-                                                                       prices · sizes · fabric
+1.01 → 1.02 → 1.03 → 1.04 → 1.06 → 1.07 → Z.01 → 1.08 → 2.01 → 2.02 → 2.03 → 2.04 → 2.05 → 2.06
+                                            ↑                                             ↑
+                                 Z.01 — Order email (Resend)           Y.01 — Drop content load
+                                 VLADIMIR'S EMAIL (facts.md §5)        PRODUCT PHOTOS (Vladimir)
+                                 ── mandatory before 1.08 ──           prices · sizes · fabric
                                                                        ── the real critical path ──
 ```
 
 **The build is not the bottleneck. Vladimir is.** `Y.01` cannot close without photos, prices, names,
-sizes, and fabric, and it is **mandatory before 2.05**; 1.07 cannot be verified without his email.
+sizes, and fabric, and it is **mandatory before 2.05**. **`Z.01` now sits on the critical path between
+1.07 and 1.08** (`D-1.07-8`): 1.07 shipped without Resend, and 1.08's DoD is a real order with a real
+email end to end — so **1.08 cannot start until Vladimir's email address exists.** That address is a
+phone call nobody has made.
 Every one of those is his to supply and none of them can be worked around, invented, or generated
 (`D-0-6`). The cart flow (1.06) is unblocked and closes without any of them.
 

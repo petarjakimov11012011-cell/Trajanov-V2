@@ -1,4 +1,4 @@
-NEXT: 1.07 (Code half) — link repo, push schema to Frankfurt Supabase, redeploy, verify hosted parity (#4) + real Turnstile (#5)
+NEXT: Z.01 — Order email (Resend), BLOCKED on Vladimir's email address (facts.md §5) → then 1.08 Verification gate. 1.08 CANNOT START until Z.01 ships (D-1.07-8): its DoD is a real order with a real email, end to end.
 
 # Current state — Trajanov-V2
 
@@ -6,32 +6,72 @@ NEXT: 1.07 (Code half) — link repo, push schema to Frankfurt Supabase, redeplo
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-16** · By: **Claude Code (recording Phase 1.07 Cowork — production accounts stood up)**
+Last updated: **2026-07-16** · By: **Claude Code (Phase 1.07 Code — deployed, hosted parity proven, real Turnstile live)**
 
 ---
 
 ## Status
 
-**Production accounts are stood up — the store can move off one laptop, but nothing is deployed or
-verified yet (Phase 1.07, Cowork/ops half).** Three accounts now exist under the operator identity: a
-**Vercel** project (`trajanov-v2`, `https://trajanov-v2.vercel.app`, Hobby, `main` = production), a
-**hosted Supabase** project in **Frankfurt** (`eu-central-1`, ref `kmuocwmevyyuhcvwoebf`, **Postgres 17
-— same major as local**), and a live **Cloudflare Turnstile** widget ("Trajanov store", **Managed**
-mode, real keys). All **six** env vars are set in Vercel (Production + Preview, Sensitive): the Supabase
-URL + **legacy** anon/service-role keys (`D-1.07-1`), the Turnstile site + secret keys, and
-`ORDER_IP_HASH_PEPPER`. Resend/email vars (`RESEND_API_KEY`, `ORDER_NOTIFICATION_EMAIL`) are
-**deliberately not set — deferred to 1.08.** **No code shipped, nothing committed, no secret in the
-repo.** Decisions `D-1.07-1/2/3` logged (legacy Supabase keys; Turnstile = Managed; Supabase
-creation-time security toggles left default). **Still owed to the 1.07 Code half:** link the repo, push
-the migrations/schema to Frankfurt, **redeploy** (env vars don't take effect until then), and verify
-hosted-Supabase parity (owed **#4**) + real Turnstile (owed **#5**) — including confirming
-`orders`/`order_items` stay **anon-deny-all** after migrations (`D-1.07-3`) and that Turnstile's Managed
-mode matches local (`D-1.07-2`). **Operator follow-ups (from the ops handoff):** delete the old
-**Stockholm** (`eu-north-1`) Supabase project (created in error, empty, recreated in Frankfurt); review/
-remove the stray `trajanov` Vercel project; confirm `ORDER_IP_HASH_PEPPER` + the Supabase DB password
-are saved in the password manager (neither recoverable — the pepper must stay identical across all
-future redeploys or IP rate-limiting breaks). Reports: `completions/Part-1-Phase-07-Cowork-Completion.md`
-+ `Ops-Handoff-Phase-1.07.md`.
+**THE STORE IS LIVE ON A PUBLIC URL — https://trajanov-v2.vercel.app — running against the real
+Frankfurt database with real bot-protection keys.** Phase 1.07 (Code) linked the repo to hosted
+Supabase (`kmuocwmevyyuhcvwoebf`, `eu-central-1`, Postgres 17.6), pushed the schema, proved parity,
+deployed, and verified production. **Six phases of "local only" (`D-1.03-5`) are over.**
+
+**Hosted parity is PROVEN, not asserted (owed #4 CLOSED).** All **8** migrations pushed; `migration
+list` shows local and remote carrying the same 8 with **no migration edited to make that true**.
+**pg_cron came up from the migration with no dashboard step** — `cron.job` returns **2 active rows**
+in the `postgres` database (the phase's biggest named risk, and it was a non-event). The **real
+46-test suite ran against Frankfurt and all 46 passed**, including the **10-vs-3 oversell gate
+(exactly 3 succeed, 7 cleanly rejected, stock 0)** and both expiry tests — **the atomic decrement
+holds on the real host, under real latency**. Hosted was then **reset clean and verified**: 0 rows in
+all 6 tables, `TRJ-####` back to **TRJ-0001**, 2 cron jobs still active. Local re-run: **46 still
+pass**, `.env.local` untouched and still pointing at Colima (`D-1.07-9`).
+
+**The phase found a real bug and fixed it (`D-1.07-14`).** The parity run failed **1 of 46**:
+hosted `anon` held `INSERT/UPDATE/DELETE/TRUNCATE` on `drops`/`products`/`variants`; local held
+none of them. Cause: `schema.sql:150-152` assumes *"a table is unreachable until GRANTed here"* —
+true locally (`auto_expose_new_tables` unset), **false on hosted**, where Cowork left
+**"Automatically expose new tables" ON** (`D-1.07-3`). **No data was ever exposed** — RLS with
+SELECT-only policies blocked every write (verified: stock 5→5, INSERT rejected `42501`) — but hosted
+had **one barrier where local has two**. New migration `20260716120000_catalog_grant_hardening.sql`
+REVOKEs those privileges from `anon`/`authenticated`/`public`; **both environments now report
+`REFERENCES,SELECT,TRIGGER`** and the test passes for the right reason. Everywhere the migrations
+already revoked explicitly (`orders`, `order_items`, `order_attempts`, all 3 functions), hosted
+matched local exactly.
+
+**Real Turnstile is live and proven end to end (owed #5 NARROWED, not closed — `D-1.07-7`).** The
+deployed `/checkout` serves site key **`0x4AAAAAAD23OFW7Ka1hTR1F`**; **no dummy key appears anywhere
+in the deployed build** (961 KB of JS + HTML scanned). A widget mounted on the production hostname
+**solved in Managed mode and minted a real token**, which Siteverify accepted with the real secret:
+**`success: true`, `hostname: trajanov-v2.vercel.app`**. A wrong-secret control returned
+`invalid-input-secret`, so the pass is meaningful. **Still owed to 1.08:** whether Cloudflare
+actually challenges a *bot* on a *real order* — that needs a live drop, which 1.07 deliberately does
+not create.
+
+**`test-drop` published to hosted** via `npm run sync:drop` — **stock INSERT-only (16 inserted, 0
+overwritten), 0 rows deleted** (`D-1.04-5`). It is **ended and null-priced** (`D-1.04-12`), so the
+site renders the *ended* state and **nothing is buyable**. **0 orders on production.**
+
+**Resend is GONE from 1.07 (`D-1.07-8`)** — struck entirely, no key, no code, no stub. Order email is
+now on-demand phase **`Z.01`**, **mandatory before 1.08**, triggered by Vladimir's email address
+arriving. **The critical path now runs through a phone call nobody has made.**
+
+**Two credential facts the operator must know (`D-1.07-12`):** (1) the Vercel env vars are marked
+**Sensitive**, which makes them **write-only** — `vercel env pull` returns all six as empty strings,
+so Cowork's "no functional impact" is true for the build and **false** for anyone working locally;
+(2) **the Supabase DB password was RESET this phase at the operator's instruction** — the password
+manager's entry is now **stale and wrong**; the new one exists only in gitignored `.env.hosted` on
+Petar's machine and is **unrecoverable if lost**. A Supabase **account access token**
+(`claude-code-phase-1.07`, expires 2026-08-15) was minted to drive the CLI and **should be revoked**.
+
+**`supabase db reset --linked` is broken against this schema (`D-1.07-15`)** — it drops tables but not
+sequences, then fails its own re-apply on `order_number_seq already exists`, leaving the database
+wiped. Recovered by hand (drop sequence → `db push --include-all`). **Never run it against a database
+with real orders — on the free tier there is no backup.**
+
+Prior (1.07 Cowork): the accounts — Vercel project, hosted Supabase (Frankfurt), Turnstile widget,
+and six env vars set in Vercel (Production + Preview, Sensitive). Reports:
+`completions/Part-1-Phase-07-Cowork-Completion.md` + `Ops-Handoff-Phase-1.07.md`.
 
 Prior (1.06): the cart flow —
 
@@ -93,11 +133,11 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 1 of 2 — Build |
-| Phase | 1.06 complete + merged; **1.07 Cowork (accounts) done** — 1.07 Code half (deploy + verify) pending |
-| Branch | `phase-1.06-cart-flow` (merged to `main`); 1.07 Cowork was ops-only — no branch, nothing committed |
-| Open PR | none — 1.01–1.06 merged `#1`–`#6`; PR `#6`'s `D-1.06-2` review **waived** (`D-1.06-11`) |
-| Deployed | **not yet** — accounts stood up 1.07 Cowork (Vercel `trajanov-v2`, hosted Supabase Frankfurt `eu-central-1`, real Turnstile); 6 env vars set in Vercel but **redeploy + schema push owed to the 1.07 Code half** (`D-1.03-5`, `D-1.06-4`) |
-| Domain | `trajanov.com` — **not purchased** |
+| Phase | **1.07 complete (both halves)** — Cowork (accounts) + Code (deploy, hosted parity, real keys). Next: `Z.01` (blocked), then the 1.08 gate |
+| Branch | `phase-1.07-deploy` → PR `#7` to `main` |
+| Open PR | **`#7`** — no fresh-session review required (that gate is 1.03/1.04 only, `D-0-3`); Petar or Lazar cross-reviews. **Production already serves this commit** (`D-1.07-5`), so the merge is a redeploy of the same code |
+| Deployed | **YES — https://trajanov-v2.vercel.app**, production, serving `/` (MK) + `/en` from the hosted Frankfurt DB. Deployed from the phase branch via `npx vercel --prod` **before** merge (`D-1.07-5`). `D-1.03-5` and `D-1.06-4` are closed |
+| Domain | `trajanov.com` — **not purchased** (2.05) |
 
 ---
 
@@ -111,6 +151,54 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### Deploy + hosted Supabase + real keys (1.07 Code) — the store left the laptop
+
+- **Live**: `https://trajanov-v2.vercel.app`, Vercel Hobby, project `trajanov-v2`, `main` =
+  production. Deployed from the phase branch via CLI **before** the PR merged (`D-1.07-5`) — Turnstile
+  will not accept preview hostnames (`D-1.07-6`), so production is the only place it can be proven.
+- **Hosted DB**: Frankfurt `eu-central-1`, ref `kmuocwmevyyuhcvwoebf`, **Postgres 17.6** (= local
+  major). **8/8 migrations pushed**; local and remote lists match; no migration edited to force it.
+  `config.toml`'s `major_version = 17` agreed with hosted — no mismatch warning.
+- **New migration** `20260716120000_catalog_grant_hardening.sql` (`D-1.07-14`) — the phase's one code
+  change. REVOKEs `insert/update/delete/truncate` on `drops`/`products`/`variants` from
+  `anon`/`authenticated`/`public`; re-asserts `grant select`. Idempotent; `db reset` reproduces it.
+  **No function, table shape, component, string, or test changed.**
+- **pg_cron on hosted**: `create extension if not exists pg_cron` **worked straight from the
+  migration** — no dashboard step. 2 active jobs (`expire-reservations` `*/5 * * * *`,
+  `prune-cron-run-details` `17 3 * * *`) in the `postgres` database. **Named risk: a PAUSED free-tier
+  project silently pauses pg_cron, and reservations then stop expiring** (register #4).
+- **Parity method** (`D-1.07-4`): ran the **real** suite against Frankfurt while empty, then reset.
+  `seed.sql` applied for the run against its own "never on a deployed database" header (`D-1.07-13`)
+  — the only way to reach the fixtures; erased by the reset, which was **verified**, not assumed.
+  All four hosted vars exported together, not just `SUPABASE_DB_URL` (`D-1.07-10`) — exporting only
+  the DB URL would have run the RLS suites against **local** and reported a **false** 46/46.
+- **Connection**: the **session pooler** (`aws-0-eu-central-1.pooler.supabase.com:5432`), not the
+  direct host (`D-1.07-11`). Direct is **IPv6-only** and this machine has **no IPv6** — `dns.resolve6`
+  finds the AAAA, `getaddrinfo` refuses it, so every tool fails `ENOTFOUND`. Session mode keeps
+  prepared statements (transaction mode on 6543 would have forced a test-helper edit). **The app never
+  uses `SUPABASE_DB_URL`** — it is admin/test only (`D-1.03-12`), so nothing in production depends on
+  this.
+- **RLS on hosted, real anon key** (Task 6, `D-1.07-3`): `orders`/`order_items` deny **select, insert,
+  update** — all `42501`. Catalog **readable, not writable** (verified against ground truth: stock
+  5→5, row counts unchanged). `create_order`/`expire_reservations`/`check_order_rate_limit`
+  **`anon=false, authenticated=false, service_role=true`** — **identical to local**.
+- **Types**: `gen types --linked` schema content is identical to committed (6 tables, 4 functions,
+  2 enums), and committed matches `--local` **byte-for-byte** (sha256 equal). `--linked` adds a
+  cloud-only `__InternalSupabase { PostgrestVersion: "14.5" }` block that `--local` never emits — so
+  the DoD's "byte-identical to `--linked`" is **unmeetable as worded**, for a non-schema reason.
+  `src/types/database.ts` left untouched, as the brief instructs.
+- **Rehearsal drop**: `npm run sync:drop` → 1 drop, 4 products, **16 variants INSERT-only, 0
+  overwritten, 0 deleted** (`D-1.04-5`). `test-drop` is **ended + null-priced** (`D-1.04-12`) — the
+  site renders the ended state, nothing is buyable, **0 orders** on production.
+- **Turnstile proven end to end**: deployed `/checkout` carries `0x4AAAAAAD23OFW7Ka1hTR1F`; **no dummy
+  key in 961 KB of deployed JS + HTML**; no `service_role`/secret/pepper/connection-string in the
+  client payload. A widget on the production hostname **solved in Managed mode** and its **real token
+  + the real secret** returned Siteverify **`success: true, hostname: trajanov-v2.vercel.app`**
+  (wrong-secret control: `invalid-input-secret`).
+- **Credentials**: hosted values live in gitignored **`.env.hosted`** (`D-1.07-9`), NOT in
+  `.env.local` — pointing `.env.local` at Frankfurt would aim `npm run dev`/`test`/`sync:drop` at
+  **production** by default. Verified: exported vars beat `process.loadEnvFile`, so both coexist.
 
 ### Cart flow (1.06) — the customer's choice reaches the order row
 
@@ -243,12 +331,12 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 
 | Integration | Status |
 |---|---|
-| Supabase | **Hosted project created** (1.07 Cowork) — Frankfurt `eu-central-1`, ref `kmuocwmevyyuhcvwoebf`, Postgres 17 (= local major); URL + **legacy** keys in Vercel (`D-1.07-1`). **Migrations not yet pushed; parity unverified (owed #4).** Local (Colima) remains the only proven env: schema + `create_order`(+TR006) + `expire_reservations` (pg_cron) + rate-limit + RLS + 46 tests. |
-| Resend | Not created — **deferred to 1.08** (no `RESEND_API_KEY` / `ORDER_NOTIFICATION_EMAIL` set) |
-| Turnstile | **Real widget created** (1.07 Cowork) — "Trajanov store", **Managed** mode (`D-1.07-2`), hostnames `trajanov-v2.vercel.app` + `localhost`; real site+secret keys in Vercel. Server Siteverify still proven only against **dummy** keys (`D-1.04-8`); real-key behaviour unverified until the Code half redeploys (owed #5). |
-| Cloudflare DNS | Not configured |
-| Cloudflare Analytics | Not configured |
-| Vercel project | **Created** (1.07 Cowork) — `trajanov-v2`, Hobby, `main` = production, `https://trajanov-v2.vercel.app`; 6 env vars set (Prod+Preview, Sensitive). **Redeploy owed** so vars take effect (1.07 Code half). |
+| Supabase | **HOSTED + MIGRATIONS PUSHED + PARITY PROVEN** (1.07 Code) — Frankfurt `eu-central-1`, ref `kmuocwmevyyuhcvwoebf`, **Postgres 17.6**. 8/8 migrations; local == remote. **46/46 tests pass against hosted**, incl. the 10-vs-3 oversell gate; pg_cron = **2 active jobs**; RLS verified with the real anon key; DB left **clean, TRJ-0001**. `test-drop` published (ended, null-priced). **Owed #4 CLOSED.** Legacy keys (`D-1.07-1`) confirmed in use. Admin access via the **session pooler** (`D-1.07-11`, IPv6). ⚠ **"Auto-expose new tables" is still ON** — future tables land anon-writable (`D-1.07-14`); ⚠ **`db reset --linked` is broken here** (`D-1.07-15`). |
+| Resend | **NOT in this project yet — struck from 1.07 entirely (`D-1.07-8`).** No account, no `RESEND_API_KEY`, no `ORDER_NOTIFICATION_EMAIL`, no code, no stub. Now on-demand **`Z.01`**, **mandatory before 1.08**, blocked on Vladimir's email (`facts.md` §5; placeholder #5). |
+| Turnstile | **REAL KEYS LIVE IN PRODUCTION** (1.07 Code) — "Trajanov store", **Managed** (`D-1.07-2`), hostnames `trajanov-v2.vercel.app` + `localhost` only (`D-1.07-6`). Deployed `/checkout` serves `0x4AAAAAAD23OFW7Ka1hTR1F`; **no dummy key anywhere in the deployed build** (`D-1.04-8` superseded). Widget **solves on the production hostname**; real token + real secret → Siteverify **`success: true`**. **Owed #5 NARROWED** — bot-vs-real-order still owed to 1.08 (`D-1.07-7`). |
+| Cloudflare DNS | Not configured (2.05) |
+| Cloudflare Analytics | Not configured (2.05) |
+| Vercel project | **DEPLOYED** (1.07 Code) — `trajanov-v2`, Hobby, `main` = production, live at `https://trajanov-v2.vercel.app` serving both locales from the hosted DB. 6 env vars in effect. ⚠ All six are **Sensitive = write-only**: `vercel env pull` returns them **empty** (`D-1.07-12`). ⚠ Stray **`trajanov`** project still exists — one repo, two projects (Lazar). |
 
 ---
 
@@ -262,8 +350,9 @@ or before any phase that builds on unverified work, the next phase is a verifica
 |---|---|---|---|
 | 1 | **Design direction sign-off.** Palette + fonts were *derived* from the handover ledger, not from a delivered filled `brand.md` (`D-1.02-1`). Lazar must eyeball the rendered site (now incl. `/about`, `/contact`) and approve/adjust the tokens. **Merge blocker on 1.05** (`D-1.05-2`). | 1.02 | Lazar review of the live site |
 | 2 | **IG profile URL click-test.** `@trajanovv2026` handle is VERIFIED and the URL renders/links correctly (verified in-browser this phase: footer, drop-ended banner, **and now Contact**), but a human must click it and confirm it opens **Vladimir's actual profile** (`facts.md` §6). **Merge blocker on 1.05** (`D-1.05-2`). | 1.02 | Lazar click-test, pre-merge |
-| 4 | **Hosted-Supabase parity** (`D-1.03-5`, extended by `D-1.04-1`). Migrations, RLS, real keys, **the pg_cron schedule, and the rate-limit table** are proven only against local Supabase (Colima). A **paused free-tier project silently pauses pg_cron** (reservations stop expiring). Re-confirm all of it on the real project. **Unblocked (1.07 Cowork): the hosted Frankfurt project now exists (Postgres 17 = local major) with URL + legacy keys in Vercel, but migrations are not yet pushed and parity is unverified — verification still owed to the 1.07 Code half, incl. confirming `orders`/`order_items` stay anon-deny-all (`D-1.07-3`).** | 1.03/1.04 | 1.07 Code half (hosted project exists; deploy + verify pending) |
-| 5 | **Real Turnstile keys.** Siteverify is proven only against Cloudflare's **dummy** keys (`D-1.04-8`); "is Cloudflare actually challenging bots" is unanswerable until real keys. Test keys must never reach production. **Unblocked (1.07 Cowork): a real Turnstile widget + real site/secret keys now exist in Vercel (Managed mode, `D-1.07-2`), but the build has not been redeployed or tested against them — verification still owed to the 1.07 Code half (confirm the deployed build uses the real keys, not the dummies, and that Managed mode matches local).** | 1.04 | 1.07 Code half / 2.05 |
+| ~~4~~ | ~~**Hosted-Supabase parity**~~ — **CLOSED by 1.07 Code, with evidence.** 8/8 migrations pushed to `kmuocwmevyyuhcvwoebf`; `migration list` shows local == remote, **no migration edited to force it**. **`npm test` against Frankfurt: 46/46**, incl. the **10-vs-3 oversell gate (exactly 3 succeed, 7 rejected, stock 0)** and both expiry tests. `cron.job` = **2 active rows**, extension created **by the migration, no dashboard step**. Rate-limit table + `check_order_rate_limit` present and exercised (20/21 test passed on hosted). RLS re-verified with the **real anon key**: `orders`/`order_items` deny select/insert/update (`42501`); functions `anon=false`, identical to local. Hosted then **reset and verified clean** (0 rows, TRJ-0001). **One real divergence was found and fixed, not waved through** (`D-1.07-14`). **Residual risk, NOT a verification debt — moved to Known issues #7:** a **paused free-tier project silently pauses pg_cron**, and reservations stop expiring. | 1.03/1.04 | **1.07 Code — DONE** |
+| 5 | **Real Turnstile keys — NARROWED, still open** (`D-1.07-7`). **Proven in 1.07 Code:** the deployed `/checkout` serves the **real** site key `0x4AAAAAAD23OFW7Ka1hTR1F`; **no dummy key appears anywhere in the deployed build** (961 KB of JS + HTML scanned) — `D-1.04-8`'s "dummy keys until 1.07" is fully retired; the widget **renders and solves in Managed mode on `trajanov-v2.vercel.app`**, and a **real token + the real secret** returned Siteverify **`success: true, hostname: trajanov-v2.vercel.app`** (a wrong-secret control returned `invalid-input-secret`, so the pass is meaningful); Managed mode's silent auto-pass **matches** the local dummy-key behaviour (`D-1.07-2` confirmed). **STILL OWED:** whether Cloudflare actually **challenges a bot on a real order**. That needs a **live drop**, which 1.07 deliberately does not create (the only drop is `test-drop`, ended + null-priced, `D-1.04-12`). Also unexercisable on preview URLs at all (`D-1.07-6`). | 1.04 | **1.08** (needs a live drop + a real order) |
+| 6 | **"Automatically expose new tables" is still ON** on the hosted project (`D-1.07-3`). `D-1.07-14` revoked the write grants on today's catalog tables, but **any table added in future** (e.g. `Y.01`'s photo/fabric work) will again be created with `anon` holding INSERT/UPDATE/DELETE/TRUNCATE, protected by RLS alone. Turning the toggle off does **not** retroactively revoke, so it must be paired with an explicit REVOKE in whatever migration adds the table. | 1.07 | Lazar (dashboard) + the next migration that adds a table |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
@@ -275,18 +364,31 @@ cart code path touches `variants`/`orders`/`order_items`); the stand-in grep ret
 `supabase/migrations/` file and neither `create_order` nor `expire_reservations` changed; no new
 dependency (`package.json` unchanged). (Prior direct-verified items carry forward unchanged.)*
 
-*Register is at **4 items**. Item #3 (fresh-session review of PR `#4`) was removed at the PR-#4 merge.
-**Item #6 (fresh-session review of PR `#6`, `D-1.06-2`) was WAIVED by the operator (`D-1.06-11`) and PR
-`#6` merged without it** — waived, not verified, so it is removed here with this note rather than
-silently. **#1 (design sign-off) and #2 (IG click-test)** were merge blockers on 1.05 (`D-1.05-2`);
-**PR `#5` has since merged**, so they were either satisfied at that merge or this file is stale on the
-point — Lazar to confirm and remove if done (not removed here — this session did not perform them).
-**#4 (hosted-Supabase parity) and #5 (real Turnstile keys)** are now **unblocked by the 1.07 Cowork
-(ops) half** — the hosted Supabase project, the real Turnstile widget/keys, and the Vercel env vars all
-exist — but **both remain owed: their verification is the 1.07 Code half's job** (link repo → push
-schema to Frankfurt → redeploy → confirm parity + real-key behaviour), **not done here.** The 1.07
-Cowork half was ops-only and verified no code directly. Numbers are not renumbered (keeps `D-1.05-2`'s
-references valid); **1.08 remains the hard gate — the register must be empty before Part 2.**
+*Register is at **4 open items** (#1, #2, #5, #6) after 1.07 Code. **#4 (hosted-Supabase parity) is
+CLOSED** — struck above with its evidence rather than deleted, per the rule. **#5 is NARROWED, not
+closed** (`D-1.07-7`): 1.07 proved the real key is served and the real secret validates a real token,
+but "does Cloudflare challenge a **bot** on a **real order**" needs a live drop and belongs to 1.08.
+**#6 is NEW this phase** — the auto-expose toggle, surfaced by `D-1.07-14`'s finding. Item #3 (fresh-
+session review of PR `#4`) was removed at the PR-#4 merge; the old #6 (fresh-session review of PR
+`#6`, `D-1.06-2`) was **WAIVED** (`D-1.06-11`), not verified, and removed with a note — **the new #6
+is a different item and reuses the number**; numbers are not otherwise renumbered (keeps `D-1.05-2`'s
+references valid). **#1 (design sign-off) and #2 (IG click-test)** were merge blockers on 1.05
+(`D-1.05-2`); **PR `#5` has since merged**, so they were either satisfied at that merge or this file is
+stale — Lazar to confirm and clear (not removed here — this session did not perform them). **1.08
+remains the hard gate — the register must be empty before Part 2, and #1, #2, #5 and #6 all sit in
+front of it.***
+
+**Owed to Lazar / the operator — dashboard + password-manager jobs only he can do:**
+
+| # | Item | What "pass" looks like |
+|---|---|---|
+| L1 | **Delete the stray Stockholm Supabase project.** **Confirmed still live this phase**: ref `ewcqwbuvbbfduytiiaxy`, region `eu-north-1`, name "petarjakimov11012011-cell's Project", status ACTIVE_HEALTHY, empty. | Only `kmuocwmevyyuhcvwoebf` (Frankfurt) remains in the Supabase account |
+| L2 | **Review/remove the stray `trajanov` Vercel project.** Confirmed still present alongside `trajanov-v2`. | Exactly one Vercel project points at this repo, so one push cannot trigger two deployments |
+| L3 | **SAVE THE NEW DB PASSWORD — CHANGED THIS PHASE (`D-1.07-12`).** The password manager's entry is **stale and wrong**: the DB password was **reset** at the operator's instruction. The new value exists **only** in gitignored `.env.hosted` on Petar's machine. **Unrecoverable if that file is lost** (another reset would be needed). Also confirm `ORDER_IP_HASH_PEPPER` is saved — the **Vercel** value must never change or every rate-limit window resets (`D-1.04-7`). | Both retrievable from the password manager, and the DB password matches `.env.hosted` |
+| L4 | **Revoke the Supabase access token `claude-code-phase-1.07`** (Account → Access Tokens; expires 2026-08-15). It controls the **whole Supabase account** and was only needed for `link`/`db push`/`gen types --linked`. | Token no longer listed |
+| L5 | **Turn OFF "Automatically expose new tables"** on `kmuocwmevyyuhcvwoebf` (register #6). Does not retroactively revoke — pair with an explicit REVOKE in any migration that adds a table. | Toggle off; next new table is not anon-writable |
+| L6 | **Register #1 (design sign-off) and #2 (Instagram URL click-test)** — owed since 1.02. **1.08 cannot pass while they sit.** The site is now on a public URL, so both are finally doable: `https://trajanov-v2.vercel.app`. | Both confirmed or cleared |
+| L7 | **Uptime monitor** — a paused free-tier project silently pauses pg_cron and takes the store offline (Known issues #7). Not set up this phase (out of scope). | A monitor hits the URL ≥ every 5 min, alerting two inboxes |
 
 ---
 
@@ -301,10 +403,13 @@ blocker.**
 | 2 | `[PLACEHOLDER: фотографија — Владимир]` (product photo) | Catalog cards, Product | Real product photos (`D-0-6`) | Vladimir |
 | 3 | `[PLACEHOLDER: состав и нега — од етикетата]` (fabric/care) | Product | Composition from the labels | Vladimir |
 | 4 | Product **names** render as neutral slots ("Производ 01…"); sizes shown are a flagged **sample** | Catalog, Product | Real names + sizes/measurements | Vladimir |
-| 5 | `[PLACEHOLDER: е-пошта — Владимир]` (contact email) | **Contact** (1.05) | Vladimir's email (`facts.md` §5) | Lazar → Vladimir |
+| 5 | `[PLACEHOLDER: е-пошта — Владимир]` (contact email) | **Contact** (1.05) — **now live at `https://trajanov-v2.vercel.app/contact`** | Vladimir's email (`facts.md` §5). **Also the trigger for `Z.01`, which is mandatory before the 1.08 gate (`D-1.07-8`)** — this row is no longer just a UI placeholder, it is on the critical path | Lazar → Vladimir |
 
 *#5 (email) is a pure UI placeholder via `<Placeholder>` (`Placeholder.email` key), shipped by 1.05
-(`D-1.05-3`) — it also gates the order-confirmation sender/recipient (`facts.md` §5, Phase 1.08).
+(`D-1.05-3`) — and it now **gates `Z.01`, which gates the 1.08 verification gate** (`D-1.07-8`;
+formerly "Phase 1.08" here, corrected: Resend was struck from 1.07 and is not built by 1.08 either,
+because a gate that builds the feature it verifies is not a gate). **Every placeholder below is now
+publicly visible on `https://trajanov-v2.vercel.app`.**
 #1–#4 are now driven by the **DB via the typed drop config** (not `demo.ts`, deleted): a null
 `price_mkd`/`name_*` renders the price/name placeholder (`D-1.04-6/10`); photo + fabric/care have **no
 DB column yet** — those columns land with **`Y.01 — Drop content load`** (`D-1.06-3`), not 1.06 — and
@@ -330,7 +435,16 @@ no placeholder (`D-1.05-5`).*
 
 ## Carryovers
 
-- **None.** `D-1.04-16` (no real product→cart→checkout item flow) is **closed by Phase 1.06**: the
+- **`Z.01 — Order email (Resend)` is now a hard dependency of the 1.08 gate** (`D-1.07-8`). 1.07
+  shipped **without** Resend — no account, no key, no code, no stub. `Z.01` is triggered by Vladimir's
+  email address arriving (`facts.md` §5; placeholder register #5) and is **mandatory before 1.08**,
+  whose DoD is a real order with a real email end to end. **Nobody has made that phone call.** This is
+  the single thing standing between a deployed store and the gate.
+- **1.08 also needs a live drop.** Owed #5's remainder (does Cloudflare challenge a real bot) and
+  1.08's own "one real order" DoD both require an **open, priced** drop. The only committed drop is
+  `test-drop` — ended and null-priced (`D-1.04-12`) — and creating a live one was **out of scope** for
+  1.07. Prices/names come from Vladimir via `Y.01`.
+- Prior: `D-1.04-16` (no real product→cart→checkout item flow) is **closed by Phase 1.06**: the
   cart flow is built, the stand-in is deleted, and an automated test proves the customer's chosen
   product+variant reaches the `order_items` row.
 
@@ -340,12 +454,15 @@ no placeholder (`D-1.05-5`).*
 
 | # | Item | Ref | State |
 |---|---|---|---|
-| 1 | **Vercel Hobby ToS violation.** Commercial use prohibited; Vercel may pull the deployment without notice, explicitly including during traffic spikes — i.e. drop day. Accepted by Lazar. | `D-0-2` | Live. Mitigations: portability rule, pre-written Pro migration (X.01), 2.06 contingency. |
+| 1 | **Vercel Hobby ToS violation.** Commercial use prohibited; Vercel may pull the deployment without notice, explicitly including during traffic spikes — i.e. drop day. Accepted by Lazar. **Now materially live: 1.07 actually deployed the store to Hobby.** | `D-0-2` | Live. Mitigations: portability rule (**re-verified 1.07: nothing Vercel-specific added; no Postgres/Blob/KV; the only Vercel artifacts are the gitignored `.vercel/` link dir**), pre-written Pro migration (X.01), 2.06 contingency. |
 | 2 | **No automated PR review.** House review gate waived for this project. Risk concentrated on 1.03/1.04 concurrency code. | `D-0-3` | Live. Mitigations: cross-review, fresh-session review on 1.03/1.04, concurrent-order test. |
 | 3 | **Public repo.** One committed secret is scraped before you notice. | `D-0-1` | Live. Mitigation: hard rule in `CLAUDE.md`. Rotate, never just delete. |
 | 4 | **Legal responsibility unconfirmed.** Minor, no registered entity, collecting consumer PII. | `facts.md` § 1 | **Cutover blocker.** Owner: Vladimir + parents. |
 | 5 | **Product photos do not exist.** | `D-0-6` | **Blocks 1.06.** Owner: Vladimir. Critical path. |
 | 6 | **Bar photos: model + venue permission unconfirmed**, and age-appropriateness of an alcohol backdrop for a 12+ audience is an open owner call. | `facts.md` § 8 | **No longer blocks 1.05** — `D-1.05-4` shipped Home + About with **no photo and no photo slot**. Still blocks any future photo hero / lifestyle imagery. Owner: Vladimir. |
+| 7 | **A paused free-tier Supabase project silently pauses pg_cron.** Free projects pause after ~7 quiet days — and this store is quiet between drops **by design**. Paused cron means `expire_reservations` stops running, so lapsed 48h holds never return their stock: **the shirt is sold to nobody, forever.** Moved here from register #4 (it is a standing risk, not a verification debt — the schedule itself is proven live on hosted). | `D-1.04-2/3` · register #4 · `D-1.07-4` | **Live and unmitigated.** No uptime monitor exists (owed: L7). Real fix is Supabase Pro ($25/mo) — a decision and a phase, never a silent upgrade. |
+| 8 | **`supabase db reset --linked` wipes the hosted database and cannot rebuild it.** It drops tables/types but not sequences, then fails its own re-apply on `order_number_seq already exists`. Recovered by hand this phase (`drop sequence` → `db push --include-all`) — harmless only because the DB was deliberately empty. | `D-1.07-15` | **Live.** **Never run against a database with real orders — the free tier has no backup.** |
+| 9 | **The six Vercel env vars are marked Sensitive = write-only.** `vercel env pull` returns all six as empty strings, so no one can recover a credential from Vercel. The DB password and pepper are **unrecoverable if the password manager and `.env.hosted` are both lost**. | `D-1.07-12` · Cowork report §3.4 | **Live.** Cowork's "cosmetic only, no functional impact" is true for the deployed build, false for anyone working locally. Mitigation: L3. |
 
 ---
 
@@ -357,7 +474,7 @@ Canonical table with gates: `Trajanov-V2-Plan.md` § 13. Status only:
 |---|---|---|
 | Buy `trajanov.com` | Lazar | Not started |
 | **Product photos** | **Vladimir** | **Not started — critical path** |
-| Vladimir's email | Lazar → Vladimir | Not started |
+| Vladimir's email | Lazar → Vladimir | **Not started — NOW THE CRITICAL PATH.** Triggers `Z.01` (`D-1.07-8`), which is mandatory before the 1.08 gate. Everything else in Part 1 is done and deployed; this is the blocker. |
 | Real prices (MKD) | Vladimir | Not started |
 | Sizes + fabric (read the labels) | Vladimir | Not started |
 | Legal responsibility w/ parents | Vladimir | Not started |
