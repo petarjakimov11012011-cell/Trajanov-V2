@@ -1245,3 +1245,58 @@ decisions start at `D-1.05-8`.*
   stand-in, GREEN against the cart), the full 46-test suite incl. the 10-vs-3 oversell gate, and the
   in-browser render check across both locales. This waiver is specific to PR `#6`; `D-0-3` is unchanged.
 - **Links:** `D-1.06-2` · `D-0-3` · `current-state.md` owed-verification register #6 · Phase 1.06
+
+---
+
+## Phase 1.07 — Production accounts (Cowork)
+
+*`D-1.07-1` … `D-1.07-3` are the **Cowork (ops) half's** decisions, made while standing up the
+hosted Vercel / Supabase / Cloudflare Turnstile accounts. No code shipped. The **Code half's** 1.07
+decisions, if any, continue from `D-1.07-4`.*
+
+### D-1.07-1 · 2026-07-16 · Hosted Supabase uses the LEGACY anon/service_role JWT keys, not the new sb_publishable/sb_secret keys
+- **Status:** Accepted
+- **Context:** Supabase now issues two key families — the legacy `anon` / `service_role` JWTs and the
+  newer `sb_publishable…` / `sb_secret…` keys. Every prior phase (1.03–1.06) was built and tested
+  against the legacy keys, the local Supabase CLI only supports legacy keys, and the env-var names in
+  use (`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) map to the legacy pair.
+- **Decision:** Capture the hosted project's **legacy** `anon` + `service_role` keys and set them in
+  Vercel (Production + Preview, Sensitive).
+- **Alternatives considered:** Adopt the new `sb_publishable…` / `sb_secret…` keys — rejected: it
+  diverges from what every prior phase was built and tested against and risks failing the hosted-parity
+  check (owed item #4) on a key format never exercised locally.
+- **Downside accepted:** The legacy JWT keys are the older mechanism Supabase is steering new projects
+  away from; a future move to the new keys is net-new work (a key swap + a re-verify). No functional
+  cost today — hosted matches local.
+- **Links:** `Ops-Handoff-Phase-1.07.md` · owed-verification #4 · `completions/Part-1-Phase-07-Cowork-Completion.md` §3
+
+### D-1.07-2 · 2026-07-16 · Turnstile widget mode = Managed
+- **Status:** Accepted
+- **Context:** The Cowork brief said "match the mode used locally with the dummy test keys," but the
+  local `.env.local` is not visible to Cowork, so the locally-used mode could not be read directly. A
+  live Cloudflare Turnstile widget ("Trajanov store") had to be created with some mode.
+- **Decision:** Create the widget in **Managed** mode (Cloudflare's recommended default). Mode is
+  changeable from the dashboard without changing the site or secret keys.
+- **Alternatives considered:** Guess Invisible / Non-interactive — rejected: same risk of mismatching
+  local behaviour, with no upside over the recommended default.
+- **Downside accepted:** The mode may not match whatever the local dummy-key setup used. **The Code
+  half of 1.07 must confirm the deployed behaviour matches local and switch the mode if needed** — a
+  dashboard toggle, no key change.
+- **Links:** `D-1.04-8` (Turnstile against dummy keys) · owed-verification #5 · `completions/Part-1-Phase-07-Cowork-Completion.md` §3
+
+### D-1.07-3 · 2026-07-16 · Hosted Supabase creation-time Security toggles left at their defaults
+- **Status:** Accepted
+- **Context:** Creating the hosted Supabase project exposed creation-time security toggles — Enable
+  Data API = on, Automatically expose new tables = on, automatic RLS = off. The migrations set RLS and
+  grants explicitly (catalog read-only; `orders`/`order_items` deny-all; functions `service_role`-only
+  per `D-1.03-9`), so the real security comes from the migrations, not these toggles.
+- **Decision:** Leave all three toggles at their defaults, keeping the hosted project standard for the
+  migrations that were tested locally.
+- **Alternatives considered:** Disable "Automatically expose new tables" (Supabase's own suggestion) —
+  deferred to avoid diverging from the locally-tested setup before the migrations have even run against
+  hosted.
+- **Downside accepted:** "Auto-expose new tables" means a future table added without an explicit
+  RLS/grant posture could be reachable by the anon key. **The Code half of 1.07 must confirm, after the
+  migrations run, that `orders`/`order_items` are not reachable by the anon key** on the hosted project
+  — exactly owed item #4's parity check.
+- **Links:** `D-1.03-9` (RLS/grants posture) · owed-verification #4 · `completions/Part-1-Phase-07-Cowork-Completion.md` §3

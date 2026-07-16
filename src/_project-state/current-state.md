@@ -1,4 +1,4 @@
-NEXT: 1.07 — Deploy + hosted Supabase + Resend + real keys
+NEXT: 1.07 (Code half) — link repo, push schema to Frankfurt Supabase, redeploy, verify hosted parity (#4) + real Turnstile (#5)
 
 # Current state — Trajanov-V2
 
@@ -6,11 +6,34 @@ NEXT: 1.07 — Deploy + hosted Supabase + Resend + real keys
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-15** · By: **Claude Code (Phase 1.06 — Cart flow)**
+Last updated: **2026-07-16** · By: **Claude Code (recording Phase 1.07 Cowork — production accounts stood up)**
 
 ---
 
 ## Status
+
+**Production accounts are stood up — the store can move off one laptop, but nothing is deployed or
+verified yet (Phase 1.07, Cowork/ops half).** Three accounts now exist under the operator identity: a
+**Vercel** project (`trajanov-v2`, `https://trajanov-v2.vercel.app`, Hobby, `main` = production), a
+**hosted Supabase** project in **Frankfurt** (`eu-central-1`, ref `kmuocwmevyyuhcvwoebf`, **Postgres 17
+— same major as local**), and a live **Cloudflare Turnstile** widget ("Trajanov store", **Managed**
+mode, real keys). All **six** env vars are set in Vercel (Production + Preview, Sensitive): the Supabase
+URL + **legacy** anon/service-role keys (`D-1.07-1`), the Turnstile site + secret keys, and
+`ORDER_IP_HASH_PEPPER`. Resend/email vars (`RESEND_API_KEY`, `ORDER_NOTIFICATION_EMAIL`) are
+**deliberately not set — deferred to 1.08.** **No code shipped, nothing committed, no secret in the
+repo.** Decisions `D-1.07-1/2/3` logged (legacy Supabase keys; Turnstile = Managed; Supabase
+creation-time security toggles left default). **Still owed to the 1.07 Code half:** link the repo, push
+the migrations/schema to Frankfurt, **redeploy** (env vars don't take effect until then), and verify
+hosted-Supabase parity (owed **#4**) + real Turnstile (owed **#5**) — including confirming
+`orders`/`order_items` stay **anon-deny-all** after migrations (`D-1.07-3`) and that Turnstile's Managed
+mode matches local (`D-1.07-2`). **Operator follow-ups (from the ops handoff):** delete the old
+**Stockholm** (`eu-north-1`) Supabase project (created in error, empty, recreated in Frankfurt); review/
+remove the stray `trajanov` Vercel project; confirm `ORDER_IP_HASH_PEPPER` + the Supabase DB password
+are saved in the password manager (neither recoverable — the pepper must stay identical across all
+future redeploys or IP rate-limiting breaks). Reports: `completions/Part-1-Phase-07-Cowork-Completion.md`
++ `Ops-Handoff-Phase-1.07.md`.
+
+Prior (1.06): the cart flow —
 
 **The cart flow is real — checkout now orders what the customer actually chose (`D-1.04-16` closed).**
 A client-side cart (a pure reducer in `src/lib/cart/cart.ts` + a sessionStorage `useSyncExternalStore`
@@ -70,10 +93,10 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 1 of 2 — Build |
-| Phase | 1.06 complete — **merged** (fresh-session review waived, `D-1.06-11`) |
-| Branch | `phase-1.06-cart-flow` (merged to `main`) |
+| Phase | 1.06 complete + merged; **1.07 Cowork (accounts) done** — 1.07 Code half (deploy + verify) pending |
+| Branch | `phase-1.06-cart-flow` (merged to `main`); 1.07 Cowork was ops-only — no branch, nothing committed |
 | Open PR | none — 1.01–1.06 merged `#1`–`#6`; PR `#6`'s `D-1.06-2` review **waived** (`D-1.06-11`) |
-| Deployed | nowhere — Supabase runs **local only** (`D-1.03-5`); Vercel project created in 1.07 (`D-1.06-4`) |
+| Deployed | **not yet** — accounts stood up 1.07 Cowork (Vercel `trajanov-v2`, hosted Supabase Frankfurt `eu-central-1`, real Turnstile); 6 env vars set in Vercel but **redeploy + schema push owed to the 1.07 Code half** (`D-1.03-5`, `D-1.06-4`) |
 | Domain | `trajanov.com` — **not purchased** |
 
 ---
@@ -220,12 +243,12 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 
 | Integration | Status |
 |---|---|
-| Supabase | **Local only (Docker/Colima)** — schema + `create_order`(+TR006) + `expire_reservations` (pg_cron-scheduled) + rate-limit + RLS + 31 tests. **No hosted project** (1.07). |
-| Resend | Not created (1.07) |
-| Turnstile | **Real widget + server Siteverify** wired, against Cloudflare **dummy test keys** (`D-1.04-8`); real keys 1.07/2.05 |
+| Supabase | **Hosted project created** (1.07 Cowork) — Frankfurt `eu-central-1`, ref `kmuocwmevyyuhcvwoebf`, Postgres 17 (= local major); URL + **legacy** keys in Vercel (`D-1.07-1`). **Migrations not yet pushed; parity unverified (owed #4).** Local (Colima) remains the only proven env: schema + `create_order`(+TR006) + `expire_reservations` (pg_cron) + rate-limit + RLS + 46 tests. |
+| Resend | Not created — **deferred to 1.08** (no `RESEND_API_KEY` / `ORDER_NOTIFICATION_EMAIL` set) |
+| Turnstile | **Real widget created** (1.07 Cowork) — "Trajanov store", **Managed** mode (`D-1.07-2`), hostnames `trajanov-v2.vercel.app` + `localhost`; real site+secret keys in Vercel. Server Siteverify still proven only against **dummy** keys (`D-1.04-8`); real-key behaviour unverified until the Code half redeploys (owed #5). |
 | Cloudflare DNS | Not configured |
 | Cloudflare Analytics | Not configured |
-| Vercel project | Not created |
+| Vercel project | **Created** (1.07 Cowork) — `trajanov-v2`, Hobby, `main` = production, `https://trajanov-v2.vercel.app`; 6 env vars set (Prod+Preview, Sensitive). **Redeploy owed** so vars take effect (1.07 Code half). |
 
 ---
 
@@ -239,10 +262,11 @@ or before any phase that builds on unverified work, the next phase is a verifica
 |---|---|---|---|
 | 1 | **Design direction sign-off.** Palette + fonts were *derived* from the handover ledger, not from a delivered filled `brand.md` (`D-1.02-1`). Lazar must eyeball the rendered site (now incl. `/about`, `/contact`) and approve/adjust the tokens. **Merge blocker on 1.05** (`D-1.05-2`). | 1.02 | Lazar review of the live site |
 | 2 | **IG profile URL click-test.** `@trajanovv2026` handle is VERIFIED and the URL renders/links correctly (verified in-browser this phase: footer, drop-ended banner, **and now Contact**), but a human must click it and confirm it opens **Vladimir's actual profile** (`facts.md` §6). **Merge blocker on 1.05** (`D-1.05-2`). | 1.02 | Lazar click-test, pre-merge |
-| 4 | **Hosted-Supabase parity** (`D-1.03-5`, extended by `D-1.04-1`). Migrations, RLS, real keys, **the pg_cron schedule, and the rate-limit table** are proven only against local Supabase (Colima). A **paused free-tier project silently pauses pg_cron** (reservations stop expiring). Re-confirm all of it on the real project. | 1.03/1.04 | 1.07 (hosted project) |
-| 5 | **Real Turnstile keys.** Siteverify is proven only against Cloudflare's **dummy** keys (`D-1.04-8`); "is Cloudflare actually challenging bots" is unanswerable until real keys. Test keys must never reach production. | 1.04 | 1.07 / 2.05 |
+| 4 | **Hosted-Supabase parity** (`D-1.03-5`, extended by `D-1.04-1`). Migrations, RLS, real keys, **the pg_cron schedule, and the rate-limit table** are proven only against local Supabase (Colima). A **paused free-tier project silently pauses pg_cron** (reservations stop expiring). Re-confirm all of it on the real project. **Unblocked (1.07 Cowork): the hosted Frankfurt project now exists (Postgres 17 = local major) with URL + legacy keys in Vercel, but migrations are not yet pushed and parity is unverified — verification still owed to the 1.07 Code half, incl. confirming `orders`/`order_items` stay anon-deny-all (`D-1.07-3`).** | 1.03/1.04 | 1.07 Code half (hosted project exists; deploy + verify pending) |
+| 5 | **Real Turnstile keys.** Siteverify is proven only against Cloudflare's **dummy** keys (`D-1.04-8`); "is Cloudflare actually challenging bots" is unanswerable until real keys. Test keys must never reach production. **Unblocked (1.07 Cowork): a real Turnstile widget + real site/secret keys now exist in Vercel (Managed mode, `D-1.07-2`), but the build has not been redeployed or tested against them — verification still owed to the 1.07 Code half (confirm the deployed build uses the real keys, not the dummies, and that Managed mode matches local).** | 1.04 | 1.07 Code half / 2.05 |
 
-*Code verified directly (not owed) this phase: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
+*Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
+verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
 `npm test` (**46**) all green, incl. the re-run 10-vs-3 oversell gate; the phase test was confirmed to
 **fail against the stand-in** (RED captured) before the stand-in was deleted; `/catalog`,
 `/catalog/[slug]`, `/cart`, `/checkout` rendered in-browser at 390px + 1180px, both locales, against
@@ -257,8 +281,12 @@ dependency (`package.json` unchanged). (Prior direct-verified items carry forwar
 silently. **#1 (design sign-off) and #2 (IG click-test)** were merge blockers on 1.05 (`D-1.05-2`);
 **PR `#5` has since merged**, so they were either satisfied at that merge or this file is stale on the
 point — Lazar to confirm and remove if done (not removed here — this session did not perform them).
-**#4 (hosted-Supabase parity) and #5 (real Turnstile keys)** remain deferred to 1.07 by design.
-Numbers are not renumbered (keeps `D-1.05-2`'s references valid); **1.08 remains the hard gate.**
+**#4 (hosted-Supabase parity) and #5 (real Turnstile keys)** are now **unblocked by the 1.07 Cowork
+(ops) half** — the hosted Supabase project, the real Turnstile widget/keys, and the Vercel env vars all
+exist — but **both remain owed: their verification is the 1.07 Code half's job** (link repo → push
+schema to Frankfurt → redeploy → confirm parity + real-key behaviour), **not done here.** The 1.07
+Cowork half was ops-only and verified no code directly. Numbers are not renumbered (keeps `D-1.05-2`'s
+references valid); **1.08 remains the hard gate — the register must be empty before Part 2.**
 
 ---
 
