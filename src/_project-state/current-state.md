@@ -135,7 +135,7 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | Part | 1 of 2 — Build |
 | Phase | **1.07 complete (both halves)** — Cowork (accounts) + Code (deploy, hosted parity, real keys). Next: `Z.01` (blocked), then the 1.08 gate |
 | Branch | `phase-1.07-deploy` → PR `#7` to `main` |
-| Open PR | **`#7`** — no fresh-session review required (that gate is 1.03/1.04 only, `D-0-3`); Petar or Lazar cross-reviews. **Production already serves this commit** (`D-1.07-5`), so the merge is a redeploy of the same code |
+| Open PR | **none** — 1.01–1.07 merged `#1`–`#7`. PR `#7` merged to `main` at phase close on Petar's instruction; no fresh-session review required (that gate is 1.03/1.04 only, `D-0-3`). **Production already served this commit before the merge** (`D-1.07-5`), so the merge was a redeploy of identical code |
 | Deployed | **YES — https://trajanov-v2.vercel.app**, production, serving `/` (MK) + `/en` from the hosted Frankfurt DB. Deployed from the phase branch via `npx vercel --prod` **before** merge (`D-1.07-5`). `D-1.03-5` and `D-1.06-4` are closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
