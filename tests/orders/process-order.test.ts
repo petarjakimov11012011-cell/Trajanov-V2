@@ -70,3 +70,40 @@ describe("processOrder — Turnstile gates create_order", () => {
     expect(out).toEqual({ status: "order_error", code: "TR004" });
   });
 });
+
+describe("processOrder — best-effort order notification (Z.01)", () => {
+  it("calls notifyOrder exactly once, AFTER a successful order, with the input and order number", async () => {
+    const notifyOrder = vi.fn(async () => {});
+    const out = await processOrder("good", INPUT, { ...makeDeps(), notifyOrder });
+    expect(out).toEqual({ status: "ok", orderNumber: "TRJ-0001" });
+    expect(notifyOrder).toHaveBeenCalledOnce();
+    expect(notifyOrder).toHaveBeenCalledWith(INPUT, "TRJ-0001");
+  });
+
+  it("does NOT notify when the order fails with a TR00x code (no order = no email)", async () => {
+    const notifyOrder = vi.fn(async () => {});
+    const deps = {
+      ...makeDeps({ createOrder: vi.fn(async () => ({ ok: false as const, code: "TR004" })) }),
+      notifyOrder,
+    };
+    const out = await processOrder("good", INPUT, deps);
+    expect(out).toEqual({ status: "order_error", code: "TR004" });
+    expect(notifyOrder).not.toHaveBeenCalled();
+  });
+
+  it("does NOT notify on an empty cart (rejected before create_order)", async () => {
+    const notifyOrder = vi.fn(async () => {});
+    const out = await processOrder("good", { ...INPUT, items: [] }, { ...makeDeps(), notifyOrder });
+    expect(out).toEqual({ status: "empty" });
+    expect(notifyOrder).not.toHaveBeenCalled();
+  });
+
+  it("still returns order success when notifyOrder THROWS — the order never depends on the email", async () => {
+    const notifyOrder = vi.fn(async () => {
+      throw new Error("resend exploded");
+    });
+    const out = await processOrder("good", INPUT, { ...makeDeps(), notifyOrder });
+    expect(out).toEqual({ status: "ok", orderNumber: "TRJ-0001" });
+    expect(notifyOrder).toHaveBeenCalledOnce();
+  });
+});

@@ -124,12 +124,16 @@ it must match Трн.мк — which it does. Do not silently harmonise it to the
 | Fact | Value | Status |
 |---|---|---|
 | Phone | **078820520** | **VERIFIED** — owner confirmed for public display, intake 2026-07-14 |
-| Email | — | **UNVERIFIED — OWED** (Lazar → Vladimir) |
+| Email | **Exists; stored as the `ORDER_NOTIFICATION_EMAIL` env var — the literal address is NEVER written to the repo (`D-Z.01-3`, `D-0-1`)** | **VERIFIED** — owner via Lazar, 2026-07-18 |
 | Physical address | None | VERIFIED (as absence) |
 
-**Email is a placeholder until it arrives.** It gates: the Contact page, the order-confirmation
-sender, and the order-notification recipient. **The order pipeline cannot be verified end-to-end
-without it** — see Phase 1.08.
+**The email now exists (VERIFIED 2026-07-18) and is wired — as of Phase Z.01 — as the internal
+order-notification recipient only.** It is read server-side from `ORDER_NOTIFICATION_EMAIL`; the literal
+value is not in this file, any commit, any fixture, or any log (public-repo rule, `D-0-1`; `D-Z.01-3`).
+It is **NOT published on the Contact page** — that placeholder (register #5) stays pending Vladimir's
+explicit sign-off to show a minor's personal email publicly (`D-Z.01-3`). **That an order actually
+delivers an email to Vladimir's inbox is still owed to Phase 1.08** (needs the live Vercel keys + a live,
+priced drop + a real order end to end).
 
 Phone format for display: confirm with Vladimir whether he wants `078 820 520` (local) or
 `+389 78 820 520` (international). Use `tel:+38978820520` in the link either way.
@@ -245,3 +249,4 @@ Say so in the completion report and it comes back to the orchestrator.
 |---|---|---|
 | 2026-07-14 | Created from intake. trn.mk fetched and verified in full. | Claude Chat (orchestrator) |
 | 2026-07-15 | **§ 4 rewritten.** All three outstanding press links fetched, read, and VERIFIED. A **fifth outlet (Република)** found and verified — it was not in the intake list. Recorded that four of the five are syndications of one supplied text, that press photos are not ours to use, and that the § 3 quote matches Трн.мк exactly (the syndications differ by one word — do not "fix" it). The "only Трн.мк may be cited" rule is retired as satisfied. | Claude Chat (orchestrator) |
+| 2026-07-18 | **§ 5 Email → VERIFIED.** Per the Phase Z.01 Code brief (Task 8, `D-Z.01-3/4`), the owner's email now exists (provenance: owner via Lazar, 2026-07-18) and is recorded **as env-var-only** (`ORDER_NOTIFICATION_EMAIL`) — the literal address is never written to the repo (`D-0-1`). Wired as the internal order-notification recipient; **not** published on Contact (register #5 stays). Real inbox delivery still owed to 1.08. Edit made by Code on explicit orchestrator instruction and surfaced in the completion report (not a silent add). | Claude Code (per Z.01 brief) |

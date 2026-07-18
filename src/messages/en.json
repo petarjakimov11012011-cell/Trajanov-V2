@@ -120,7 +120,7 @@
     "protected": "Bot protection.",
     "noDrop": "No active drop right now.",
     "emptyCart": "Your cart is empty.",
-    "success": "Order {orderNumber} received. Reserved for 48 hours.",
+    "success": "Order {orderNumber} received and reserved for 48 hours. You pay cash on delivery — we'll call you to confirm.",
     "turnstileFailed": "That check didn't pass. Try again.",
     "rateLimited": "Too many attempts from this network. Wait a moment and try again.",
     "genericError": "Something went wrong. Try again.",
