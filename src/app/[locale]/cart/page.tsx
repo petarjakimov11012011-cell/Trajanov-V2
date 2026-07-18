@@ -1,5 +1,23 @@
+import type {Metadata} from 'next';
+import type {Locale} from 'next-intl';
 import {useTranslations} from 'next-intl';
+import {getTranslations} from 'next-intl/server';
 import {CartView} from '@/components/cart/CartView';
+import {localeAlternates} from '@/lib/metadata';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: Locale}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  const t = await getTranslations({locale, namespace: 'Meta'});
+  return {
+    title: t('cartTitle'),
+    description: t('cartDescription'),
+    alternates: localeAlternates('/cart', locale),
+  };
+}
 
 // The cart reads real client cart state (sessionStorage-backed store). Empty, items, and the 2-unit
 // cap are all driven by what the customer actually added (brief Task 5).

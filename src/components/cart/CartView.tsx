@@ -103,7 +103,7 @@ export function CartView() {
               </button>
               <div className="flex items-center gap-2">
                 <IconBtn
-                  label="−"
+                  label={t('decrease')}
                   disabled={l.qty <= 1}
                   onClick={() => setQty(l.variantId, l.qty - 1)}
                 >
@@ -113,7 +113,7 @@ export function CartView() {
                   {l.qty}
                 </span>
                 <IconBtn
-                  label="+"
+                  label={t('increase')}
                   disabled={atCap}
                   onClick={() => setQty(l.variantId, l.qty + 1)}
                 >

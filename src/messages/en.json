@@ -90,6 +90,8 @@
     "size": "Size",
     "qty": "Qty",
     "remove": "Remove",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
     "capNotice": "Max 2 items per order — stock is limited and reserved when you order.",
     "subtotal": "Subtotal",
     "shipping": "Shipping",
@@ -134,7 +136,8 @@
     "currency": "MKD",
     "languageMk": "МК",
     "languageEn": "EN",
-    "switchLanguage": "Change language"
+    "switchLanguage": "Change language",
+    "shippingNotice": "We ship inside North Macedonia only. We can't deliver outside the country. Cash on delivery."
   },
   "Placeholder": {
     "productPhoto": "[PLACEHOLDER: product photo — Vladimir]",
@@ -158,5 +161,24 @@
     "stockBadge": "Stock badge",
     "field": "Checkout field",
     "sampleNote": "Sample to show the token — not a real price."
+  },
+  "Meta": {
+    "siteTitle": "Trajanov — clothing drops",
+    "siteDescription": "Oversized unisex t-shirts from Strumica, in limited drops.",
+    "homeTitle": "Trajanov — next drop",
+    "homeDescription": "Oversized unisex t-shirts from Strumica. Drops of 3 to 5 pieces, real limited stock, cash on delivery.",
+    "catalogTitle": "Catalog — Trajanov",
+    "catalogDescription": "The pieces in the active drop. Real, limited stock.",
+    "productDescription": "Oversized unisex t-shirt. Shipping within North Macedonia only, cash on delivery.",
+    "cartTitle": "Cart — Trajanov",
+    "cartDescription": "The pieces you picked, before you order.",
+    "checkoutTitle": "Checkout — Trajanov",
+    "checkoutDescription": "Enter your delivery details. Cash on delivery, shipping within North Macedonia only.",
+    "aboutTitle": "About — Trajanov",
+    "aboutDescription": "One brand, one designer from Strumica. The story behind Trajanov.",
+    "contactTitle": "Contact — Trajanov",
+    "contactDescription": "Get in touch: phone and Instagram. Strumica, North Macedonia.",
+    "styleguideTitle": "Design system — Trajanov",
+    "styleguideDescription": "Internal design-system reference."
   }
 }

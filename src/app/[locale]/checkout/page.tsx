@@ -1,10 +1,28 @@
+import type {Metadata} from 'next';
+import type {Locale} from 'next-intl';
 import {useTranslations} from 'next-intl';
+import {getTranslations} from 'next-intl/server';
 import {CheckoutForm} from '@/components/checkout/CheckoutForm';
+import {localeAlternates} from '@/lib/metadata';
 
 // The order path runs server-side (Turnstile → rate limit → create_order). What it submits comes from
 // the customer's cart (client state), read inside the form; create_order remains the sole authority on
 // the window, cap, price, and stock (D-1.04-9). The page itself only needs the public Turnstile key.
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: Locale}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  const t = await getTranslations({locale, namespace: 'Meta'});
+  return {
+    title: t('checkoutTitle'),
+    description: t('checkoutDescription'),
+    alternates: localeAlternates('/checkout', locale),
+  };
+}
 
 export default function CheckoutPage() {
   // Cloudflare Turnstile sitekey is public by design (NEXT_PUBLIC_). Dummy test key until 1.07 (D-1.04-8).

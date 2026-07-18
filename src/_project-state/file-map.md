@@ -6,11 +6,24 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-18** · By: **Claude Code (Phase 1.08 — Verification gate, Code half)**
+Last updated: **2026-07-19** · By: **Claude Code (Phase 2.01 — Bilingual, Code)**
 
 ---
 
 ## Status
+
+**Bilingual landed (Phase 2.01).** New files: `src/lib/site.ts` (`SITE_URL` origin constant),
+`src/lib/metadata.ts` (`localeAlternates` — hreflang + canonical via next-intl `getPathname`),
+`src/components/system/ShippingNotice.tsx` (shared MK-only shipping notice), `scripts/i18n-inventory.ts`
+(+ `npm run i18n:inventory`), `docs/i18n/string-inventory.md` (committed, generated), and
+`tests/i18n/{catalog-parity,pathnames}.test.ts`. `src/i18n/routing.ts` gained a `pathnames` map (MK Latin
+slugs); `next.config.ts` gained the 308 redirect table. Modified: every page under `src/app/[locale]/`
+(added `generateMetadata`; product page also renders `ShippingNotice`), `layout.tsx` (static metadata →
+`generateMetadata`), `src/lib/format.ts` (`formatMkd` locale-aware), `src/messages/{mk,en}.json`
+(`Cart.decrease`/`increase`, `Common.shippingNotice`, `Meta` namespace), and components
+`LanguageSwitch`/`HomeExperience`/`ProductCard`/`CartView`/`CheckoutForm`. **No `supabase/migrations/`,
+`create_order`, `expire_reservations`, or `src/config/` file touched; no new dependency.** See the 2.01
+row in the change log. Below is the Z.01/1.06/1.05/1.04 history.
 
 **Order email landed (Phase Z.01).** The reserved-and-empty `src/lib/email/` is now populated:
 `order-notification.ts` (a pure MK composer + a best-effort Resend sender that never throws and bounds
@@ -93,7 +106,7 @@ Trajanov-V2/
 ├── .env.example                    # KEY NAMES ONLY — never values
 ├── .gitignore                      # covers .env* (with !.env.example) — verified in 1.01
 ├── components.json                 # shadcn/ui config
-├── next.config.ts                  # wrapped with next-intl plugin
+├── next.config.ts                  # next-intl plugin + 308 redirect table (old English MK paths → MK slugs, 2.01)
 ├── postcss.config.mjs              # Tailwind v4
 ├── eslint.config.mjs               # ESLint flat config
 ├── tsconfig.json                   # @/* → ./src/*
@@ -104,8 +117,10 @@ Trajanov-V2/
 ├── briefs/
 │   └── Part-1-Phase-01-Code.md     # this phase's brief
 ├── docs/
-│   └── design-handovers/
-│       └── Part-1-Phase-02-Handover.md  # current UI spec — read before UI work
+│   ├── design-handovers/
+│   │   └── Part-1-Phase-02-Handover.md  # current UI spec — read before UI work
+│   └── i18n/
+│       └── string-inventory.md      # GENERATED (npm run i18n:inventory) — every key/MK/EN/where, for 2.02 (2.01)
 │
 ├── src/
 │   ├── _project-state/
@@ -130,7 +145,7 @@ Trajanov-V2/
 │   │       └── styleguide/page.tsx  # component-state strip (review aid)
 │   │
 │   ├── i18n/                        # next-intl config (added 1.01)
-│   │   ├── routing.ts               # locales, defaultLocale, as-needed prefix
+│   │   ├── routing.ts               # locales, defaultLocale, as-needed prefix + pathnames (localised slugs, 2.01)
 │   │   ├── request.ts               # getRequestConfig → messages
 │   │   └── navigation.ts            # locale-aware Link/redirect/…
 │   │
@@ -144,12 +159,14 @@ Trajanov-V2/
 │   │   ├── checkout/               # CheckoutField, CheckoutForm, Turnstile (real widget, 1.04)
 │   │   ├── layout/                 # SiteHeader, SiteFooter, LanguageSwitch
 │   │   ├── home/                   # HomeExperience (props-driven from server drop state, 1.04)
-│   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice, DevPreviewSwitch (1.04)
+│   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice, DevPreviewSwitch (1.04), ShippingNotice (MK-only shipping, 2.01)
 │   │
 │   ├── lib/
 │   │   ├── utils.ts                 # cn() — shadcn helper
 │   │   ├── social.ts                # facts-backed public contact constants: IG handle/URL + phone (1.04/1.05)
-│   │   ├── format.ts                # formatMkd() price formatter (1.04)
+│   │   ├── format.ts                # formatMkd(amount,currency,locale) — locale-aware price formatter (1.04, locale-aware 2.01)
+│   │   ├── site.ts                  # SITE_URL origin constant — hreflang/canonical base (2.01, TODO(2.05): trajanov.com)
+│   │   ├── metadata.ts              # localeAlternates() — reciprocal hreflang + canonical via next-intl getPathname (2.01)
 │   │   ├── cart/
 │   │   │   └── cart.ts              # PURE cart reducer + 2-unit cap + toOrderItems (React-free, testable, 1.06)
 │   │   ├── supabase/
@@ -206,11 +223,15 @@ Trajanov-V2/
 │
 ├── scripts/                        # operator tooling (1.04) — direct-Postgres, not runtime code
 │   ├── sync-core.ts                # config→DB sync logic (testable): idempotent, stock insert-only
-│   └── sync-drop.ts                # `npm run sync:drop` CLI wrapper (tsx)
+│   ├── sync-drop.ts                # `npm run sync:drop` CLI wrapper (tsx)
+│   └── i18n-inventory.ts           # `npm run i18n:inventory` → docs/i18n/string-inventory.md (pure file IO, no DB, 2.01)
 │
 ├── tests/                          # Vitest — DB integration; need a live local stack (D-1.03-12)
 │   ├── setup.ts                    # loads .env.local (Node 24 process.loadEnvFile)
 │   ├── helpers/db.ts               # anon/service supabase-js clients + direct pg admin conn
+│   ├── i18n/                       # NO DB — pure catalog/config assertions (2.01)
+│   │   ├── catalog-parity.test.ts  # mk.json ⇔ en.json identical key sets + no empty value (bar About.quoteNote)
+│   │   └── pathnames.test.ts       # route folders ⇔ routing.pathnames; both-locale slugs; no orphan
 │   ├── cart/
 │   │   └── cart.test.ts            # PURE cart reducer: choice recorded, 2-unit cap, toOrderItems boundary (1.06)
 │   ├── email/
@@ -275,4 +296,5 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-15 | 1.04 | Added `src/config/` (5 files), `src/lib/drop/state.ts`, `src/lib/orders/{process-order,actions,phone}.ts`, `src/lib/rate-limit/{hash,ip}.ts`, `src/lib/turnstile/verify.ts`, `src/lib/{social,format}.ts`, `scripts/{sync-core,sync-drop}.ts`, 4 migrations, `src/components/checkout/Turnstile.tsx`, `src/components/system/DevPreviewSwitch.tsx`, 6 test files under `tests/{config,orders}/`. **Deleted** `src/lib/demo.ts` and `src/components/checkout/TurnstilePlaceholder.tsx`. Rewired `src/app/[locale]/{page,catalog,catalog/[slug],checkout,styleguide}` + several components to real DB data. Removed `.gitkeep` from `src/config`, `src/lib/{drop,rate-limit}`. `D-1.04-*`. | Claude Code |
 | 2026-07-18 | Z.01 | Added `src/lib/email/order-notification.ts` (composer + best-effort Resend sender) and `tests/email/order-notification.test.ts` (Resend mocked). Removed `.gitkeep` from now-populated `src/lib/email`. Modified `src/lib/orders/process-order.ts` (optional `notifyOrder` dep, awaited best-effort after success), `src/lib/orders/actions.ts` (enrichment + wire the sender), `src/messages/{mk,en}.json` (`Order.success` copy), `tests/orders/process-order.test.ts` (+4 notify cases). Added dep `resend 6.17.2`. **No `supabase/migrations/`, `src/app`, or component file touched; `create_order`/`expire_reservations` unchanged.** `D-Z.01-1…7`. | Claude Code |
 | 2026-07-16 | 1.07 (Code) | Added **one migration** `supabase/migrations/20260716120000_catalog_grant_hardening.sql` (REVOKE anon/authenticated/public write privileges on `drops`/`products`/`variants` — closes the hosted-only grants gap, `D-1.07-14`) and `briefs/Part-1-Phase-07-Code.md`. Modified `Trajanov-V2-Phase-Plan.md` (Resend struck from 1.07, `Z.01` added + on the critical path), `src/_project-state/00_stack-and-config.md` (Pinned corrections + appended change-log row), `Decisions.md` (`D-1.07-4`…`D-1.07-15`), `current-state.md`. **No `src/` application code, no component, no message-catalog, no test file, and no existing migration changed. `create_order`/`expire_reservations` untouched. No new npm dependency.** New untracked local files (gitignored, never committed): `.env.hosted` (`D-1.07-9`), `.vercel/`. | Claude Code |
+| 2026-07-19 | 2.01 (Code) | **Bilingual.** Added `src/lib/site.ts`, `src/lib/metadata.ts`, `src/components/system/ShippingNotice.tsx`, `scripts/i18n-inventory.ts`, `docs/i18n/string-inventory.md` (generated, committed), `tests/i18n/{catalog-parity,pathnames}.test.ts`, and `briefs/Part-2-Phase-01-Code.md`. Modified `src/i18n/routing.ts` (`pathnames`), `next.config.ts` (308 redirects), all 8 pages under `src/app/[locale]/` + `layout.tsx` (`generateMetadata` + product `ShippingNotice`), `src/lib/format.ts` (locale-aware), `src/messages/{mk,en}.json` (`Cart.decrease/increase`, `Common.shippingNotice`, `Meta` namespace), `src/components/{layout/LanguageSwitch,home/HomeExperience,product/ProductCard,cart/CartView,checkout/CheckoutForm}.tsx`, `package.json` (`i18n:inventory` script). **No `supabase/migrations/`, `src/config/`, `create_order`, `expire_reservations`, or test-of-record changed; `create_order`/`expire_reservations` untouched; no new dependency.** `D-2.01-1…12`. | Claude Code |
 | 2026-07-18 | 1.08 (Code) | **No new source files.** Modified `facts.md` §7 (real price 1199 MKD + sizes VERIFIED), `src/config/products.ts` (rehearsal now priced 1199 MKD; two verified colourways `test-mustard-ochre` S/M/L/XL + `test-off-white` XL-only; names still null), `src/config/drops.ts` (rehearsal comment), `Decisions.md` (`D-1.08-1/2/3`), `current-state.md`, `file-map.md`. Added root docs `Part-1-Phase-08-Operator-Runbook.md` + `completions/Part-1-Phase-08-Code-Completion.md`. **No `supabase/migrations/`, `src/app`, component, or test file changed; `create_order`/`expire_reservations` untouched; no new dependency.** Hosted verification used seed/test fixtures only, removed after (hosted left clean, TRJ-0001). `D-1.08-*`. | Claude Code |

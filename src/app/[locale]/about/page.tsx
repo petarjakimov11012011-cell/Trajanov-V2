@@ -1,5 +1,22 @@
+import type {Metadata} from 'next';
+import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations, getFormatter} from 'next-intl/server';
 import {Link} from '@/i18n/navigation';
+import {localeAlternates} from '@/lib/metadata';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: Locale}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  const t = await getTranslations({locale, namespace: 'Meta'});
+  return {
+    title: t('aboutTitle'),
+    description: t('aboutDescription'),
+    alternates: localeAlternates('/about', locale),
+  };
+}
 
 // About is a static page: no drop state, no DB read, nothing to recompute per request. It does NOT
 // carry the drop pages' `force-dynamic` (D-1.05, Task 3). setRequestLocale enables static rendering

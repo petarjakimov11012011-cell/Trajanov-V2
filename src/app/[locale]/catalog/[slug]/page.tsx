@@ -1,3 +1,5 @@
+import type {Metadata} from 'next';
+import type {Locale} from 'next-intl';
 import {getTranslations, getLocale} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import {ArrowLeft} from 'lucide-react';
@@ -5,16 +7,43 @@ import {Link} from '@/i18n/navigation';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {Placeholder} from '@/components/system/Placeholder';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
+import {ShippingNotice} from '@/components/system/ShippingNotice';
 import {StockBadge} from '@/components/drop/StockBadge';
 import {AddToCartPanel} from '@/components/product/AddToCartPanel';
 import {type BuyState} from '@/components/product/BuyButton';
 import {formatMkd} from '@/lib/format';
 import {getProductView, parsePreviewState} from '@/lib/drop/state';
+import {localeAlternates} from '@/lib/metadata';
 
 // Product data is read from the DB per request (D-1.04-9); no static params.
 export const dynamic = 'force-dynamic';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
+
+// Per-locale title from the product's real name (or the neutral placeholder + index while names are
+// OWED); generic per-locale description; reciprocal hreflang for the SHARED product slug (D-2.01-2/5/6).
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: Locale; slug: string}>;
+}): Promise<Metadata> {
+  const {locale, slug} = await params;
+  const t = await getTranslations({locale});
+  const result = await getProductView(slug);
+  const realName = result
+    ? locale === 'mk'
+      ? result.product.nameMk
+      : result.product.nameEn
+    : null;
+  const title = result
+    ? (realName ?? `${t('Placeholder.productName')} ${pad2(result.product.index)}`)
+    : t('Meta.catalogTitle');
+  return {
+    title,
+    description: t('Meta.productDescription'),
+    alternates: localeAlternates({pathname: '/catalog/[slug]', params: {slug}}, locale),
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -73,7 +102,7 @@ export default async function ProductPage({
             <div className="text-price tabular">
               {product.priceMkd != null ? (
                 <span className="text-foreground">
-                  {formatMkd(product.priceMkd, t('Common.currency'))}
+                  {formatMkd(product.priceMkd, t('Common.currency'), locale)}
                 </span>
               ) : (
                 <Placeholder>{t('Placeholder.price')}</Placeholder>
@@ -87,6 +116,10 @@ export default async function ProductPage({
               {soldOut && <StockBadge level="sold-out" />}
             </div>
           </div>
+
+          {/* MK-only shipping statement, in the buy panel ABOVE the Add-to-cart control so it is visible
+              without scrolling past it at 390px (D-2.01, Task 7). Shared key with checkout. */}
+          <ShippingNotice />
 
           <AddToCartPanel
             sizes={product.sizes}

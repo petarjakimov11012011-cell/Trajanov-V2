@@ -1759,3 +1759,171 @@ Executor (Code) decisions start at `D-1.08-3`.*
 - **Alternative rejected:** Leave the operator half for a later session per `D-1.08-3` — rejected because the operator was present and ready, and doing it live let Code verify the DB side and drive the open→order→verify→close window safely (drop open only for the test, closed immediately, test order deleted — exactly the `D-1.08-1` mitigation).
 - **Downside accepted:** The rehearsal drop was briefly buyable on the public URL during the test (unannounced, ~minutes, closed immediately, order deleted — the accepted `D-1.08-1` cost). The hosted `test-drop` is now left carrying the real-priced colourways (ended, not buyable) instead of the old null-priced placeholders — this **matches the committed config** and is the intended rehearsal end-state. **Recommended housekeeping (L1–L4, L7) is still open** but is explicitly outside the gate's zero-condition.
 - **Links:** `D-1.08-1` · `D-1.08-2` · `D-1.08-3` · `Part-1-Phase-08-Operator-Runbook.md` · owed-verification register (now empty)
+
+---
+
+## Phase 2.01 — Bilingual (Code)
+
+*`D-2.01-1` … `D-2.01-5` are the orchestrator's, handed down verbatim in the Phase 2.01 brief
+("Decisions already made") and logged here before any code was written. Executor (Code) decisions
+start at `D-2.01-6`.*
+
+### D-2.01-1 · 2026-07-19 · MK route slugs are Latin transliteration, not Cyrillic
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator), via Lazar — handed down verbatim in the Phase 2.01 brief.
+- **Decision:** MK route slugs are **Latin transliteration** — `/katalog`, `/kosnicka`, `/naracka`,
+  `/za-nas`, `/kontakt` — not Cyrillic.
+- **Alternative rejected:** Cyrillic slugs (`/каталог`, `/кошничка`).
+- **Downside accepted:** A Macedonian reader sees transliterated Latin in the address bar, which is less
+  native than Cyrillic.
+- **Reason:** Links get shared in Viber and Instagram bios, where Cyrillic paths percent-encode into
+  unreadable strings (`/каталог` → `/%D0%BA%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3`) and some clients mangle them.
+- **Links:** `src/i18n/routing.ts` (`pathnames`) · `next.config.ts` (redirect table)
+
+### D-2.01-2 · 2026-07-19 · Product-detail slugs stay single and shared across both locales
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 2.01 brief.
+- **Decision:** `/katalog/[slug]` and `/en/catalog/[slug]` resolve the **same** product slug (from
+  `src/config/products.ts` / the DB); the product token is not localised.
+- **Alternative rejected:** Per-locale product slugs (`slug_mk`/`slug_en` columns).
+- **Downside accepted:** An MK product URL carries a non-localised product token.
+- **Reason:** Real product names do not exist yet (placeholder register #4, owner Vladimir); adding
+  per-locale slug columns now would be a migration built on invented content.
+- **Links:** `src/components/product/ProductCard.tsx` (object-form `Link`) · `src/lib/metadata.ts`
+
+### D-2.01-3 · 2026-07-19 · Old paths redirect permanently (308), they do not 404
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 2.01 brief.
+- **Decision:** `/catalog`, `/catalog/:slug`, `/cart`, `/checkout`, `/about`, `/contact` each **308** to
+  their new MK slug. `/en/*` is untouched by these rules.
+- **Alternative rejected:** Letting them 404 since the store has no traffic yet.
+- **Downside accepted:** A small redirect table to carry forward (kept in lockstep with `pathnames`).
+- **Reason:** The site has been publicly reachable since 1.07 and links may already exist; a dead link on
+  a store that sells three times a year is expensive.
+- **Links:** `next.config.ts`
+
+### D-2.01-4 · 2026-07-19 · /styleguide is not localised
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 2.01 brief.
+- **Decision:** `/styleguide` stays `/styleguide` and `/en/styleguide` — an internal review aid, not a
+  customer surface.
+- **Alternative rejected:** Localising the styleguide slug + its internal labels.
+- **Downside accepted:** Its internal field labels stay English and its font-demo section renders Cyrillic
+  in both locales (see `D-2.01-12`).
+- **Links:** `src/i18n/routing.ts` · `src/app/[locale]/styleguide/page.tsx`
+
+### D-2.01-5 · 2026-07-19 · Slugs are provisional until 2.02 confirms them
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 2.01 brief.
+- **Decision:** The MK slugs are provisional; 2.02's native speakers confirm them. Changing one is a
+  one-line edit in `routing.ts` plus one matching redirect row.
+- **Alternative rejected:** Treating the slugs as final now.
+- **Downside accepted:** A slug may change in 2.02, costing one `routing.ts` line + one `next.config.ts` row.
+- **Reason:** The reviewers who can judge the Macedonian have not seen it yet.
+- **Links:** `src/i18n/routing.ts` · `next.config.ts` (both carry a "keep in lockstep" comment)
+
+*`D-2.01-6` onward are the executor's (Code), made while building 2.01.*
+
+### D-2.01-6 · 2026-07-19 · The language switch reads the query at click time, not via useSearchParams
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** `LanguageSwitch` preserves the current query string by reading `window.location.search`
+  inside the click handler, rather than the `useSearchParams()` hook. It still switches locale in place
+  via `router.replace({pathname, params, query}, {locale})` (next-intl's documented locale-switch shape),
+  so the page and the `?preview` param survive.
+- **Alternative rejected:** Use `useSearchParams()` and wrap `LanguageSwitch` in a `<Suspense>` boundary.
+- **Downside accepted:** The query is only read on click (a click handler always runs client-side, so this
+  is not a real limitation).
+- **Reason:** `LanguageSwitch` sits in the header on **every** page, including the statically-prerendered
+  About/Contact pages; `useSearchParams()` forces those into a CSR bail-out and **failed the build**
+  ("useSearchParams() should be wrapped in a suspense boundary at page /[locale]/about"). Reading the
+  query only on click keeps the switch a plain client component with no prerender cost.
+- **Links:** `src/components/layout/LanguageSwitch.tsx`
+
+### D-2.01-7 · 2026-07-19 · One shared ShippingNotice component + key, placed ABOVE Add-to-cart
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** A small new `ShippingNotice` component renders the one shared key `Common.shippingNotice`
+  in both places (product buy panel + checkout COD block). On the product page it sits **above** the
+  Add-to-cart control (in the sticky buy column); on checkout, above the Place-order button. The product
+  page's existing below-the-fold "Shipping" detail (`Product.shippingBody`, from 1.02) is **left in place**.
+- **Alternative rejected:** Reuse `Product.shippingBody` and drop the notice below the buy button; or inline
+  the markup in both places without a component.
+- **Downside accepted:** A new tiny component (the brief permits one if the notice needs it), and the
+  product page now states shipping twice — a prominent buy-panel notice **and** the existing Shipping detail
+  section. They agree (NMK only + COD); the redundancy is mild and the prominent notice is the required one.
+- **Reason:** "Visible without scrolling past the Add-to-cart control at 390px" is satisfied unambiguously by
+  placing it above the button; a shared component keeps the two placements from drifting.
+- **Links:** `src/components/system/ShippingNotice.tsx` · `Common.shippingNotice` (traces to `facts.md` §7,
+  VERIFIED) · `src/app/[locale]/catalog/[slug]/page.tsx` · `src/components/checkout/CheckoutForm.tsx`
+
+### D-2.01-8 · 2026-07-19 · formatMkd takes an explicit locale argument
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** `formatMkd(amount, currency, locale)` gains a required `locale` param and groups the number
+  for that locale (`mk` → `1.199`, `en` → `1,199`); the amount and currency are unchanged (MKD always).
+- **Alternative rejected:** Read the active locale inside `format.ts` (via a next-intl server call), keeping
+  the two-arg signature.
+- **Downside accepted:** Both call sites must pass the locale (both already have it from `useLocale()` /
+  `getLocale()`).
+- **Reason:** `format.ts` is a tiny, dependency-free, unit-testable helper; threading the locale in keeps it
+  pure rather than coupling it to next-intl's request context. No currency conversion exists anywhere.
+- **Links:** `src/lib/format.ts` · `src/components/product/ProductCard.tsx` · `src/app/[locale]/catalog/[slug]/page.tsx`
+
+### D-2.01-9 · 2026-07-19 · Pathname-coverage test asserts config completeness, not runtime resolution
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** `tests/i18n/pathnames.test.ts` checks that every route folder under `src/app/[locale]/` has
+  a `pathnames` entry, that no entry is an orphan, and that each entry carries a non-empty slug (with the
+  same `[param]` token) for **both** locales — reading `routing.pathnames` directly.
+- **Alternative rejected:** Import next-intl's `getPathname` (from `@/i18n/navigation`) and assert the fully
+  resolved `/en`-prefixed URLs in the test.
+- **Downside accepted:** The test proves the routing **config** is complete, not next-intl's runtime URL
+  resolution. The live `/en` prefixing + the actual localised URLs are verified in-browser (this phase's
+  render pass: redirects 308, MK slugs 200, `/en/*` 200, hreflang reciprocal).
+- **Reason:** Importing `@/i18n/navigation` pulls `next/navigation` into the plain-node Vitest runner and
+  fails to resolve ("Cannot find module 'next/navigation'") — the client navigation surface is not loadable
+  outside the Next runtime. Testing the config is robust and still fails a page-added-without-a-slug.
+- **Links:** `tests/i18n/pathnames.test.ts`
+
+### D-2.01-10 · 2026-07-19 · catalog-parity empty-value check allowlists About.quoteNote
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** The parity test's "no empty value" assertion allowlists exactly one key, `About.quoteNote`,
+  which is intentionally empty on MK.
+- **Alternative rejected:** Require every value in both catalogs to be non-empty.
+- **Downside accepted:** A one-entry allowlist to maintain in the test.
+- **Reason:** The About pull-quote's "translated" note is empty on MK (the MK quote is the original — it
+  needs no note) and set only on EN (`D-1.05-6`). next-intl requires identical key sets, so the MK side is a
+  deliberate empty string, not a missing translation. Without the allowlist the test would falsely fail.
+- **Links:** `tests/i18n/catalog-parity.test.ts` · `D-1.05-6`
+
+### D-2.01-11 · 2026-07-19 · Product metadata does a best-effort second DB read to title by product name
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** The product page's `generateMetadata` calls `getProductView(slug)` to title the page by the
+  product's real name (or the neutral placeholder + index while names are OWED), falling back to the catalog
+  title if the product is not found.
+- **Alternative rejected:** Title the product page generically per locale (e.g. "Product — Trajanov") with no
+  fetch.
+- **Downside accepted:** One extra DB read per product-page load (metadata + render each read the drop).
+  Product pages are `force-dynamic` and low-traffic between drops, so the cost is negligible.
+- **Reason:** A per-product `<title>` is the correct, complete behaviour once real names exist; the fetch is
+  cheap and gracefully degrades.
+- **Links:** `src/app/[locale]/catalog/[slug]/page.tsx`
+
+### D-2.01-12 · 2026-07-19 · The styleguide is excluded from the string sweep and the EN no-Cyrillic check
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** `/styleguide` is not swept for user-facing literals, and its EN page is exempt from the
+  "no Cyrillic" expectation. Its internal field labels stay English and its font-demo section deliberately
+  renders Cyrillic glyphs (`Трајанов — Trajanov`, `ѓ ќ љ њ џ …`) in both locales.
+- **Alternative rejected:** Extract the styleguide's internal labels to the catalog and strip its Cyrillic
+  demo from the EN build.
+- **Downside accepted:** The styleguide's EN HTML contains Cyrillic and English literals — acceptable because
+  it is an internal review aid, not a customer surface (`D-2.01-4`), and the Cyrillic is the whole point of
+  the font-coverage demo.
+- **Reason:** Translating away a font-glyph demonstration would defeat its purpose; the styleguide is never a
+  customer-facing page.
+- **Links:** `src/app/[locale]/styleguide/page.tsx` · `D-2.01-4` · `docs/i18n/string-inventory.md`
+  (“Intentionally not translated”)

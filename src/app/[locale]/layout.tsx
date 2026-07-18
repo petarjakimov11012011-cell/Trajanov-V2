@@ -2,17 +2,29 @@ import type {Metadata} from 'next';
 import {Rubik, Inter} from 'next/font/google';
 import {notFound} from 'next/navigation';
 import {NextIntlClientProvider, hasLocale} from 'next-intl';
+import {getTranslations} from 'next-intl/server';
 import {routing} from '@/i18n/routing';
+import {SITE_URL} from '@/lib/site';
 import {SiteHeader} from '@/components/layout/SiteHeader';
 import {SiteFooter} from '@/components/layout/SiteFooter';
 import '../globals.css';
 
-// Placeholder metadata for the design system. Real, localised metadata +
-// hreflang + OG land in Phase 2.01.
-export const metadata: Metadata = {
-  title: 'Trajanov',
-  description: 'Trajanov',
-};
+// Per-locale default title + description, from the message catalog (Meta namespace) — no metadata
+// string is hardcoded here (D-2.01, Task 5). Each page overrides title/description with its own; this
+// is the fallback. `metadataBase` anchors any relative metadata URL to the canonical origin (Task 6).
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: string}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  const t = await getTranslations({locale, namespace: 'Meta'});
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: t('siteTitle'),
+    description: t('siteDescription'),
+  };
+}
 
 // Display face — boxy, confident. Cyrillic subset requested so the build
 // fails loudly if the family ever drops MK glyph coverage (brand.md §4).

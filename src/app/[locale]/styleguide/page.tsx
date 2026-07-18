@@ -1,4 +1,7 @@
+import type {Metadata} from 'next';
+import type {Locale} from 'next-intl';
 import {useTranslations} from 'next-intl';
+import {getTranslations} from 'next-intl/server';
 import {Countdown} from '@/components/drop/Countdown';
 import {DropLiveBanner, DropEndedBanner} from '@/components/drop/DropBanner';
 import {StockBadge} from '@/components/drop/StockBadge';
@@ -6,7 +9,24 @@ import {ProductCard} from '@/components/product/ProductCard';
 import {BuyButton} from '@/components/product/BuyButton';
 import {SizePicker} from '@/components/product/SizePicker';
 import {CheckoutField} from '@/components/checkout/CheckoutField';
+import {localeAlternates} from '@/lib/metadata';
 import type {ProductView} from '@/types/drop';
+
+// Styleguide is an internal review aid, not a customer surface, and is not localised (D-2.01-4). It
+// still emits its own metadata + reciprocal hreflang so every route carries alternates (Task 6).
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: Locale}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  const t = await getTranslations({locale, namespace: 'Meta'});
+  return {
+    title: t('styleguideTitle'),
+    description: t('styleguideDescription'),
+    alternates: localeAlternates('/styleguide', locale),
+  };
+}
 
 // Local sample products — the styleguide is a design reference and needs each card state on demand
 // (in-stock / low / sold-out), which real drop data cannot guarantee. Null names/prices render the
