@@ -6,11 +6,19 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-15** · By: **Claude Code (Phase 1.06 — Cart flow)**
+Last updated: **2026-07-18** · By: **Claude Code (Phase Z.01 — Order email)**
 
 ---
 
 ## Status
+
+**Order email landed (Phase Z.01).** The reserved-and-empty `src/lib/email/` is now populated:
+`order-notification.ts` (a pure MK composer + a best-effort Resend sender that never throws and bounds
+itself). It is fired from the order path via an injected `notifyOrder` dep on `processOrder`, wired in
+`actions.ts` (which also does the best-effort variant→product/size lookup). New test dir `tests/email/`.
+New dep `resend 6.17.2`. `Order.success` copy extended (COD + call-to-confirm, both locales). **No
+`supabase/migrations/` file, `create_order`, or `expire_reservations` touched.** See the 1.06/1.05/1.04
+notes below.
 
 **Cart flow landed (Phase 1.06).** New: `src/lib/cart/cart.ts` (pure reducer + 2-unit cap),
 `src/components/cart/cart-store.ts` (sessionStorage `useSyncExternalStore`), and
@@ -42,7 +50,7 @@ structure. Notes:
 - **4 migrations** under `supabase/migrations/` (price/name nullable, `create_order` `TR006`,
   rate-limit table + fn, `pg_cron`). **6 new test files** under `tests/{config,orders}/`.
 - **`.gitkeep` removed** from now-populated dirs: `src/config`, `src/lib/drop`, `src/lib/rate-limit`.
-- **Still reserved and empty** (`.gitkeep`): `src/lib/email` (1.07), `src/components/ui`.
+- **Still reserved and empty** (`.gitkeep`): `src/components/ui`. (`src/lib/email` was populated in Z.01.)
 - Carried from 1.02/1.03: route folders (non-localised slugs, `D-1.02-4`), component dirs, the typed
   Supabase clients + `order-errors.ts`, the test harness. The Phase 1.02 handover is at
   `docs/design-handovers/Part-1-Phase-02-Handover.md`.
@@ -157,7 +165,8 @@ Trajanov-V2/
 │   │   │   └── ip.ts                # server-only rate-limit RPC call (1.04)
 │   │   ├── turnstile/
 │   │   │   └── verify.ts            # server-only Cloudflare Siteverify (1.04)
-│   │   └── email/                  # .gitkeep — Resend side channel (1.07)
+│   │   └── email/                  # Resend side channel — order notification (Z.01)
+│   │       └── order-notification.ts # MK composer + best-effort sender; never throws, bounded (Z.01)
 │   │
 │   ├── config/                     # typed drop config (1.04, D-0-4)
 │   │   ├── schema.ts                # DropConfig/ProductConfig types + validators + constants
@@ -202,6 +211,8 @@ Trajanov-V2/
 │   ├── helpers/db.ts               # anon/service supabase-js clients + direct pg admin conn
 │   ├── cart/
 │   │   └── cart.test.ts            # PURE cart reducer: choice recorded, 2-unit cap, toOrderItems boundary (1.06)
+│   ├── email/
+│   │   └── order-notification.test.ts # Z.01 sender — Resend MOCKED, no DB: sends once/right fields, throw+missing-env degrade, no PII in logs
 │   ├── concurrency/
 │   │   ├── oversell.test.ts        # 10 orders / 3 units → exactly 3 succeed, 7 insufficient_stock
 │   │   └── expiry.test.ts          # stock returned exactly once, incl. 2 concurrent sweeps
@@ -215,7 +226,7 @@ Trajanov-V2/
 │       ├── checkout-items.test.ts  # cart→create_order: chosen variant reaches order_items, 2-items, cap, TR004 (1.06)
 │       ├── price-missing.test.ts   # TR006 rejects null price, no decrement (D-1.04-6)
 │       ├── rate-limit.test.ts      # 20 ok / 21st rejected; stored value is a hash, not an IP
-│       └── process-order.test.ts   # turnstile/ratelimit/empty-cart gate create_order (Task 6, +empty 1.06)
+│       └── process-order.test.ts   # turnstile/ratelimit/empty-cart gate create_order (Task 6, +empty 1.06, +Z.01 notify-after-success)
 ```
 
 Root additions (1.03): `vitest.config.ts` (serial file execution — one shared local DB).
@@ -260,4 +271,5 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-15 | 1.03 | Added `supabase/` (config.toml, seed.sql, 3 migrations), `src/lib/supabase/{client,server}.ts`, `src/lib/orders/order-errors.ts`, `src/types/database.ts` (generated), `tests/` suites + `tests/{setup.ts,helpers/db.ts}`, `vitest.config.ts`. Removed now-stale `.gitkeep` from `supabase/migrations`, `tests/concurrency`, `src/lib/{supabase,orders}`, `src/types`. **Zero change under `src/app`/`src/components`/`src/messages`.** `D-1.03-*`. | Claude Code |
 | 2026-07-15 | 1.05 | Added `src/app/[locale]/{about,contact}/page.tsx` (both STATIC via `setRequestLocale`). Added `Trajanov-V2-Plan.md` + `Trajanov-V2-Phase-Plan.md` at root (operator-committed, `D-1.05-1`) + to reserved paths. Extended `src/lib/social.ts` (phone constants). Modified `SiteFooter.tsx` (About/Contact links + translated location + phone import), `HomeExperience.tsx` (Home→About link in countdown/ended), `src/messages/{mk,en}.json` (About/Contact/Nav/Placeholder keys), `completions/_TEMPLATE.md` (filename fix). **No `src/lib/{drop,orders}`, `src/config/`, `supabase/`, `tests/` change.** `D-1.05-*`. | Claude Code |
 | 2026-07-15 | 1.04 | Added `src/config/` (5 files), `src/lib/drop/state.ts`, `src/lib/orders/{process-order,actions,phone}.ts`, `src/lib/rate-limit/{hash,ip}.ts`, `src/lib/turnstile/verify.ts`, `src/lib/{social,format}.ts`, `scripts/{sync-core,sync-drop}.ts`, 4 migrations, `src/components/checkout/Turnstile.tsx`, `src/components/system/DevPreviewSwitch.tsx`, 6 test files under `tests/{config,orders}/`. **Deleted** `src/lib/demo.ts` and `src/components/checkout/TurnstilePlaceholder.tsx`. Rewired `src/app/[locale]/{page,catalog,catalog/[slug],checkout,styleguide}` + several components to real DB data. Removed `.gitkeep` from `src/config`, `src/lib/{drop,rate-limit}`. `D-1.04-*`. | Claude Code |
+| 2026-07-18 | Z.01 | Added `src/lib/email/order-notification.ts` (composer + best-effort Resend sender) and `tests/email/order-notification.test.ts` (Resend mocked). Removed `.gitkeep` from now-populated `src/lib/email`. Modified `src/lib/orders/process-order.ts` (optional `notifyOrder` dep, awaited best-effort after success), `src/lib/orders/actions.ts` (enrichment + wire the sender), `src/messages/{mk,en}.json` (`Order.success` copy), `tests/orders/process-order.test.ts` (+4 notify cases). Added dep `resend 6.17.2`. **No `supabase/migrations/`, `src/app`, or component file touched; `create_order`/`expire_reservations` unchanged.** `D-Z.01-1…7`. | Claude Code |
 | 2026-07-16 | 1.07 (Code) | Added **one migration** `supabase/migrations/20260716120000_catalog_grant_hardening.sql` (REVOKE anon/authenticated/public write privileges on `drops`/`products`/`variants` — closes the hosted-only grants gap, `D-1.07-14`) and `briefs/Part-1-Phase-07-Code.md`. Modified `Trajanov-V2-Phase-Plan.md` (Resend struck from 1.07, `Z.01` added + on the critical path), `src/_project-state/00_stack-and-config.md` (Pinned corrections + appended change-log row), `Decisions.md` (`D-1.07-4`…`D-1.07-15`), `current-state.md`. **No `src/` application code, no component, no message-catalog, no test file, and no existing migration changed. `create_order`/`expire_reservations` untouched. No new npm dependency.** New untracked local files (gitignored, never committed): `.env.hosted` (`D-1.07-9`), `.vercel/`. | Claude Code |

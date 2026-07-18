@@ -25,6 +25,13 @@ export interface ProcessDeps {
   createOrder: (
     input: OrderInput,
   ) => Promise<{ ok: true; orderNumber: string } | { ok: false; code: string }>;
+  /**
+   * Best-effort order-notification side channel (Z.01, Plan §8). Invoked ONLY after create_order()
+   * succeeds — the order and its reservation are already written. Optional, and contracted to never
+   * throw or meaningfully block; it is wrapped below regardless, so the order outcome can never depend
+   * on it. The database is the record; the email is a notification (D-0-5, Plan §8).
+   */
+  notifyOrder?: (input: OrderInput, orderNumber: string) => Promise<void>;
 }
 
 export type OrderOutcome =
@@ -61,7 +68,19 @@ export async function processOrder(
 
   // 3. create_order() — the only path that decrements stock.
   const result = await deps.createOrder(input);
-  if (result.ok) return { status: "ok", orderNumber: result.orderNumber };
+  if (result.ok) {
+    // 4. Best-effort notification (Z.01). The order is committed; whatever happens here — a Resend
+    // outage, a timeout, a thrown error — the customer still sees success. The sender logs its own
+    // cause (no PII). Never let the side channel change the record (Plan §8, D-0-5).
+    if (deps.notifyOrder) {
+      try {
+        await deps.notifyOrder(input, result.orderNumber);
+      } catch {
+        // Intentionally swallowed: the order already succeeded and must report success regardless.
+      }
+    }
+    return { status: "ok", orderNumber: result.orderNumber };
+  }
   if (isOrderErrorCode(result.code)) return { status: "order_error", code: result.code };
   return { status: "error" };
 }

@@ -1,9 +1,12 @@
 "use server";
 
 import { headers } from "next/headers";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { verifyTurnstile, isRetryableTurnstile } from "@/lib/turnstile/verify";
 import { hashIp, clientIpFromHeaders, recordAndCheckRateLimit } from "@/lib/rate-limit/ip";
+import { sendOrderNotification, type OrderNotificationLine } from "@/lib/email/order-notification";
 import { processOrder, type OrderInput, type OrderOutcome } from "./process-order";
 import { normalizeMkPhone } from "./phone";
 
@@ -79,5 +82,65 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
       const row = Array.isArray(data) ? data[0] : data;
       return { ok: true, orderNumber: row.order_number as string };
     },
+    // Best-effort order email (Z.01). Runs only after create_order() succeeds; sendOrderNotification
+    // never throws and bounds itself, and processOrder wraps this again — so the order response never
+    // depends on it (Plan §8). Enrichment (variant → product/size) is best-effort too: if it fails,
+    // Vladimir still gets the order number and customer details and can pull the rest from Supabase.
+    notifyOrder: async (oi, orderNumber) => {
+      const lines = await resolveOrderLines(supabase, oi.items);
+      await sendOrderNotification({
+        orderNumber,
+        customerName: oi.customerName,
+        phone: oi.phone,
+        city: oi.city,
+        address: oi.address,
+        notes: oi.notes ?? null,
+        lines,
+      });
+    },
+  });
+}
+
+// Shape of the variant→product embed used to name the ordered lines for Vladimir's email. Cast with
+// `as unknown as` (the repo's convention for embedded selects — see src/lib/drop/state.ts).
+interface RawVariantRow {
+  id: string;
+  size: string;
+  products: { name_mk: string | null; name_en: string | null; slug: string } | null;
+}
+
+/**
+ * Resolve the ordered variants to human-readable lines (product name/slug + size + quantity) for the
+ * notification email. Best-effort: bounded by a short abort timeout and fully wrapped, so a slow or
+ * failing lookup degrades to quantity-only lines rather than delaying or breaking the order path.
+ */
+async function resolveOrderLines(
+  supabase: SupabaseClient<Database>,
+  items: { variantId: string; quantity: number }[],
+): Promise<OrderNotificationLine[]> {
+  const detail = new Map<string, { productName: string | null; size: string }>();
+  try {
+    const { data } = await supabase
+      .from("variants")
+      .select("id, size, products(name_mk, name_en, slug)")
+      .in(
+        "id",
+        items.map((i) => i.variantId),
+      )
+      .abortSignal(AbortSignal.timeout(4000));
+    for (const row of (data ?? []) as unknown as RawVariantRow[]) {
+      const p = Array.isArray(row.products) ? row.products[0] : row.products;
+      detail.set(row.id, {
+        productName: p?.name_mk ?? p?.name_en ?? p?.slug ?? null,
+        size: row.size,
+      });
+    }
+  } catch {
+    // Lookup failed (timeout, transient error): fall through to quantity-only lines. The order number
+    // and customer details still reach Vladimir; the DB remains the record (Plan §8).
+  }
+  return items.map((i) => {
+    const d = detail.get(i.variantId);
+    return { productName: d?.productName ?? null, size: d?.size ?? null, quantity: i.quantity };
   });
 }

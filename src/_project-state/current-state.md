@@ -1,4 +1,4 @@
-NEXT: Z.01 — Order email (Resend), BLOCKED on Vladimir's email address (facts.md §5) → then 1.08 Verification gate. 1.08 CANNOT START until Z.01 ships (D-1.07-8): its DoD is a real order with a real email, end to end.
+NEXT: 1.08 — Verification gate (real order end to end; owed-verification register must be empty). Z.01 (order email) SHIPPED — the sender is built and unit-tested against a mocked Resend. 1.08 still needs the live Resend keys in Vercel + a live, priced drop to prove a real order reaches Vladimir's inbox.
 
 # Current state — Trajanov-V2
 
@@ -6,11 +6,25 @@ NEXT: Z.01 — Order email (Resend), BLOCKED on Vladimir's email address (facts.
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-16** · By: **Claude Code (Phase 1.07 Code — deployed, hosted parity proven, real Turnstile live)**
+Last updated: **2026-07-18** · By: **Claude Code (Phase Z.01 — Order notification email, Resend)**
 
 ---
 
 ## Status
+
+**Z.01 SHIPPED — the order-notification email is built (Phase Z.01, this update).** When `create_order()`
+returns success, the order path fires a **best-effort** MK notification to Vladimir via **Resend** (SDK
+`resend 6.17.2`), so he can phone the customer to confirm. It is wired as an injected, awaited-but-guarded
+`notifyOrder` dep on the pure `processOrder` core (`D-Z.01-5`): a Resend outage, timeout, thrown error, or
+**missing env var never fails, delays past ~8s, or rolls back the order** — the DB is the record, the email
+is a side channel (Plan §8, `D-0-5`). Sender in `src/lib/email/order-notification.ts`; from
+`onboarding@resend.dev` until `trajanov.com` (`D-Z.01-2`); **no customer email collected** (`D-Z.01-1`).
+Vladimir's address lives **only** in `ORDER_NOTIFICATION_EMAIL` and is **not** published on Contact
+(`D-Z.01-3`; placeholder #5 stays). **56 tests pass** (46 + 6 email, Resend mocked + 4 notify-wiring),
+incl. the re-run 10-vs-3 oversell gate; build/lint/tsc clean. **What is owed to 1.08:** that a real order
+actually *delivers* to Vladimir's inbox — needs the live Vercel keys (operator prereq) + a live, priced
+drop. Branch `phase-Z01-order-email`. **`create_order`/`expire_reservations`/migrations untouched; the only
+new dependency is `resend`.**
 
 **THE STORE IS LIVE ON A PUBLIC URL — https://trajanov-v2.vercel.app — running against the real
 Frankfurt database with real bot-protection keys.** Phase 1.07 (Code) linked the repo to hosted
@@ -52,9 +66,9 @@ not create.
 overwritten), 0 rows deleted** (`D-1.04-5`). It is **ended and null-priced** (`D-1.04-12`), so the
 site renders the *ended* state and **nothing is buyable**. **0 orders on production.**
 
-**Resend is GONE from 1.07 (`D-1.07-8`)** — struck entirely, no key, no code, no stub. Order email is
-now on-demand phase **`Z.01`**, **mandatory before 1.08**, triggered by Vladimir's email address
-arriving. **The critical path now runs through a phone call nobody has made.**
+**Resend was struck from 1.07 (`D-1.07-8`) and BUILT in Z.01 (this update).** 1.07 shipped no key, no
+code, no stub; Z.01 added the SDK + sender. The email code is done and unit-tested; the remaining Resend
+work is real-world only (live keys + a live drop), owed to 1.08 — see the register.
 
 **Two credential facts the operator must know (`D-1.07-12`):** (1) the Vercel env vars are marked
 **Sensitive**, which makes them **write-only** — `vercel env pull` returns all six as empty strings,
@@ -133,9 +147,9 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 1 of 2 — Build |
-| Phase | **1.07 complete (both halves)** — Cowork (accounts) + Code (deploy, hosted parity, real keys). Next: `Z.01` (blocked), then the 1.08 gate |
-| Branch | `phase-1.07-deploy` → PR `#7` to `main` |
-| Open PR | **none** — 1.01–1.07 merged `#1`–`#7`. PR `#7` merged to `main` at phase close on Petar's instruction; no fresh-session review required (that gate is 1.03/1.04 only, `D-0-3`). **Production already served this commit before the merge** (`D-1.07-5`), so the merge was a redeploy of identical code |
+| Phase | **Z.01 (Code) complete** — order-notification email built + unit-tested (mocked Resend). 1.07 complete before it. Next: the **1.08** verification gate |
+| Branch | `phase-Z01-order-email` → PR to `main` (this phase) |
+| Open PR | **Z.01** (`phase-Z01-order-email` → `main`), opened this phase. Prior 1.01–1.07 merged `#1`–`#7`. No fresh-session review required (that gate is 1.03/1.04 only, `D-0-3`; Z.01 sits in the order path but its DoD requires only the full suite green, which it is) |
 | Deployed | **YES — https://trajanov-v2.vercel.app**, production, serving `/` (MK) + `/en` from the hosted Frankfurt DB. Deployed from the phase branch via `npx vercel --prod` **before** merge (`D-1.07-5`). `D-1.03-5` and `D-1.06-4` are closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
@@ -151,6 +165,30 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### Order notification email (Z.01) — the side channel, best-effort
+
+- **Sender** `src/lib/email/order-notification.ts`: `composeOrderNotification()` (pure MK subject + body —
+  order number, each product/size/qty, customer name/phone/city/address/notes) and `sendOrderNotification()`
+  (reads `RESEND_API_KEY` + `ORDER_NOTIFICATION_EMAIL` at call time, sends via `resend`, **never throws**,
+  bounds the call at 8s, logs failures **without PII** — only the order number + Resend error code). From
+  `onboarding@resend.dev` (`D-Z.01-2`). **No `import "server-only"`** — deliberately, so it stays unit-
+  testable; it is only ever imported by the "use server" action + tests, never a client component.
+- **Wiring**: optional `notifyOrder(input, orderNumber)` on `ProcessDeps`; `processOrder` calls it **only**
+  after `create_order()` succeeds, awaited inside a `try/catch` so the order outcome is fixed before the
+  email is attempted (`D-Z.01-5`). `actions.ts` supplies the closure: `resolveOrderLines()` does one bounded
+  (4s abort), best-effort `service_role` SELECT (`variants` embed `products.name_mk/name_en/slug`) to name
+  the lines, degrading to quantity-only on failure (`D-Z.01-6`); then `sendOrderNotification`.
+- **Customer confirmation** (Task 5): `Order.success` extended in **both** locales to state the order number,
+  the 48h reservation, **COD**, and **"we'll call you to confirm"** (`D-Z.01-7`). No new message key — MK/EN
+  key sets stay identical. No customer email is collected (`D-Z.01-1`).
+- **Tests**: `tests/email/order-notification.test.ts` (Resend **mocked**, no DB) proves: one email to the
+  right recipient from `onboarding@resend.dev` with the right fields; a thrown Resend error and a missing
+  env var both degrade silently (no throw); **no PII in any log line**; and the null-line fallback fabricates
+  nothing. `tests/orders/process-order.test.ts` (+4) proves notify fires exactly once after success, never on
+  failure/empty, and a throwing notify still returns success. **56 pass** incl. the re-run oversell gate.
+- **Dep**: `resend 6.17.2` — the only new dependency; no new `npm audit` advisory. **No migration,
+  `create_order`, `expire_reservations`, component, route, or existing test changed.**
 
 ### Deploy + hosted Supabase + real keys (1.07 Code) — the store left the laptop
 
@@ -332,7 +370,7 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 | Integration | Status |
 |---|---|
 | Supabase | **HOSTED + MIGRATIONS PUSHED + PARITY PROVEN** (1.07 Code) — Frankfurt `eu-central-1`, ref `kmuocwmevyyuhcvwoebf`, **Postgres 17.6**. 8/8 migrations; local == remote. **46/46 tests pass against hosted**, incl. the 10-vs-3 oversell gate; pg_cron = **2 active jobs**; RLS verified with the real anon key; DB left **clean, TRJ-0001**. `test-drop` published (ended, null-priced). **Owed #4 CLOSED.** Legacy keys (`D-1.07-1`) confirmed in use. Admin access via the **session pooler** (`D-1.07-11`, IPv6). ⚠ **"Auto-expose new tables" is still ON** — future tables land anon-writable (`D-1.07-14`); ⚠ **`db reset --linked` is broken here** (`D-1.07-15`). |
-| Resend | **NOT in this project yet — struck from 1.07 entirely (`D-1.07-8`).** No account, no `RESEND_API_KEY`, no `ORDER_NOTIFICATION_EMAIL`, no code, no stub. Now on-demand **`Z.01`**, **mandatory before 1.08**, blocked on Vladimir's email (`facts.md` §5; placeholder #5). |
+| Resend | **BUILT (Z.01).** SDK `resend 6.17.2`; server-side best-effort order-notification sender in `src/lib/email/order-notification.ts`, fired after `create_order()` succeeds (`D-Z.01-5`), never affecting the order (Plan §8). From `onboarding@resend.dev` (`D-Z.01-2`); recipient in `ORDER_NOTIFICATION_EMAIL`, not published on Contact (`D-Z.01-3`). Unit-tested with **Resend mocked** — never hits the API. ⚠ **Real inbox delivery is UNVERIFIED — owed to 1.08** (needs the live Vercel keys, which are an operator prereq, + a live priced drop + a real order). |
 | Turnstile | **REAL KEYS LIVE IN PRODUCTION** (1.07 Code) — "Trajanov store", **Managed** (`D-1.07-2`), hostnames `trajanov-v2.vercel.app` + `localhost` only (`D-1.07-6`). Deployed `/checkout` serves `0x4AAAAAAD23OFW7Ka1hTR1F`; **no dummy key anywhere in the deployed build** (`D-1.04-8` superseded). Widget **solves on the production hostname**; real token + real secret → Siteverify **`success: true`**. **Owed #5 NARROWED** — bot-vs-real-order still owed to 1.08 (`D-1.07-7`). |
 | Cloudflare DNS | Not configured (2.05) |
 | Cloudflare Analytics | Not configured (2.05) |
@@ -353,6 +391,8 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | ~~4~~ | ~~**Hosted-Supabase parity**~~ — **CLOSED by 1.07 Code, with evidence.** 8/8 migrations pushed to `kmuocwmevyyuhcvwoebf`; `migration list` shows local == remote, **no migration edited to force it**. **`npm test` against Frankfurt: 46/46**, incl. the **10-vs-3 oversell gate (exactly 3 succeed, 7 rejected, stock 0)** and both expiry tests. `cron.job` = **2 active rows**, extension created **by the migration, no dashboard step**. Rate-limit table + `check_order_rate_limit` present and exercised (20/21 test passed on hosted). RLS re-verified with the **real anon key**: `orders`/`order_items` deny select/insert/update (`42501`); functions `anon=false`, identical to local. Hosted then **reset and verified clean** (0 rows, TRJ-0001). **One real divergence was found and fixed, not waved through** (`D-1.07-14`). **Residual risk, NOT a verification debt — moved to Known issues #7:** a **paused free-tier project silently pauses pg_cron**, and reservations stop expiring. | 1.03/1.04 | **1.07 Code — DONE** |
 | 5 | **Real Turnstile keys — NARROWED, still open** (`D-1.07-7`). **Proven in 1.07 Code:** the deployed `/checkout` serves the **real** site key `0x4AAAAAAD23OFW7Ka1hTR1F`; **no dummy key appears anywhere in the deployed build** (961 KB of JS + HTML scanned) — `D-1.04-8`'s "dummy keys until 1.07" is fully retired; the widget **renders and solves in Managed mode on `trajanov-v2.vercel.app`**, and a **real token + the real secret** returned Siteverify **`success: true, hostname: trajanov-v2.vercel.app`** (a wrong-secret control returned `invalid-input-secret`, so the pass is meaningful); Managed mode's silent auto-pass **matches** the local dummy-key behaviour (`D-1.07-2` confirmed). **STILL OWED:** whether Cloudflare actually **challenges a bot on a real order**. That needs a **live drop**, which 1.07 deliberately does not create (the only drop is `test-drop`, ended + null-priced, `D-1.04-12`). Also unexercisable on preview URLs at all (`D-1.07-6`). | 1.04 | **1.08** (needs a live drop + a real order) |
 | 6 | **"Automatically expose new tables" is still ON** on the hosted project (`D-1.07-3`). `D-1.07-14` revoked the write grants on today's catalog tables, but **any table added in future** (e.g. `Y.01`'s photo/fabric work) will again be created with `anon` holding INSERT/UPDATE/DELETE/TRUNCATE, protected by RLS alone. Turning the toggle off does **not** retroactively revoke, so it must be paired with an explicit REVOKE in whatever migration adds the table. | 1.07 | Lazar (dashboard) + the next migration that adds a table |
+| 7 | **A real order actually sends a notification email that arrives in Vladimir's inbox.** Z.01 built + unit-tested the sender against a **mocked** Resend — it never touched the real API. Real delivery needs: the operator prereqs done (Resend account under Vladimir's email, API key, `RESEND_API_KEY` + `ORDER_NOTIFICATION_EMAIL` set in Vercel Production+Preview, Sensitive), **and** a live, priced drop, **and** a real order placed end to end. On the free tier before `trajanov.com` is verified, `onboarding@resend.dev` can only deliver to the account's own verified address — hence the account is Vladimir's (`D-Z.01-4`). | Z.01 | **1.08** (needs live keys + a live priced drop + a real order) |
+| 8 | **Branded from-address on `trajanov.com`.** The sender is `onboarding@resend.dev` until the domain is bought + verified (`D-Z.01-2`). Owed to the domain/cutover work, not here. | Z.01 | **2.05** (domain purchase + verification) |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
@@ -364,19 +404,24 @@ cart code path touches `variants`/`orders`/`order_items`); the stand-in grep ret
 `supabase/migrations/` file and neither `create_order` nor `expire_reservations` changed; no new
 dependency (`package.json` unchanged). (Prior direct-verified items carry forward unchanged.)*
 
-*Register is at **4 open items** (#1, #2, #5, #6) after 1.07 Code. **#4 (hosted-Supabase parity) is
-CLOSED** — struck above with its evidence rather than deleted, per the rule. **#5 is NARROWED, not
-closed** (`D-1.07-7`): 1.07 proved the real key is served and the real secret validates a real token,
-but "does Cloudflare challenge a **bot** on a **real order**" needs a live drop and belongs to 1.08.
-**#6 is NEW this phase** — the auto-expose toggle, surfaced by `D-1.07-14`'s finding. Item #3 (fresh-
-session review of PR `#4`) was removed at the PR-#4 merge; the old #6 (fresh-session review of PR
-`#6`, `D-1.06-2`) was **WAIVED** (`D-1.06-11`), not verified, and removed with a note — **the new #6
-is a different item and reuses the number**; numbers are not otherwise renumbered (keeps `D-1.05-2`'s
-references valid). **#1 (design sign-off) and #2 (IG click-test)** were merge blockers on 1.05
-(`D-1.05-2`); **PR `#5` has since merged**, so they were either satisfied at that merge or this file is
-stale — Lazar to confirm and clear (not removed here — this session did not perform them). **1.08
-remains the hard gate — the register must be empty before Part 2, and #1, #2, #5 and #6 all sit in
-front of it.***
+*Code verified directly in **Z.01** (not owed): `npm run build`, `npx tsc --noEmit`, `npm run lint`, and
+`npm test` (**56** — 46 + 6 email + 4 notify) all green, incl. the re-run 10-vs-3 oversell gate; the email
+sender's best-effort guarantees (sends once on success with the right recipient/fields; a thrown Resend
+error, a Resend error object, and a missing env var all leave the order successful; **no PII in any log
+line**) are proven by unit tests against a **mocked** Resend — the real API is never called; the diff was
+grepped clean of any email literal, key, or PII, and `.env.local`/`.env.hosted` remain gitignored; no
+`supabase/migrations/` file, `create_order`, `expire_reservations`, component, or route changed; the only
+new dependency is `resend 6.17.2`.*
+
+*Register is at **6 open items** (#1, #2, #5, #6, #7, #8) after Z.01. **#4 (hosted-Supabase parity) is
+CLOSED** (struck above). **#5 is NARROWED** (`D-1.07-7`). **#7 and #8 are NEW this phase**: #7 = real email
+delivery to Vladimir's inbox (needs live keys + a live priced drop + a real order → **1.08**); #8 = branded
+from-address on `trajanov.com` (→ **2.05**). Item #3 (fresh-session review of PR `#4`) was removed at the
+PR-#4 merge; the old #6 (review of PR `#6`, `D-1.06-2`) was **WAIVED** (`D-1.06-11`); the current #6 is the
+auto-expose toggle. **#1 (design sign-off) and #2 (IG click-test)** were 1.05 merge blockers (`D-1.05-2`);
+**PR `#5` has since merged**, so Lazar must confirm and clear them (this session did not perform them).
+**1.08 remains the hard gate — the register must be empty before Part 2, and #1, #2, #5, #6, #7 and #8 all
+sit in front of it.** #7 is the one Z.01 exists to enable: the code is done; only the live proof remains.*
 
 **Owed to Lazar / the operator — dashboard + password-manager jobs only he can do:**
 
@@ -403,13 +448,14 @@ blocker.**
 | 2 | `[PLACEHOLDER: фотографија — Владимир]` (product photo) | Catalog cards, Product | Real product photos (`D-0-6`) | Vladimir |
 | 3 | `[PLACEHOLDER: состав и нега — од етикетата]` (fabric/care) | Product | Composition from the labels | Vladimir |
 | 4 | Product **names** render as neutral slots ("Производ 01…"); sizes shown are a flagged **sample** | Catalog, Product | Real names + sizes/measurements | Vladimir |
-| 5 | `[PLACEHOLDER: е-пошта — Владимир]` (contact email) | **Contact** (1.05) — **now live at `https://trajanov-v2.vercel.app/contact`** | Vladimir's email (`facts.md` §5). **Also the trigger for `Z.01`, which is mandatory before the 1.08 gate (`D-1.07-8`)** — this row is no longer just a UI placeholder, it is on the critical path | Lazar → Vladimir |
+| 5 | `[PLACEHOLDER: е-пошта — Владимир]` (contact email) | **Contact** (1.05) — live at `https://trajanov-v2.vercel.app/contact` | **The email now EXISTS (VERIFIED 2026-07-18) and is wired as the Z.01 notification recipient — but it is DELIBERATELY NOT published on Contact yet** (`D-Z.01-3`): showing a minor's personal email to a 12+ audience + scrapers awaits Vladimir's explicit sign-off. So this placeholder **stays** — no longer "waiting on the email to exist", now waiting on **Vladimir's OK to display it publicly** | Vladimir (sign-off) |
 
 *#5 (email) is a pure UI placeholder via `<Placeholder>` (`Placeholder.email` key), shipped by 1.05
-(`D-1.05-3`) — and it now **gates `Z.01`, which gates the 1.08 verification gate** (`D-1.07-8`;
-formerly "Phase 1.08" here, corrected: Resend was struck from 1.07 and is not built by 1.08 either,
-because a gate that builds the feature it verifies is not a gate). **Every placeholder below is now
-publicly visible on `https://trajanov-v2.vercel.app`.**
+(`D-1.05-3`). **Z.01 has shipped**, so this row no longer gates anything on the build side — the email
+exists and is wired as the notification recipient. It now persists for a **different** reason (`D-Z.01-3`):
+Vladimir's personal email is not published publicly until he signs off. Do **not** clear it by filling the
+Contact page until that sign-off exists. **Every placeholder below is publicly visible on
+`https://trajanov-v2.vercel.app`.**
 #1–#4 are now driven by the **DB via the typed drop config** (not `demo.ts`, deleted): a null
 `price_mkd`/`name_*` renders the price/name placeholder (`D-1.04-6/10`); photo + fabric/care have **no
 DB column yet** — those columns land with **`Y.01 — Drop content load`** (`D-1.06-3`), not 1.06 — and
@@ -435,15 +481,17 @@ no placeholder (`D-1.05-5`).*
 
 ## Carryovers
 
-- **`Z.01 — Order email (Resend)` is now a hard dependency of the 1.08 gate** (`D-1.07-8`). 1.07
-  shipped **without** Resend — no account, no key, no code, no stub. `Z.01` is triggered by Vladimir's
-  email address arriving (`facts.md` §5; placeholder register #5) and is **mandatory before 1.08**,
-  whose DoD is a real order with a real email end to end. **Nobody has made that phone call.** This is
-  the single thing standing between a deployed store and the gate.
-- **1.08 also needs a live drop.** Owed #5's remainder (does Cloudflare challenge a real bot) and
-  1.08's own "one real order" DoD both require an **open, priced** drop. The only committed drop is
-  `test-drop` — ended and null-priced (`D-1.04-12`) — and creating a live one was **out of scope** for
-  1.07. Prices/names come from Vladimir via `Y.01`.
+- **`Z.01 — Order email (Resend)` is DONE on the code side** (this update; `D-1.07-8` satisfied). The
+  sender is built and unit-tested against a mocked Resend; the order path fires it best-effort after
+  `create_order()`. **What remains is real-world only, and it is owed to 1.08** (register #7): the operator
+  prereqs (Resend account under Vladimir's email, API key, the two Vercel env vars) plus a live, priced
+  drop and a real order, to prove an email actually lands in Vladimir's inbox. **This session had no
+  independent confirmation that the operator prereqs are done** — the wiring + mocked tests are valid
+  either way, and real delivery is (as designed) a 1.08 concern.
+- **1.08 also needs a live drop.** Owed #5's remainder (does Cloudflare challenge a real bot), Z.01's
+  register #7 (a real order emails Vladimir), and 1.08's own "one real order" DoD all require an **open,
+  priced** drop. The only committed drop is `test-drop` — ended and null-priced (`D-1.04-12`) — and creating
+  a live one is out of scope here. Prices/names come from Vladimir via `Y.01`.
 - Prior: `D-1.04-16` (no real product→cart→checkout item flow) is **closed by Phase 1.06**: the
   cart flow is built, the stand-in is deleted, and an automated test proves the customer's chosen
   product+variant reaches the `order_items` row.
@@ -474,7 +522,7 @@ Canonical table with gates: `Trajanov-V2-Plan.md` § 13. Status only:
 |---|---|---|
 | Buy `trajanov.com` | Lazar | Not started |
 | **Product photos** | **Vladimir** | **Not started — critical path** |
-| Vladimir's email | Lazar → Vladimir | **Not started — NOW THE CRITICAL PATH.** Triggers `Z.01` (`D-1.07-8`), which is mandatory before the 1.08 gate. Everything else in Part 1 is done and deployed; this is the blocker. |
+| Vladimir's email | Lazar → Vladimir | **Address obtained (VERIFIED 2026-07-18, `facts.md` §5) — Z.01 code shipped against it.** Remaining, owed to 1.08 (register #7): confirm the operator prereqs are done (Resend account under Vladimir's email + confirmation-link click, API key, `RESEND_API_KEY`/`ORDER_NOTIFICATION_EMAIL` in Vercel) so a real order actually reaches his inbox. |
 | Real prices (MKD) | Vladimir | Not started |
 | Sizes + fabric (read the labels) | Vladimir | Not started |
 | Legal responsibility w/ parents | Vladimir | Not started |

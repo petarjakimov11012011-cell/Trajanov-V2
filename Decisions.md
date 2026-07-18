@@ -1567,3 +1567,118 @@ decisions, if any, continue from `D-1.07-4`.*
   empty database, exactly as `D-1.07-4` designed — **on a database with real orders this would have been a
   data-loss event with no backup on the free tier.** Do not run it against a live database.
 - **Links:** `D-1.07-4` · `D-1.07-13` · Supabase CLI `2.109.1`
+
+---
+
+## Phase Z.01 — Order notification email (Resend)
+
+*`D-Z.01-1` … `D-Z.01-4` are the orchestrator's, handed down verbatim in the Phase Z.01 Code brief and
+logged here before any code was written. Executor (Code) decisions start at `D-Z.01-5`.*
+
+### D-Z.01-1 · 2026-07-18 · Customer confirmation is on-screen only; no customer email collected
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase Z.01 Code brief
+- **Decision:** The customer's confirmation is the on-screen success state; no customer email address is
+  collected and no customer receipt email is sent.
+- **Alternative rejected:** Add an email field to checkout and send the customer a receipt.
+- **Downside accepted:** Customers get no email confirmation — but the confirm channel is Vladimir's phone
+  call (Plan §8), and checkout stays minimal for the impatient mobile buyer (Plan §3).
+- **Links:** `Trajanov-V2-Plan.md` §8 · §4 (checkout fields) · `src/messages/{mk,en}.json` `Order.success`
+
+### D-Z.01-2 · 2026-07-18 · Sender is `onboarding@resend.dev` until `trajanov.com` is purchased + verified
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase Z.01 Code brief
+- **Decision:** The notification's from-address is Resend's shared `onboarding@resend.dev` for now.
+- **Alternative rejected:** Wait for the domain before building.
+- **Downside accepted:** Notifications come from a generic Resend address (slightly less trustworthy, small
+  spam-folder risk) until the branded domain lands — low impact, since these go only to Vladimir. A branded
+  from-address on `trajanov.com` is owed to the domain/cutover work (2.05), not here.
+- **Links:** `facts.md` §9 · Phase 2.05 · `ORDER_FROM_ADDRESS` in `src/lib/email/order-notification.ts`
+
+### D-Z.01-3 · 2026-07-18 · Vladimir's email is the internal notification recipient only; NOT published on Contact yet
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase Z.01 Code brief
+- **Decision:** Vladimir's email is wired as the internal notification recipient only; it is NOT published
+  on the Contact page. The Contact-page email placeholder (placeholder register #5) stays.
+- **Alternative rejected:** Display it publicly now (`facts.md` §5 says the email "gates the Contact page").
+- **Downside accepted:** The Contact placeholder persists a while longer.
+- **Rationale:** Do not publish a minor's personal email to a 12+ audience and to repo/page scrapers without
+  his explicit sign-off — that sign-off has not been given.
+- **Links:** `facts.md` §5 · placeholder register #5 · `src/app/[locale]/contact/page.tsx`
+
+### D-Z.01-4 · 2026-07-18 · The Resend account is created under Vladimir's email address, and Lazar does it personally
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase Z.01 Code brief
+- **Decision:** The Resend account is created under Vladimir's email address, and Lazar does it personally
+  (not Cowork).
+- **Alternative rejected:** Sign up under Lazar's email and reroute to Vladimir later, or have Cowork create it.
+- **Downside accepted:** Vladimir must click one Resend confirmation link.
+- **Rationale:** Free-tier delivery (no verified domain) only reaches the account's own address, so this is
+  what makes the 1.08 "a real order reaches the fulfiller" test actually test Vladimir's inbox — and keeping
+  Lazar as the only human who touches the address minimizes exposure of a minor's email.
+- **Links:** Phase 1.08 · operator prerequisites (Phase Z.01 Code brief)
+
+---
+
+*`D-Z.01-5` onward are the executor's (Code), made while building Z.01.*
+
+### D-Z.01-5 · 2026-07-18 · The notification is an injected `notifyOrder` dep on `processOrder`, awaited best-effort after create_order
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly, this phase)
+- **Context:** The email must fire "after `create_order()` returns success" (Task 4) and must never fail,
+  delay past a reasonable timeout, or roll back the order (Plan §8, `D-0-5`). `process-order.ts` is the
+  repo's deliberately dependency-free, unit-testable order core (`D-1.06-8`); `actions.ts` wires the real
+  dependencies to it.
+- **Decision:** Add an optional `notifyOrder(input, orderNumber)` to `ProcessDeps`. `processOrder` calls it
+  ONLY after `create_order()` succeeds, `await`ed inside a `try/catch` that swallows any failure — so the
+  outcome is fixed to `{status:"ok"}` before the email is attempted and can never depend on it. `actions.ts`
+  supplies the real closure (enrich lines → `sendOrderNotification`). `sendOrderNotification` never throws
+  and bounds its own Resend call with an 8s timeout. This makes the "sends exactly once on success / not on
+  failure / a throw leaves success" guarantees unit-testable purely, the way Turnstile-gates-create_order is.
+- **Alternative rejected:** (a) Fire-and-forget (don't await) after the action returns — rejected: on Vercel
+  serverless the function can be frozen/killed the instant the response is sent, silently dropping the very
+  email this phase exists to send; `waitUntil` would fix it but is **Vercel-specific** and the portability
+  rule (`00_stack-and-config.md`) forbids it. (b) Put the trigger only in `actions.ts` — rejected: it would
+  move the load-bearing "never affects the order" guarantee out of the one module that has a pure test
+  harness.
+- **Downside accepted:** On a *rare* Resend hang the customer's success screen waits up to the 8s send
+  timeout (plus a ≤4s enrichment bound) before rendering. Normal path adds well under a second. This is the
+  price of `await`ing on a platform that cannot reliably defer work past the response — and the brief
+  explicitly permits "a reasonable timeout".
+- **Links:** `src/lib/orders/process-order.ts` · `actions.ts` · `Trajanov-V2-Plan.md` §8 · portability rule
+
+### D-Z.01-6 · 2026-07-18 · The email names each line by a best-effort DB lookup (product/size), degrading to quantity-only
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly, this phase)
+- **Context:** The email must carry "the product/variant/size/quantity ordered" (Task 3/4), but the cart —
+  and therefore `OrderInput` — carries only `variant_id` + quantity (`D-1.06-7`); a UUID is useless to
+  Vladimir. `create_order()` is untouchable (out of scope) and returns only order id/number/total.
+- **Decision:** After the order succeeds, `resolveOrderLines()` does one `service_role` SELECT on `variants`
+  (embedding `products.name_mk/name_en/slug`) for the ordered variant ids, bounded by a 4s `AbortSignal`
+  timeout and fully wrapped. On any failure it degrades to quantity-only lines; the order number + customer
+  details still reach Vladimir, who can pull the rest from Supabase (the DB is the record).
+- **Alternative rejected:** (a) Put only variant ids + quantity in the email — rejected: unreadable, defeats
+  the purpose. (b) Modify `create_order()` to return line details — rejected: it is explicitly out of scope
+  and is the proven concurrency core. (c) Read `order_items` back by `order_id` — same extra read, no gain.
+- **Downside accepted:** One extra read on the order path after success (bounded, best-effort, never blocks
+  the customer response beyond its timeout). Product names render only as well as the config is filled — a
+  null name falls back to `name_en` then the slug, never a fabricated name (`D-1.04-10`).
+- **Links:** `src/lib/orders/actions.ts` (`resolveOrderLines`) · `D-1.06-7` · `D-1.04-10`
+
+### D-Z.01-7 · 2026-07-18 · The on-screen confirmation copy is folded into `Order.success`, stating COD + the confirmation call
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly, this phase)
+- **Context:** Task 5 / Plan §8 require the post-order on-screen state to tell the customer, in both locales,
+  that this is cash on delivery **and** that they will be called to confirm. The existing `Order.success`
+  stated only "received / reserved 48h"; COD lived in the always-visible summary panel (`Checkout.codSummary`)
+  but the **call-to-confirm was nowhere**.
+- **Decision:** Extend the existing `Order.success` string in both catalogs to a self-contained confirmation:
+  order number + 48h reservation + COD + "we'll call you to confirm". No new message key (keeps the MK/EN key
+  sets identical — the repo invariant), no new component.
+- **Alternative rejected:** Add a separate confirmation key/banner component — rejected: more surface for the
+  MK/EN key-set drift the repo guards against, for one status line. Leave it as-is — rejected: the
+  call-to-confirm was genuinely missing, and Task 5 is a DoD item, not just a "verify existing" check.
+- **Downside accepted:** COD is now stated in two places at once (the summary panel and the success line).
+  Harmless redundancy; the success line is self-contained on purpose, so it reads correctly even if the
+  summary panel layout changes. Humanizer pass run on both strings.
+- **Links:** `src/messages/{mk,en}.json` `Order.success` · `Trajanov-V2-Plan.md` §8
