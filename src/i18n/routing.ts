@@ -10,7 +10,8 @@ import {defineRouting} from 'next-intl/routing';
 // MK slugs are Latin transliteration, not Cyrillic (D-2.01-1, decided by Lazar): links get shared in
 // Viber/Instagram where a Cyrillic path percent-encodes into an unreadable string. Product-detail
 // slugs are single and shared across both locales (D-2.01-2) — the product token is not localised.
-// Slugs are provisional until 2.02 confirms them: changing one here is a one-line edit + one matching
+// The 2.02 native-MK review confirmed all six MK slugs unchanged (D-2.02-3): two native speakers read
+// each one in the address bar and kept it. Changing one is still a one-line edit here + one matching
 // redirect row in next.config.ts (keep the two in lockstep).
 export const routing = defineRouting({
   locales: ['mk', 'en'],

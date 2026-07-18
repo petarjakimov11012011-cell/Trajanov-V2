@@ -1,4 +1,4 @@
-NEXT: 2.02 — Native MK review (two native speakers read every MK string + every URL against `docs/i18n/string-inventory.md` and confirm the provisional slugs; fix mechanical faults only). **Phase 2.01 — Bilingual — COMPLETE (2026-07-19, branch `phase-2.01-bilingual`).** The MK store is now Macedonian down to its URLs: localised route slugs via next-intl `pathnames` (MK Latin `/katalog`·`/kosnicka`·`/naracka`·`/za-nas`·`/kontakt`, EN keeps `/en/catalog`…; product slug single/shared, `D-2.01-1/2`); old English MK paths **308** to the new slugs while `/en/*` is untouched (`next.config.ts`, `D-2.01-3`). Every user-facing string is in the catalogs (only leftover extraction was the cart stepper aria-labels); per-locale `<title>`/description + reciprocal **hreflang** (mk/en/x-default→MK) + self-canonical on **every** page, absolute on the one `SITE_URL` in `src/lib/site.ts`. The **MK-only shipping statement** (one shared key `Common.shippingNotice`, traced to `facts.md` §7 VERIFIED) renders above Add-to-cart on the product page and in the COD block on checkout, both locales, EN unambiguous we don't deliver outside NMK. `formatMkd` is locale-aware (MK `1.199` / EN `1,199`, MKD always, no conversion). The language switch preserves the page + `?preview` across the slug change. New `docs/i18n/string-inventory.md` (regen `npm run i18n:inventory`) for the 2.02 reviewers. **63 tests pass** (56 + 7 new i18n: catalog parity + pathname coverage); build/lint/tsc clean. **No `supabase/migrations/`, `create_order`, `expire_reservations`, or hosted DB touched; no new npm dependency.** Owed-verification register **stays EMPTY** (everything verified in-browser by Code). Recommended-but-not-blocking operator housekeeping (L1–L4, L7) is still open — see `Part-1-Phase-08-Operator-Runbook.md`.
+NEXT: 2.03 — Legal + facts audit (hand-write Terms · Privacy · Shipping & Returns; full `facts.md` audit — every rendered claim traced to a VERIFIED entry). **Blocked on legal responsibility confirmed with Vladimir's parents (`facts.md` §1) — a cutover blocker, owner Vladimir.** **Phase 2.02 — Native MK review — COMPLETE (2026-07-19, branch `phase-2.02-mk-review`).** Two native Macedonian speakers (Lazar + Petar) read all **150** MK strings and all **8** URLs in both locales against `docs/i18n/string-inventory.md`, plus the six MK route slugs — verdict a **clean pass: every string OK (no spelling/grammar/agreement/terminology fault, no English-in-MK leak, no style change) and all six slugs confirmed Keep** (`/katalog`·`/katalog/[slug]`·`/kosnicka`·`/naracka`·`/za-nas`·`/kontakt`; Latin transliteration + shared product slug both stand, `D-2.02-3`). Working record in `docs/i18n/mk-review-2.02.md` (both sign-offs filled; the two reviewed jointly, Code transcribed the verdicts, `D-2.02-2`). **No fault → `src/messages/{mk,en}.json` untouched (Task 3 a no-op); all six Keep → `next.config.ts`, redirect table, `pathnames`, and `tests/i18n/` unchanged** — the only code change is the `routing.ts` comment flipping "provisional"→"confirmed"; "provisional" language removed from `routing.ts` + this file. **63 tests pass** incl. the 10-vs-3 oversell gate; build/lint/tsc clean; parity driven **RED→GREEN**; `npm run i18n:inventory` regenerated `string-inventory.md` **byte-identical**. **No `supabase/migrations/`, `create_order`, `expire_reservations`, hosted DB, or npm dependency touched.** Owed-verification register **stays EMPTY**; placeholder register **unchanged**. Recommended-but-not-blocking operator housekeeping (L1–L4, L7) is still open — see `Part-1-Phase-08-Operator-Runbook.md`.
 
 # Current state — Trajanov-V2
 
@@ -6,13 +6,33 @@ NEXT: 2.02 — Native MK review (two native speakers read every MK string + ever
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-19** · By: **Claude Code (Phase 2.01 — Bilingual, Code)**
+Last updated: **2026-07-19** · By: **Claude Code (Phase 2.02 — Native MK review, Code)**
 
 ---
 
 ## Status
 
-**2.01 COMPLETE — the store is bilingual down to the URL (this update, 2026-07-19).** next-intl `pathnames`
+**2.02 COMPLETE — the native MK review passed clean (this update, 2026-07-19).** Two native Macedonian
+speakers, Lazar and Petar, read all **150** MK strings and all **8** URLs in both locales against
+`docs/i18n/string-inventory.md`, plus the six MK route slugs. Verdict: **every string OK — no
+spelling / grammar / agreement / terminology fault, no English-in-MK leak, and no style change — and all six
+slugs confirmed Keep** (`/katalog`, `/katalog/[slug]`, `/kosnicka`, `/naracka`, `/za-nas`, `/kontakt`; the
+Latin transliteration, `D-2.01-1`, and the shared product slug, `D-2.01-2`, both stand — `D-2.02-3`). The
+working record is `docs/i18n/mk-review-2.02.md`: the how-to, the URL walk, the slug question, the full
+150-row table with a verdict on every row, and **both sign-off blocks filled** (the two reviewed **jointly**
+and Code transcribed the verdicts, `D-2.02-2`; provenance noted in the file). Because nothing was a fault,
+**`src/messages/{mk,en}.json` are untouched** (Task 3 a no-op — no string changed, so no humanizer pass and
+no `facts.md` re-verify was needed); because every slug is Keep, **`next.config.ts`, the redirect table,
+`src/i18n/routing.ts` `pathnames`, and `tests/i18n/` are unchanged** — the only code change in the whole
+phase is the `routing.ts` comment flipping from "provisional" to "confirmed", and the removal of "provisional"
+slug language from `routing.ts` and this file. **63 tests pass** (unchanged from 2.01) incl. the 10-vs-3
+oversell gate; build / lint / tsc clean; the parity test was driven **RED then GREEN**; `npm run i18n:inventory`
+regenerated `docs/i18n/string-inventory.md` **byte-identical** (no commit — no string changed). **No
+`supabase/migrations/`, `src/config/`, `create_order`, `expire_reservations`, hosted DB, or npm dependency
+touched.** Branch `phase-2.02-mk-review`. **Owed-verification register stays EMPTY; placeholder register
+unchanged.**
+
+**2.01 COMPLETE — the store is bilingual down to the URL (2026-07-19).** next-intl `pathnames`
 localise the MK route slugs (Latin transliteration, `D-2.01-1`) while the internal route folders are
 unchanged; the product slug is single/shared across locales (`D-2.01-2`). Old English MK paths **308** to
 the new slugs (`next.config.ts`, kept in lockstep with `routing.ts`), `/en/*` untouched (`D-2.01-3`). Every
@@ -202,9 +222,9 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 2 of 2 — Launch prep |
-| Phase | **2.01 complete — Bilingual** (localised MK slugs via `pathnames`, 308 redirects, full string extraction, per-locale metadata + reciprocal hreflang, MK-only shipping on product + checkout, locale-aware price formatting, in-place language switch, string inventory + i18n tests). Next: **2.02** (Native MK review) |
-| Branch | `phase-2.01-bilingual` → PR `#10`, **merged to `main`** (2026-07-19, merge commit `a39cada`) |
-| Open PR | **none** — 1.01–1.07 merged `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; **2.01 merged `#10`** on Petar's instruction (`D-0-3`: other-operator review, no fresh-session Claude review — that gate was 1.03/1.04 only) |
+| Phase | **2.02 complete — Native MK review** (two native speakers read all 150 MK strings + 8 URLs + the 6 MK slugs; **clean pass** — every string OK, all six slugs confirmed Keep; review record + sign-offs committed, no source string changed). Next: **2.03** (Legal + facts audit) |
+| Branch | `phase-2.02-mk-review` → PR **[#11](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/11)** to `main`, **open** (2026-07-19), awaiting Lazar's merge (`D-0-3`, no self-merge). Prior: `phase-2.01-bilingual` → PR `#10`, merged `a39cada` |
+| Open PR | **`#11` OPEN** — `phase-2.02-mk-review` → `main` (2026-07-19), for **Lazar** to review + merge (`D-0-3`; Code never self-merges). Prior: 1.01–1.07 `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; 2.01 `#10` (all merged) |
 | Deployed | **YES — https://trajanov-v2.vercel.app**, production. **2.01 merged (`#10`) is LIVE and smoke-verified by Code (2026-07-19):** old `/catalog` **308→`/katalog`**, MK `/katalog` **200**, `/en/catalog` **200**, home `<html lang="mk">` + `canonical` + `hrefLang` mk/en/x-default all present. `D-1.03-5`/`D-1.06-4` closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
@@ -220,6 +240,29 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### Native MK review (2.02) — clean pass, no source change
+
+- **Review record** `docs/i18n/mk-review-2.02.md`: the instrument the two reviewers worked from **and** the
+  recorded result. Six sections — a plain-language how-to, an 8-page URL walk (both locales, live absolute
+  links on `https://trajanov-v2.vercel.app`, checked 200 before writing), the six-slug Keep/Change question,
+  the full **150-key** MK/EN table with a verdict on every row, the "intentionally not translated" list, and
+  two sign-off blocks. The 150 keys were diffed against `docs/i18n/string-inventory.md` — **150 = 150**, exact.
+- **Result: clean pass.** All 150 strings `OK` (no faults, no style notes); all six MK slugs `Keep`. Both
+  reviewers (Lazar + Petar) signed off; they reviewed **jointly** and Code transcribed the verdicts, with the
+  provenance stated in the file's Section 6 (`D-2.02-2`).
+- **What that means for the code:** nothing to fix. `src/messages/{mk,en}.json` are **unchanged** (Task 3 a
+  no-op); `next.config.ts`, the redirect table, `src/i18n/routing.ts` `pathnames`, and `tests/i18n/` are
+  **unchanged** (all six slugs Keep, `D-2.02-3`). The only code edit in the phase is the `routing.ts` comment
+  flipping "provisional"→"confirmed"; the word "provisional" is now gone from `routing.ts` and this file
+  (`D-2.01-5` in `Decisions.md` is left intact as the historical record).
+- **Decisions:** `D-2.02-1` (review pack in English prose, MK strings verbatim, dev-path column dropped),
+  `D-2.02-2` (joint review transcribed by Code), `D-2.02-3` (all six slugs confirmed Keep).
+- **Gates re-run (standing protection, none skipped):** `npm run build` / `npx tsc --noEmit` / `npm run lint`
+  clean; `npm test` **63/63** incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected
+  with insufficient_stock, stock 0`; the catalog-parity test driven **RED** (removed `Nav.contact` from
+  `en.json` → `keys present only in mk.json: [ 'Nav.contact' ]`) **then GREEN** (restored); `npm run
+  i18n:inventory` regenerated `string-inventory.md` **byte-identical** (no string changed → nothing to commit).
 
 ### Bilingual (2.01) — Macedonian down to the URL
 
@@ -651,7 +694,7 @@ Canonical table with gates: `Trajanov-V2-Plan.md` § 13. Status only:
 | Model + venue permission | Vladimir | Not started |
 | Verify press links | Lazar | **Done** — all 5 fetched, read, VERIFIED 2026-07-15 (`facts.md` §4); cited on About (`D-1.05-5`) |
 | First drop date + products | Vladimir | Not started |
-| MK copy review | Lazar + Petar | **Ready to start — Phase 2.02.** 2.01 shipped `docs/i18n/string-inventory.md` (every key/MK/EN/where) + every URL in both locales for the reviewers; slugs are provisional pending their confirmation (`D-2.01-5`). |
+| MK copy review | Lazar + Petar | **DONE — Phase 2.02 (2026-07-19).** Both native speakers read all 150 MK strings + 8 URLs + the 6 slugs against `docs/i18n/string-inventory.md`; **clean pass** — every string OK, all six slugs confirmed **Keep** (`D-2.02-3`). Record + both sign-offs in `docs/i18n/mk-review-2.02.md`. |
 
 ---
 
