@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-19 |
 | **Branch** | `phase-2.01-bilingual` |
-| **PR** | (opened to `main` — see § 11) |
+| **PR** | [#10](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/10) → `main` |
 | **Brief** | `briefs/Part-2-Phase-01-Code.md` |
 
 ---

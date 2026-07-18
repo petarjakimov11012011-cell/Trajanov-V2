@@ -203,8 +203,8 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 |---|---|
 | Part | 2 of 2 — Launch prep |
 | Phase | **2.01 complete — Bilingual** (localised MK slugs via `pathnames`, 308 redirects, full string extraction, per-locale metadata + reciprocal hreflang, MK-only shipping on product + checkout, locale-aware price formatting, in-place language switch, string inventory + i18n tests). Next: **2.02** (Native MK review) |
-| Branch | `phase-2.01-bilingual` → PR to `main` (open; see Open PR) |
-| Open PR | **`phase-2.01-bilingual` → `main`** (2.01, Bilingual). Reviewed by the other operator before merge (`D-0-3`); no fresh-session Claude review required (that gate was 1.03/1.04 only). Prior: 1.01–1.07 `#1`–`#7`, Z.01 `#8`, 1.08 `#9` — all merged |
+| Branch | `phase-2.01-bilingual` → PR `#10` (open) |
+| Open PR | **`#10` — `phase-2.01-bilingual` → `main`** (2.01, Bilingual). Reviewed by the other operator before merge (`D-0-3`); no fresh-session Claude review required (that gate was 1.03/1.04 only). Prior: 1.01–1.07 `#1`–`#7`, Z.01 `#8`, 1.08 `#9` — all merged |
 | Deployed | **YES — https://trajanov-v2.vercel.app**, production, serving `/` (MK) + `/en` from the hosted Frankfurt DB. Deployed from the phase branch via `npx vercel --prod` **before** merge (`D-1.07-5`). `D-1.03-5` and `D-1.06-4` are closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
