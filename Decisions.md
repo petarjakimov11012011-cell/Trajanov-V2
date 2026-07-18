@@ -1682,3 +1682,71 @@ logged here before any code was written. Executor (Code) decisions start at `D-Z
   Harmless redundancy; the success line is self-contained on purpose, so it reads correctly even if the
   summary panel layout changes. Humanizer pass run on both strings.
 - **Links:** `src/messages/{mk,en}.json` `Order.success` · `Trajanov-V2-Plan.md` §8
+
+---
+
+## Phase 1.08 — Verification gate
+
+*`D-1.08-1` and `D-1.08-2` are the orchestrator's, handed down verbatim in the Phase 1.08 brief.
+Executor (Code) decisions start at `D-1.08-3`.*
+
+### D-1.08-1 · 2026-07-18 · 1.08 runs as a machinery-verification gate against a stand-in rehearsal drop
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.08 brief.
+- **Decision:** **1.08 runs as a machinery-verification gate against a stand-in rehearsal drop that uses
+  Vladimir's real price (1199 MKD) and real sizes; names/photos/fabric remain placeholders and
+  real-catalog verification is deferred to 2.04/2.05.**
+- **Alternative rejected:** Wait for the full real catalog (photos, fabric, names, date) before running the
+  gate at all.
+- **Downside accepted:** The gate proves the machine, not the finished catalog — photos/fabric/names remain
+  cutover blockers (placeholder register, 2.05); and a real-priced drop is briefly buyable on the public URL
+  during the test (mitigated: not announced, closed immediately, test order deleted).
+- **Links:** `facts.md` §7 · `src/config/products.ts` · Phases 2.04, 2.05
+
+### D-1.08-2 · 2026-07-18 · Register #8 (branded from-address) is reclassified from owed-verification to the 2.05 cutover track
+- **Status:** Accepted
+- **Decided by:** Claude Chat (orchestrator) — handed down verbatim in the Phase 1.08 brief.
+- **Decision:** **Register #8 (branded from-address on `trajanov.com`) is reclassified from the
+  owed-verification register to the 2.05 cutover track.**
+- **Alternative rejected:** Leave it in the owed-verification register.
+- **Downside accepted:** None of substance — #8 cannot be cleared without the domain (unbought, 2.05), so
+  leaving it there makes 1.08's "register to zero" impossible. The gate's register-to-zero condition covers
+  #1, #2, #5, #6, #7.
+- **Links:** `D-Z.01-2` · Phase 2.05 · owed-verification register
+
+### D-1.08-3 · 2026-07-18 · The gate's Code half ran against hosted this session; the operator half + email prereq are deferred to a runbook (NEXT stays 1.08)
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor, on-the-fly) — with the operator's explicit direction this session
+  ("run the hosted verification now; the email prereqs are unconfirmed; skip the live order for now").
+- **Context:** 1.08 is a "Code + Operator" gate. Its Code-verifiable half (facts + config, the concurrent
+  oversell re-run, live pg_cron expiry, Turnstile enforcement, IP + phone rate limits) can run against the
+  live Frankfurt DB with no human in the loop. Its other half is inherently human: a real order placed on a
+  phone with a browser-solved Turnstile, the notification email landing in **Vladimir's** inbox, the design
+  sign-off, the Instagram click-test, and the Supabase "auto-expose" toggle. The operator directed that the
+  live order be skipped this session and flagged the Z.01 email prereqs (Resend account + Vercel keys) as
+  **unconfirmed**.
+- **Decision:** Run and evidence the **Code half** against hosted now, then **return hosted to its exact
+  pre-session clean state** (seed fixtures removed, sequence reset to TRJ-0001). **Do NOT open a public
+  buyable rehearsal drop** and **do NOT synthesise a fake end-to-end order.** Prove **Turnstile enforcement
+  and the IP/phone rate limits at the exact server-side calls the Server Action makes** — Cloudflare
+  Siteverify with the **real production secret** (`invalid`/`missing` → rejected; wrong-secret control →
+  `invalid-input-secret`), and the `check_order_rate_limit` RPC + `create_order`'s `TR005` — rather than by
+  hand-driving the deployed Next Server Action (which needs a browser-solved token / an open drop, i.e. the
+  operator path). Package the human half — publish rehearsal drop → real order → verify DB + inbox → close →
+  design sign-off / IG / toggle / housekeeping — as a step-by-step **operator runbook**. **`NEXT:` stays
+  `1.08`** until the operator completes their half; the register is **not** claimed at zero.
+- **Alternative rejected:** (a) Open a real-priced buyable drop on the public URL and attempt a synthetic
+  end-to-end order without a human — rejected: no human can solve the real Turnstile, it exposes buyable
+  merchandise publicly for no verification gain, and it is exactly the "briefly buyable" risk `D-1.08-1`
+  says to minimise. (b) Set `NEXT: 2.01` and declare the register at zero now — rejected: dishonest, #1/#2/
+  #6/#7 are genuinely still owed and the gate is the hard pre-Part-2 barrier. (c) Hand-craft a `Next-Action`
+  POST to the deployed Server Action — rejected: brittle, and a malformed request rejected for the wrong
+  reason would be a false "enforced" claim.
+- **Downside accepted:** The gate does **not** fully pass this session — `#5` is cleared with Code evidence
+  (per the brief's Task 5 definition), but register-to-zero, the "one real order end to end", the
+  "notification email in Vladimir's inbox", and "rehearsal drop published then closed" DoD items remain
+  **open** on the operator + the (unconfirmed) email prereqs. Turnstile/rate-limit enforcement is proven at
+  the server-side RPC/Siteverify layer the action calls, not by a browser-driven end-to-end submit; the
+  fully end-to-end path is the operator's live order. All of this is stated plainly in the completion report
+  and the operator runbook.
+- **Links:** `src/_project-state/completions/Part-1-Phase-08-Code-Completion.md` · `Part-1-Phase-08-Operator-Runbook.md` · owed-verification register (#1, #2, #6, #7) · `D-1.07-7` (#5) · `D-Z.01-4` (email prereq)
