@@ -1,20 +1,22 @@
-# Completion report — Part 1 Phase 08: Verification gate (Code half)
+# Completion report — Part 1 Phase 08: Verification gate — PASSED
 
-> **Read this first:** this phase is a **"Code + Operator" gate**, and **only the Code half ran this
-> session.** The operator directed (in chat) that the hosted verification proceed now, that the Z.01 email
-> prereqs are **unconfirmed**, and that the **live phone order be skipped for now**. So the gate is **NOT
-> passed** — the Code-verifiable half is done and evidenced against the live Frankfurt DB, and the operator
-> half is packaged as a runbook (`Part-1-Phase-08-Operator-Runbook.md`). `NEXT:` stays `1.08` (`D-1.08-3`).
+> **Read this first:** this "Code + Operator" gate **PASSED IN FULL this session (2026-07-18).** It ran in two
+> passes, both in the same session: (1) the **Code half** — facts/config + the hosted-verification evidence
+> below (`D-1.08-3`); then (2) the **operator half** — the Z.01 email prereqs were set up, a **real phone order
+> (`TRJ-0001`)** was placed on the briefly-opened rehearsal drop, the **MK notification email arrived in
+> Vladimir's inbox**, and the design sign-off / IG click-test / auto-expose toggle were all cleared (`D-1.08-4`).
+> The **owed-verification register is now EMPTY** (#1, #2, #5, #6, #7 cleared; #8 → 2.05). Hosted was returned
+> **clean** (TRJ reset to 0001). **`NEXT:` advances to `2.01`; Part 2 may begin.**
 
 | | |
 |---|---|
 | **Phase** | 1.08 |
-| **Name** | Verification gate (Code half) |
+| **Name** | Verification gate — **PASSED** |
 | **Executor** | Claude Code |
-| **Operator** | Petar (this session) / Lazar (dashboard + human register items) |
+| **Operator** | Petar / Lazar (this session — real order, inbox check, design sign-off, IG, toggle) |
 | **Date** | 2026-07-18 |
 | **Branch** | `phase-1.08-verification-gate` |
-| **PR** | *(not opened yet — see §10; the operator half + email prereq are still open)* |
+| **PR** | *(opening now — see §10)* |
 | **Brief** | Part 1 · Phase 1.08 · Code + Operator — Verification gate |
 
 ---
@@ -34,11 +36,21 @@
   `order_number_seq` reset so the first **real** order is **TRJ-0001**.
 - **The placeholder register moved:** #1 (price) **cleared**, #4 **narrowed to product-names-only** (sizes now
   real). Owed-verification register: **#5 cleared** (Turnstile enforcement), **#8 reclassified to 2.05**.
-- **The human half is packaged**, not skipped: `Part-1-Phase-08-Operator-Runbook.md` is a step-by-step
-  open→order→verify→close + design-signoff/IG/toggle/housekeeping runbook.
+- **The operator half then ran, same session (`D-1.08-4`).** The Z.01 email prereqs were set up (Resend
+  account under Vladimir's email + `RESEND_API_KEY`/`ORDER_NOTIFICATION_EMAIL` in Vercel, redeployed); the
+  priced config was **synced to hosted** and the rehearsal `test-drop` **briefly opened**; a **real order
+  (`TRJ-0001`)** was placed on a phone (real Turnstile, real phone/address); the on-screen confirmation showed
+  **COD + call-to-confirm + 1199 ден**; and the **MK notification email arrived in Vladimir's inbox**. Code
+  then verified the DB (order row, atomic decrement 3→2, 48h reservation, 1199 total + price snapshot), closed
+  the drop, **deleted the order + reservation, restored stock, reset the sequence**, and re-verified hosted
+  clean. Lazar cleared **design sign-off**, the **IG click-test** (`@trajanovv2026` → Vladimir's real profile),
+  and turned the **auto-expose toggle OFF**.
+- **The register is empty and the gate passed.** `Part-1-Phase-08-Operator-Runbook.md` remains in the repo as
+  the reusable open→order→verify→close runbook (used for this order; reusable for the real 2.04/2.05 drop).
 
-**What did NOT ship (deferred, operator):** publishing the buyable rehearsal drop; the one real phone order;
-the notification email in Vladimir's inbox; the design sign-off; the IG click-test; the auto-expose toggle.
+**Still open (recommended, NOT part of the gate's zero-condition):** operator housekeeping L1 (stray Stockholm
+Supabase project), L2 (stray `trajanov` Vercel project), L3 (save DB password + pepper), L4 (revoke the
+`claude-code-phase-1.07` access token), L7 (uptime monitor).
 
 ---
 
@@ -46,7 +58,8 @@ the notification email in Vladimir's inbox; the design sign-off; the IG click-te
 
 | ID | Decision | Alternative rejected | Downside accepted |
 |---|---|---|---|
-| `D-1.08-3` | Run + evidence the gate's **Code half** against hosted this session; **defer** the live order + human register items to an operator runbook; prove Turnstile + rate limits at the **server-side calls the action makes** (Siteverify with the real secret; `check_order_rate_limit` RPC; `create_order` `TR005`), not by hand-driving the deployed Server Action; **`NEXT:` stays `1.08`**. | (a) Open a public buyable drop + synthesise an end-to-end order without a human; (b) set `NEXT: 2.01` and declare the register at zero; (c) hand-craft a `Next-Action` POST to the Server Action. | The gate does not fully pass this session; #1/#2/#6/#7 stay open; enforcement proven at the RPC/Siteverify layer, not a browser-driven end-to-end submit (that is the operator's live order). |
+| `D-1.08-3` | Run + evidence the gate's **Code half** against hosted first; prove Turnstile + rate limits at the **server-side calls the action makes** (Siteverify with the real secret; `check_order_rate_limit` RPC; `create_order` `TR005`), not by hand-driving the deployed Server Action. | (a) Open a public buyable drop + synthesise an end-to-end order without a human; (b) hand-craft a `Next-Action` POST to the Server Action. | Enforcement first proven at the RPC/Siteverify layer, not a browser-driven submit — but the operator's real order (below) then exercised the fully end-to-end path. |
+| `D-1.08-4` | **Complete the operator half in the same session** (the operator was present): set up the email prereqs, open the rehearsal drop, place a **real order**, verify DB + inbox, close + delete + restore, clear the human register items. **Register empty; `NEXT:` → `2.01`.** | Leave the operator half for a later session (per `D-1.08-3`). | The drop was briefly buyable on the public URL (unannounced, minutes, closed immediately, order deleted — the accepted `D-1.08-1` cost); hosted `test-drop` now carries the real-priced colourways (matches committed config). |
 
 `D-1.08-1` and `D-1.08-2` are the **orchestrator's**, logged verbatim in `Decisions.md` as instructed by the
 brief (machinery-gate-vs-real-catalog; #8 → 2.05).
@@ -55,11 +68,10 @@ brief (machinery-gate-vs-real-catalog; #8 → 2.05).
 
 ## 3. Surprises and off-spec changes
 
-- **The gate cannot be completed by Code alone, and the operator deferred its human half.** The brief's DoD
-  assumes the live order + inbox check + human register items happen in-session. Given the operator's answers
-  (email prereqs unconfirmed; skip the live order), the register **cannot reach zero this session**. I did the
-  Code half and wrote a runbook rather than force a synthetic order. **The brief's "register to zero / NEXT =
-  2.01 / one real order" items are therefore open, not done.**
+- **The gate ran in two passes, both this session.** The Code half ran first (operator initially deferred the
+  live order + flagged the email prereqs as unconfirmed, `D-1.08-3`); the operator then chose to complete the
+  human half live (`D-1.08-4`). Doing it interactively let Code drive the open→order→verify→close window safely
+  and verify the DB side. **The register reached zero and the gate passed.**
 - **Task 5 method.** "Submit an order request to production" via the deployed **Next Server Action** is not
   cleanly scriptable (needs the hashed action id + a browser-solved token, and an open drop). I proved Turnstile
   enforcement at the exact server call the action makes — Cloudflare **Siteverify with the real production
@@ -68,10 +80,10 @@ brief (machinery-gate-vs-real-catalog; #8 → 2.05).
   evidence for the bot-challenge nuance of #5.
 - **Task 6 method.** Same reason: IP limit exercised via the `check_order_rate_limit` RPC and the phone limit
   via `create_order`'s `TR005` — the exact server-side calls, but not through a browser submit.
-- **The priced config was deliberately NOT synced to hosted.** Because the live order is deferred, syncing the
-  new priced products (and opening a buyable drop) would expose merchandise publicly for no verification gain.
-  Hosted therefore still carries the OLD null-priced `test-piece-01..04`; the runbook's step 1a syncs the new
-  config when the operator runs the order.
+- **The priced config was synced to hosted for the operator's order.** `npm run sync:drop` replaced the old
+  null-priced `test-piece-01..04` with the two priced colourways (drop kept ended/not-buyable until the window
+  was briefly opened for the real order, then closed). Hosted now carries `test-mustard-ochre` (S/M/L/XL) +
+  `test-off-white` (XL-only) at 1199 MKD, stock 3 — matching the committed config.
 - **`src/config/products.ts` structure.** The brief says "set the price on the drop's products and the real
   per-product sizes (mustard/ochre → S,M,L,XL; off-white → XL only)." I modelled the rehearsal as exactly those
   **two verified colourways** (down from four placeholder `test-piece-*`), since those are the only real garment
@@ -158,19 +170,19 @@ Phone create_order same phone/drop: 1st = ok, 2nd = TR005 (duplicate_phone); sto
 | Turnstile enforced server-side — missing/invalid token rejected; no order row; no stock change (#5) | ☑ (Siteverify/real-secret method; §3) |
 | Rate limits (IP + phone) fire; excess rejected; test rows cleaned | ☑ (RPC/`TR005` method; §3) |
 | Hosted returned known-clean via targeted deletes (no `db reset --linked`); TRJ reset to 0001 | ☑ |
-| **Rehearsal drop published (buyable) then closed; one real order end to end** | ☐ **deferred — operator** |
-| **Owed register to zero; `NEXT:` = 2.01** | ☐ **not met — #1/#2/#6/#7 open** |
+| **Rehearsal drop published (buyable) then closed; one real order end to end** | ☑ (`TRJ-0001`; drop opened for the test, closed immediately after; order deleted) |
+| **Owed register to zero; `NEXT:` = 2.01** | ☑ **register EMPTY; `NEXT:` = 2.01** |
 
-### Owed to Lazar / a real device / Vladimir's inbox (all in the runbook)
+### Verified by the operator this session (all now cleared — `D-1.08-4`)
 
-| # | Item | Steps | What "pass" looks like |
-|---|---|---|---|
-| Prereq | Z.01 email keys live | Runbook §0 | Resend account under Vladimir's email; `RESEND_API_KEY` + `ORDER_NOTIFICATION_EMAIL` in Vercel (Prod+Preview, Sensitive); redeploy |
-| #7 | Real order end to end + email in inbox | Runbook §1–3, `https://trajanov-v2.vercel.app` | Order row + atomic decrement + 48h reservation; on-screen COD + call-to-confirm + **1199 ден**; MK email in Vladimir's inbox |
-| #1 | Design sign-off | Runbook §4 — review 7 pages | Tokens approved or exact changes logged |
-| #2 | Instagram click-test | Runbook §4 — click `@trajanovv2026` | Opens Vladimir's real profile |
-| #6 | Auto-expose toggle OFF | Runbook §4 — Supabase Settings → API | Toggle off |
-| L1–L4, L7 | Housekeeping | Runbook §5 | Stray projects removed; password+pepper saved; token revoked; uptime monitor live |
+| # | Item | What passed |
+|---|---|---|
+| Prereq | Z.01 email keys live | Resend account under Vladimir's email; `RESEND_API_KEY` + `ORDER_NOTIFICATION_EMAIL` in Vercel (Prod+Preview, Sensitive); redeployed. ☑ |
+| #7 | Real order end to end + email in inbox | `TRJ-0001`: order row + atomic decrement (3→2) + 48h reservation; on-screen **COD + call-to-confirm + 1199 ден**; MK email **arrived in Vladimir's inbox** (subject "Нова нарачка TRJ-0001 — Trajanov", correct line/customer block/COD copy). ☑ |
+| #1 | Design sign-off | Lazar reviewed the live site; tokens approved, no changes requested. ☑ |
+| #2 | Instagram click-test | `@trajanovv2026` opens Vladimir's real profile. ☑ |
+| #6 | Auto-expose toggle OFF | Turned off on `kmuocwmevyyuhcvwoebf`. ☑ |
+| L1–L4, L7 | Housekeeping (**recommended, not gate-blocking**) | **Still open** — stray Supabase/Vercel projects, save password+pepper, revoke access token, uptime monitor (runbook §5). |
 
 ---
 
@@ -180,7 +192,7 @@ Phone create_order same phone/drop: 1st = ok, 2nd = TR005 (duplicate_phone); sto
 
 | Placeholder | Page | Change | Owner |
 |---|---|---|---|
-| `[PLACEHOLDER: цена MKD]` (price) | Catalog/Product/Cart/Checkout | **CLEARED** — 1199 MKD VERIFIED + in config (clears on the site when the operator syncs) | — |
+| `[PLACEHOLDER: цена MKD]` (price) | Catalog/Product/Cart/Checkout | **CLEARED** — 1199 MKD VERIFIED, in config, and synced to hosted; the checkout/cart/confirmation rendered **1199 ден** during the real order (no placeholder, no USD) | — |
 | Product **names** as neutral slots + sizes-as-sample | Catalog/Product | **NARROWED to names-only** — sizes now real (VERIFIED); measurements still owed | Vladimir |
 
 Unchanged: #2 photo, #3 fabric/care, #5 contact email (`D-Z.01-3`).
@@ -219,17 +231,16 @@ from env and never printed.
 
 ## 10. Blocked / carryover
 
-| Item | Waiting on | Owner |
+| Item | Status | Owner |
 |---|---|---|
-| Z.01 email prereqs (Resend account + Vercel keys) | Confirmation / setup in the dashboards | Lazar |
-| One real order end to end + email in Vladimir's inbox (#7) | The prereqs + a real phone order (runbook §1–3) | Lazar/Petar + Vladimir's inbox |
-| Design sign-off (#1), IG click-test (#2), auto-expose toggle (#6) | Human review / dashboard | Lazar |
-| Housekeeping L1–L4, L7 | Dashboards / password manager / uptime monitor | Lazar |
-| Opening the PR + setting `NEXT: 2.01` + register-to-zero | The operator half completing | Whoever closes the gate |
+| Z.01 email prereqs (Resend account + Vercel keys) | ✅ Done — set up + redeployed this session | Lazar |
+| One real order end to end + email in Vladimir's inbox (#7) | ✅ Done — `TRJ-0001`, email in inbox | Lazar/Petar + Vladimir |
+| Design sign-off (#1), IG click-test (#2), auto-expose toggle (#6) | ✅ All done | Lazar |
+| Housekeeping **L1–L4, L7** | ⏳ **Open — recommended, not gate-blocking** (runbook §5) | Lazar |
 
-**On the PR:** I have **not** opened it, because (a) my rules are to commit/push only when asked, and (b) the
-phase is genuinely half-done — the PR should represent a closeable gate or be explicitly labelled the Code
-half. The branch holds the Code work ready to commit whenever the operator says.
+**Only recommended housekeeping remains** — it is explicitly outside the gate's zero-condition, but L7 (uptime
+monitor) is **strongly recommended before any real launch** because a paused free-tier project silently pauses
+pg_cron (Known issues #7). **The PR is being opened now that the gate has passed in full.**
 
 ---
 
@@ -237,12 +248,13 @@ half. The branch holds the Code work ready to commit whenever the operator says.
 
 | File | Done |
 |---|---|
-| `current-state.md` — **`NEXT:` line on line 1** | ☑ (set to `1.08 (operator half)`, **not** 2.01 — the gate isn't passed) |
-| `current-state.md` — owed-verification register | ☑ (#5 cleared, #8→2.05, #1/#2/#6/#7 open) |
-| `current-state.md` — placeholder register | ☑ (#1 cleared, #4 narrowed) |
+| `current-state.md` — **`NEXT:` line on line 1** | ☑ (set to `2.01 — Bilingual`; the gate passed in full) |
+| `current-state.md` — owed-verification register | ☑ (**EMPTY** — #1/#2/#5/#6/#7 cleared, #8→2.05) |
+| `current-state.md` — placeholder register | ☑ (#1 cleared + synced, #4 narrowed) |
 | `file-map.md` — matches disk | ☑ |
 | `00_stack-and-config.md` — new deps / pins / config | ☑ n/a (no dependency/config change) |
-| `Decisions.md` — every §2 entry appended | ☑ (`D-1.08-1/2/3`) |
+| `Decisions.md` — every §2 entry appended | ☑ (`D-1.08-1/2/3/4`) |
 
-**`NEXT:` line I set:** `NEXT: 1.08 (operator half) — Verification gate. The CODE half PASSED against hosted …
-STILL OWED before Part 2 … The owed-verification register is NOT yet empty — do not start 2.01 until it is.`
+**`NEXT:` line I set:** `NEXT: 2.01 — Bilingual (…). Phase 1.08 — the verification gate — PASSED IN FULL
+(2026-07-18). … The owed-verification register is EMPTY (#8 reclassified to 2.05); hosted was returned clean.
+Part 2 may begin.`

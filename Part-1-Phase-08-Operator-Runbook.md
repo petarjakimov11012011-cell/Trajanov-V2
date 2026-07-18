@@ -1,5 +1,13 @@
 # Phase 1.08 — Operator Runbook (the human half of the verification gate)
 
+> **STATUS — 2026-07-18: the gate PASSED.** The register items in this runbook were completed **this session**
+> (`D-1.08-4`): the email prereqs were set up, a real order (`TRJ-0001`) was placed and its **email arrived in
+> Vladimir's inbox** (#7), and the design sign-off (#1), IG click-test (#2), and auto-expose toggle (#6) were
+> done. **Still open — recommended, NOT gate-blocking:** the housekeeping in §5 (**L1** stray Stockholm Supabase
+> project, **L2** stray `trajanov` Vercel project, **L3** save DB password + pepper, **L4** revoke the
+> `claude-code-phase-1.07` access token, **L7** uptime monitor). This file also stays as the reusable
+> open→order→verify→close runbook for the real first drop (2.04/2.05).
+
 **Why this exists.** The 1.08 gate has two halves. The **Code half** (facts + config, the concurrent
 oversell re-run, live pg_cron expiry, Turnstile enforcement, IP + phone rate limits) was run and evidenced
 against the live Frankfurt DB this session, and hosted was returned to a **clean** state (see
