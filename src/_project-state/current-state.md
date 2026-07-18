@@ -148,8 +148,8 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 |---|---|
 | Part | 1 of 2 — Build |
 | Phase | **Z.01 (Code) complete** — order-notification email built + unit-tested (mocked Resend). 1.07 complete before it. Next: the **1.08** verification gate |
-| Branch | `phase-Z01-order-email` → PR to `main` (this phase) |
-| Open PR | **Z.01** (`phase-Z01-order-email` → `main`), opened this phase. Prior 1.01–1.07 merged `#1`–`#7`. No fresh-session review required (that gate is 1.03/1.04 only, `D-0-3`; Z.01 sits in the order path but its DoD requires only the full suite green, which it is) |
+| Branch | `phase-Z01-order-email` → PR `#8` to `main` (this phase) |
+| Open PR | **`#8`** (`phase-Z01-order-email` → `main`), opened this phase. Prior 1.01–1.07 merged `#1`–`#7`. No fresh-session review required (that gate is 1.03/1.04 only, `D-0-3`; Z.01 sits in the order path but its DoD requires only the full suite green, which it is) |
 | Deployed | **YES — https://trajanov-v2.vercel.app**, production, serving `/` (MK) + `/en` from the hosted Frankfurt DB. Deployed from the phase branch via `npx vercel --prod` **before** merge (`D-1.07-5`). `D-1.03-5` and `D-1.06-4` are closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 

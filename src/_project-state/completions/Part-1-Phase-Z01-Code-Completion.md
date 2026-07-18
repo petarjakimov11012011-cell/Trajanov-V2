@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-18 |
 | **Branch** | `phase-Z01-order-email` |
-| **PR** | → `main` (opened this phase) |
+| **PR** | [#8](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/8) → `main` |
 | **Brief** | Part 1 · Phase Z.01 · Code — Order notification email (Resend) |
 
 ---
