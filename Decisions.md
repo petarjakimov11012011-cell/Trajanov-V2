@@ -1927,3 +1927,60 @@ start at `D-2.01-6`.*
   customer-facing page.
 - **Links:** `src/app/[locale]/styleguide/page.tsx` · `D-2.01-4` · `docs/i18n/string-inventory.md`
   (“Intentionally not translated”)
+
+### D-2.02-1 · 2026-07-19 · Review pack in English prose; MK strings verbatim; dev-path column dropped
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** `docs/i18n/mk-review-2.02.md` (the reviewer instrument) is written with its instructional
+  prose in English, reproduces every MK/EN string verbatim from `docs/i18n/string-inventory.md`, and omits
+  the inventory's file-path “Where” column from the 150-row table.
+- **Alternative rejected:** (a) Write the reviewer instructions in Macedonian; (b) keep the inventory's
+  file-path “Where” column in the reviewer table, per a literal reading of the brief's “copied from
+  `string-inventory.md`”.
+- **Downside accepted:** The guidance is in English, not the reviewers' first language; and the table drops
+  the machine-readable source-file pointer, so a reviewer cannot tell from the table alone which file a
+  string lives in.
+- **Reason:** Both reviewers already run the whole project in English (briefs, state, reports); generating
+  fresh Macedonian *instructions* would inject exactly the machine-written MK this phase exists to distrust —
+  the strings under review stay verbatim, which is the point. File paths are noise for two non-coders, and
+  the URL walk (Section 2) gives every customer-facing string a human-readable location instead.
+- **Links:** `docs/i18n/mk-review-2.02.md` · `docs/i18n/string-inventory.md` · Phase 2.02 Task 1.
+
+### D-2.02-2 · 2026-07-19 · Native review done jointly and transcribed by Code, not sequential in-file editing
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor), on the operator's instruction.
+- **Decision:** Lazar and Petar reviewed the pack together in one sitting and confirmed the outcome to Code
+  in session; Code transcribed the verdicts into the file (all 150 `OK`, all six slugs `Keep`, reviewer
+  `L, P` on every row) and filled both sign-off blocks, with a Section-6 note stating how the sign-off was
+  captured.
+- **Alternative rejected:** Require each reviewer to hand-edit the file in sequence (Lazar first, Petar
+  second marking agree/disagree), per the brief's stated flow.
+- **Downside accepted:** The brief's “second reviewer sees the first's verdicts” sequencing collapses into a
+  joint review, and the sign-off is a Code transcription of a verbal confirmation rather than two independent
+  hand-edits — a lighter paper trail than two separate in-file passes.
+- **Reason:** The reviewers are non-coders who reviewed together in person; forcing sequential markdown-table
+  editing adds friction without changing the result. The gate's intent — two native speakers both vouch for
+  every string — is met (both present, both confirmed), and the provenance is recorded openly here and in the
+  file rather than dressed up as hand-signed.
+- **Links:** `docs/i18n/mk-review-2.02.md` (Section 6) · Phase 2.02 Task 2.
+
+### D-2.02-3 · 2026-07-19 · All six provisional MK slugs confirmed (Keep); “provisional” language removed
+- **Status:** Accepted
+- **Decided by:** Lazar + Petar (native-MK reviewers), recorded by Claude Code.
+- **Decision:** The six provisional MK route slugs from 2.01 (`/katalog`, `/katalog/[slug]`, `/kosnicka`,
+  `/naracka`, `/za-nas`, `/kontakt`) are confirmed unchanged. The Latin-transliteration approach (`D-2.01-1`)
+  and the single shared product slug (`D-2.01-2`) stand. The “provisional pending 2.02” wording is removed
+  from the `routing.ts` comment and from `current-state.md`; `next.config.ts`, the redirect table, the tests,
+  and the live site are unchanged (Keep ⇒ no routing edit).
+- **Alternative rejected:** Change one or more slugs — a different Latin spelling (e.g. `/kosnicka` →
+  `/korpa`), a different Macedonian word, or Cyrillic slugs (`/кошничка`). The reviewers were given all three
+  as valid answers and an explicit “cheap now, expensive after the domain is live” prompt.
+- **Downside accepted:** Latin transliteration is locked in for these routes; a future rename now costs a
+  redirect chain (old English path → 2.01 slug → new slug) rather than one hop, and Cyrillic-in-the-address-bar
+  (which some may find more native) is foregone for link-sharing legibility.
+- **Reason:** Both native speakers read the address bar and judged every slug recognisable and correctly
+  spelled; the transliteration reasoning (Cyrillic percent-encodes to gibberish when pasted in
+  Viber/Instagram, `D-2.01-1`) held up under native review. Confirming now clears the one open item the slugs
+  carried.
+- **Links:** `src/i18n/routing.ts` · `next.config.ts` · `docs/i18n/mk-review-2.02.md` (Section 3) ·
+  `D-2.01-1` · `D-2.01-2` · `D-2.01-5`.
