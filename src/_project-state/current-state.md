@@ -205,7 +205,7 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | Phase | **2.01 complete — Bilingual** (localised MK slugs via `pathnames`, 308 redirects, full string extraction, per-locale metadata + reciprocal hreflang, MK-only shipping on product + checkout, locale-aware price formatting, in-place language switch, string inventory + i18n tests). Next: **2.02** (Native MK review) |
 | Branch | `phase-2.01-bilingual` → PR `#10`, **merged to `main`** (2026-07-19, merge commit `a39cada`) |
 | Open PR | **none** — 1.01–1.07 merged `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; **2.01 merged `#10`** on Petar's instruction (`D-0-3`: other-operator review, no fresh-session Claude review — that gate was 1.03/1.04 only) |
-| Deployed | **YES — https://trajanov-v2.vercel.app**, production. **2.01 merged to `main` (`#10`) auto-deploys** the localised slugs / redirects / hreflang / shipping notice. **Post-merge deploy not yet re-verified by Code** — recommend a smoke check once Vercel finishes: MK `/katalog` 200, old `/catalog` 308, `/en/catalog` 200, hreflang present. `D-1.03-5`/`D-1.06-4` closed |
+| Deployed | **YES — https://trajanov-v2.vercel.app**, production. **2.01 merged (`#10`) is LIVE and smoke-verified by Code (2026-07-19):** old `/catalog` **308→`/katalog`**, MK `/katalog` **200**, `/en/catalog` **200**, home `<html lang="mk">` + `canonical` + `hrefLang` mk/en/x-default all present. `D-1.03-5`/`D-1.06-4` closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
 ---
