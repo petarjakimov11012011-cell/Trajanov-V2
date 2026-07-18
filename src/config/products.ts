@@ -1,76 +1,54 @@
 // The product CATALOGUE, keyed by drop slug (D-0-4). Prices, names, and stock live here.
 //
-// NOTHING here is invented (facts.md): no real product has a name, a price, a fabric claim, or a size
-// chart yet — all are OWED by Vladimir (facts.md §7). So every product below is priced `null` and named
-// `null` (the UI renders a neutral slot, "Производ 01", from position). The ONLY concrete values are
-// sizes + stock, which exist purely to exercise the card states (in-stock / low / sold-out) of the
-// rehearsal drop. When Vladimir supplies real data, fill nameMk/nameEn + priceMkd here and re-sync.
+// PHASE 1.08 (D-1.08-1): the rehearsal drop now carries Vladimir's REAL price and REAL sizes — the
+// only two facts we have (facts.md §7, VERIFIED 2026-07-18): price 1199 MKD, currency MKD, sizes
+// S/M/L/XL with the off-white shirt XL-only. Names, photos, and fabric/care are still OWED and stay
+// placeholders (name_* = null → the UI renders a neutral slot "Производ 01"; no photo/fabric columns
+// exist yet — D-1.06-3). The two products below are the two VERIFIED colourways (facts.md §7); the
+// colourway is used only as an INTERNAL slug identifier — the customer-facing name stays a placeholder
+// until Vladimir supplies real product names (placeholder register #4).
+//
+// This is a STAND-IN rehearsal drop for the 1.08 machinery-verification gate, NOT the real first drop
+// (that is 2.04/2.05, gated on photos + fabric + names + a drop date). The `test-` slug prefix keeps it
+// obviously non-production even though the price is now real. Its committed window is in the PAST
+// (drops.ts) so it renders "ended" and nothing is buyable by default; the gate opens it briefly, then
+// closes it (Task 7 → Task 12). When Vladimir supplies real names, fill nameMk/nameEn here and re-sync.
 
 import type { ProductConfig } from "./schema";
 
 export const PRODUCTS: Readonly<Record<string, readonly ProductConfig[]>> = {
-  // Rehearsal drop — mirrors the 1.02 handover's 4-piece grid (incl. a sold-out card). test- slugs +
-  // null prices/names make it obviously not real (Task 1). Stock states: in-stock, low, in-stock, sold-out.
+  // Rehearsal drop — real price (1199 MKD) + real sizes; names still placeholder (null). The two
+  // verified colourways: mustard/ochre in S/M/L/XL, off-white in XL only (a single-variant product —
+  // a deliberately-exercised path). Stock is small and INSERT-only (D-1.04-5): enough to place the
+  // gate's one real order and see an atomic decrement, not real inventory.
   "test-drop": [
     {
-      slug: "test-piece-01",
+      // Colourway: mustard/ochre (internal identifier only — facts.md §7). Sizes S, M, L, XL.
+      slug: "test-mustard-ochre",
       nameMk: null,
       nameEn: null,
-      priceMkd: null,
+      priceMkd: 1199,
       photoPath: null,
       careMk: null,
       careEn: null,
       sizes: [
-        { size: "S", stock: 5 },
-        { size: "M", stock: 5 },
-        { size: "L", stock: 5 },
-        { size: "XL", stock: 0 }, // shows an unavailable size in the picker
+        { size: "S", stock: 3 },
+        { size: "M", stock: 3 },
+        { size: "L", stock: 3 },
+        { size: "XL", stock: 3 },
       ],
     },
     {
-      slug: "test-piece-02",
+      // Colourway: off-white (internal identifier only — facts.md §7). XL ONLY — a single-variant
+      // product, so the gate exercises the one-size buy path as well.
+      slug: "test-off-white",
       nameMk: null,
       nameEn: null,
-      priceMkd: null,
+      priceMkd: 1199,
       photoPath: null,
       careMk: null,
       careEn: null,
-      sizes: [
-        { size: "S", stock: 0 },
-        { size: "M", stock: 1 },
-        { size: "L", stock: 1 },
-        { size: "XL", stock: 0 }, // total 2 remaining → "low stock" badge (≤ threshold)
-      ],
-    },
-    {
-      slug: "test-piece-03",
-      nameMk: null,
-      nameEn: null,
-      priceMkd: null,
-      photoPath: null,
-      careMk: null,
-      careEn: null,
-      sizes: [
-        { size: "S", stock: 5 },
-        { size: "M", stock: 5 },
-        { size: "L", stock: 5 },
-        { size: "XL", stock: 0 },
-      ],
-    },
-    {
-      slug: "test-piece-04",
-      nameMk: null,
-      nameEn: null,
-      priceMkd: null,
-      photoPath: null,
-      careMk: null,
-      careEn: null,
-      sizes: [
-        { size: "S", stock: 0 },
-        { size: "M", stock: 0 },
-        { size: "L", stock: 0 },
-        { size: "XL", stock: 0 }, // fully sold out → non-interactive sold-out card
-      ],
+      sizes: [{ size: "XL", stock: 3 }],
     },
   ],
 };

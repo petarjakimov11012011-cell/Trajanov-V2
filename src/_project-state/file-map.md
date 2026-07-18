@@ -6,7 +6,7 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-18** · By: **Claude Code (Phase Z.01 — Order email)**
+Last updated: **2026-07-18** · By: **Claude Code (Phase 1.08 — Verification gate, Code half)**
 
 ---
 
@@ -35,7 +35,9 @@ structure. Notes:
 
 - **Typed drop config in `src/config/`** (`D-0-4`): `schema.ts` (types + validators + constants),
   `time.ts` (DST-aware Europe/Skopje resolver), `drops.ts` (schedule) + `products.ts` (catalogue),
-  `index.ts` (join). Committed rehearsal: one **ended, null-priced** `test-drop` (`D-1.04-12`).
+  `index.ts` (join). Committed rehearsal: one **ended** `test-drop`, now **priced 1199 MKD** with real sizes
+  (two verified colourways: `test-mustard-ochre` S/M/L/XL, `test-off-white` XL-only; names still placeholder)
+  as the 1.08 machinery-verification stand-in (`D-1.04-12`, `D-1.08-1`).
 - **Config→DB sync** at `scripts/{sync-core.ts,sync-drop.ts}` — `npm run sync:drop`, a direct
   Postgres admin tool (`D-1.04-11`), not runtime code.
 - **Server-only drop state** `src/lib/drop/state.ts` (`import "server-only"`, proven a client-import
@@ -273,3 +275,4 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-15 | 1.04 | Added `src/config/` (5 files), `src/lib/drop/state.ts`, `src/lib/orders/{process-order,actions,phone}.ts`, `src/lib/rate-limit/{hash,ip}.ts`, `src/lib/turnstile/verify.ts`, `src/lib/{social,format}.ts`, `scripts/{sync-core,sync-drop}.ts`, 4 migrations, `src/components/checkout/Turnstile.tsx`, `src/components/system/DevPreviewSwitch.tsx`, 6 test files under `tests/{config,orders}/`. **Deleted** `src/lib/demo.ts` and `src/components/checkout/TurnstilePlaceholder.tsx`. Rewired `src/app/[locale]/{page,catalog,catalog/[slug],checkout,styleguide}` + several components to real DB data. Removed `.gitkeep` from `src/config`, `src/lib/{drop,rate-limit}`. `D-1.04-*`. | Claude Code |
 | 2026-07-18 | Z.01 | Added `src/lib/email/order-notification.ts` (composer + best-effort Resend sender) and `tests/email/order-notification.test.ts` (Resend mocked). Removed `.gitkeep` from now-populated `src/lib/email`. Modified `src/lib/orders/process-order.ts` (optional `notifyOrder` dep, awaited best-effort after success), `src/lib/orders/actions.ts` (enrichment + wire the sender), `src/messages/{mk,en}.json` (`Order.success` copy), `tests/orders/process-order.test.ts` (+4 notify cases). Added dep `resend 6.17.2`. **No `supabase/migrations/`, `src/app`, or component file touched; `create_order`/`expire_reservations` unchanged.** `D-Z.01-1…7`. | Claude Code |
 | 2026-07-16 | 1.07 (Code) | Added **one migration** `supabase/migrations/20260716120000_catalog_grant_hardening.sql` (REVOKE anon/authenticated/public write privileges on `drops`/`products`/`variants` — closes the hosted-only grants gap, `D-1.07-14`) and `briefs/Part-1-Phase-07-Code.md`. Modified `Trajanov-V2-Phase-Plan.md` (Resend struck from 1.07, `Z.01` added + on the critical path), `src/_project-state/00_stack-and-config.md` (Pinned corrections + appended change-log row), `Decisions.md` (`D-1.07-4`…`D-1.07-15`), `current-state.md`. **No `src/` application code, no component, no message-catalog, no test file, and no existing migration changed. `create_order`/`expire_reservations` untouched. No new npm dependency.** New untracked local files (gitignored, never committed): `.env.hosted` (`D-1.07-9`), `.vercel/`. | Claude Code |
+| 2026-07-18 | 1.08 (Code) | **No new source files.** Modified `facts.md` §7 (real price 1199 MKD + sizes VERIFIED), `src/config/products.ts` (rehearsal now priced 1199 MKD; two verified colourways `test-mustard-ochre` S/M/L/XL + `test-off-white` XL-only; names still null), `src/config/drops.ts` (rehearsal comment), `Decisions.md` (`D-1.08-1/2/3`), `current-state.md`, `file-map.md`. Added root docs `Part-1-Phase-08-Operator-Runbook.md` + `completions/Part-1-Phase-08-Code-Completion.md`. **No `supabase/migrations/`, `src/app`, component, or test file changed; `create_order`/`expire_reservations` untouched; no new dependency.** Hosted verification used seed/test fixtures only, removed after (hosted left clean, TRJ-0001). `D-1.08-*`. | Claude Code |

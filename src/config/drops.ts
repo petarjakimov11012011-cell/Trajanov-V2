@@ -12,12 +12,14 @@
 import type { DropSchedule } from "./schema";
 
 export const DROPS: readonly DropSchedule[] = [
-  // ── REHEARSAL ONLY — not a real drop (Task 1). ────────────────────────────────────────────────
-  // Slug is `test-drop` and every product is `test-`-prefixed and priced null, so it is trivially
-  // obvious this is not merchandise. Its window is in the PAST, so it renders as an *ended* drop and
-  // the sync's null-price preflight allows it (an ended drop can never be ordered — D-1.04-6). To see
-  // the countdown and live states against this same data, use the dev-only `?preview=` override
-  // (src/lib/drop) — a null-priced drop cannot legitimately be published open or future.
+  // ── REHEARSAL ONLY — not a real drop (D-1.08-1). ──────────────────────────────────────────────
+  // Slug is `test-drop` and both products are `test-`-prefixed, so it is trivially obvious this is not
+  // merchandise even though the price is now REAL (1199 MKD) and the sizes are real (products.ts). Its
+  // committed window is in the PAST, so it renders as an *ended* drop and nothing is buyable by default.
+  // The 1.08 gate briefly opens the window (via a transient sync) to place one real order, then closes
+  // it again (Task 7 → Task 12); that transient open state is NOT committed here. To preview the
+  // countdown/live states against this data without opening it, use the dev-only `?preview=` override
+  // (src/lib/drop). The real, launchable first drop is 2.04/2.05.
   {
     slug: "test-drop",
     startsAt: "2026-06-06T20:00",

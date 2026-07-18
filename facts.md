@@ -9,7 +9,7 @@ in `src/_project-state/current-state.md`. The register must be empty before cuto
 No exceptions. No inventing. No "it's probably fine." This file is the only legal source for
 factual claims on the site.
 
-Last updated: 2026-07-15 · Maintained by: Lazar (orchestrator turn) — executors propose additions
+Last updated: 2026-07-18 · Maintained by: Lazar (orchestrator turn) — executors propose additions
 via completion reports, they do not silently add.
 
 ---
@@ -160,25 +160,29 @@ survive being pasted into an Instagram story or bio link — see the OG requirem
 |---|---|---|
 | Product type | Oversized unisex t-shirts | VERIFIED (owner + photos) |
 | Colourways seen so far | Mustard/ochre, off-white | VERIFIED (photos, 2026-07-14) |
-| Price ceiling | **~$65 / approx. 3,700 MKD — INDICATIVE ONLY, not a real price** | **UNVERIFIED** |
-| Actual prices | — | **UNVERIFIED — OWED per drop** (Vladimir) |
-| Currency | **MKD (денари)** — confirm with Vladimir | **UNVERIFIED** |
+| ~~Price ceiling~~ | ~~**~$65 / approx. 3,700 MKD — INDICATIVE ONLY, not a real price**~~ | **SUPERSEDED** — a real price now exists (below); the indicative ceiling is retired |
+| Actual price — this drop | **1199 MKD** (the shirts in the current drop) | **VERIFIED** — owner via Lazar, 2026-07-18 |
+| Currency | **MKD (денари)** — the site renders MKD only, never USD | **VERIFIED** — owner via Lazar, 2026-07-18 |
 | Shipping | **North Macedonia only** | VERIFIED (owner, intake) |
 | Payment | **Cash on delivery only** | VERIFIED (owner, intake) |
-| Sizes available | — | **UNVERIFIED — OWED** (Vladimir) |
-| Fabric / composition / care | — | **UNVERIFIED — OWED** (Vladimir) |
+| Sizes available | **S, M, L, XL** — except the **off-white** shirt, which is **XL only** | **VERIFIED** — owner via Lazar, 2026-07-18 |
+| Fabric / composition / care | — | **UNVERIFIED — OWED** (Vladimir; read off the labels) |
 | Products per drop | 3–5 | VERIFIED (owner, intake) |
 
-**"Up to $65" is a ballpark Lazar gave to describe the price range — it is not a price and must
-never render.** Every product needs a real price in MKD from Vladimir before its page ships.
+**The real price for this drop is 1199 MKD (VERIFIED 2026-07-18).** The old "up to $65 / ~3,700
+MKD" was a ballpark Lazar gave to describe the range — it was never a price and is now retired. The
+site renders MKD only; **no USD figure ever renders.** Price is per drop: each future drop still
+needs its own real MKD price from Vladimir before its page ships.
 
 **Fabric and care are not optional and not guessable.** They are printed on the shirts' own labels.
 Vladimir has 30 of them. Do not write "premium heavyweight cotton" because it sounds right — read
 the label. A false composition claim on a product page is a consumer-protection issue, not a copy
-issue.
+issue. **Still OWED.**
 
-**Sizes:** the photos show a boxy oversized fit. That is an observation, not a size chart. Get the
-real sizes and measurements from Vladimir.
+**Sizes (VERIFIED 2026-07-18):** the drop runs in **S, M, L, XL**, with the **off-white** shirt
+available in **XL only**. That is the size *list*, not a measurement chart — the cm/fit measurements
+per size are still owed by Vladimir. The photos show a boxy oversized fit; that remains an
+observation, not a spec.
 
 ---
 
@@ -250,3 +254,4 @@ Say so in the completion report and it comes back to the orchestrator.
 | 2026-07-14 | Created from intake. trn.mk fetched and verified in full. | Claude Chat (orchestrator) |
 | 2026-07-15 | **§ 4 rewritten.** All three outstanding press links fetched, read, and VERIFIED. A **fifth outlet (Република)** found and verified — it was not in the intake list. Recorded that four of the five are syndications of one supplied text, that press photos are not ours to use, and that the § 3 quote matches Трн.мк exactly (the syndications differ by one word — do not "fix" it). The "only Трн.мк may be cited" rule is retired as satisfied. | Claude Chat (orchestrator) |
 | 2026-07-18 | **§ 5 Email → VERIFIED.** Per the Phase Z.01 Code brief (Task 8, `D-Z.01-3/4`), the owner's email now exists (provenance: owner via Lazar, 2026-07-18) and is recorded **as env-var-only** (`ORDER_NOTIFICATION_EMAIL`) — the literal address is never written to the repo (`D-0-1`). Wired as the internal order-notification recipient; **not** published on Contact (register #5 stays). Real inbox delivery still owed to 1.08. Edit made by Code on explicit orchestrator instruction and surfaced in the completion report (not a silent add). | Claude Code (per Z.01 brief) |
+| 2026-07-18 | **§ 7 Price + sizes → VERIFIED (Phase 1.08 Code brief, Task 1, `D-1.08-1`).** Price **1199 MKD** for this drop and currency **MKD** marked VERIFIED (provenance: owner via Lazar, 2026-07-18); the old "~$65 / ~3,700 MKD INDICATIVE ONLY" ceiling is **SUPERSEDED** — a real price now exists. Sizes **S/M/L/XL** VERIFIED, with the **off-white** shirt **XL-only**. Fabric/composition/care and per-size measurements stay **UNVERIFIED — OWED**. Edit made by Code on explicit orchestrator instruction (the gate runs against a real-priced rehearsal drop, `D-1.08-1`) and surfaced in the completion report — not a silent add. | Claude Code (per 1.08 brief) |
