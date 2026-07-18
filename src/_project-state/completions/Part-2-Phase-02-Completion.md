@@ -11,7 +11,7 @@ slugs confirmed and no source string changed.
 | **Operator** | Petar |
 | **Reviewers** | Lazar + Petar (native MK speakers) |
 | **Branch** | `phase-2.02-mk-review` |
-| **PR** | **Not yet opened** — branch committed locally, held per operator (see §7) |
+| **PR** | [#11](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/11) → `main` — **open** (2026-07-19), for Lazar to review + merge (`D-0-3`, no self-merge) |
 | **Brief** | `briefs/Part-2-Phase-02-Code.md` |
 
 ---
@@ -199,10 +199,9 @@ strings and public URLs; the local Supabase demo keys printed during verificatio
 
 ## 7. Risks, follow-ups, what the next phase needs to know
 
-- **The PR is not open yet.** The branch `phase-2.02-mk-review` is committed locally and was held at the
-  operator's request ("local only for now") while they reviewed with Lazar. The brief's Task 6 calls for a PR
-  to `main` for the **other** operator to merge (`D-0-3`; I do not self-merge). Opening it needs a push to the
-  public remote — awaiting the operator's go-ahead.
+- **PR [#11](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/11) is open** (pushed on the
+  operator's go-ahead after the local-only review with Lazar). It awaits **Lazar's** review + merge — Code
+  does not self-merge (`D-0-3`).
 - **A clean pass is a real result, but a light paper trail.** The verdicts were captured from a joint,
   in-session confirmation and transcribed by Code (`D-2.02-2`), not two independent hand-edits. If the
   orchestrator wants stronger evidence, the two reviewers can annotate the committed file directly — the row

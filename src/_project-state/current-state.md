@@ -223,8 +223,8 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 |---|---|
 | Part | 2 of 2 — Launch prep |
 | Phase | **2.02 complete — Native MK review** (two native speakers read all 150 MK strings + 8 URLs + the 6 MK slugs; **clean pass** — every string OK, all six slugs confirmed Keep; review record + sign-offs committed, no source string changed). Next: **2.03** (Legal + facts audit) |
-| Branch | `phase-2.02-mk-review` → PR **pending** to `main` (opens once the operator gives the go-ahead to push — held local at their request this session). Prior: `phase-2.01-bilingual` → PR `#10`, merged `a39cada` |
-| Open PR | **2.02 PR not yet pushed** — `phase-2.02-mk-review` is committed locally and held per the operator; a PR to `main` opens on their go-ahead, for the **other** operator to merge (`D-0-3`; never self-merge). Prior: 1.01–1.07 `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; 2.01 `#10` (all merged) |
+| Branch | `phase-2.02-mk-review` → PR **[#11](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/11)** to `main`, **open** (2026-07-19), awaiting Lazar's merge (`D-0-3`, no self-merge). Prior: `phase-2.01-bilingual` → PR `#10`, merged `a39cada` |
+| Open PR | **`#11` OPEN** — `phase-2.02-mk-review` → `main` (2026-07-19), for **Lazar** to review + merge (`D-0-3`; Code never self-merges). Prior: 1.01–1.07 `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; 2.01 `#10` (all merged) |
 | Deployed | **YES — https://trajanov-v2.vercel.app**, production. **2.01 merged (`#10`) is LIVE and smoke-verified by Code (2026-07-19):** old `/catalog` **308→`/katalog`**, MK `/katalog` **200**, `/en/catalog` **200**, home `<html lang="mk">` + `canonical` + `hrefLang` mk/en/x-default all present. `D-1.03-5`/`D-1.06-4` closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
