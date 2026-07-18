@@ -1,11 +1,28 @@
+import type {Metadata} from 'next';
+import type {Locale} from 'next-intl';
 import {getTranslations} from 'next-intl/server';
 import {ProductCard} from '@/components/product/ProductCard';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {DevPreviewSwitch} from '@/components/system/DevPreviewSwitch';
 import {getActiveDropView, parsePreviewState} from '@/lib/drop/state';
+import {localeAlternates} from '@/lib/metadata';
 
 // Catalog grid — the active drop's pieces, read from the DB on every request (D-1.04-9).
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: Locale}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  const t = await getTranslations({locale, namespace: 'Meta'});
+  return {
+    title: t('catalogTitle'),
+    description: t('catalogDescription'),
+    alternates: localeAlternates('/catalog', locale),
+  };
+}
 
 export default async function CatalogPage({
   searchParams,

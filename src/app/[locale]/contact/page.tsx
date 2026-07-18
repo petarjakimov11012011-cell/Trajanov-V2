@@ -1,11 +1,28 @@
+import type {Metadata} from 'next';
+import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations} from 'next-intl/server';
 import {Placeholder} from '@/components/system/Placeholder';
+import {localeAlternates} from '@/lib/metadata';
 import {
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
   PHONE_DISPLAY,
   PHONE_TEL,
 } from '@/lib/social';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{locale: Locale}>;
+}): Promise<Metadata> {
+  const {locale} = await params;
+  const t = await getTranslations({locale, namespace: 'Meta'});
+  return {
+    title: t('contactTitle'),
+    description: t('contactDescription'),
+    alternates: localeAlternates('/contact', locale),
+  };
+}
 
 // Contact is a static page — same as About, no drop state, no DB read (D-1.05, Task 4). No form (the
 // phone is the channel), no address (there is none — facts.md §1). Phone + Instagram are imported from

@@ -1,9 +1,10 @@
 'use client';
 
 import {useEffect, useState} from 'react';
-import {useRouter} from 'next/navigation';
 import {useTranslations} from 'next-intl';
-import {Link} from '@/i18n/navigation';
+// Locale-aware router + Link (D-2.01). useRouter here is used only for router.refresh() at T-0, but it
+// comes from the i18n navigation surface so no user-facing routing bypasses the localised helpers.
+import {Link, useRouter} from '@/i18n/navigation';
 import {Countdown} from '@/components/drop/Countdown';
 import {
   DropCountdownEyebrow,

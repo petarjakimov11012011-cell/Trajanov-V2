@@ -8,6 +8,7 @@ import {Link} from '@/i18n/navigation';
 import {CheckoutField} from './CheckoutField';
 import {Turnstile, type TurnstileHandle} from './Turnstile';
 import {Placeholder} from '@/components/system/Placeholder';
+import {ShippingNotice} from '@/components/system/ShippingNotice';
 import {useCart} from '@/components/cart/cart-store';
 import {toOrderItems, cartDropSlug} from '@/lib/cart/cart';
 import {placeOrder, type PlaceOrderResult} from '@/lib/orders/actions';
@@ -133,6 +134,10 @@ export function CheckoutForm({siteKey}: {siteKey: string}) {
         </div>
         <p className="text-muted-foreground text-small">{t('codSummary')}</p>
         <p className="text-muted-foreground text-small">{t('reserveNote')}</p>
+
+        {/* MK-only shipping statement by the COD block, before the submit button (D-2.01, Task 7).
+            Same shared key as the product page. */}
+        <ShippingNotice />
 
         {/* Turnstile placement (handover §9). The widget is invisible until it needs interaction; the
             check runs on submit. */}

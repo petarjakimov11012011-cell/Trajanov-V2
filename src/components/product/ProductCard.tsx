@@ -54,7 +54,7 @@ export function ProductCard({product}: {product: ProductView}) {
 
         {product.priceMkd != null ? (
           <span className="text-foreground text-sm font-semibold tabular">
-            {formatMkd(product.priceMkd, t('Common.currency'))}
+            {formatMkd(product.priceMkd, t('Common.currency'), locale)}
           </span>
         ) : (
           <Placeholder>{t('Placeholder.price')}</Placeholder>
@@ -88,7 +88,9 @@ export function ProductCard({product}: {product: ProductView}) {
 
   return (
     <Link
-      href={`/catalog/${product.slug}`}
+      // Object form so next-intl emits the localised product URL (/katalog/<slug> or /en/catalog/<slug>)
+      // from the shared, non-localised product slug (D-2.01-2). Never hand-write the MK slug.
+      href={{pathname: '/catalog/[slug]', params: {slug: product.slug}}}
       className="rounded-[var(--radius-lg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ground"
     >
       {inner}

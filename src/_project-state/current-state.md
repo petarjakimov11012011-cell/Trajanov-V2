@@ -1,4 +1,4 @@
-NEXT: 2.01 — Bilingual (next-intl: every string extracted, `hreflang`, localised route slugs, EN states MK-only shipping on product + checkout). **Phase 1.08 — the verification gate — PASSED IN FULL (2026-07-18).** `facts.md`+config carry the real **1199 MKD** price and real sizes; on the live Frankfurt DB the **10-vs-3 oversell gate**, **live pg_cron reservation expiry**, **Turnstile enforcement (real secret)**, and **IP + phone rate limits** were all re-proven; then a **real end-to-end order (`TRJ-0001`)** was placed on a phone and its **MK notification email arrived in Vladimir's inbox** (#7). The four human register items were cleared by the operator: **design sign-off** (#1), **IG click-test** (#2), **auto-expose toggle OFF** (#6), plus #5 (Turnstile) by Code. **The owed-verification register is EMPTY** (#8 reclassified to 2.05, `D-1.08-2`); hosted was returned **clean** (TRJ reset to 0001). **Part 2 may begin.** Recommended-but-not-blocking operator housekeeping (L1–L4, L7) is still open — see `Part-1-Phase-08-Operator-Runbook.md`.
+NEXT: 2.02 — Native MK review (two native speakers read every MK string + every URL against `docs/i18n/string-inventory.md` and confirm the provisional slugs; fix mechanical faults only). **Phase 2.01 — Bilingual — COMPLETE (2026-07-19, branch `phase-2.01-bilingual`).** The MK store is now Macedonian down to its URLs: localised route slugs via next-intl `pathnames` (MK Latin `/katalog`·`/kosnicka`·`/naracka`·`/za-nas`·`/kontakt`, EN keeps `/en/catalog`…; product slug single/shared, `D-2.01-1/2`); old English MK paths **308** to the new slugs while `/en/*` is untouched (`next.config.ts`, `D-2.01-3`). Every user-facing string is in the catalogs (only leftover extraction was the cart stepper aria-labels); per-locale `<title>`/description + reciprocal **hreflang** (mk/en/x-default→MK) + self-canonical on **every** page, absolute on the one `SITE_URL` in `src/lib/site.ts`. The **MK-only shipping statement** (one shared key `Common.shippingNotice`, traced to `facts.md` §7 VERIFIED) renders above Add-to-cart on the product page and in the COD block on checkout, both locales, EN unambiguous we don't deliver outside NMK. `formatMkd` is locale-aware (MK `1.199` / EN `1,199`, MKD always, no conversion). The language switch preserves the page + `?preview` across the slug change. New `docs/i18n/string-inventory.md` (regen `npm run i18n:inventory`) for the 2.02 reviewers. **63 tests pass** (56 + 7 new i18n: catalog parity + pathname coverage); build/lint/tsc clean. **No `supabase/migrations/`, `create_order`, `expire_reservations`, or hosted DB touched; no new npm dependency.** Owed-verification register **stays EMPTY** (everything verified in-browser by Code). Recommended-but-not-blocking operator housekeeping (L1–L4, L7) is still open — see `Part-1-Phase-08-Operator-Runbook.md`.
 
 # Current state — Trajanov-V2
 
@@ -6,13 +6,36 @@ NEXT: 2.01 — Bilingual (next-intl: every string extracted, `hreflang`, localis
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-18** · By: **Claude Code (Phase 1.08 — Verification gate, PASSED in full)**
+Last updated: **2026-07-19** · By: **Claude Code (Phase 2.01 — Bilingual, Code)**
 
 ---
 
 ## Status
 
-**1.08 CODE HALF PASSED against hosted (this update, 2026-07-18); operator half + email prereq still OWED.**
+**2.01 COMPLETE — the store is bilingual down to the URL (this update, 2026-07-19).** next-intl `pathnames`
+localise the MK route slugs (Latin transliteration, `D-2.01-1`) while the internal route folders are
+unchanged; the product slug is single/shared across locales (`D-2.01-2`). Old English MK paths **308** to
+the new slugs (`next.config.ts`, kept in lockstep with `routing.ts`), `/en/*` untouched (`D-2.01-3`). Every
+user-facing string lives in `src/messages/{mk,en}.json` — the only literals left to extract were the cart
+quantity-stepper `aria-label`s (`Cart.decrease`/`increase`); a new `Meta` namespace drives per-locale
+`<title>`/description on every route. Reciprocal **hreflang** (mk/en/x-default→MK) + a self-referencing
+`canonical`, all absolute on the single `SITE_URL` constant (`src/lib/site.ts`, `TODO(2.05): trajanov.com`),
+are emitted per page via `src/lib/metadata.ts`'s `localeAlternates` + next-intl `getPathname`. The MK-only
+**shipping statement** (one shared key `Common.shippingNotice`, traced to `facts.md` §7 VERIFIED) renders
+above Add-to-cart on the product page and in the checkout COD block, both locales; the EN wording is
+explicit that we do not deliver outside North Macedonia (`ShippingNotice.tsx`, `D-2.01-7`). `formatMkd` is
+now locale-aware (MK `1.199 ден` / EN `1,199 MKD`; MKD always, **no currency conversion anywhere**,
+`D-2.01-8`). The `LanguageSwitch` switches locale in place and preserves the page + query/`?preview` across
+the slug change (`D-2.01-6`). A committed `docs/i18n/string-inventory.md` (regen `npm run i18n:inventory`)
+lists every key/MK/EN/where + two flag sections for the 2.02 reviewers. **63 tests pass** (56 + 7 new i18n:
+catalog parity + pathname coverage; the parity test was confirmed RED when a key was removed from `en.json`,
+then restored). Verified in-browser both locales at 390px + 1180px: redirects (308 + Location), MK slugs 200,
+`/en/*` 200, reciprocal hreflang, the shipping notice, and the language switch on a dynamic product page with
+`?preview`. **No `supabase/migrations/`, `create_order`, `expire_reservations`, component-of-record, or
+hosted DB touched; no new npm dependency** (added the `i18n:inventory` script only). Branch
+`phase-2.01-bilingual`. **Owed-verification register stays EMPTY.**
+
+**1.08 CODE HALF PASSED against hosted (2026-07-18); operator half + email prereq still OWED.**
 The gate ran its Code-verifiable half against the live Frankfurt DB and returned it clean (`D-1.08-3`):
 - **Real content recorded.** `facts.md` §7 marks **1199 MKD** + currency **MKD** + sizes **S/M/L/XL
   (off-white XL-only)** VERIFIED (owner via Lazar, 2026-07-18); the old ~$65/3,700 MKD indicative ceiling is
@@ -178,10 +201,10 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 
 | | |
 |---|---|
-| Part | 1 of 2 — Build |
-| Phase | **1.08 complete — the verification gate PASSED IN FULL** (real order `TRJ-0001` + email in Vladimir's inbox + owed-verification register driven to zero). Z.01 + 1.07 complete before it. Next: **2.01** (Bilingual) |
-| Branch | `phase-1.08-verification-gate` → PR `#9`, **merged to `main`** (2026-07-18, merge commit `063b73c`) |
-| Open PR | **none** — 1.01–1.07 merged `#1`–`#7`; Z.01 merged `#8`; **1.08 merged `#9`** on Petar's instruction. No fresh-session review required (that gate is 1.03/1.04 only, `D-0-3`; 1.08 is a verification gate whose DoD is the evidence, all green) |
+| Part | 2 of 2 — Launch prep |
+| Phase | **2.01 complete — Bilingual** (localised MK slugs via `pathnames`, 308 redirects, full string extraction, per-locale metadata + reciprocal hreflang, MK-only shipping on product + checkout, locale-aware price formatting, in-place language switch, string inventory + i18n tests). Next: **2.02** (Native MK review) |
+| Branch | `phase-2.01-bilingual` → PR `#10` (open) |
+| Open PR | **`#10` — `phase-2.01-bilingual` → `main`** (2.01, Bilingual). Reviewed by the other operator before merge (`D-0-3`); no fresh-session Claude review required (that gate was 1.03/1.04 only). Prior: 1.01–1.07 `#1`–`#7`, Z.01 `#8`, 1.08 `#9` — all merged |
 | Deployed | **YES — https://trajanov-v2.vercel.app**, production, serving `/` (MK) + `/en` from the hosted Frankfurt DB. Deployed from the phase branch via `npx vercel --prod` **before** merge (`D-1.07-5`). `D-1.03-5` and `D-1.06-4` are closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
@@ -197,6 +220,51 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### Bilingual (2.01) — Macedonian down to the URL
+
+- **Localised route slugs** (`src/i18n/routing.ts`): `pathnames` maps each internal route to its MK Latin
+  slug (`/katalog`, `/kosnicka`, `/naracka`, `/za-nas`, `/kontakt`) and EN English slug (`/en/catalog`, …);
+  `localePrefix: 'as-needed'`, `defaultLocale: 'mk'` unchanged. Route **folders** under `src/app/[locale]/`
+  are NOT renamed. Product route `/catalog/[slug]` keeps a single shared slug in both locales (`D-2.01-2`).
+  `src/proxy.ts` consumes `routing` unchanged — **no edit needed**.
+- **Redirects** (`next.config.ts`): six **308** rules from the old English MK paths to the new MK slugs
+  (`/catalog→/katalog`, `/catalog/:slug→/katalog/:slug`, `/cart→/kosnicka`, `/checkout→/naracka`,
+  `/about→/za-nas`, `/contact→/kontakt`). `/en/*` is not matched. Runs before the next-intl middleware.
+  Carries a "keep in lockstep with `routing.ts`" comment (`D-2.01-3`).
+- **Typed navigation everywhere**: `ProductCard`'s dynamic link uses the object form
+  `{pathname:'/catalog/[slug]', params:{slug}}` so next-intl emits the localised URL; `HomeExperience`'s
+  `useRouter` moved to `@/i18n/navigation`. The only remaining `next/navigation` imports are `notFound`
+  (layout, product page — not a route link) and `useParams` (LanguageSwitch — a param reader with no
+  next-intl equivalent). No hand-written MK slug in any component.
+- **String extraction**: the only user-facing literals still inline were the cart quantity-stepper
+  `aria-label`s → `Cart.decrease` / `Cart.increase`. Everything else was already in the catalogs.
+- **Per-locale metadata** (`Meta` namespace): `generateMetadata` on every route (+ the layout default)
+  sets a locale-distinct `<title>` + description from the catalog; nothing hardcoded in `layout.tsx`.
+  `<html lang>` renders `mk`/`en` correctly.
+- **hreflang + canonical** (`src/lib/site.ts` + `src/lib/metadata.ts`): a single `SITE_URL` constant
+  (`https://trajanov-v2.vercel.app`, `TODO(2.05): trajanov.com` — **not** from a Vercel var, no new env
+  var). `localeAlternates(href, locale)` builds `alternates` via next-intl `getPathname`: `canonical` in
+  the page's own locale, `languages.mk`/`languages.en`/`languages['x-default']`(→MK), all absolute and
+  reciprocal (EN↔MK point at each other for the same page, incl. the shared product slug).
+- **Shipping statement** (`src/components/system/ShippingNotice.tsx`, `Common.shippingNotice`): one shared
+  key, traced to `facts.md` §7 ("Shipping — North Macedonia only", VERIFIED). Renders above Add-to-cart on
+  the product page and in the checkout COD block, both locales. EN: "We ship inside North Macedonia only.
+  We can't deliver outside the country. Cash on delivery." (`D-2.01-7`). The product page's existing
+  below-fold Shipping detail (`Product.shippingBody`) is unchanged, so shipping shows twice there.
+- **Locale-correct formatting** (`src/lib/format.ts`): `formatMkd(amount, currency, locale)` groups per
+  locale (MK `1.199`, EN `1,199`), MKD always. Dates already go through the next-intl formatter (About).
+  **No currency conversion exists anywhere** (`D-2.01-8`).
+- **Language switch** (`src/components/layout/LanguageSwitch.tsx`): `router.replace({pathname, params,
+  query}, {locale})` keeps the customer on the same page across the slug change; query + `?preview` read
+  from `window.location.search` at click time (avoids a CSR bail-out on the static pages, `D-2.01-6`).
+- **String inventory** (`scripts/i18n-inventory.ts`, `npm run i18n:inventory` → `docs/i18n/string-inventory.md`,
+  committed): 150 keys with MK/EN/where + "Intentionally not translated" + "byte-identical" (4) sections.
+  Flags ~12 apparently-unused keys carried from earlier phases (e.g. `Home.title`, `Product.details`) for
+  2.02 — **not removed** (out of scope).
+- **Tests** (`tests/i18n/`): catalog parity (identical key sets, no empty value bar the deliberate
+  `About.quoteNote`, `D-2.01-10`) + pathname coverage (route folders ⇔ `pathnames`, both-locale slugs,
+  `D-2.01-9`). **63 pass** total; parity confirmed RED then GREEN. No DB needed for the i18n suites.
 
 ### Order notification email (Z.01) — the side channel, best-effort
 
@@ -492,6 +560,10 @@ zero-condition.*
 Every visible `[PLACEHOLDER: …]` on the site. **Must be empty before cutover (2.05). Launch
 blocker.**
 
+*2.01 shipped **no new placeholder** and **cleared/reworded/hid none** — the existing rows below are
+unchanged. The placeholder strings themselves (`Placeholder.*`) were already in the catalogs; 2.01 only
+confirmed they are translated in both locales.*
+
 | # | Placeholder | Page | Waiting on | Owner |
 |---|---|---|---|---|
 | ~~1~~ | ~~`[PLACEHOLDER: цена MKD]` (product price)~~ | ~~Catalog cards, Product, Cart, Checkout~~ | **CLEARED 2026-07-18** — a real price now exists: **1199 MKD** VERIFIED (`facts.md` §7), set in `src/config/products.ts`, and **synced to hosted** (the rehearsal `test-drop` products carry 1199 MKD). When the drop was briefly opened for the gate's real order, the checkout/cart/confirmation rendered **1199 ден** (no placeholder, no USD). Each *future* drop still needs its own real price, but that is per-drop, not a standing placeholder. | — |
@@ -579,7 +651,7 @@ Canonical table with gates: `Trajanov-V2-Plan.md` § 13. Status only:
 | Model + venue permission | Vladimir | Not started |
 | Verify press links | Lazar | **Done** — all 5 fetched, read, VERIFIED 2026-07-15 (`facts.md` §4); cited on About (`D-1.05-5`) |
 | First drop date + products | Vladimir | Not started |
-| MK copy review | Lazar + Petar | Scheduled — Phase 2.02 |
+| MK copy review | Lazar + Petar | **Ready to start — Phase 2.02.** 2.01 shipped `docs/i18n/string-inventory.md` (every key/MK/EN/where) + every URL in both locales for the reviewers; slugs are provisional pending their confirmation (`D-2.01-5`). |
 
 ---
 
