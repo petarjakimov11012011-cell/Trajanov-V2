@@ -6,11 +6,13 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-19** · By: **Claude Code (Phase 2.01 — Bilingual, Code)**
+Last updated: **2026-07-19** · By: **Claude Code (Phase 2.03 — Legal + facts audit, Code)**
 
 ---
 
 ## Status
+
+**Legal pages + facts audit landed (Phase 2.03).** New: three static pages `src/app/[locale]/{terms,privacy,shipping-returns}/page.tsx`; a shared shell `src/components/legal/LegalPage.tsx` (new `legal/` dir); `docs/legal/facts-audit-2.03.md` (new `docs/legal/` dir); `docs/i18n/mk-review-2.03.md`; and the completion report. Modified: `src/i18n/routing.ts` (3 new `pathnames` entries, **no** redirect-table change — new paths), `src/components/layout/SiteFooter.tsx` (3 legal links), `src/messages/{mk,en}.json` (**+63 keys**: `Terms`/`Privacy`/`ShippingReturns` + `Nav.terms/privacy/shipping` + 6 `Meta` + `Common.lastUpdated` + `Placeholder.courier/returnsWindow`), `facts.md` (§1 amendment + change-log row), `tests/i18n/pathnames.test.ts` (explicit legal-route assertions), `docs/i18n/string-inventory.md` (regenerated → 213), `Decisions.md` (`D-2.03-1…6`), `current-state.md`. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, or npm dependency touched.** Below is the 2.01/Z.01/1.06/1.05/1.04 history.
 
 **Bilingual landed (Phase 2.01).** New files: `src/lib/site.ts` (`SITE_URL` origin constant),
 `src/lib/metadata.ts` (`localeAlternates` — hreflang + canonical via next-intl `getPathname`),
@@ -119,9 +121,12 @@ Trajanov-V2/
 ├── docs/
 │   ├── design-handovers/
 │   │   └── Part-1-Phase-02-Handover.md  # current UI spec — read before UI work
-│   └── i18n/
-│       ├── string-inventory.md      # GENERATED (npm run i18n:inventory) — every key/MK/EN/where, for 2.02 (2.01)
-│       └── mk-review-2.02.md        # native-MK review record: 150 strings + 8 URLs + 6 slugs, verdicts + both sign-offs (2.02)
+│   ├── i18n/
+│   │   ├── string-inventory.md      # GENERATED (npm run i18n:inventory) — every key/MK/EN/where (2.01, regen 2.03 → 213)
+│   │   ├── mk-review-2.02.md        # native-MK review record: 150 strings + 8 URLs + 6 slugs, verdicts + both sign-offs (2.02)
+│   │   └── mk-review-2.03.md        # native-MK review pack for the 63 new legal strings — UNSIGNED (2.03)
+│   └── legal/
+│       └── facts-audit-2.03.md      # every rendered claim traced; 2 findings; zero UNSOURCED (2.03)
 │
 ├── src/
 │   ├── _project-state/
@@ -139,6 +144,9 @@ Trajanov-V2/
 │   │       ├── page.tsx             # home → HomeExperience (countdown / LIVE) + Home→About link (1.05)
 │   │       ├── about/page.tsx       # STATIC — press story, facts.md §3/§4; setRequestLocale (1.05)
 │   │       ├── contact/page.tsx     # STATIC — phone/IG + email placeholder, no form/address (1.05)
+│   │       ├── terms/page.tsx         # STATIC — Terms of sale; Vladimir alone (D-2.03-1); no statute (2.03)
+│   │       ├── privacy/page.tsx       # STATIC — Privacy; fields match orders schema; no cookie banner (2.03)
+│   │       ├── shipping-returns/page.tsx  # STATIC — reuses ShippingNotice; 2 visible placeholders (2.03)
 │   │       ├── catalog/page.tsx     # drop grid
 │   │       ├── catalog/[slug]/page.tsx  # product page
 │   │       ├── cart/page.tsx        # cart at 2-unit cap
@@ -159,6 +167,7 @@ Trajanov-V2/
 │   │   ├── cart/                   # CartView, cart-store (sessionStorage useSyncExternalStore, 1.06)
 │   │   ├── checkout/               # CheckoutField, CheckoutForm, Turnstile (real widget, 1.04)
 │   │   ├── layout/                 # SiteHeader, SiteFooter, LanguageSwitch
+│   │   ├── legal/                  # LegalPage + LegalSection — shared shell for the 3 legal pages (2.03, D-2.03-3)
 │   │   ├── home/                   # HomeExperience (props-driven from server drop state, 1.04)
 │   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice, DevPreviewSwitch (1.04), ShippingNotice (MK-only shipping, 2.01)
 │   │
@@ -300,3 +309,4 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-19 | 2.01 (Code) | **Bilingual.** Added `src/lib/site.ts`, `src/lib/metadata.ts`, `src/components/system/ShippingNotice.tsx`, `scripts/i18n-inventory.ts`, `docs/i18n/string-inventory.md` (generated, committed), `tests/i18n/{catalog-parity,pathnames}.test.ts`, and `briefs/Part-2-Phase-01-Code.md`. Modified `src/i18n/routing.ts` (`pathnames`), `next.config.ts` (308 redirects), all 8 pages under `src/app/[locale]/` + `layout.tsx` (`generateMetadata` + product `ShippingNotice`), `src/lib/format.ts` (locale-aware), `src/messages/{mk,en}.json` (`Cart.decrease/increase`, `Common.shippingNotice`, `Meta` namespace), `src/components/{layout/LanguageSwitch,home/HomeExperience,product/ProductCard,cart/CartView,checkout/CheckoutForm}.tsx`, `package.json` (`i18n:inventory` script). **No `supabase/migrations/`, `src/config/`, `create_order`, `expire_reservations`, or test-of-record changed; `create_order`/`expire_reservations` untouched; no new dependency.** `D-2.01-1…12`. | Claude Code |
 | 2026-07-18 | 1.08 (Code) | **No new source files.** Modified `facts.md` §7 (real price 1199 MKD + sizes VERIFIED), `src/config/products.ts` (rehearsal now priced 1199 MKD; two verified colourways `test-mustard-ochre` S/M/L/XL + `test-off-white` XL-only; names still null), `src/config/drops.ts` (rehearsal comment), `Decisions.md` (`D-1.08-1/2/3`), `current-state.md`, `file-map.md`. Added root docs `Part-1-Phase-08-Operator-Runbook.md` + `completions/Part-1-Phase-08-Code-Completion.md`. **No `supabase/migrations/`, `src/app`, component, or test file changed; `create_order`/`expire_reservations` untouched; no new dependency.** Hosted verification used seed/test fixtures only, removed after (hosted left clean, TRJ-0001). `D-1.08-*`. | Claude Code |
 | 2026-07-19 | 2.02 (Code) | **Native MK review — clean pass, no source change.** Added `docs/i18n/mk-review-2.02.md` (review record) + `briefs/Part-2-Phase-02-Code.md` + `completions/Part-2-Phase-02-Completion.md`. Modified `src/i18n/routing.ts` (**comment only** — "provisional"→"confirmed", `pathnames` untouched), `Decisions.md` (`D-2.02-1/2/3`), `current-state.md`. **Zero fault found → `src/messages/{mk,en}.json` untouched; all six slugs Keep → `next.config.ts`, redirect table, `tests/i18n/` untouched.** `string-inventory.md` regenerated byte-identical (no commit). **No `supabase/migrations/`, `src/config/`, component, or test-of-record changed; `create_order`/`expire_reservations` untouched; no new dependency.** `D-2.02-*`. | Claude Code |
+| 2026-07-19 | 2.03 (Code) | **Legal pages + facts audit.** Added `src/app/[locale]/{terms,privacy,shipping-returns}/page.tsx` (all STATIC), `src/components/legal/LegalPage.tsx`, `docs/legal/facts-audit-2.03.md`, `docs/i18n/mk-review-2.03.md` (unsigned), `completions/Part-2-Phase-03-Completion.md`, `briefs/Part-2-Phase-03-Code.md`. Modified `src/i18n/routing.ts` (3 `pathnames` entries — **no** redirect change), `src/components/layout/SiteFooter.tsx` (3 links), `src/messages/{mk,en}.json` (**+63 keys**: `Terms`/`Privacy`/`ShippingReturns` + `Nav`/`Meta`/`Common.lastUpdated`/`Placeholder.courier/returnsWindow`), `facts.md` (§1 amend + change log), `tests/i18n/pathnames.test.ts` (legal-route assertions), `docs/i18n/string-inventory.md` (regen → 213), `Decisions.md` (`D-2.03-1…6`), `current-state.md`. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, or new dependency touched.** `D-2.03-*`. | Claude Code |

@@ -34,6 +34,24 @@ export function SiteFooter() {
             >
               {t('contact')}
             </Link>
+            <Link
+              href="/terms"
+              className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+            >
+              {t('terms')}
+            </Link>
+            <Link
+              href="/privacy"
+              className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+            >
+              {t('privacy')}
+            </Link>
+            <Link
+              href="/shipping-returns"
+              className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+            >
+              {t('shipping')}
+            </Link>
           </nav>
         </div>
         <div className="text-muted-foreground flex flex-col gap-1 text-small sm:items-end">
