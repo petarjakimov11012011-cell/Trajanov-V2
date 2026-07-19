@@ -80,3 +80,27 @@ describe("pathname coverage — routing.pathnames ⇔ src/app/[locale]", () => {
     }
   });
 });
+
+// The three legal routes added in 2.03 (D-2.03, Task 9). Asserted by name and exact slug so a
+// regression that drops one, or mistranslates a MK slug, fails the gate instead of shipping a dead
+// customer link once the real domain is live. Kept in lockstep with routing.pathnames.
+describe("legal routes (2.03) — /terms, /privacy, /shipping-returns in both locales", () => {
+  const expected: Record<string, {mk: string; en: string}> = {
+    "/terms": {mk: "/uslovi", en: "/terms"},
+    "/privacy": {mk: "/privatnost", en: "/privacy"},
+    "/shipping-returns": {mk: "/isporaka-i-vrakjanje", en: "/shipping-returns"},
+  };
+
+  for (const [route, slugs] of Object.entries(expected)) {
+    it(`${route} maps to its localised slug in mk and en`, () => {
+      const entry = pathnames[route];
+      expect(entry, `${route} missing from routing.pathnames`).toBeDefined();
+      expect(slugFor(entry, "mk"), `${route} @ mk`).toBe(slugs.mk);
+      expect(slugFor(entry, "en"), `${route} @ en`).toBe(slugs.en);
+    });
+
+    it(`${route} has a real route folder under src/app/[locale]`, () => {
+      expect(routes, `no page folder for ${route}`).toContain(route);
+    });
+  }
+});

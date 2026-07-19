@@ -5,6 +5,9 @@
     "cart": "Cart",
     "about": "About",
     "contact": "Contact",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "shipping": "Shipping & returns",
     "location": "Strumica, North Macedonia",
     "brand": "TRAJANOV"
   },
@@ -38,6 +41,63 @@
     "instagramNote": "Drops are announced here. This is the main channel.",
     "emailLabel": "Email",
     "context": "Strumica, North Macedonia · Ships within North Macedonia only · Cash on delivery."
+  },
+  "Terms": {
+    "eyebrow": "Legal",
+    "h1": "Terms of sale",
+    "intro": "This is a small brand with no company behind it. Here's exactly how ordering works — no fine print.",
+    "sellerHeading": "Who you buy from",
+    "sellerBody": "Trajanov is run by Vladimir Trajanov, in Strumica, North Macedonia. There is no registered company and no shop with an address. One person stands behind the brand.",
+    "contactHeading": "How to reach us",
+    "contactBody": "The fastest way to reach us is by phone or on Instagram.",
+    "paymentHeading": "Payment",
+    "paymentBody": "You pay cash on delivery, when the parcel arrives. No cards, no bank transfer, no paying in advance.",
+    "shippingHeading": "Where we ship",
+    "shippingBody": "We ship inside North Macedonia only. No delivery abroad.",
+    "orderingHeading": "How ordering works",
+    "orderingBody1": "When you order, the stock is reserved for 48 hours — not sold on the spot. We call you to confirm. If we can't reach you, the reservation lapses and the piece goes back on sale.",
+    "orderingBody2": "Maximum 2 items per order. Drops are limited and the stock is real — when it's gone, it's gone.",
+    "pricesHeading": "Prices",
+    "pricesBody": "Prices are in Macedonian denars (MKD) and shown on the product page. That is the amount you pay the courier. There is no conversion to any other currency.",
+    "noHeading": "What we don't do",
+    "noBody": "No accounts, no saved cards, no subscriptions, no discount codes."
+  },
+  "Privacy": {
+    "eyebrow": "Legal",
+    "h1": "Privacy",
+    "intro": "We collect only what we need to get the shirt to you. Nothing more.",
+    "collectHeading": "What we collect when you order",
+    "collectBody": "Name, phone number, city, address, and your note if you leave one. That's everything. We don't collect your email — there is no email field.",
+    "whyHeading": "Why",
+    "whyBody": "To deliver the shirt and to call you to confirm the order. That is the only use.",
+    "whoHeading": "Who sees it",
+    "whoBody": "Vladimir, and the courier who delivers to you. The order details are emailed to Vladimir so he can call you.",
+    "storageHeading": "Where it's stored",
+    "storageBody": "In a database hosted in Frankfurt, Germany.",
+    "abuseHeading": "Anti-abuse",
+    "abuseBody": "Because ordering is free, we store a one-way hashed form of your IP address to limit how many orders come from one connection. The raw IP is never stored.",
+    "browserHeading": "In your browser",
+    "browserBody": "The cart lives in sessionStorage and disappears when you close the tab. No advertising cookies, no tracking pixels, no analytics cookies, no social pixels.",
+    "deleteHeading": "How to delete your data",
+    "deleteBody": "Call us and we'll delete them. No form, no portal — just the phone number.",
+    "responsibleHeading": "Who is responsible",
+    "responsibleBody": "Vladimir Trajanov, Strumica, North Macedonia."
+  },
+  "ShippingReturns": {
+    "eyebrow": "Legal",
+    "h1": "Shipping & returns",
+    "intro": "Where we ship, how you pay, and what to do if something's wrong.",
+    "whereHeading": "Where we ship",
+    "paymentHeading": "Payment on delivery",
+    "paymentBody": "You pay the courier in cash when the parcel arrives.",
+    "deliveryHeading": "Courier, delivery time and cost",
+    "deliveryBody": "We don't have these confirmed yet. We won't guess, because you pay cash at the door.",
+    "problemHeading": "If something is wrong with your order",
+    "problemBody": "Wrong size sent, damaged packaging, or the parcel never arrived — call the phone number and Vladimir will sort it out directly.",
+    "limitsHeading": "What we can't do yet",
+    "limitsBody": "There is no online returns portal and no prepaid return label. If you need to return something, it goes through the phone.",
+    "returnsHeading": "Returns and exchange window",
+    "returnsBody": "We don't have the exact window confirmed yet."
   },
   "Drop": {
     "days": "DAYS",
@@ -137,7 +197,8 @@
     "languageMk": "МК",
     "languageEn": "EN",
     "switchLanguage": "Change language",
-    "shippingNotice": "We ship inside North Macedonia only. We can't deliver outside the country. Cash on delivery."
+    "shippingNotice": "We ship inside North Macedonia only. We can't deliver outside the country. Cash on delivery.",
+    "lastUpdated": "Last updated"
   },
   "Placeholder": {
     "productPhoto": "[PLACEHOLDER: product photo — Vladimir]",
@@ -146,6 +207,8 @@
     "sizesSample": "sizes — sample, pending Vladimir",
     "composition": "[PLACEHOLDER: composition & care — from the label]",
     "email": "[PLACEHOLDER: email — Vladimir]",
+    "courier": "[PLACEHOLDER: courier, delivery time and delivery cost — Vladimir]",
+    "returnsWindow": "[PLACEHOLDER: returns and exchange window — Vladimir]",
     "notice": "Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase."
   },
   "Styleguide": {
@@ -178,6 +241,12 @@
     "aboutDescription": "One brand, one designer from Strumica. The story behind Trajanov.",
     "contactTitle": "Contact — Trajanov",
     "contactDescription": "Get in touch: phone and Instagram. Strumica, North Macedonia.",
+    "termsTitle": "Terms of sale — Trajanov",
+    "termsDescription": "How ordering works: cash on delivery, shipping within North Macedonia only, 48-hour reservation.",
+    "privacyTitle": "Privacy — Trajanov",
+    "privacyDescription": "What we collect when you order, and why. Just name, phone, city and address — no email, no advertising cookies.",
+    "shippingTitle": "Shipping & returns — Trajanov",
+    "shippingDescription": "Shipping within North Macedonia only, cash on delivery. If something is wrong, call us.",
     "styleguideTitle": "Design system — Trajanov",
     "styleguideDescription": "Internal design-system reference."
   }

@@ -1,4 +1,4 @@
-NEXT: 2.03 — Legal + facts audit (hand-write Terms · Privacy · Shipping & Returns; full `facts.md` audit — every rendered claim traced to a VERIFIED entry). **Blocked on legal responsibility confirmed with Vladimir's parents (`facts.md` §1) — a cutover blocker, owner Vladimir.** **Phase 2.02 — Native MK review — COMPLETE (2026-07-19, branch `phase-2.02-mk-review`).** Two native Macedonian speakers (Lazar + Petar) read all **150** MK strings and all **8** URLs in both locales against `docs/i18n/string-inventory.md`, plus the six MK route slugs — verdict a **clean pass: every string OK (no spelling/grammar/agreement/terminology fault, no English-in-MK leak, no style change) and all six slugs confirmed Keep** (`/katalog`·`/katalog/[slug]`·`/kosnicka`·`/naracka`·`/za-nas`·`/kontakt`; Latin transliteration + shared product slug both stand, `D-2.02-3`). Working record in `docs/i18n/mk-review-2.02.md` (both sign-offs filled; the two reviewed jointly, Code transcribed the verdicts, `D-2.02-2`). **No fault → `src/messages/{mk,en}.json` untouched (Task 3 a no-op); all six Keep → `next.config.ts`, redirect table, `pathnames`, and `tests/i18n/` unchanged** — the only code change is the `routing.ts` comment flipping "provisional"→"confirmed"; "provisional" language removed from `routing.ts` + this file. **63 tests pass** incl. the 10-vs-3 oversell gate; build/lint/tsc clean; parity driven **RED→GREEN**; `npm run i18n:inventory` regenerated `string-inventory.md` **byte-identical**. **No `supabase/migrations/`, `create_order`, `expire_reservations`, hosted DB, or npm dependency touched.** Owed-verification register **stays EMPTY**; placeholder register **unchanged**. Recommended-but-not-blocking operator housekeeping (L1–L4, L7) is still open — see `Part-1-Phase-08-Operator-Runbook.md`.
+NEXT: 2.04 — Perf, a11y, SEO (Lighthouse, schema.org, sitemap, robots, OG images — none of which 2.03 touched). **Phase 2.03 — Legal + facts audit — COMPLETE (2026-07-19, branch `phase-2.03-legal-facts`).** Three **static** legal pages shipped both locales — Terms (`/uslovi`·`/en/terms`), Privacy (`/privatnost`·`/en/privacy`), Shipping & Returns (`/isporaka-i-vrakjanje`·`/en/shipping-returns`) — built from the `/about`+`/contact` editorial pattern via a shared `LegalPage` shell, all `●` SSG. Responsible party is **Vladimir Trajanov, Струмица, alone** (`D-2.03-1`, Lazar's call) — **no parent named anywhere in the diff**; **no statute/article/withdrawal period cited** (Decision 5); **no cookie banner** (Decision 4); the email **stays unpublished**. Privacy's collected-field list matches the real `orders` columns (`20260715021215_schema.sql`: name/phone/city/address/note — **no email**); the IP line matches `src/lib/rate-limit/hash.ts` (one-way hash, raw IP never stored). Courier/delivery-cost and returns-window ship as **visible `[PLACEHOLDER: …]`** (register #6, #7 — owner Vladimir), not guesses. **Full `facts.md` audit** committed at `docs/legal/facts-audit-2.03.md` — every rendered claim traced; **2 findings** (F-1 the `facts.md` §1 responsible-party contradiction, resolved by the §1 amendment; F-2 the cart's "calculated on delivery", surfaced not reworded, `D-2.03-6`); **zero UNSOURCED remain**; §10 clean (`grep`-checked). `facts.md` §1 amended (both the displayed party and the intake fact kept; open parental-confirmation flag intact). **63→213 message keys** (63 new, MK+EN identical); humanizer pass run; `docs/i18n/mk-review-2.03.md` committed **unsigned**; `string-inventory.md` regenerated (213) + committed. **69 tests pass** (63 + 6 new legal-route pathname assertions) incl. the 10-vs-3 oversell gate; build/lint/tsc clean; parity driven **RED→GREEN**. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, hosted DB, or npm dependency touched.** **Owed-verification register is NO LONGER EMPTY** — 2.03 added **two rows** (#9 no human legal review; #10 MK legal copy unreviewed) — both verify by 2.05 cutover. Placeholder register **+2** (#6, #7). PR open, awaiting Lazar's review + merge (`D-0-3`, no self-merge). Recommended operator housekeeping (L1–L4, L7) still open.
 
 # Current state — Trajanov-V2
 
@@ -6,13 +6,42 @@ NEXT: 2.03 — Legal + facts audit (hand-write Terms · Privacy · Shipping & Re
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-19** · By: **Claude Code (Phase 2.02 — Native MK review, Code)**
+Last updated: **2026-07-19** · By: **Claude Code (Phase 2.03 — Legal + facts audit, Code)**
 
 ---
 
 ## Status
 
-**2.02 COMPLETE — the native MK review passed clean (this update, 2026-07-19).** Two native Macedonian
+**2.03 COMPLETE — the store has honest legal pages and every rendered claim is now audited (this
+update, 2026-07-19).** Three **static** pages joined the site in both locales, built from the same
+editorial pattern as `/about`+`/contact` through a shared `src/components/legal/LegalPage.tsx` shell:
+**Terms** (`/uslovi` · `/en/terms`), **Privacy** (`/privatnost` · `/en/privacy`), and **Shipping &
+Returns** (`/isporaka-i-vrakjanje` · `/en/shipping-returns`) — all prerendered `●` SSG per locale, no
+`force-dynamic`. Every line is written to a source: `facts.md §1/§7`, shipped code (the 48h reservation,
+the 2-per-order cap, COD, the one-way IP hash, the `orders`-column field list, the notification email),
+or a logged decision. **No statute, article, directive, or statutory withdrawal period is cited**
+(Decision 5); **no cookie banner** was added (Decision 4); the **email is not published** on any page
+(register #5 intact). The responsible party displayed on Terms + Privacy is **Vladimir Trajanov,
+Струмица, alone** (`D-2.03-1`, Lazar's call) — **no parent or guardian name appears anywhere in the
+diff.** Delivery cost/time and the returns/exchange window ship as **visible `[PLACEHOLDER: …]`** markers
+(register #6, #7 — owner Vladimir), never estimated. The **full `facts.md` audit** is committed at
+`docs/legal/facts-audit-2.03.md`: every rendered claim traced, **2 findings surfaced** (F-1 the §1
+responsible-party contradiction — resolved by amending §1; F-2 the cart's "calculated on delivery" —
+surfaced, not reworded, `D-2.03-6`), **zero UNSOURCED rows remain**, and the §10 "do-NOT-have" list
+(reviews, counts, partners, team, second location) `grep`-confirmed **absent**. `facts.md` §1 amended so
+the file and the site agree (displayed party + intake fact both kept; the open parental-confirmation flag
+**unchanged**). Message catalogs grew **150 → 213 keys** (63 new, MK+EN identical, no empty value); a
+`humanizer` pass ran over every new string; `docs/i18n/mk-review-2.03.md` is committed **unsigned** for
+the native review; `docs/i18n/string-inventory.md` regenerated (213) and committed. **69 tests pass** (63
++ 6 new legal-route pathname assertions) incl. the **10-vs-3 oversell gate**; build/lint/tsc clean;
+parity driven **RED→GREEN**. **Nothing touched** in `supabase/migrations/`, `create_order`,
+`expire_reservations`, the cart, `src/config/`, the hosted DB, or dependencies. All three pages rendered
+in-browser at 390px + 1180px in both locales (Cyrillic native, placeholders visible, footer links resolve
+to the localised slugs). **The owed-verification register is NO LONGER EMPTY** — 2.03 added rows **#9**
+(no human legal review) and **#10** (MK legal copy unreviewed), both owner-verifiable by the 2.05 cutover.
+Branch `phase-2.03-legal-facts`; PR open, **not self-merged** (`D-0-3`).
+
+**2.02 COMPLETE — the native MK review passed clean (2026-07-19).** Two native Macedonian
 speakers, Lazar and Petar, read all **150** MK strings and all **8** URLs in both locales against
 `docs/i18n/string-inventory.md`, plus the six MK route slugs. Verdict: **every string OK — no
 spelling / grammar / agreement / terminology fault, no English-in-MK leak, and no style change — and all six
@@ -222,9 +251,9 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 2 of 2 — Launch prep |
-| Phase | **2.02 complete — Native MK review** (two native speakers read all 150 MK strings + 8 URLs + the 6 MK slugs; **clean pass** — every string OK, all six slugs confirmed Keep; review record + sign-offs committed, no source string changed). Next: **2.03** (Legal + facts audit) |
-| Branch | `phase-2.02-mk-review` → PR **[#11](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/11)** to `main`, **open** (2026-07-19), awaiting Lazar's merge (`D-0-3`, no self-merge). Prior: `phase-2.01-bilingual` → PR `#10`, merged `a39cada` |
-| Open PR | **`#11` OPEN** — `phase-2.02-mk-review` → `main` (2026-07-19), for **Lazar** to review + merge (`D-0-3`; Code never self-merges). Prior: 1.01–1.07 `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; 2.01 `#10` (all merged) |
+| Phase | **2.03 complete — Legal + facts audit** (three static legal pages both locales via a shared `LegalPage` shell; full `facts.md` audit, 2 findings, zero UNSOURCED; §1 amended; 63 new MK+EN keys; MK review pack unsigned). Next: **2.04** (Perf, a11y, SEO) |
+| Branch | `phase-2.03-legal-facts` → PR **#12** to `main`, **open** (2026-07-19), awaiting Lazar's review + merge (`D-0-3`, no self-merge). Prior: `phase-2.02-mk-review` → PR `#11`, merged `6afae55` |
+| Open PR | **`#12` OPEN** — `phase-2.03-legal-facts` → `main` (2026-07-19), for **Lazar** to review + merge (`D-0-3`; Code never self-merges). Prior: 1.01–1.07 `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; 2.01 `#10`; 2.02 `#11` (all merged) |
 | Deployed | **YES — https://trajanov-v2.vercel.app**, production. **2.01 merged (`#10`) is LIVE and smoke-verified by Code (2026-07-19):** old `/catalog` **308→`/katalog`**, MK `/katalog` **200**, `/en/catalog` **200**, home `<html lang="mk">` + `canonical` + `hrefLang` mk/en/x-default all present. `D-1.03-5`/`D-1.06-4` closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
@@ -240,6 +269,54 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### Legal pages + facts audit (2.03) — three honest pages, every claim traced
+
+- **Three static legal pages**, both locales, all `●` SSG (`setRequestLocale`, no `force-dynamic`):
+  `src/app/[locale]/terms/page.tsx` (`/uslovi` · `/en/terms`), `privacy/page.tsx` (`/privatnost` ·
+  `/en/privacy`), `shipping-returns/page.tsx` (`/isporaka-i-vrakjanje` · `/en/shipping-returns`). Built
+  from the `/about`+`/contact` editorial pattern through a **shared shell** `src/components/legal/LegalPage.tsx`
+  (`LegalPage` + `LegalSection`, `D-2.03-3`); brand.md tokens only. Each carries a per-locale `Meta`
+  title/description + `localeAlternates` (canonical + reciprocal hreflang) and a fixed, per-locale-formatted
+  **last-updated date** (`Common.lastUpdated` + a `LAST_UPDATED` constant, `D-2.03-4`).
+- **Terms** — who you buy from (**Vladimir Trajanov, Струмица, alone** — `D-2.03-1`; no company, no
+  address), reach us (phone + IG from `social.ts`, email unpublished), COD-only, NMK-only, the 48h
+  reservation + 2-per-order + call-to-confirm flow, MKD prices/no conversion, and "what we don't do".
+- **Privacy** — collected fields **matched to the real `orders` columns** in
+  `supabase/migrations/20260715021215_schema.sql` (name/phone/city/address/note, **no email** — `D-Z.01-1`);
+  why/who (notification email to Vladimir, `D-Z.01-5`); Frankfurt storage; the **one-way IP hash, raw IP
+  never stored** (`src/lib/rate-limit/hash.ts`); `sessionStorage` cart + **no advertising/tracking/analytics/
+  social cookies** (no consent banner — Decision 4); deletion by phone; responsible party Vladimir alone.
+- **Shipping & Returns** — reuses the shared `ShippingNotice` (`Common.shippingNotice`, §7); pay-courier-on-
+  arrival; **two visible `[PLACEHOLDER: …]`** (courier/time/cost, returns window — register #6/#7, owner
+  Vladimir), never estimated; "call the phone, Vladimir sorts it" and a plain statement that there is no
+  online returns portal / prepaid label. **No statutory withdrawal period cited** (Decision 5).
+- **Facts audit** `docs/legal/facts-audit-2.03.md` — Part A walks all 150 pre-2.03 keys + rendered
+  constants; Part B the 63 new keys. Status per row (VERIFIED `facts.md` / VERIFIED code / PLACEHOLDER /
+  NOT A CLAIM / UNSOURCED). **2 findings:** F-1 (`facts.md` §1 responsible-party contradiction → resolved
+  by the §1 amendment) and F-2 (cart "calculated on delivery" → surfaced, not reworded, `D-2.03-6`).
+  **Zero UNSOURCED remain.** §10 "do-NOT-have" list `grep`-confirmed absent (EAM appears only as the
+  competition organiser/prize factory on About).
+- **`facts.md` §1 amended** so file and site agree (displayed party = Vladimir alone `D-2.03-1`; intake
+  fact kept; **open parental-confirmation flag unchanged**); dated change-log row added.
+- **Strings**: `Terms`/`Privacy`/`ShippingReturns` namespaces + `Nav.terms/privacy/shipping` + 6 `Meta`
+  + `Common.lastUpdated` + `Placeholder.courier`/`returnsWindow` — **63 new, MK+EN key sets identical
+  (150 → 213)**, no empty value. `humanizer` pass run (cut a stiff "Here is exactly" and a self-praising
+  "Short and honest:" opener; the "no X, no Y, no Z" negations match the established voice and stayed).
+  `docs/i18n/string-inventory.md` regenerated (213) + committed; `docs/i18n/mk-review-2.03.md` committed
+  **unsigned** (63-row table + 3-slug question + two sign-off blocks).
+- **Routing**: three `pathnames` entries (MK Latin transliteration, `D-2.01-1`); **no 308 redirects**
+  (new paths, nothing to redirect from); lockstep comment updated. Footer links all three (locale-aware
+  `Link`, `Nav.*` keys). `tests/i18n/pathnames.test.ts` gained explicit both-locale assertions for the
+  three routes.
+- **Gates**: `npm run build` / `npx tsc --noEmit` / `npm run lint` clean; `npm test` **69/69** incl.
+  `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected with insufficient_stock,
+  stock 0`; parity driven **RED** (`Terms.sellerHeading` removed from `en.json`) **→ GREEN**. Rendered
+  in-browser at 390px + 1180px, both locales. **No `supabase/migrations/`, `create_order`,
+  `expire_reservations`, cart, `src/config/`, hosted DB, or npm dependency touched.**
+- **Decisions:** `D-2.03-1` (responsible party — Lazar), `D-2.03-2` (audit treats operational claims as
+  code-VERIFIED), `D-2.03-3` (shared `LegalPage` shell), `D-2.03-4` (fixed last-updated date), `D-2.03-5`
+  (placeholders in the `Placeholder` namespace), `D-2.03-6` (cart F-2 surfaced, not reworded).
 
 ### Native MK review (2.02) — clean pass, no source change
 
@@ -536,6 +613,8 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | ~~6~~ | **"Automatically expose new tables"** — **CLEARED — 1.08 operator (2026-07-18).** Lazar turned the toggle **OFF** on `kmuocwmevyyuhcvwoebf`. **Standing caveat (not a debt):** turning it off does **not** retroactively revoke, so any future migration that adds a table (e.g. `Y.01`'s photo/fabric work) must still pair it with an explicit `REVOKE` — carry this into that migration's DoD (`D-1.07-3/14`). | 1.07 | **CLEARED — Lazar (dashboard)** |
 | ~~7~~ | **A real order sends a notification email that arrives in Vladimir's inbox** — **CLEARED — 1.08 operator (2026-07-18).** The Z.01 email prereqs were set up (Resend account under Vladimir's email + `RESEND_API_KEY`/`ORDER_NOTIFICATION_EMAIL` in Vercel, redeployed), the rehearsal drop was opened, and **a real order (`TRJ-0001`) was placed end to end on a phone.** The MK notification **arrived in Vladimir's inbox** from `onboarding@resend.dev` — subject "Нова нарачка TRJ-0001 — Trajanov", listing the ordered line (`test-mustard-ochre — величина L — 1 бр.`), the full customer block (name/phone/city/address/notes), and the COD + call-to-confirm + "Supabase is the record" lines. DB side confirmed: order row, atomic decrement (3→2), 48h reservation. Order + reservation then deleted; hosted returned clean (`D-1.08-4`). | Z.01 | **CLEARED — 1.08 operator (real order + email)** |
 | ~~8~~ | **Branded from-address on `trajanov.com`.** The sender is `onboarding@resend.dev` until the domain is bought + verified (`D-Z.01-2`). **RECLASSIFIED to the 2.05 cutover track (`D-1.08-2`)** — removed from this register's zero-condition, since #8 cannot be cleared without the (unbought) domain and leaving it here would make 1.08's "register to zero" impossible. | Z.01 → | **2.05** (domain purchase + verification) |
+| 9 | **The legal pages have had no human legal review.** Terms, Privacy, and Shipping & Returns were written in-house by Code from `facts.md` and shipped code; **no lawyer has read them**, and the responsible party named is a **minor, alone** (`D-2.03-1`). No statute is cited and nothing legally binding is asserted beyond what the store operationally does — but no professional has confirmed these pages are adequate for a cash-on-delivery consumer contract. Owner: **Lazar + Vladimir**. | 2.03 | **2.05 cutover** |
+| 10 | **New MK legal copy is unreviewed by a native speaker.** The 63 new `Terms` / `Privacy` / `ShippingReturns` (+ `Nav`/`Meta`/`Placeholder`) MK strings are machine-written and have **not** been read by a native Macedonian speaker — legal copy is the worst place for a machine-translation error. Review pack ready and **unsigned** at `docs/i18n/mk-review-2.03.md` (63-row table + slug question for the 3 new slugs + two sign-off blocks). Owner: **Lazar + Petar**. | 2.03 | **before 2.05 cutover** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
@@ -574,7 +653,14 @@ clean); the **design sign-off**, **IG click-test**, and **auto-expose toggle OFF
 hosted `test-drop` is left **ended** and carrying the two real-priced colourways (`test-mustard-ochre`
 S/M/L/XL, `test-off-white` XL-only, 1199 MKD, stock 3) — matching the committed config, nothing buyable.*
 
-*After **1.08 (Code + operator, 2026-07-18) the register's zero-condition is MET — the register is EMPTY.**
+***2.03 update (2026-07-19): the register is NO LONGER EMPTY.*** Phase 2.03 added rows **#9** (the legal
+pages have had no human legal review) and **#10** (the new MK legal copy is unreviewed by a native
+speaker). Neither is a build blocker; **both are 2.05-cutover blockers**, owned jointly by Lazar +
+Vladimir (#9) and Lazar + Petar (#10). This is expected — the phase brief said this register "is why it
+stops being empty." The 1.08 note below stands as the historical record of how the **Part 2 hard gate**
+(register-to-zero before Part 2) was met; that gate is unaffected — it fired before 2.01 and passed.
+
+*After **1.08 (Code + operator, 2026-07-18) the register's zero-condition was MET — the register was EMPTY.**
 Cleared/moved this session: **#5 CLEARED** (Code — real-secret Siteverify enforcement); **#1** design sign-off,
 **#2** IG click-test, **#6** auto-expose toggle OFF, and **#7** real-order-delivers-email-to-Vladimir's-inbox
 all **CLEARED by the operator** (`D-1.08-4`, evidence in each row above); **#8 RECLASSIFIED to the 2.05 cutover
@@ -603,6 +689,11 @@ zero-condition.*
 Every visible `[PLACEHOLDER: …]` on the site. **Must be empty before cutover (2.05). Launch
 blocker.**
 
+*2.03 update (2026-07-19): **+2 rows** — #6 (courier / delivery time / delivery cost) and #7
+(returns/exchange window), both on the new Shipping & Returns page, owner Vladimir. 2.03 **cleared,
+reworded, or hid no existing placeholder** (#2–#5 are byte-for-byte unchanged); it added two honest
+`[PLACEHOLDER: …]` markers rather than guessing a delivery cost or a returns window.*
+
 *2.01 shipped **no new placeholder** and **cleared/reworded/hid none** — the existing rows below are
 unchanged. The placeholder strings themselves (`Placeholder.*`) were already in the catalogs; 2.01 only
 confirmed they are translated in both locales.*
@@ -614,6 +705,8 @@ confirmed they are translated in both locales.*
 | 3 | `[PLACEHOLDER: состав и нега — од етикетата]` (fabric/care) | Product | Composition from the labels | Vladimir |
 | 4 | Product **names** render as neutral slots ("Производ 01…") — **NARROWED to names-only 2026-07-18**: sizes are now **real** (S/M/L/XL, off-white XL-only, VERIFIED `facts.md` §7), no longer a flagged sample. Per-size **measurements** (cm/fit chart) are still owed. | Catalog, Product | Real product **names** + a size-**measurement** chart | Vladimir |
 | 5 | `[PLACEHOLDER: е-пошта — Владимир]` (contact email) | **Contact** (1.05) — live at `https://trajanov-v2.vercel.app/contact` | **The email now EXISTS (VERIFIED 2026-07-18) and is wired as the Z.01 notification recipient — but it is DELIBERATELY NOT published on Contact yet** (`D-Z.01-3`): showing a minor's personal email to a 12+ audience + scrapers awaits Vladimir's explicit sign-off. So this placeholder **stays** — no longer "waiting on the email to exist", now waiting on **Vladimir's OK to display it publicly** | Vladimir (sign-off) |
+| 6 | `[PLACEHOLDER: курир, време и цена на испорака — Владимир]` (courier, delivery time + delivery cost) | **Shipping & Returns** (`/isporaka-i-vrakjanje`, `/en/shipping-returns`) — live after 2.03 deploys | Courier + delivery time + delivery **cost** — none in `facts.md`. Deliberately **not** estimated: on cash-on-delivery a wrong delivery cost is money asked for at the door on a promise nobody made (`D-2.03` Task 5) | Vladimir |
+| 7 | `[PLACEHOLDER: рок за враќање и замена — Владимир]` (returns/exchange window) | **Shipping & Returns** | The returns/exchange **window** — not in `facts.md`; **no statutory withdrawal period is cited** (Decision 5). A real number comes from Vladimir | Vladimir |
 
 *#5 (email) is a pure UI placeholder via `<Placeholder>` (`Placeholder.email` key), shipped by 1.05
 (`D-1.05-3`). **Z.01 has shipped**, so this row no longer gates anything on the build side — the email
@@ -670,7 +763,7 @@ no placeholder (`D-1.05-5`).*
 | 1 | **Vercel Hobby ToS violation.** Commercial use prohibited; Vercel may pull the deployment without notice, explicitly including during traffic spikes — i.e. drop day. Accepted by Lazar. **Now materially live: 1.07 actually deployed the store to Hobby.** | `D-0-2` | Live. Mitigations: portability rule (**re-verified 1.07: nothing Vercel-specific added; no Postgres/Blob/KV; the only Vercel artifacts are the gitignored `.vercel/` link dir**), pre-written Pro migration (X.01), 2.06 contingency. |
 | 2 | **No automated PR review.** House review gate waived for this project. Risk concentrated on 1.03/1.04 concurrency code. | `D-0-3` | Live. Mitigations: cross-review, fresh-session review on 1.03/1.04, concurrent-order test. |
 | 3 | **Public repo.** One committed secret is scraped before you notice. | `D-0-1` | Live. Mitigation: hard rule in `CLAUDE.md`. Rotate, never just delete. |
-| 4 | **Legal responsibility unconfirmed.** Minor, no registered entity, collecting consumer PII. | `facts.md` § 1 | **Cutover blocker.** Owner: Vladimir + parents. |
+| 4 | **Legal responsibility unconfirmed.** Minor, no registered entity, collecting consumer PII. 2.03 shipped Terms + Privacy naming **Vladimir alone** (`D-2.03-1`) and the pages have had **no legal review** (owed #9) — the underlying legal exposure is unchanged and still owed. | `facts.md` § 1 · `D-2.03-1` | **Cutover blocker.** Owner: Vladimir + parents. |
 | 5 | **Product photos do not exist.** | `D-0-6` | **Blocks 1.06.** Owner: Vladimir. Critical path. |
 | 6 | **Bar photos: model + venue permission unconfirmed**, and age-appropriateness of an alcohol backdrop for a 12+ audience is an open owner call. | `facts.md` § 8 | **No longer blocks 1.05** — `D-1.05-4` shipped Home + About with **no photo and no photo slot**. Still blocks any future photo hero / lifestyle imagery. Owner: Vladimir. |
 | 7 | **A paused free-tier Supabase project silently pauses pg_cron.** Free projects pause after ~7 quiet days — and this store is quiet between drops **by design**. Paused cron means `expire_reservations` stops running, so lapsed 48h holds never return their stock: **the shirt is sold to nobody, forever.** Moved here from register #4 (it is a standing risk, not a verification debt — the schedule itself is proven live on hosted). | `D-1.04-2/3` · register #4 · `D-1.07-4` | **Live and unmitigated.** No uptime monitor exists (owed: L7). Real fix is Supabase Pro ($25/mo) — a decision and a phase, never a silent upgrade. |
@@ -690,11 +783,11 @@ Canonical table with gates: `Trajanov-V2-Plan.md` § 13. Status only:
 | Vladimir's email | Lazar → Vladimir | **DONE (2026-07-18).** Address VERIFIED (`facts.md` §5); Z.01 code shipped against it; the operator prereqs are now **live** (Resend account under Vladimir's email + `RESEND_API_KEY`/`ORDER_NOTIFICATION_EMAIL` in Vercel, redeployed) and a real order (`TRJ-0001`) **delivered the MK notification to his inbox** (register #7 cleared, `D-1.08-4`). Still **not** published on Contact (`D-Z.01-3`, placeholder #5). |
 | Real prices (MKD) | Vladimir | **This drop: 1199 MKD VERIFIED (2026-07-18)** — recorded in `facts.md` §7 + `src/config/products.ts`. Each future drop still needs its own price. |
 | Sizes + fabric (read the labels) | Vladimir | **Sizes VERIFIED (2026-07-18):** S/M/L/XL, off-white XL-only (`facts.md` §7). **Still owed:** fabric/composition/care (from the labels) + a per-size measurement chart. |
-| Legal responsibility w/ parents | Vladimir | Not started |
+| Legal responsibility w/ parents | Vladimir | **Still owed (cutover blocker).** 2.03 shipped Terms + Privacy naming **Vladimir Trajanov, Струмица, alone** as the responsible party (`D-2.03-1`, Lazar's call), with the `facts.md` §1 open flag kept — but no parent has confirmed legal responsibility and **no lawyer has read the pages** (new owed-verification row #9). |
 | Model + venue permission | Vladimir | Not started |
 | Verify press links | Lazar | **Done** — all 5 fetched, read, VERIFIED 2026-07-15 (`facts.md` §4); cited on About (`D-1.05-5`) |
 | First drop date + products | Vladimir | Not started |
-| MK copy review | Lazar + Petar | **DONE — Phase 2.02 (2026-07-19).** Both native speakers read all 150 MK strings + 8 URLs + the 6 slugs against `docs/i18n/string-inventory.md`; **clean pass** — every string OK, all six slugs confirmed **Keep** (`D-2.02-3`). Record + both sign-offs in `docs/i18n/mk-review-2.02.md`. |
+| MK copy review | Lazar + Petar | **150 strings DONE (2.02); +63 new legal strings OWED (2.03).** 2.02 was a clean pass on the original 150 (`docs/i18n/mk-review-2.02.md`, both signed). 2.03 added 63 new MK strings (Terms/Privacy/ShippingReturns + Nav/Meta/Placeholder) that **no native speaker has read** — pack **unsigned** at `docs/i18n/mk-review-2.03.md` (owed-verification row #10), verifies before 2.05 cutover. |
 
 ---
 

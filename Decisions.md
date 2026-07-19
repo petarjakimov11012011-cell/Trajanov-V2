@@ -1984,3 +1984,116 @@ start at `D-2.01-6`.*
   carried.
 - **Links:** `src/i18n/routing.ts` · `next.config.ts` · `docs/i18n/mk-review-2.02.md` (Section 3) ·
   `D-2.01-1` · `D-2.01-2` · `D-2.01-5`.
+
+### D-2.03-1 · 2026-07-19 · Responsible party displayed on the site is Vladimir Trajanov, alone — no parent named
+- **Status:** Accepted
+- **Decided by:** **Lazar** (orchestrator, with Vladimir). Recorded by Claude Code.
+- **Decision:** The Terms and Privacy pages name **Vladimir Trajanov, Струмица, Северна Македонија** as
+  the responsible party for the cash-on-delivery consumer contract and for customer personal data. **No
+  parent or guardian name appears anywhere on the site.** The line ships as real, complete copy — not a
+  `[PLACEHOLDER]`. `facts.md` §1 is amended so the file and the site agree: the row now records the
+  *displayed* party (Vladimir alone) beside the unchanged VERIFIED intake fact (Vladimir and his
+  parents), and the §1 open flag (confirm legal responsibility with the parents before cutover) stays.
+- **Alternative rejected:** (a) name a parent as the responsible party; (b) name Vladimir "represented
+  by his parent/guardian [name]"; (c) ship the line as a `[PLACEHOLDER]` until the parents confirm.
+- **Downside accepted, stated plainly:** Vladimir is a secondary-school student and there is no
+  registered legal entity, so the site names a **minor, alone**, as the party responsible for a
+  cash-on-delivery consumer contract and for customer PII. If a customer disputes an order, no adult is
+  named anywhere on the site. **Nobody on this project is a lawyer,** and no lawyer has read these pages
+  (new owed-verification row). This was Lazar's call, made with the tradeoff stated.
+- **Reason:** Naming a parent without their confirmed consent would itself be an unverified claim about a
+  real person; the honest, shippable state is the real, complete party we can stand behind today, with
+  the parental-confirmation flag kept open on the parallel track rather than papered over.
+- **Links:** `src/app/[locale]/terms/page.tsx` · `src/app/[locale]/privacy/page.tsx` · `facts.md` §1 ·
+  `current-state.md` (owed-verification register) · Phase 2.03 brief Decision 1.
+
+### D-2.03-2 · 2026-07-19 · The facts audit treats operational commitments as VERIFIED-via-shipped-code, not UNSOURCED
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** In `docs/legal/facts-audit-2.03.md`, operational claims the site makes about how the
+  store works — the 48-hour reservation, 2-units-per-order cap, cash-on-delivery / no-online-payment,
+  atomic "someone got there first" stock, rate-limit and bot-check messages — are marked **VERIFIED**
+  with the source cited as the **shipped migration / decision** (e.g. `create_order()`,
+  `orders.reserved_until`), not as a `facts.md` section. Rows carry `§n` (facts.md) or `code:` so the
+  two bases are never blurred.
+- **Alternative rejected:** (a) mark every operational claim **UNSOURCED** because it is not literally in
+  `facts.md`, then either delete it or add operational mechanics to `facts.md`; (b) fold them all into
+  **NOT A CLAIM**.
+- **Downside accepted:** "VERIFIED" now spans two source types, so a reader must check each row's citation
+  to know whether a claim is brand-fact-backed or code-backed; `facts.md` remains a brand/business-facts
+  source and deliberately does **not** hold operational mechanics like the 48h hold.
+- **Reason:** The brief's Decision 5 explicitly sets the standard for these pages as *"what the store
+  actually does … traceable to `facts.md` or to shipped code."* Shipped, tested code is at least as
+  authoritative as an intake note for how the order path behaves; marking it UNSOURCED would be false,
+  and stuffing operational mechanics into `facts.md` would blur what that file is for.
+- **Links:** `docs/legal/facts-audit-2.03.md` (Status vocabulary; §A.4/§A.5) · Phase 2.03 brief Decision 5.
+
+### D-2.03-3 · 2026-07-19 · One shared LegalPage/LegalSection shell for the three legal pages
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** Terms, Privacy, and Shipping & Returns render through a shared presentational
+  `src/components/legal/LegalPage.tsx` (`LegalPage` shell + `LegalSection`), rather than each page
+  repeating the About/Contact markup inline.
+- **Alternative rejected:** Inline the `max-w-2xl` header/section markup in each of the three page files,
+  exactly as `/about` and `/contact` do it.
+- **Downside accepted:** The site now carries **two** editorial patterns — About/Contact inline, and the
+  three legal pages via a shared shell — so a future restyle of the editorial look must touch both
+  places. A reader comparing About to Terms sees the same output from different code.
+- **Reason:** Three near-identical page shells with ~7 sections each is where copy-paste drift hides; one
+  shell keeps the legal pages provably consistent with each other and confines a change to one file. The
+  shell reproduces the About/Contact visual shape and brand.md tokens, so the *output* still matches the
+  established look.
+- **Links:** `src/components/legal/LegalPage.tsx` · `src/app/[locale]/{terms,privacy,shipping-returns}/page.tsx`.
+
+### D-2.03-4 · 2026-07-19 · Last-updated is a fixed, hand-maintained date + a shared Common.lastUpdated label
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** Each legal page carries `const LAST_UPDATED = '2026-07-19'`, formatted per locale via the
+  next-intl formatter, and a single shared `Common.lastUpdated` label key. The date is **not** read from
+  the clock.
+- **Alternative rejected:** (a) render `new Date()` at request time; (b) a per-namespace `lastUpdated`
+  key in each of Terms/Privacy/ShippingReturns.
+- **Downside accepted:** The date is hand-maintained — whoever edits the copy must remember to bump the
+  constant in each page — and the constant is duplicated across three files.
+- **Reason:** A clock-driven date on a **static** page is both misleading (it would read "today" on every
+  visit, not when the terms last changed) and non-deterministic for the SSG build. A shared label keeps
+  MK/EN key parity trivial. Duplicating a one-line date constant is cheaper than a shared module for
+  three static pages.
+- **Links:** `src/app/[locale]/{terms,privacy,shipping-returns}/page.tsx` · `src/messages/{mk,en}.json`
+  (`Common.lastUpdated`).
+
+### D-2.03-5 · 2026-07-19 · Courier and returns-window placeholders live in the existing Placeholder namespace
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** The two new visible placeholders on `/shipping-returns` are `Placeholder.courier` and
+  `Placeholder.returnsWindow`, added to the existing `Placeholder` namespace and rendered via the
+  existing `<Placeholder>` component — the same pattern as `Placeholder.email` etc.
+- **Alternative rejected:** Put the placeholder strings inside the `ShippingReturns` namespace
+  (`ShippingReturns.courierPlaceholder`, `ShippingReturns.returnsPlaceholder`).
+- **Downside accepted:** The two placeholder strings live in a different namespace than the page that
+  renders them, so a reader scanning `ShippingReturns` alone will not see them.
+- **Reason:** Every other `[PLACEHOLDER: …]` marker on the site already lives in `Placeholder`, and the
+  string-inventory / register tooling and the `<Placeholder>` component are built around that one
+  namespace; keeping the two new markers there makes them consistent and easy to find as a set.
+- **Links:** `src/messages/{mk,en}.json` (`Placeholder.courier`, `Placeholder.returnsWindow`) ·
+  `src/app/[locale]/shipping-returns/page.tsx`.
+
+### D-2.03-6 · 2026-07-19 · The cart's "Shipping — calculated on delivery" is surfaced as a finding, not reworded this phase
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** Audit finding **F-2** — the cart order-summary line `Shipping: calculated on delivery`
+  (MK `се пресметува при подигање`) — is **surfaced** in the audit and completion report but **not
+  reworded** in this phase. It is classified VERIFIED (operational: the app computes no shipping fee and
+  everything is settled at the door under COD, §7) with a standing note.
+- **Alternative rejected:** Reword or remove the cart string now, to align it with the `/shipping-returns`
+  placeholder that admits we do not know the courier / delivery cost.
+- **Downside accepted:** Until reconciled, two surfaces describe the delivery cost slightly differently —
+  the cart states it is "calculated on delivery", while `/shipping-returns` flags the delivery cost as an
+  owed placeholder. A future cart-touching phase must revisit the cart line once Vladimir supplies
+  courier terms.
+- **Reason:** The cart is explicitly **out of scope** for 2.03, the string passed the 2.02 native-MK
+  review, and the only *correct* rewrite depends on the very courier terms Vladimir still owes — rewording
+  now would swap one hedge for another or invent detail. The line states **no amount**, so it is not the
+  dangerous case the brief warns about (an invented delivery cost asked for at the door).
+- **Links:** `docs/legal/facts-audit-2.03.md` (Finding F-2) · `src/components/cart/CartView.tsx`
+  (`Cart.shipping`, `Cart.shippingValue`) · Phase 2.03 brief Task 2.
