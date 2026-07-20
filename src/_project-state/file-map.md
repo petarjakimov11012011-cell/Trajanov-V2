@@ -12,6 +12,8 @@ Last updated: **2026-07-19** · By: **Claude Code (Phase 2.03 — Legal + facts 
 
 ## Status
 
+**Perf / a11y / SEO landed (Phase 2.04).** New: `src/app/sitemap.ts`, `src/app/robots.ts`, `src/app/og/route.tsx` (+ two vendored Rubik woff files), `src/components/seo/JsonLd.tsx`, `src/lib/seo/{site-jsonld,product-jsonld}.ts`, `tests/seo/{site-jsonld,product-jsonld}.test.ts`, `completions/Part-2-Phase-04-Completion.md`. Modified: `src/lib/metadata.ts` (`pageMetadata`/`ogImageUrl` add OG+Twitter+noindex), all 11 pages under `src/app/[locale]/` + `layout.tsx` (switched to `pageMetadata`; layout also renders site JSON-LD + skip link + `<main id>`), `src/proxy.ts` (exclude `/og` from the matcher), `src/lib/drop/state.ts` (`listCatalogProductSlugs` for the sitemap), `src/app/globals.css` (focus-visible backstop), `src/components/{home/HomeExperience,layout/LanguageSwitch,layout/SiteFooter,layout/SiteHeader,product/ProductCard,system/PhotoSlot}.tsx` (a11y), `src/messages/{mk,en}.json` (`Common.skipToContent`), `docs/i18n/string-inventory.md` (→214), `vitest.config.ts` (`@`→src alias), `Decisions.md` (`D-2.04-1…8`), `current-state.md`. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, `src/types/database.ts`, or npm dependency touched; `SITE_URL` unchanged.** Below is the 2.03/2.01 history.
+
 **Legal pages + facts audit landed (Phase 2.03).** New: three static pages `src/app/[locale]/{terms,privacy,shipping-returns}/page.tsx`; a shared shell `src/components/legal/LegalPage.tsx` (new `legal/` dir); `docs/legal/facts-audit-2.03.md` (new `docs/legal/` dir); `docs/i18n/mk-review-2.03.md`; and the completion report. Modified: `src/i18n/routing.ts` (3 new `pathnames` entries, **no** redirect-table change — new paths), `src/components/layout/SiteFooter.tsx` (3 legal links), `src/messages/{mk,en}.json` (**+63 keys**: `Terms`/`Privacy`/`ShippingReturns` + `Nav.terms/privacy/shipping` + 6 `Meta` + `Common.lastUpdated` + `Placeholder.courier/returnsWindow`), `facts.md` (§1 amendment + change-log row), `tests/i18n/pathnames.test.ts` (explicit legal-route assertions), `docs/i18n/string-inventory.md` (regenerated → 213), `Decisions.md` (`D-2.03-1…6`), `current-state.md`. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, or npm dependency touched.** Below is the 2.01/Z.01/1.06/1.05/1.04 history.
 
 **Bilingual landed (Phase 2.01).** New files: `src/lib/site.ts` (`SITE_URL` origin constant),
@@ -138,7 +140,13 @@ Trajanov-V2/
 │   │
 │   ├── app/
 │   │   ├── favicon.ico
-│   │   ├── globals.css              # brand.md tokens + shadcn semantic map (dark-only)
+│   │   ├── globals.css              # brand.md tokens + shadcn semantic map (dark-only) + focus-visible backstop (2.04)
+│   │   ├── robots.ts                # robots.txt — allow all, Disallow /styleguide, Sitemap URL (2.04)
+│   │   ├── sitemap.ts               # sitemap.xml — both locales, getPathname slugs + DB products (2.04, dynamic)
+│   │   ├── og/                      # per-locale typographic share card (2.04)
+│   │   │   ├── route.tsx            # next/og ImageResponse 1200×630; ?l=&t= → wordmark + Meta title
+│   │   │   ├── rubik-latin-700.woff # vendored Rubik 700 (SIL OFL) — satori font (no runtime Google)
+│   │   │   └── rubik-cyrillic-700.woff # vendored Rubik Cyrillic 700 — MK card renders native Cyrillic
 │   │   └── [locale]/               # mk (default, /) | en (/en/)
 │   │       ├── layout.tsx           # <html>, Rubik+Inter fonts, header/footer, provider
 │   │       ├── page.tsx             # home → HomeExperience (countdown / LIVE) + Home→About link (1.05)
@@ -168,6 +176,7 @@ Trajanov-V2/
 │   │   ├── checkout/               # CheckoutField, CheckoutForm, Turnstile (real widget, 1.04)
 │   │   ├── layout/                 # SiteHeader, SiteFooter, LanguageSwitch
 │   │   ├── legal/                  # LegalPage + LegalSection — shared shell for the 3 legal pages (2.03, D-2.03-3)
+│   │   ├── seo/                    # JsonLd — renders a JSON-LD <script> (2.04)
 │   │   ├── home/                   # HomeExperience (props-driven from server drop state, 1.04)
 │   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice, DevPreviewSwitch (1.04), ShippingNotice (MK-only shipping, 2.01)
 │   │
@@ -176,7 +185,10 @@ Trajanov-V2/
 │   │   ├── social.ts                # facts-backed public contact constants: IG handle/URL + phone (1.04/1.05)
 │   │   ├── format.ts                # formatMkd(amount,currency,locale) — locale-aware price formatter (1.04, locale-aware 2.01)
 │   │   ├── site.ts                  # SITE_URL origin constant — hreflang/canonical base (2.01, TODO(2.05): trajanov.com)
-│   │   ├── metadata.ts              # localeAlternates() — reciprocal hreflang + canonical via next-intl getPathname (2.01)
+│   │   ├── metadata.ts              # localeAlternates() (2.01) + pageMetadata()/ogImageUrl() — OG+Twitter+noindex (2.04)
+│   │   ├── seo/                     # structured-data builders (2.04)
+│   │   │   ├── site-jsonld.ts       # Organization + WebSite @graph — no address/logo/SearchAction/partner
+│   │   │   └── product-jsonld.ts    # Product node, gated on a real name; availability from drop state
 │   │   ├── cart/
 │   │   │   └── cart.ts              # PURE cart reducer + 2-unit cap + toOrderItems (React-free, testable, 1.06)
 │   │   ├── supabase/
@@ -310,3 +322,4 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-18 | 1.08 (Code) | **No new source files.** Modified `facts.md` §7 (real price 1199 MKD + sizes VERIFIED), `src/config/products.ts` (rehearsal now priced 1199 MKD; two verified colourways `test-mustard-ochre` S/M/L/XL + `test-off-white` XL-only; names still null), `src/config/drops.ts` (rehearsal comment), `Decisions.md` (`D-1.08-1/2/3`), `current-state.md`, `file-map.md`. Added root docs `Part-1-Phase-08-Operator-Runbook.md` + `completions/Part-1-Phase-08-Code-Completion.md`. **No `supabase/migrations/`, `src/app`, component, or test file changed; `create_order`/`expire_reservations` untouched; no new dependency.** Hosted verification used seed/test fixtures only, removed after (hosted left clean, TRJ-0001). `D-1.08-*`. | Claude Code |
 | 2026-07-19 | 2.02 (Code) | **Native MK review — clean pass, no source change.** Added `docs/i18n/mk-review-2.02.md` (review record) + `briefs/Part-2-Phase-02-Code.md` + `completions/Part-2-Phase-02-Completion.md`. Modified `src/i18n/routing.ts` (**comment only** — "provisional"→"confirmed", `pathnames` untouched), `Decisions.md` (`D-2.02-1/2/3`), `current-state.md`. **Zero fault found → `src/messages/{mk,en}.json` untouched; all six slugs Keep → `next.config.ts`, redirect table, `tests/i18n/` untouched.** `string-inventory.md` regenerated byte-identical (no commit). **No `supabase/migrations/`, `src/config/`, component, or test-of-record changed; `create_order`/`expire_reservations` untouched; no new dependency.** `D-2.02-*`. | Claude Code |
 | 2026-07-19 | 2.03 (Code) | **Legal pages + facts audit.** Added `src/app/[locale]/{terms,privacy,shipping-returns}/page.tsx` (all STATIC), `src/components/legal/LegalPage.tsx`, `docs/legal/facts-audit-2.03.md`, `docs/i18n/mk-review-2.03.md` (unsigned), `completions/Part-2-Phase-03-Completion.md`, `briefs/Part-2-Phase-03-Code.md`. Modified `src/i18n/routing.ts` (3 `pathnames` entries — **no** redirect change), `src/components/layout/SiteFooter.tsx` (3 links), `src/messages/{mk,en}.json` (**+63 keys**: `Terms`/`Privacy`/`ShippingReturns` + `Nav`/`Meta`/`Common.lastUpdated`/`Placeholder.courier/returnsWindow`), `facts.md` (§1 amend + change log), `tests/i18n/pathnames.test.ts` (legal-route assertions), `docs/i18n/string-inventory.md` (regen → 213), `Decisions.md` (`D-2.03-1…6`), `current-state.md`. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, or new dependency touched.** `D-2.03-*`. | Claude Code |
+| 2026-07-20 | 2.04 (Code) | **Perf / a11y / SEO.** Added `src/app/{sitemap.ts,robots.ts}`, `src/app/og/{route.tsx,rubik-latin-700.woff,rubik-cyrillic-700.woff}`, `src/components/seo/JsonLd.tsx`, `src/lib/seo/{site-jsonld,product-jsonld}.ts`, `tests/seo/{site-jsonld,product-jsonld}.test.ts`, `completions/Part-2-Phase-04-Completion.md`. Modified `src/lib/metadata.ts` (`pageMetadata`/`ogImageUrl`), all 11 `src/app/[locale]/**/page.tsx` + `layout.tsx` (pageMetadata + site JSON-LD + skip link + `<main id>`), `src/proxy.ts` (exclude `/og`), `src/lib/drop/state.ts` (`listCatalogProductSlugs`), `src/app/globals.css` (focus-visible), `src/components/{home/HomeExperience,layout/LanguageSwitch,layout/SiteFooter,layout/SiteHeader,product/ProductCard,system/PhotoSlot}.tsx`, `src/messages/{mk,en}.json` (`Common.skipToContent`), `docs/i18n/string-inventory.md` (→214), `vitest.config.ts` (alias), `Decisions.md` (`D-2.04-1…8`), `current-state.md`. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, `src/types/database.ts`, or new dependency touched; `SITE_URL` unchanged.** `D-2.04-*`. | Claude Code |

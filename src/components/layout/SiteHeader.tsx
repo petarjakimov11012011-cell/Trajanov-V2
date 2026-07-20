@@ -27,7 +27,7 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
           <Link
             href="/cart"
             aria-label={t('cart')}
-            className="text-foreground relative inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] transition-colors duration-[var(--motion-fast)] hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+            className="text-foreground relative inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] transition-colors duration-[var(--motion-fast)] hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <ShoppingBag className="h-5 w-5" strokeWidth={1.75} />
             {cartCount > 0 && (

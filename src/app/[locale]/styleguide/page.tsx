@@ -9,7 +9,7 @@ import {ProductCard} from '@/components/product/ProductCard';
 import {BuyButton} from '@/components/product/BuyButton';
 import {SizePicker} from '@/components/product/SizePicker';
 import {CheckoutField} from '@/components/checkout/CheckoutField';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 import type {ProductView} from '@/types/drop';
 
 // Styleguide is an internal review aid, not a customer surface, and is not localised (D-2.01-4). It
@@ -21,11 +21,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  // Internal review aid — noindex + Disallowed in robots (Task 2/3), never a customer surface.
+  return pageMetadata({
+    href: '/styleguide',
+    locale,
     title: t('styleguideTitle'),
     description: t('styleguideDescription'),
-    alternates: localeAlternates('/styleguide', locale),
-  };
+    index: false,
+  });
 }
 
 // Local sample products — the styleguide is a design reference and needs each card state on demand

@@ -27,3 +27,54 @@ export function localeAlternates(href: Href, currentLocale: Locale): Metadata['a
     },
   };
 }
+
+/** Absolute URL of the per-locale typographic share card (src/app/og), carrying the page's title
+ *  (Task 6). Absolute on `SITE_URL` so a scraper resolves it without a base — proven by grep, not left
+ *  to `metadataBase`. The title is a public page title (never personal data), so a query param is fine. */
+export function ogImageUrl(locale: Locale, title: string): string {
+  const params = new URLSearchParams({l: locale, t: title});
+  return `${SITE_URL}/og?${params.toString()}`;
+}
+
+/**
+ * The full per-page metadata for a route (Task 5/6): title + description, reciprocal hreflang/canonical,
+ * an absolute Open Graph + Twitter `summary_large_image` card, and (when `index: false`) a noindex.
+ * One helper so EVERY route carries an absolute `og:image` + `twitter:image` — provable by grep, never
+ * missed a page. `ogTitle` overrides the text baked into the card + `og:title` (the product page passes
+ * a neutral brand title instead of a placeholder product slot, so no placeholder reaches a card).
+ */
+export function pageMetadata(opts: {
+  href: Href;
+  locale: Locale;
+  title: string;
+  description: string;
+  ogTitle?: string;
+  index?: boolean;
+}): Metadata {
+  const {href, locale, title, description, index = true} = opts;
+  const ogTitle = opts.ogTitle ?? title;
+  const url = SITE_URL + getPathname({href, locale});
+  const image = ogImageUrl(locale, ogTitle);
+  return {
+    title,
+    description,
+    alternates: localeAlternates(href, locale),
+    // Content routes stay indexable (default); Cart / Checkout / Styleguide pass index:false (Task 3).
+    robots: index ? undefined : {index: false, follow: false},
+    openGraph: {
+      type: 'website',
+      siteName: 'Trajanov',
+      locale: locale === 'mk' ? 'mk_MK' : 'en_US',
+      url,
+      title: ogTitle,
+      description,
+      images: [{url: image, width: 1200, height: 630, alt: ogTitle}],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: ogTitle,
+      description,
+      images: [image],
+    },
+  };
+}

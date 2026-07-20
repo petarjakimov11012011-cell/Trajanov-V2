@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 213 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 214 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -69,6 +69,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Common.languageMk` | МК | МК | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.lastUpdated` | Последно ажурирано | Last updated | `src/app/[locale]/privacy/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/app/[locale]/terms/page.tsx` |
 | `Common.shippingNotice` | Испорака само во Северна Македонија. Не доставуваме надвор од земјата. Плаќање со готовина при преземање. | We ship inside North Macedonia only. We can't deliver outside the country. Cash on delivery. | `src/components/system/ShippingNotice.tsx` |
+| `Common.skipToContent` | Прескокни до содржината | Skip to content | `src/app/[locale]/layout.tsx` |
 | `Common.switchLanguage` | Промени јазик | Change language | `src/components/layout/LanguageSwitch.tsx` |
 | `Contact.context` | Струмица, Северна Македонија · Испорака само низ Северна Македонија · Готовина при преземање. | Strumica, North Macedonia · Ships within North Macedonia only · Cash on delivery. | `src/app/[locale]/contact/page.tsx` |
 | `Contact.emailLabel` | Е-пошта | Email | `src/app/[locale]/contact/page.tsx` |
@@ -94,7 +95,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Home.opening` | Се отвора… | Opening… | `src/components/home/HomeExperience.tsx` |
 | `Home.sub` | 3 до 5 парчиња. Вистински, ограничени залихи. Готовина при преземање. | 3 to 5 pieces. Real, limited stock. Cash on delivery. | `src/components/home/HomeExperience.tsx` |
 | `Home.tagline` | Наскоро. | Coming soon. | _(not found in source)_ |
-| `Home.title` | Trajanov | Trajanov | _(not found in source)_ |
+| `Home.title` | Trajanov | Trajanov | `src/components/home/HomeExperience.tsx` |
 | `Meta.aboutDescription` | Еден бренд, еден дизајнер од Струмица. Приказната зад Trajanov. | One brand, one designer from Strumica. The story behind Trajanov. | `src/app/[locale]/about/page.tsx` |
 | `Meta.aboutTitle` | За брендот — Trajanov | About — Trajanov | `src/app/[locale]/about/page.tsx` |
 | `Meta.cartDescription` | Парчињата што ги избра, пред нарачка. | The pieces you picked, before you order. | `src/app/[locale]/cart/page.tsx` |

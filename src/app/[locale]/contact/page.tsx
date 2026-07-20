@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations} from 'next-intl/server';
 import {Placeholder} from '@/components/system/Placeholder';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 import {
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
@@ -17,11 +17,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  return pageMetadata({
+    href: '/contact',
+    locale,
     title: t('contactTitle'),
     description: t('contactDescription'),
-    alternates: localeAlternates('/contact', locale),
-  };
+  });
 }
 
 // Contact is a static page — same as About, no drop state, no DB read (D-1.05, Task 4). No form (the
