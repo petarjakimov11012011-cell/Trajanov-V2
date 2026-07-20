@@ -25,7 +25,7 @@ export function PhotoSlot({
           'repeating-linear-gradient(135deg, color-mix(in srgb, var(--color-border) 60%, transparent) 0 1px, transparent 1px 14px)',
       }}
     >
-      <span className="text-muted-foreground max-w-[80%] px-3 text-center font-mono text-[0.7rem] leading-tight">
+      <span className="text-muted-foreground max-w-[80%] px-3 text-center font-mono text-xs leading-tight">
         {label}
       </span>
     </div>

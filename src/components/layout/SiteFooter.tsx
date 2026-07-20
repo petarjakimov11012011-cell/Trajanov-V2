@@ -24,31 +24,31 @@ export function SiteFooter() {
           <nav className="text-muted-foreground mt-2 flex flex-col gap-1 text-small">
             <Link
               href="/about"
-              className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+              className="py-1.5 hover:text-foreground transition-colors duration-[var(--motion-fast)]"
             >
               {t('about')}
             </Link>
             <Link
               href="/contact"
-              className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+              className="py-1.5 hover:text-foreground transition-colors duration-[var(--motion-fast)]"
             >
               {t('contact')}
             </Link>
             <Link
               href="/terms"
-              className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+              className="py-1.5 hover:text-foreground transition-colors duration-[var(--motion-fast)]"
             >
               {t('terms')}
             </Link>
             <Link
               href="/privacy"
-              className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+              className="py-1.5 hover:text-foreground transition-colors duration-[var(--motion-fast)]"
             >
               {t('privacy')}
             </Link>
             <Link
               href="/shipping-returns"
-              className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+              className="py-1.5 hover:text-foreground transition-colors duration-[var(--motion-fast)]"
             >
               {t('shipping')}
             </Link>
@@ -57,7 +57,7 @@ export function SiteFooter() {
         <div className="text-muted-foreground flex flex-col gap-1 text-small sm:items-end">
           <a
             href={PHONE_TEL}
-            className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+            className="py-1.5 hover:text-foreground transition-colors duration-[var(--motion-fast)]"
           >
             {PHONE_DISPLAY}
           </a>
@@ -65,7 +65,7 @@ export function SiteFooter() {
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noreferrer"
-            className="hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+            className="py-1.5 hover:text-foreground transition-colors duration-[var(--motion-fast)]"
           >
             {INSTAGRAM_HANDLE}
           </a>

@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations, getFormatter} from 'next-intl/server';
 import {LegalPage, LegalSection} from '@/components/legal/LegalPage';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 import {PHONE_DISPLAY, PHONE_TEL} from '@/lib/social';
 
 // Fixed last-updated date (see Terms page note).
@@ -15,11 +15,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  return pageMetadata({
+    href: '/privacy',
+    locale,
     title: t('privacyTitle'),
     description: t('privacyDescription'),
-    alternates: localeAlternates('/privacy', locale),
-  };
+  });
 }
 
 // Privacy — a STATIC editorial page (D-2.03, Task 4). The list of collected fields matches the actual

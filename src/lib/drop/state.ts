@@ -173,6 +173,17 @@ export interface ProductPageView {
   dropState: DropState;
 }
 
+/** Every real product slug across all drops, for the sitemap (Task 1). Deduped and sorted so the
+ *  output is stable. Read from the DB — the server product list, never a hand-typed slug. */
+export async function listCatalogProductSlugs(): Promise<string[]> {
+  const drops = await fetchDrops();
+  const slugs = new Set<string>();
+  for (const drop of drops) {
+    for (const product of drop.products) slugs.add(product.slug);
+  }
+  return [...slugs].sort();
+}
+
 export async function getProductView(
   slug: string,
   opts: { preview?: DropState } = {},

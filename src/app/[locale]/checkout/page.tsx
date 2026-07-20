@@ -3,7 +3,7 @@ import type {Locale} from 'next-intl';
 import {useTranslations} from 'next-intl';
 import {getTranslations} from 'next-intl/server';
 import {CheckoutForm} from '@/components/checkout/CheckoutForm';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 
 // The order path runs server-side (Turnstile → rate limit → create_order). What it submits comes from
 // the customer's cart (client state), read inside the form; create_order remains the sole authority on
@@ -17,11 +17,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  // Checkout collects PII and must never be indexed (Task 3).
+  return pageMetadata({
+    href: '/checkout',
+    locale,
     title: t('checkoutTitle'),
     description: t('checkoutDescription'),
-    alternates: localeAlternates('/checkout', locale),
-  };
+    index: false,
+  });
 }
 
 export default function CheckoutPage() {

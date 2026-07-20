@@ -56,6 +56,7 @@ export function LanguageSwitch({className}: {className?: string}) {
           <button
             key={loc}
             type="button"
+            lang={loc}
             aria-pressed={active}
             onClick={() => switchTo(loc)}
             className={cn(

@@ -3,7 +3,7 @@ import type {Locale} from 'next-intl';
 import {useTranslations} from 'next-intl';
 import {getTranslations} from 'next-intl/server';
 import {CartView} from '@/components/cart/CartView';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 
 export async function generateMetadata({
   params,
@@ -12,11 +12,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  // Cart is a private, transient step — noindex (Task 3). It still carries a share card + alternates.
+  return pageMetadata({
+    href: '/cart',
+    locale,
     title: t('cartTitle'),
     description: t('cartDescription'),
-    alternates: localeAlternates('/cart', locale),
-  };
+    index: false,
+  });
 }
 
 // The cart reads real client cart state (sessionStorage-backed store). Empty, items, and the 2-unit

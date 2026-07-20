@@ -43,14 +43,16 @@ export function ProductCard({product}: {product: ProductView}) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <h3
+        {/* h2 so the grid sits one level under each page's single h1 (Catalog / Home-live), with no
+            skipped level (WCAG 2.2 — heading order, Task 8). */}
+        <h2
           className={cn(
             'font-display text-base font-semibold',
             soldOut ? 'text-soldout' : 'text-foreground',
           )}
         >
           {title}
-        </h3>
+        </h2>
 
         {product.priceMkd != null ? (
           <span className="text-foreground text-sm font-semibold tabular">
@@ -62,10 +64,11 @@ export function ProductCard({product}: {product: ProductView}) {
 
         <div className="pt-1">
           {product.stock === 'in-stock' && <StockBadge level="in-stock" />}
+          {/* The low pill (near-black on red — 4.8:1, brand.md §3 ledger) instead of raw red text on the
+              surface card: red-on-surface only reaches 4.31:1 and fails WCAG 2.2 AA (Task 8). Same pill
+              the product detail page already uses. */}
           {product.stock === 'low' && (
-            <span className="text-accent text-sm font-semibold">
-              {t('Stock.low', {count: product.remaining})}
-            </span>
+            <StockBadge level="low" remaining={product.remaining} />
           )}
           {soldOut && (
             <span className="text-soldout text-sm font-semibold">

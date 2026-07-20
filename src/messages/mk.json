@@ -198,7 +198,8 @@
     "languageEn": "EN",
     "switchLanguage": "Промени јазик",
     "shippingNotice": "Испорака само во Северна Македонија. Не доставуваме надвор од земјата. Плаќање со готовина при преземање.",
-    "lastUpdated": "Последно ажурирано"
+    "lastUpdated": "Последно ажурирано",
+    "skipToContent": "Прескокни до содржината"
   },
   "Placeholder": {
     "productPhoto": "[PLACEHOLDER: фотографија — Владимир]",

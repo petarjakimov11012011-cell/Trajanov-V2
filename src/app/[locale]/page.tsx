@@ -4,7 +4,7 @@ import {getTranslations} from 'next-intl/server';
 import {HomeExperience} from '@/components/home/HomeExperience';
 import {DevPreviewSwitch} from '@/components/system/DevPreviewSwitch';
 import {getActiveDropView, parsePreviewState} from '@/lib/drop/state';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 
 // Drop state is computed on the server from the DB on every request — never cached, never client-decided
 // (D-1.04-9). A CDN-frozen home page would still say "countdown" after the drop opened.
@@ -17,11 +17,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  return pageMetadata({
+    href: '/',
+    locale,
     title: t('homeTitle'),
     description: t('homeDescription'),
-    alternates: localeAlternates('/', locale),
-  };
+  });
 }
 
 export default async function HomePage({

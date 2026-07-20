@@ -13,7 +13,11 @@ import {AddToCartPanel} from '@/components/product/AddToCartPanel';
 import {type BuyState} from '@/components/product/BuyButton';
 import {formatMkd} from '@/lib/format';
 import {getProductView, parsePreviewState} from '@/lib/drop/state';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
+import {getPathname} from '@/i18n/navigation';
+import {SITE_URL} from '@/lib/site';
+import {productJsonLd} from '@/lib/seo/product-jsonld';
+import {JsonLd} from '@/components/seo/JsonLd';
 
 // Product data is read from the DB per request (D-1.04-9); no static params.
 export const dynamic = 'force-dynamic';
@@ -38,11 +42,15 @@ export async function generateMetadata({
   const title = result
     ? (realName ?? `${t('Placeholder.productName')} ${pad2(result.product.index)}`)
     : t('Meta.catalogTitle');
-  return {
+  return pageMetadata({
+    href: {pathname: '/catalog/[slug]', params: {slug}},
+    locale,
     title,
     description: t('Meta.productDescription'),
-    alternates: localeAlternates({pathname: '/catalog/[slug]', params: {slug}}, locale),
-  };
+    // The share card + og:title use the REAL name, or a neutral brand title while names are
+    // placeholders — never the neutral slot ("Производ 01") baked into a card (Task 5/6 scope).
+    ogTitle: realName ?? t('Meta.catalogTitle'),
+  });
 }
 
 export default async function ProductPage({
@@ -76,8 +84,23 @@ export default async function ProductPage({
         ? 'sold-out'
         : 'default';
 
+  // Product structured data (Task 5): a node is emitted ONLY once the product has a real name; while
+  // names are placeholders (register #4) `productJsonLd` returns null and nothing ships. Price + MKD +
+  // availability come from the real server state; image/description are omitted while placeholdered.
+  const productUrl =
+    SITE_URL +
+    getPathname({href: {pathname: '/catalog/[slug]', params: {slug: product.slug}}, locale});
+  const jsonLd = productJsonLd({
+    name: realName,
+    priceMkd: product.priceMkd,
+    stock: product.stock,
+    dropState,
+    url: productUrl,
+  });
+
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6">
+      {jsonLd && <JsonLd data={jsonLd} />}
       <Link
         href="/catalog"
         className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-sm transition-colors duration-[var(--motion-fast)]"

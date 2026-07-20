@@ -1,4 +1,4 @@
-NEXT: 2.04 — Perf, a11y, SEO (Lighthouse, schema.org, sitemap, robots, OG images — none of which 2.03 touched). **Phase 2.03 — Legal + facts audit — COMPLETE (2026-07-19, branch `phase-2.03-legal-facts`).** Three **static** legal pages shipped both locales — Terms (`/uslovi`·`/en/terms`), Privacy (`/privatnost`·`/en/privacy`), Shipping & Returns (`/isporaka-i-vrakjanje`·`/en/shipping-returns`) — built from the `/about`+`/contact` editorial pattern via a shared `LegalPage` shell, all `●` SSG. Responsible party is **Vladimir Trajanov, Струмица, alone** (`D-2.03-1`, Lazar's call) — **no parent named anywhere in the diff**; **no statute/article/withdrawal period cited** (Decision 5); **no cookie banner** (Decision 4); the email **stays unpublished**. Privacy's collected-field list matches the real `orders` columns (`20260715021215_schema.sql`: name/phone/city/address/note — **no email**); the IP line matches `src/lib/rate-limit/hash.ts` (one-way hash, raw IP never stored). Courier/delivery-cost and returns-window ship as **visible `[PLACEHOLDER: …]`** (register #6, #7 — owner Vladimir), not guesses. **Full `facts.md` audit** committed at `docs/legal/facts-audit-2.03.md` — every rendered claim traced; **2 findings** (F-1 the `facts.md` §1 responsible-party contradiction, resolved by the §1 amendment; F-2 the cart's "calculated on delivery", surfaced not reworded, `D-2.03-6`); **zero UNSOURCED remain**; §10 clean (`grep`-checked). `facts.md` §1 amended (both the displayed party and the intake fact kept; open parental-confirmation flag intact). **63→213 message keys** (63 new, MK+EN identical); humanizer pass run; `docs/i18n/mk-review-2.03.md` committed **unsigned**; `string-inventory.md` regenerated (213) + committed. **69 tests pass** (63 + 6 new legal-route pathname assertions) incl. the 10-vs-3 oversell gate; build/lint/tsc clean; parity driven **RED→GREEN**. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, hosted DB, or npm dependency touched.** **Owed-verification register is NO LONGER EMPTY** — 2.03 added **two rows** (#9 no human legal review; #10 MK legal copy unreviewed) — both verify by 2.05 cutover. Placeholder register **+2** (#6, #7). **PR #12 MERGED to `main` (merge `4fcc0bd`) on Petar's explicit instruction (`D-0-3`: an operator, not Code, authorised the merge); production deploy VERIFIED** — the six legal URLs serve on `https://trajanov-v2.vercel.app` (MK slugs `/uslovi`·`/privatnost`·`/isporaka-i-vrakjanje` → 200 direct; `/en/*` → 200; MK Terms renders „Услови на продажба" + „Владимир Трајанов, од Струмица"). Recommended operator housekeeping (L1–L4, L7) still open.
+NEXT: 2.05 — Cutover: buy `trajanov.com`, flip the `SITE_URL` constant, Cloudflare DNS + Web Analytics, and clear the placeholder + owed-verification registers before launch. **Phase 2.04 — Perf, a11y, SEO — COMPLETE (2026-07-20, branch `phase-2.04-perf-a11y-seo`).** Shipped: `sitemap.xml` (both locales, absolute on `SITE_URL`, slugs from next-intl `getPathname` — no hand-typed slug — plus each DB product; Cart/Checkout/`/styleguide` excluded), `robots.txt` (Sitemap + Disallow `/styleguide`), per-page **noindex** on Cart/Checkout/`/styleguide` (content routes stay indexable), site-wide **Organization + WebSite JSON-LD** (no address, no fabricated logo, no SearchAction, no EAM/partner; `sameAs` = the one IG URL), a **Product JSON-LD** generator gated on a REAL name (emits no node while names are placeholders #4; availability derived from `src/lib/drop/state.ts`, never hardcoded InStock; `image`/`description` omitted while #2/#3), and per-locale **typographic OG share cards** (`next/og`, vendored Rubik Cyrillic woff — the MK card renders native Cyrillic, screenshotted) wired through a central `pageMetadata()` so an absolute `og:image` + `twitter:summary_large_image` sits on **every** route (grep-proven). **a11y: axe zero serious/critical** on Home/Catalog/Product/Checkout/Terms; skip-to-content link + `<main id>`, one H1/page + no heading skips, checkout real `<label>`s + `aria-describedby`/`aria-live` (triggered + verified), a global focus-visible ring, `lang` on the language switch + the About quote, WCAG-2.2 24px tap targets (footer) + 44px cart icon, the reduced-motion rule ships. **Lighthouse (actual, per route/form-factor pasted in the report): Accessibility 100 + Best-Practices 100 on all five routes; Desktop Performance 100; SEO 100 on the real production origin** — the localhost SEO 92 is the cross-origin `canonical` artifact (canonical → `SITE_URL` while testing on `127.0.0.1`), **proven 100 on `https://trajanov-v2.vercel.app/en`**; Checkout SEO 58 is the intentional noindex correctly failing the crawlable audit. **Gaps owed to Lazar:** mobile Performance **94** on Catalog + Checkout (throttled SSR — re-check on PageSpeed Insights after 2.05); the human **OG paste-test** into Instagram/Viber (only a human with those apps can confirm the card). `SITE_URL` unchanged; **no `supabase/`, `create_order`, `expire_reservations`, cart, `src/config/`, `src/types/database.ts`, or npm dependency touched**; `npm test` **84/84** incl. the 10-vs-3 oversell gate (re-run GREEN); build / lint / tsc clean. Prior: **Phase 2.03 — Legal + facts audit — COMPLETE (2026-07-19, branch `phase-2.03-legal-facts`).** Three **static** legal pages shipped both locales — Terms (`/uslovi`·`/en/terms`), Privacy (`/privatnost`·`/en/privacy`), Shipping & Returns (`/isporaka-i-vrakjanje`·`/en/shipping-returns`) — built from the `/about`+`/contact` editorial pattern via a shared `LegalPage` shell, all `●` SSG. Responsible party is **Vladimir Trajanov, Струмица, alone** (`D-2.03-1`, Lazar's call) — **no parent named anywhere in the diff**; **no statute/article/withdrawal period cited** (Decision 5); **no cookie banner** (Decision 4); the email **stays unpublished**. Privacy's collected-field list matches the real `orders` columns (`20260715021215_schema.sql`: name/phone/city/address/note — **no email**); the IP line matches `src/lib/rate-limit/hash.ts` (one-way hash, raw IP never stored). Courier/delivery-cost and returns-window ship as **visible `[PLACEHOLDER: …]`** (register #6, #7 — owner Vladimir), not guesses. **Full `facts.md` audit** committed at `docs/legal/facts-audit-2.03.md` — every rendered claim traced; **2 findings** (F-1 the `facts.md` §1 responsible-party contradiction, resolved by the §1 amendment; F-2 the cart's "calculated on delivery", surfaced not reworded, `D-2.03-6`); **zero UNSOURCED remain**; §10 clean (`grep`-checked). `facts.md` §1 amended (both the displayed party and the intake fact kept; open parental-confirmation flag intact). **63→213 message keys** (63 new, MK+EN identical); humanizer pass run; `docs/i18n/mk-review-2.03.md` committed **unsigned**; `string-inventory.md` regenerated (213) + committed. **69 tests pass** (63 + 6 new legal-route pathname assertions) incl. the 10-vs-3 oversell gate; build/lint/tsc clean; parity driven **RED→GREEN**. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, hosted DB, or npm dependency touched.** **Owed-verification register is NO LONGER EMPTY** — 2.03 added **two rows** (#9 no human legal review; #10 MK legal copy unreviewed) — both verify by 2.05 cutover. Placeholder register **+2** (#6, #7). **PR #12 MERGED to `main` (merge `4fcc0bd`) on Petar's explicit instruction (`D-0-3`: an operator, not Code, authorised the merge); production deploy VERIFIED** — the six legal URLs serve on `https://trajanov-v2.vercel.app` (MK slugs `/uslovi`·`/privatnost`·`/isporaka-i-vrakjanje` → 200 direct; `/en/*` → 200; MK Terms renders „Услови на продажба" + „Владимир Трајанов, од Струмица"). Recommended operator housekeeping (L1–L4, L7) still open.
 
 # Current state — Trajanov-V2
 
@@ -6,14 +6,61 @@ NEXT: 2.04 — Perf, a11y, SEO (Lighthouse, schema.org, sitemap, robots, OG imag
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-19** · By: **Claude Code (Phase 2.03 — Legal + facts audit, Code)**
+Last updated: **2026-07-20** · By: **Claude Code (Phase 2.04 — Perf, a11y, SEO, Code)**
 
 ---
 
 ## Status
 
-**2.03 COMPLETE — the store has honest legal pages and every rendered claim is now audited (this
-update, 2026-07-19).** Three **static** pages joined the site in both locales, built from the same
+**2.04 COMPLETE — the store is fast, accessible, and survives being pasted into an Instagram story
+(this update, 2026-07-20).** Discoverability + share surfaces shipped, none of which 2.03 touched:
+a dynamic **`/sitemap.xml`** (both locales, every indexable route absolute on `SITE_URL` via next-intl
+`getPathname` + each DB product; Cart/Checkout/`/styleguide` absent), **`/robots.txt`** (Sitemap +
+`Disallow /styleguide`), and per-page **`noindex`** on Cart/Checkout/`/styleguide` while the content
+routes stay indexable. **Structured data:** site-wide Organization + WebSite JSON-LD in the locale
+layout (`src/lib/seo/site-jsonld.ts`) — **no address (`facts.md` §1), no fabricated logo, no
+SearchAction, no EAM/partner**, `sameAs` = the one Instagram URL from `src/lib/social.ts`; and a
+Product JSON-LD generator (`src/lib/seo/product-jsonld.ts`) that **emits no node while product names
+are placeholders (register #4)** and, once a product has a real name, carries the real `price` + `MKD`
+and an availability **derived from `src/lib/drop/state.ts`** (never a hardcoded `InStock`), with
+`image`/`description` omitted while #2/#3 stand. Verified end-to-end against the local seed DB (which
+carries real test names) — a real `Product` node rendered with `availability InStock`, `price "999"`,
+`priceCurrency MKD`, no image/description; on production (null names) no node ships. **Share cards:** a
+per-locale, **type-only** `next/og` card (`src/app/og/route.tsx`, 1200×630, brand ground + mustard
+wordmark + the page's `Meta` title + the `@trajanovv2026` handle) rendered with a **vendored Rubik
+Cyrillic woff** so the MK card shows native Cyrillic (screenshot in the report) — no photo, no baked
+countdown. Every route's metadata now flows through one helper `pageMetadata()` (`src/lib/metadata.ts`),
+so an **absolute** `og:image` + `twitter:card="summary_large_image"` is present on **every** route
+(grep-confirmed across all 10 routes × both locales), reusing the 2.01 hreflang/canonical. **a11y —
+WCAG 2.2 AA:** axe (axe-core 4.10 in a headless Chromium, tall viewport) returns **zero
+serious/critical** on Home (live), Catalog, Product, Checkout (form populated), and Terms; a
+skip-to-content link + `<main id="main-content">`, one H1 per page with no skipped levels (ProductCard
+`h3`→`h2`; a visually-hidden H1 on the live home), checkout **real `<label>`s** + `aria-invalid` /
+`aria-describedby` (triggered and confirmed) + a polite `aria-live` region, a global `:focus-visible`
+ring on the brand focus-ring token, `lang` on the language switch + the About quote, WCAG-2.2 **24px**
+footer targets + a **44px** cart icon, and the `prefers-reduced-motion` rule shipping in the CSS
+(neutralises the live-dot pulse; the countdown is value-updates-only and the drop reveal is a plain
+swap — framer-motion unused). **Two real a11y bugs were found and fixed:** the low-stock card count
+was accent-red on the surface card (**4.31:1**, fails AA) → now the near-black-on-red pill (4.8:1,
+`D-2.04-4`); the footer nav links were under the 24px target size (`D-2.04-5`). **Lighthouse (real
+scores, pasted per route/form-factor in the completion report): Accessibility 100 + Best-Practices 100
+on all five routes; Desktop Performance 100 on all five; SEO 100 on the live production origin** — the
+localhost SEO **92** on content routes is purely the cross-origin `canonical` audit artifact (canonical
+points at `SITE_URL` while Lighthouse runs on `127.0.0.1`), **verified 100 on
+`https://trajanov-v2.vercel.app/en` with the canonical audit passing**; Checkout SEO **58** is the
+deliberate `noindex` correctly failing the is-crawlable audit. **Owed:** mobile Performance **94** on
+Catalog + Checkout (throttled-mobile SSR — re-check on PageSpeed Insights post-2.05), and the human
+**OG paste-test** into Instagram + Viber (code cannot confirm a real link preview). **Standing gates:**
+`npm test` **84/84** (69 prior + 15 new SEO/JSON-LD) incl. the **10-vs-3 oversell gate** (re-run GREEN),
+build / lint / tsc clean; `vitest.config.ts` gained the `@`→`src` alias (`D-2.04-8`), no new dependency,
+`package.json` runtime deps unchanged, `SITE_URL` unchanged. **No `supabase/migrations/`, `create_order`,
+`expire_reservations`, cart, `src/config/`, `src/types/database.ts`, or hosted DB touched.** **No new
+placeholder shipped and none cleared/reworded/hidden (#2–#7 byte-unchanged).** Branch
+`phase-2.04-perf-a11y-seo`; **not yet merged** — an operator authorises the merge (`D-0-3`). Owed-verification
+register **+2 rows** (#11 OG paste-test; #12 the mobile-Perf/SEO Lighthouse gaps).
+
+**2.03 COMPLETE — the store has honest legal pages and every rendered claim is now audited
+(2026-07-19).** Three **static** pages joined the site in both locales, built from the same
 editorial pattern as `/about`+`/contact` through a shared `src/components/legal/LegalPage.tsx` shell:
 **Terms** (`/uslovi` · `/en/terms`), **Privacy** (`/privatnost` · `/en/privacy`), and **Shipping &
 Returns** (`/isporaka-i-vrakjanje` · `/en/shipping-returns`) — all prerendered `●` SSG per locale, no
@@ -251,10 +298,10 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 2 of 2 — Launch prep |
-| Phase | **2.03 complete — Legal + facts audit** (three static legal pages both locales via a shared `LegalPage` shell; full `facts.md` audit, 2 findings, zero UNSOURCED; §1 amended; 63 new MK+EN keys; MK review pack unsigned). Next: **2.04** (Perf, a11y, SEO) |
-| Branch | `phase-2.03-legal-facts` → PR **#12** — **MERGED to `main` (merge `4fcc0bd`, 2026-07-19)** on Petar's instruction; branch deleted. Prior: `phase-2.02-mk-review` → PR `#11`, merged `6afae55` |
-| Open PR | **None.** `#12` merged (2026-07-19). Prior merged: 1.01–1.07 `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; 2.01 `#10`; 2.02 `#11`; 2.03 `#12` |
-| Deployed | **YES — https://trajanov-v2.vercel.app**, production. **2.01 merged (`#10`) is LIVE and smoke-verified by Code (2026-07-19):** old `/catalog` **308→`/katalog`**, MK `/katalog` **200**, `/en/catalog` **200**, home `<html lang="mk">` + `canonical` + `hrefLang` mk/en/x-default all present. `D-1.03-5`/`D-1.06-4` closed |
+| Phase | **2.04 complete — Perf, a11y, SEO** (sitemap + robots + noindex; Organization + WebSite + gated Product JSON-LD; per-locale `next/og` share cards absolute on every route; WCAG 2.2 AA — axe zero serious/critical; Lighthouse A11y/BP 100, Desktop Perf 100, SEO 100 on prod). Next: **2.05** (cutover — domain + Cloudflare) |
+| Branch | `phase-2.04-perf-a11y-seo` — **not yet PR'd; awaits an operator-authorised merge (`D-0-3`)**. Prior: `phase-2.03-legal-facts` → PR `#12`, merged `4fcc0bd` (2026-07-19); `phase-2.02-mk-review` → PR `#11`, merged `6afae55` |
+| Open PR | **None yet — the 2.04 branch awaits an operator-authorised PR + merge (`D-0-3`; Code does not self-merge).** Prior merged: 1.01–1.07 `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; 2.01 `#10`; 2.02 `#11`; 2.03 `#12` |
+| Deployed | **YES — https://trajanov-v2.vercel.app**, production (currently **2.03**; **2.04 not yet deployed** — its sitemap/robots/JSON-LD/OG cards + a11y go live only when the branch merges). **2.01 merged (`#10`) is LIVE and smoke-verified by Code (2026-07-19):** old `/catalog` **308→`/katalog`**, MK `/katalog` **200**, `/en/catalog` **200**, home `<html lang="mk">` + `canonical` + `hrefLang` mk/en/x-default all present. `D-1.03-5`/`D-1.06-4` closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
 ---
@@ -269,6 +316,65 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### Perf, a11y, SEO (2.04) — discoverable, accessible, and shareable
+
+- **Sitemap** `src/app/sitemap.ts` (dynamic): one `<url>` per (route, locale) with reciprocal
+  `alternates.languages`, every URL absolute on `SITE_URL` + next-intl `getPathname` (grep: no hand-typed
+  slug), plus each real product from `listCatalogProductSlugs()` (new export on `src/lib/drop/state.ts`,
+  reads the DB). **Home, Catalog, About, Contact, Terms, Privacy, Shipping & Returns + each Product** in
+  both locales; **Cart, Checkout, `/styleguide` excluded.** DB read wrapped in try/catch → static routes
+  still serve if the product read fails.
+- **robots** `src/app/robots.ts`: `Allow /`, `Disallow /styleguide` + `/en/styleguide`, `Host` +
+  `Sitemap: ${SITE_URL}/sitemap.xml`.
+- **noindex** on Cart, Checkout, `/styleguide` (both locales) via `pageMetadata({index:false})` →
+  `<meta name="robots" content="noindex, nofollow">`; the content routes carry no robots meta (indexable).
+  Verified by curl on all routes.
+- **Site JSON-LD** `src/lib/seo/site-jsonld.ts` + `src/components/seo/JsonLd.tsx`, rendered in the locale
+  layout: an `@graph` of **Organization** (`@id #organization`, `sameAs` = `INSTAGRAM_URL` only) +
+  **WebSite** (`inLanguage ["mk","en"]`, `publisher` → the org). **No `address`, no `logo`, no
+  `potentialAction`/SearchAction, no EAM/partner** (asserted by `tests/seo/site-jsonld.test.ts`).
+- **Product JSON-LD** `src/lib/seo/product-jsonld.ts`, rendered on `/catalog/[slug]` **only when the
+  product has a real name**. `brand` = Trajanov; `offers` with real `price` (string) + `priceCurrency
+  "MKD"` + `availability` from `availabilityFor(dropState, stock)` (live+stock → InStock, live+soldout →
+  SoldOut, countdown → PreOrder, ended+stock → OutOfStock — never hardcoded InStock, `D-2.04-3`);
+  `image`/`description` omitted while #2/#3. `tests/seo/product-jsonld.test.ts` (12 cases) proves the
+  placeholder gate + real-name node + the mapping. Exercised live: the seed's real-named product rendered
+  a valid node; production's null-named `test-drop` renders none.
+- **OG share cards** `src/app/og/route.tsx` (`next/og`, Node runtime): 1200×630, brand ground + mustard
+  wordmark + the page's `Meta` title + `@trajanovv2026`, type-only (no photo, no baked countdown). Rubik
+  700 latin + cyrillic loaded from **vendored woff** (`src/app/og/*.woff`, SIL OFL) via `readFileSync(new
+  URL(...))` — no runtime Google request; MK renders native Cyrillic (screenshot). `/og` excluded from the
+  proxy matcher (`src/proxy.ts`) so next-intl doesn't 404 it.
+- **Central metadata** `src/lib/metadata.ts` — new `pageMetadata()` + `ogImageUrl()`: title/description +
+  `localeAlternates` (2.01 hreflang/canonical, unchanged) + absolute `openGraph.images` +
+  `twitter.card:"summary_large_image"` + optional noindex. **All 11 pages + the layout default** switched
+  to it, so `og:image` + `twitter:image` are absolute on **every** route (grep-verified, 10 routes × 2
+  locales). The product page passes a neutral brand `ogTitle` while names are placeholders, so **no
+  placeholder value is baked into a card**.
+- **a11y (WCAG 2.2 AA)** — axe-core 4.10 (headless Chromium, tall viewport so off-screen sampling doesn't
+  false-positive) = **zero serious/critical** on Home (live), Catalog, Product, Checkout (form populated),
+  Terms. Changes: skip-to-content link + `<main id="main-content">` (`layout.tsx`, new `Common.skipToContent`);
+  `ProductCard` heading `h3`→`h2` + a visually-hidden `h1` on the live home (no heading skips); the
+  low-stock card count → the `StockBadge` red pill (AA contrast, `D-2.04-4`); footer link 24px targets +
+  44px cart icon (`D-2.04-5`); a global `:focus-visible` ring (`globals.css`, `D-2.04-6`); `lang` on the
+  language-switch buttons + the About quote; `PhotoSlot` label 11.2px→12px (legible). Checkout already had
+  real `<label>`s + `aria-invalid`/`aria-describedby` + `aria-live` — **triggered and confirmed** (error
+  submit flips `aria-invalid="true"` + wires `aria-describedby` → the error text). `prefers-reduced-motion`
+  rule ships in the CSS bundle; countdown is value-updates-only, reveal is a plain swap.
+- **Lighthouse** (actual scores in `completions/Part-2-Phase-04-Completion.md`): Desktop **P/A/BP = 100**
+  on all five routes; Mobile **A/BP = 100** on all five, Mobile **P** = Home 98 / Product 97 / Legal 95 /
+  Catalog 94 / Checkout 94; **SEO 100 on the production origin** (localhost 92 = cross-origin canonical
+  artifact, proven 100 on prod; Checkout 58 = intentional noindex).
+- **Gates**: `npm run build` / `npx tsc --noEmit` / `npm run lint` clean; `npm test` **84/84** (69 + 15
+  new) incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected …, stock 0`; the
+  catalog-parity test stays GREEN (both catalogs gained `Common.skipToContent`). `docs/i18n/string-inventory.md`
+  regenerated (213 → 214). **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart,
+  `src/config/`, `src/types/database.ts`, hosted DB, or npm dependency touched; `SITE_URL` unchanged.**
+- **Decisions:** `D-2.04-1` (dynamic `/og` + central `pageMetadata`), `D-2.04-2` (brand hex literals +
+  vendored Rubik woff), `D-2.04-3` (availability mapping), `D-2.04-4` (low-stock pill for AA contrast),
+  `D-2.04-5` (24px/44px tap targets), `D-2.04-6` (global focus-visible), `D-2.04-7` (skip link + new MK
+  string), `D-2.04-8` (vitest `@` alias).
 
 ### Legal pages + facts audit (2.03) — three honest pages, every claim traced
 
@@ -614,7 +720,9 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | ~~7~~ | **A real order sends a notification email that arrives in Vladimir's inbox** — **CLEARED — 1.08 operator (2026-07-18).** The Z.01 email prereqs were set up (Resend account under Vladimir's email + `RESEND_API_KEY`/`ORDER_NOTIFICATION_EMAIL` in Vercel, redeployed), the rehearsal drop was opened, and **a real order (`TRJ-0001`) was placed end to end on a phone.** The MK notification **arrived in Vladimir's inbox** from `onboarding@resend.dev` — subject "Нова нарачка TRJ-0001 — Trajanov", listing the ordered line (`test-mustard-ochre — величина L — 1 бр.`), the full customer block (name/phone/city/address/notes), and the COD + call-to-confirm + "Supabase is the record" lines. DB side confirmed: order row, atomic decrement (3→2), 48h reservation. Order + reservation then deleted; hosted returned clean (`D-1.08-4`). | Z.01 | **CLEARED — 1.08 operator (real order + email)** |
 | ~~8~~ | **Branded from-address on `trajanov.com`.** The sender is `onboarding@resend.dev` until the domain is bought + verified (`D-Z.01-2`). **RECLASSIFIED to the 2.05 cutover track (`D-1.08-2`)** — removed from this register's zero-condition, since #8 cannot be cleared without the (unbought) domain and leaving it here would make 1.08's "register to zero" impossible. | Z.01 → | **2.05** (domain purchase + verification) |
 | 9 | **The legal pages have had no human legal review.** Terms, Privacy, and Shipping & Returns were written in-house by Code from `facts.md` and shipped code; **no lawyer has read them**, and the responsible party named is a **minor, alone** (`D-2.03-1`). No statute is cited and nothing legally binding is asserted beyond what the store operationally does — but no professional has confirmed these pages are adequate for a cash-on-delivery consumer contract. Owner: **Lazar + Vladimir**. | 2.03 | **2.05 cutover** |
-| 10 | **New MK legal copy is unreviewed by a native speaker.** The 63 new `Terms` / `Privacy` / `ShippingReturns` (+ `Nav`/`Meta`/`Placeholder`) MK strings are machine-written and have **not** been read by a native Macedonian speaker — legal copy is the worst place for a machine-translation error. Review pack ready and **unsigned** at `docs/i18n/mk-review-2.03.md` (63-row table + slug question for the 3 new slugs + two sign-off blocks). Owner: **Lazar + Petar**. | 2.03 | **before 2.05 cutover** |
+| 10 | **New MK legal copy is unreviewed by a native speaker.** The 63 new `Terms` / `Privacy` / `ShippingReturns` (+ `Nav`/`Meta`/`Placeholder`) MK strings are machine-written and have **not** been read by a native Macedonian speaker — legal copy is the worst place for a machine-translation error. Review pack ready and **unsigned** at `docs/i18n/mk-review-2.03.md` (63-row table + slug question for the 3 new slugs + two sign-off blocks). **2.04 added one more machine-written MK string — `Common.skipToContent` („Прескокни до содржината", the skip link, `D-2.04-7`) — fold it into this same review.** Owner: **Lazar + Petar**. | 2.03 | **before 2.05 cutover** |
+| 11 | **OG paste-test — the real traffic path (Plan §10).** Lazar pastes the deployed **MK + EN Home and Product** URLs into an Instagram story/DM **and** Viber and confirms the branded card renders — image **and** title, Cyrillic intact on the MK card. Code proved the card serves at 1200×630 and renders native Cyrillic (screenshot), and that `og:image`/`twitter:image` are absolute on every route — but **only a human with those apps can confirm the actual in-app link preview**; a link-preview/OG-debugger check by Code is **not** a substitute. Verifies **after 2.04 deploys**. Owner: **Lazar**. | 2.04 | **after 2.04 deploy** |
+| 12 | **Lighthouse categories that could not reach 95 in-phase** (measured on `next start` + local seed DB, headless Chrome). **(a)** Mobile **Performance 94** on Catalog + Checkout (throttled-mobile SSR with a DB read; Desktop is 100, mobile Home/Product/Legal are 98/97/95). **(b)** Content-route **SEO 92 on localhost is a cross-origin `canonical` artifact** — Code verified **SEO 100 with the canonical audit passing on the real origin `https://trajanov-v2.vercel.app/en`**, so this should read 100 once 2.04 deploys; **(c)** Checkout **SEO 58** is the intentional `noindex` correctly failing the crawlable audit (not a defect). Lazar re-checks (a) + (b) on **PageSpeed Insights** against the live 2.04 deploy. Owner: **Lazar**. | 2.04 | **after 2.04 deploy (PageSpeed Insights)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
@@ -688,6 +796,14 @@ zero-condition.*
 
 Every visible `[PLACEHOLDER: …]` on the site. **Must be empty before cutover (2.05). Launch
 blocker.**
+
+*2.04 update (2026-07-20): **no change to the register.** Phase 2.04 shipped **no new placeholder** and
+**cleared, reworded, hid, or filled none** — #2–#7 are byte-for-byte unchanged. The load-bearing rule
+for this phase: **no placeholder value reaches any JSON-LD or OG image.** The Product JSON-LD emits **no
+node** while product names are placeholders (#4) — proven both by unit test (null name → null) and by
+grep across the rendered pages — and the OG card falls back to a neutral brand title rather than baking
+the neutral slot ("Производ NN"). (Note: this phase's font-size fix bumped the `PhotoSlot` placeholder
+label from 11.2px to 12px for legibility — the placeholder **text is unchanged**, only its size.)*
 
 *2.03 update (2026-07-19): **+2 rows** — #6 (courier / delivery time / delivery cost) and #7
 (returns/exchange window), both on the new Shipping & Returns page, owner Vladimir. 2.03 **cleared,

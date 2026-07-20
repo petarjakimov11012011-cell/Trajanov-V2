@@ -171,6 +171,14 @@
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
   }
+  /* Visible keyboard focus on EVERY interactive element (WCAG 2.2 — 2.4.7), using the brand focus-ring
+     token at 2px / 2px offset (brand.md §3). A backstop: components that set their own focus-visible
+     ring (buttons, cards, size picker) opt out with `outline-none` and keep it; links and controls with
+     no explicit style inherit this, so nothing is ever focusable without a visible indicator. */
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
 }
 
 /* Respect reduced motion globally; components opt back in deliberately. */

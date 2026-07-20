@@ -4,7 +4,7 @@ import {setRequestLocale, getTranslations, getFormatter} from 'next-intl/server'
 import {LegalPage, LegalSection} from '@/components/legal/LegalPage';
 import {ShippingNotice} from '@/components/system/ShippingNotice';
 import {Placeholder} from '@/components/system/Placeholder';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 import {PHONE_DISPLAY, PHONE_TEL} from '@/lib/social';
 
 // Fixed last-updated date (see Terms page note).
@@ -17,11 +17,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  return pageMetadata({
+    href: '/shipping-returns',
+    locale,
     title: t('shippingTitle'),
     description: t('shippingDescription'),
-    alternates: localeAlternates('/shipping-returns', locale),
-  };
+  });
 }
 
 // Shipping & Returns — a STATIC editorial page (D-2.03, Task 5). Where = NMK only, reusing the shared

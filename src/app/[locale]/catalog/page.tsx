@@ -5,7 +5,7 @@ import {ProductCard} from '@/components/product/ProductCard';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {DevPreviewSwitch} from '@/components/system/DevPreviewSwitch';
 import {getActiveDropView, parsePreviewState} from '@/lib/drop/state';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 
 // Catalog grid — the active drop's pieces, read from the DB on every request (D-1.04-9).
 export const dynamic = 'force-dynamic';
@@ -17,11 +17,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  return pageMetadata({
+    href: '/catalog',
+    locale,
     title: t('catalogTitle'),
     description: t('catalogDescription'),
-    alternates: localeAlternates('/catalog', locale),
-  };
+  });
 }
 
 export default async function CatalogPage({

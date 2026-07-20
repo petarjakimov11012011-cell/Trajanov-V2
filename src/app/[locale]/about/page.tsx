@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations, getFormatter} from 'next-intl/server';
 import {Link} from '@/i18n/navigation';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 
 export async function generateMetadata({
   params,
@@ -11,11 +11,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  return pageMetadata({
+    href: '/about',
+    locale,
     title: t('aboutTitle'),
     description: t('aboutDescription'),
-    alternates: localeAlternates('/about', locale),
-  };
+  });
 }
 
 // About is a static page: no drop state, no DB read, nothing to recompute per request. It does NOT
@@ -84,7 +85,9 @@ export default async function AboutPage({
         <p>{t('body3')}</p>
       </div>
 
-      <blockquote className="border-mustard flex flex-col gap-3 border-l-2 pl-6">
+      {/* The quote text is rendered in the page's own language — the MK original on MK, the marked EN
+          translation on EN (D-1.05-6). `lang` states that explicitly for assistive tech (Task 8). */}
+      <blockquote lang={locale} className="border-mustard flex flex-col gap-3 border-l-2 pl-6">
         <p className="font-display text-h2 text-foreground font-semibold text-balance">
           {t('quote')}
         </p>

@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations, getFormatter} from 'next-intl/server';
 import {LegalPage, LegalSection} from '@/components/legal/LegalPage';
-import {localeAlternates} from '@/lib/metadata';
+import {pageMetadata} from '@/lib/metadata';
 import {
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
@@ -21,11 +21,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'Meta'});
-  return {
+  return pageMetadata({
+    href: '/terms',
+    locale,
     title: t('termsTitle'),
     description: t('termsDescription'),
-    alternates: localeAlternates('/terms', locale),
-  };
+  });
 }
 
 // Terms of Sale — a STATIC editorial page (setRequestLocale, no force-dynamic), same shape as /about +
