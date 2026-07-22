@@ -2533,3 +2533,78 @@ start at `D-2.01-6`.*
   writes `briefs/Part-X-Phase-01-*.md`; surfaced here and in the completion report so it isn't lost.
 - **Links:** `docs/ops/drop-day-contingency.md` · `Trajanov-V2-Phase-Plan.md` (X.01) · `D-0-2` ·
   `00_stack-and-config.md` (portability rule)
+
+---
+
+## Phase Y.02 — Product 03 (baby blue) catalog stub
+
+### D-Y.02-1 · 2026-07-22 · Owner-authorised out-of-order insert — Product 03 added as a catalog stub ahead of Y.01
+- **Status:** Accepted
+- **Decided by:** Lazar (owner), 2026-07-22 — handed to Code in the Phase Y.02 brief.
+- **Context:** Vladimir has confirmed a third colourway (baby blue) with a real price (1999 MKD) and real
+  sizes (S/M/L/XL). The critical path is the 2.06 operator rehearsal, then `Y.01` (the full drop-content
+  load). Baby blue's photos + fabric are still OWED, so it cannot enter a live drop yet — but its confirmed
+  price + sizes can be recorded and rendered now.
+- **Decision:** Insert Product 03 into the catalog **now**, out of order, as a visible, honest stub — real
+  price + sizes, placeholder photo/fabric/name — so it is live-ready the moment Vladimir's photos and fabric
+  arrive. This is an owner-authorised insert; it does **not** replace the 2.06 rehearsal on the critical path
+  (the `NEXT:` line stays pointed at the rehearsal).
+- **Alternatives considered:** **Option A — fold baby blue into the full `Y.01` drop-content load.**
+  Rejected by Lazar: it delays recording confirmed facts (price + sizes) and building the stub until Y.01,
+  when the catalog can carry the colourway honestly today.
+- **Downside accepted:** Two new placeholders join the register (photo, fabric — plus the name, already
+  covered generically), and a product page that **cannot enter a live drop** until real photos + fabric
+  arrive. The register's zero-condition (before the first REAL drop) now has three more Product-03 rows to
+  clear.
+- **Links:** `facts.md` §7 (Product 03 sub-block) · `src/config/products.ts` · placeholder register
+  (`current-state.md`) · Phase `Y.01`
+
+### D-Y.02-2 · 2026-07-22 · Product 03 joins the existing ENDED `test-drop`, not a new or live drop
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor), while building Y.02.
+- **Context:** The brief says Product 03 is "added to the catalog only; NOT assigned to any drop." But the
+  data model makes a drop-less product impossible: `products.drop_id` is **NOT NULL** (schema), the config
+  `PRODUCTS` map is **keyed by drop slug**, and the catalog is **drop-scoped** — `getActiveDropView()` →
+  `pickActiveDrop()` renders exactly ONE drop's products (a live drop wins, else the soonest upcoming, else
+  the most recent). The only committed drop is `test-drop` (ENDED, past window), where the existing two
+  products live. So "catalog lists three products" + "browsable-but-not-buyable" + "committed drop stays
+  ENDED" can only all hold if Product 03 is added to `test-drop` itself.
+- **Decision:** Add Product 03 as the **third** product in the existing **ENDED** `test-drop` (in
+  `src/config/products.ts`, where the other two live). Its `sort_order` becomes 3 → the UI renders the
+  neutral slot "Производ 03" / "Product 03". `drops.ts` (the schedule) is **untouched** — no new drop, no
+  window change; `test-drop` stays ENDED, so all three render browsable-but-not-buyable, the site's default
+  state between drops. "NOT assigned to any drop" is read as **not assigned to any live/future/real drop**
+  (the DoD's own words: "browsable but not buyable *(no live drop)*").
+- **Alternatives considered:** **(a) A separate new drop for Product 03** — rejected: `pickActiveDrop`
+  would then feature either the new drop (hiding the existing two from the catalog) or keep `test-drop`
+  active (Product 03 never appears), and either breaks "catalog lists three products." **(b) A product with
+  no drop row** — rejected: impossible under `drop_id NOT NULL` and the drop-scoped catalog; it would need a
+  schema + query change to `create_order`/reservation-adjacent territory, out of scope and against the brief.
+- **Downside accepted:** Product 03 shares `test-drop`'s `drop_id` and its ENDED window, and carries the
+  `test-` slug prefix (`test-baby-blue`) like its two neighbours. Its true drop assignment — its own real
+  first drop with a real slug — is **deferred to `Y.01`**, once real photos exist.
+- **Links:** `src/config/products.ts` · `src/lib/drop/state.ts` (`pickActiveDrop`) ·
+  `supabase/migrations/20260715021215_schema.sql` (`products.drop_id NOT NULL`) · `D-Y.02-3`
+
+### D-Y.02-3 · 2026-07-22 · No migration — Product 03 lands via the typed config + the existing INSERT-only sync
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor), while building Y.02.
+- **Context:** The brief anticipates that adding a product "may require a new Supabase migration" and asks
+  for one only "if adding it requires" it. But the `products`/`variants` tables already exist, and the
+  established path for adding a product is the typed config (`D-0-4`) written to the DB by
+  `npm run sync:drop` — which **INSERTs** a new product + its per-size variant rows, setting stock on INSERT
+  only (`D-1.04-5`) via a direct admin connection (`D-1.04-11`). Adding a product is a **data** operation,
+  not a **schema** change.
+- **Decision:** Add Product 03 to `src/config/products.ts` and rely on the existing sync to insert the
+  product + variant rows. Write **no migration**. No table, no `create_order`, no `expire_reservations`, no
+  RLS, no decrement/reservation logic is touched — all byte-unchanged.
+- **Alternatives considered:** **A hand-written migration** inserting the product + variant rows — rejected:
+  it would duplicate the sync's job, bypass its preflights + idempotency + INSERT-only-stock guarantee, and
+  put catalog DATA inside a schema-migration file (the wrong home for it, and the exact mixing the sync
+  design avoids).
+- **Downside accepted:** The Product 03 rows reach a given database only when someone runs
+  `npm run sync:drop` against it — so **production shows Product 03 only after the operator syncs** (the same
+  operator step every drop/catalog change already needs; the production DB is not written by this PR). Code
+  verified the insert against the **local** DB this phase.
+- **Links:** `scripts/sync-core.ts` (INSERT-only) · `scripts/sync-drop.ts` · `D-1.04-5` · `D-1.04-11` ·
+  `D-0-4` · `D-Y.02-2`

@@ -188,6 +188,28 @@ available in **XL only**. That is the size *list*, not a measurement chart — t
 per size are still owed by Vladimir. The photos show a boxy oversized fit; that remains an
 observation, not a spec.
 
+### Product 03 — baby blue (added 2026-07-22)
+
+A **third colourway, baby blue**, confirmed by the owner (Vladimir, via Lazar, 2026-07-22), working
+name **"Product 03"**. Added to the catalog now as a visible, honest stub (`D-Y.02-1`) so it is
+live-ready the moment the photos and fabric arrive — without inventing anything we do not yet have.
+
+| Fact | Value | Status |
+|---|---|---|
+| Colourway | **Baby blue** | **VERIFIED (owner-stated)** — Vladimir, 2026-07-22. **NOT yet photographed** — do **not** mark "VERIFIED (photos)" like the mustard/ochre + off-white row above |
+| Working name | **"Product 03"** | Owner working name / placeholder — the real customer-facing name is **UNVERIFIED — OWED** (Vladimir) |
+| Price | **1999 MKD** | **VERIFIED** — owner, 2026-07-22 |
+| Sizes | **S, M, L, XL** | **VERIFIED** — owner, 2026-07-22 |
+| Photos | — | **UNVERIFIED — OWED** (Vladimir) |
+| Fabric / composition / care | — | **UNVERIFIED — OWED** (Vladimir; read off the label) |
+
+**Baby blue is owner-stated, not photographed.** The other two colourways are VERIFIED *by photos on
+hand*; baby blue is confirmed by Vladimir, but no product (or lifestyle) photo of it exists yet. So it
+ships in the catalog with a visible photo placeholder, a fabric/care placeholder, and the neutral name
+slot ("Производ 03") — never a stand-in image, never an invented composition or name (`D-0-6`,
+`D-Y.02-1`). Its price (1999 MKD) and sizes (S/M/L/XL) render as real, VERIFIED facts. **Photos +
+fabric are OWED before it can enter a live drop** — that assignment is `Y.01`.
+
 ---
 
 ## 8. Photography
@@ -264,3 +286,4 @@ Say so in the completion report and it comes back to the orchestrator.
 | 2026-07-18 | **§ 5 Email → VERIFIED.** Per the Phase Z.01 Code brief (Task 8, `D-Z.01-3/4`), the owner's email now exists (provenance: owner via Lazar, 2026-07-18) and is recorded **as env-var-only** (`ORDER_NOTIFICATION_EMAIL`) — the literal address is never written to the repo (`D-0-1`). Wired as the internal order-notification recipient; **not** published on Contact (register #5 stays). Real inbox delivery still owed to 1.08. Edit made by Code on explicit orchestrator instruction and surfaced in the completion report (not a silent add). | Claude Code (per Z.01 brief) |
 | 2026-07-18 | **§ 7 Price + sizes → VERIFIED (Phase 1.08 Code brief, Task 1, `D-1.08-1`).** Price **1199 MKD** for this drop and currency **MKD** marked VERIFIED (provenance: owner via Lazar, 2026-07-18); the old "~$65 / ~3,700 MKD INDICATIVE ONLY" ceiling is **SUPERSEDED** — a real price now exists. Sizes **S/M/L/XL** VERIFIED, with the **off-white** shirt **XL-only**. Fabric/composition/care and per-size measurements stay **UNVERIFIED — OWED**. Edit made by Code on explicit orchestrator instruction (the gate runs against a real-priced rehearsal drop, `D-1.08-1`) and surfaced in the completion report — not a silent add. | Claude Code (per 1.08 brief) |
 | 2026-07-19 | **§ 1 Responsible party amended (Phase 2.03 Code, `D-2.03-1`).** The row now records that the party **displayed** on Terms + Privacy is **Vladimir Trajanov, alone** (Lazar's call), while keeping the underlying VERIFIED intake fact (Vladimir Trajanov and his parents) visible in the same cell — neither overwritten nor deleted. The §1 open flag (confirm legal responsibility with the parents before cutover) is **unchanged and still open**. Full walk of every rendered claim recorded in `docs/legal/facts-audit-2.03.md`; no other claim needed a `facts.md` change. Edit made by Code on explicit orchestrator instruction and surfaced in the completion report — not a silent add. | Claude Code (per 2.03 brief) |
+| 2026-07-22 | **§ 7 Product 03 — baby blue added (Phase Y.02 Code, Task 1, `D-Y.02-1`).** A **third colourway, baby blue**, working name "Product 03": **price 1999 MKD VERIFIED** (owner, 2026-07-22) and **sizes S/M/L/XL VERIFIED** (owner); the colourway itself is **owner-stated, NOT photographed** (explicitly not "VERIFIED (photos)" like the other two); **photos + fabric/care UNVERIFIED — OWED** (Vladimir); the real customer-facing name is OWED. Recorded as a new `### Product 03` sub-block in § 7. Owner-authorised out-of-order insert (Lazar, 2026-07-22). Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.02 brief) |

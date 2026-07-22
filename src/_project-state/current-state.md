@@ -6,11 +6,46 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-22** · By: **Claude Code (Phase 2.06 — Drop rehearsal + contingency, Code half)**
+Last updated: **2026-07-22** · By: **Claude Code (Phase Y.02 — Product 03 (baby blue) catalog stub)**
 
 ---
 
 ## Status
+
+**Y.02 COMPLETE — a third product, "Product 03" (baby blue), is now a visible, honest catalog stub
+(this update, 2026-07-22).** An owner-authorised out-of-order insert (`D-Y.02-1`, Lazar, 2026-07-22) —
+it does **NOT** replace the 2.06 operator rehearsal on the critical path (line 1 `NEXT:` is unchanged).
+**No commerce logic touched.** What shipped:
+- **`facts.md` §7** gained a `### Product 03 — baby blue` sub-block: **price 1999 MKD** + **sizes
+  S/M/L/XL** marked **VERIFIED (owner, 2026-07-22)**; the **colourway is owner-stated, NOT photographed**
+  (deliberately *not* "VERIFIED (photos)" like mustard/ochre + off-white); **photos + fabric/care OWED**
+  (Vladimir); the real name OWED.
+- **`src/config/products.ts`** — a **third** product, `test-baby-blue`, added to the existing **ENDED**
+  `test-drop`, mirroring the two colourways there exactly: `name_* = null` (→ neutral slot "Производ 03",
+  `sort_order` 3), `priceMkd: 1999`, `photoPath`/`careMk`/`careEn` null, sizes **S/M/L/XL** (stock 3 each,
+  nominal — the drop is ended, nothing is buyable). It renders **browsable-but-not-buyable** (the site's
+  default state between drops). It is **NOT** in a live/real drop — `drops.ts` (the schedule) is untouched;
+  true drop assignment is `Y.01` (`D-Y.02-2`).
+- **No migration** (`D-Y.02-3`): the product + its per-size variant rows land via the existing typed config
+  + `npm run sync:drop` (INSERT-only, `D-1.04-5`/`D-1.04-11`) — a data operation, not a schema change. The
+  `products`/`variants` tables, `create_order`, `expire_reservations`, the atomic decrement + reservation
+  logic, cart, checkout, `SITE_URL`, and the drop schedule are all **byte-unchanged** (grep-proven in the
+  report).
+- **Product JSON-LD stays suppressed** for Product 03 (its name is a placeholder → `productJsonLd` returns
+  null), consistent with the existing two.
+- **No new user-facing string:** Product 03 reuses the existing shared placeholder keys
+  (`Placeholder.productPhoto` / `Placeholder.composition` / the `Placeholder.productName` neutral slot) and
+  the shared MKD price format — both locales already carry them, so no MK/EN catalog change was needed.
+
+**Gates:** `npm run build` / `npx tsc --noEmit` / `npm run lint` clean; `npm test` **85/85** incl. the
+10-vs-3 oversell gate (the concurrency test targets the seed's `test-open-drop`/`test-tee-black`, wholly
+independent of `src/config/products.ts`, so adding a catalog product cannot disturb the oversell
+guarantee — proven, not assumed). Rendered in-browser (see the report): the catalog lists **three**
+products with Product 03 the baby-blue one, and its product page shows price **1.999 ден** / **1,999 MKD**,
+selectable sizes S/M/L/XL, visible photo + composition placeholders, the neutral name "Производ 03" /
+"Product 03", and the browsable-but-not-buyable (ended, no live drop) state. **Placeholder register +3
+rows** (#8 photo, #9 fabric/care, #10 real name — all Product 03, owner Vladimir); **owed-verification
+register unchanged**. Decisions `D-Y.02-1/2/3`. Branch `phase-y.02-product-03-stub`; PR to `main`.
 
 **2.06 CODE HALF COMPLETE — drop day is now a script, and the rehearsal is ready to run (this update,
 2026-07-22).** A Code + operator phase like the 1.08 gate: Code shipped the two repo documents, the safe
@@ -1039,6 +1074,16 @@ Lazar's explicit override (`D-2.05-2`).** The zero-condition is **re-pointed to 
 prevents is not triggered by cutover alone — it IS the moment a drop opens. **The register must reach
 zero before the first real drop.**
 
+*Y.02 update (2026-07-22): **+3 rows — #8, #9, #10 — all for Product 03 (baby blue).** The new catalog
+stub (`D-Y.02-1`) ships with the SAME visible placeholders as the two existing colourways: a photo slot
+(#8), a fabric/care slot (#9), and the neutral name slot (#10). These are **not new placeholder strings** —
+Product 03 reuses the exact shared keys the generic rows #2/#3/#4 already cover (`Placeholder.productPhoto`
+/ `Placeholder.composition` / the `Placeholder.productName` neutral slot); the new rows make **baby blue's
+own** owed photo + fabric + name explicit, so the "register to zero before the first REAL drop" gate counts
+three products' worth of owed content, not two. **Cleared / reworded / hid none** — #2–#7 are
+byte-unchanged. Product 03's price (1999 MKD) and sizes (S/M/L/XL) are VERIFIED and render as real facts, so
+they are **not** placeholders.*
+
 *2.06 update (2026-07-22): **no change to the register.** The Code half of 2.06 shipped only ops docs +
 SQL helpers under `docs/ops/` — no new placeholder, and #2/#3/#4/#7 are byte-unchanged. The rehearsal runs
 against the existing `test-drop` (placeholder names, no photos) and does **not** fill any product
@@ -1084,6 +1129,9 @@ confirmed they are translated in both locales.*
 | ~~5~~ | ~~`[PLACEHOLDER: е-пошта — Владимир]` (contact email)~~ | ~~Contact~~ | **CLEARED 2026-07-22 (2.05).** `info@trajanovv.com` is now published on Contact in both locales (a real `mailto:`, `EMAIL` constant in `src/lib/social.ts`); the `Placeholder.email` key was removed from both catalogs. VERIFIED for public display (Lazar/Vladimir, 2026-07-21, `facts.md` §5). It is a **domain** address (Cloudflare Email Routing → Vladimir's inbox), **not** his personal email — so the `D-Z.01-3` concern (publishing a minor's personal address) does not apply. | — |
 | 6 | `[PLACEHOLDER: курир и цена на испорака — Владимир]` (courier + delivery cost) | **Shipping & Returns** (`/isporaka-i-vrakjanje`, `/en/shipping-returns`) | **NARROWED 2026-07-22 (2.05):** delivery **time** is now VERIFIED (3–5 business days, `facts.md` §7) and shows on the page, so this placeholder dropped „време"/"time" — only **courier + delivery cost** remain, neither in `facts.md`. Deliberately **not** estimated: on cash-on-delivery a wrong delivery cost is money asked for at the door on a promise nobody made (`D-2.03` Task 5) | Vladimir |
 | 7 | `[PLACEHOLDER: рок за враќање и замена — Владимир]` (returns/exchange window) | **Shipping & Returns** | The returns/exchange **window** — not in `facts.md`; **no statutory withdrawal period is cited** (Decision 5). A real number comes from Vladimir | Vladimir |
+| 8 | `[PLACEHOLDER: фотографија — Владимир]` — **Product 03 (baby blue)** photo | Catalog card, Product (`/katalog/test-baby-blue`, `/en/catalog/test-baby-blue`) | A **real baby-blue product photo** (`D-0-6`, `D-Y.02-1`) — no stand-in, no generated image, no other shirt's photo. Same shared key as #2, scoped to the new colourway | Vladimir |
+| 9 | `[PLACEHOLDER: состав и нега — од етикетата]` — **Product 03 (baby blue)** fabric/care | Product | Composition + care **read off baby blue's label** — never guessed (`D-Y.02-1`). Same shared key as #3, scoped to the new colourway | Vladimir |
+| 10 | Product 03 **name** renders as the neutral slot "Производ 03" / "Product 03" | Catalog, Product | The **real customer-facing name** for baby blue — no invented name (`D-Y.02-1`). Same neutral-slot mechanism as #4, scoped to the new colourway | Vladimir |
 
 *#5 (email) was a pure UI placeholder via `<Placeholder>` (`Placeholder.email` key), shipped by 1.05
 (`D-1.05-3`) and held pending Vladimir's OK to publish a contact email (`D-Z.01-3`). **That sign-off came
