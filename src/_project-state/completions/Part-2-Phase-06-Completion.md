@@ -14,7 +14,7 @@
 | **Operator** | Lazar + Vladimir (owed — the live rehearsal) |
 | **Date** | 2026-07-22 |
 | **Branch** | `phase-2.06-rehearsal-contingency` |
-| **PR** | [#16](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/16) (opened this session → `main`; not self-merged) |
+| **PR** | [#16](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/16) — **MERGED to `main`** (merge `20e5d3d`, 2026-07-22) on Petar's explicit instruction (`D-0-3`: operator-authorised, not Code) |
 | **Brief** | `briefs/Part-2-Phase-06-Code.md` |
 
 ---
@@ -201,7 +201,7 @@ No secret was committed at any point on this branch.
 | Item | Waiting on | Owner |
 |---|---|---|
 | The live rehearsal (owed #15 + #16 + items A–I above) | Lazar + Vladimir running `docs/ops/drop-rehearsal-runbook.md` on real devices | Lazar + Vladimir |
-| Merge the PR (Code does not self-merge, `D-0-3`) | An operator | Petar / Lazar |
+| ~~Merge the PR~~ | **DONE** — PR #16 merged to `main` (merge `20e5d3d`, 2026-07-22) on Petar's instruction (`D-0-3`) | Petar |
 | **Write the X.01 (Vercel Pro migration) brief** (`D-2.06-2`) | Authoring `briefs/Part-X-Phase-01-*.md` so the recovery path is a checklist, not an improvisation | Lazar / Code (next phase) |
 | Uptime monitor (register **L7**) | Standing one up so detection isn't customer-report-only (also guards Known issue #7) | Lazar (ops) |
 | Cloudflare Web Analytics beacon (`D-2.05-5`) | Analytics token | Lazar (ops) |
