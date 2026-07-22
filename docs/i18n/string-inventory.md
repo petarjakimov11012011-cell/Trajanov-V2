@@ -142,8 +142,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Order.success` | Нарачка {orderNumber} е примена и резервирана 48 часа. Плаќаш со готовина при преземање — ќе те побараме телефонски за да ја потврдиме. | Order {orderNumber} received and reserved for 48 hours. You pay cash on delivery — we'll call you to confirm. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.turnstileFailed` | Проверката не помина. Пробај повторно. | That check didn't pass. Try again. | `src/components/checkout/CheckoutForm.tsx` |
 | `Placeholder.composition` | [PLACEHOLDER: состав и нега — од етикетата] | [PLACEHOLDER: composition & care — from the label] | `src/app/[locale]/catalog/[slug]/page.tsx` |
-| `Placeholder.courier` | [PLACEHOLDER: курир, време и цена на испорака — Владимир] | [PLACEHOLDER: courier, delivery time and delivery cost — Vladimir] | `src/app/[locale]/shipping-returns/page.tsx` |
-| `Placeholder.email` | [PLACEHOLDER: е-пошта — Владимир] | [PLACEHOLDER: email — Vladimir] | `src/app/[locale]/contact/page.tsx` |
+| `Placeholder.courier` | [PLACEHOLDER: курир и цена на испорака — Владимир] | [PLACEHOLDER: courier and delivery cost — Vladimir] | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Placeholder.notice` | Преглед на дизајн-системот. Податоците за производите (назив, цена, величини, состав, фотографии) се примероци — вистинските ги внесува Владимир во подоцнежна фаза. | Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase. | `src/components/system/PreviewNotice.tsx` |
 | `Placeholder.price` | [PLACEHOLDER: цена MKD] | [PLACEHOLDER: price MKD] | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/checkout/CheckoutForm.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Placeholder.productName` | Производ | Product | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/product/ProductCard.tsx` |
@@ -178,8 +177,9 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Product.shippingBody` | Само во Северна Македонија. Плаќање со готовина при преземање. | North Macedonia only. Cash on delivery. | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Product.size` | Величина | Size | `src/components/product/AddToCartPanel.tsx` |
 | `Product.sizeGuide` | Водич за величини | Size guide | _(not found in source)_ |
-| `ShippingReturns.deliveryBody` | Овие детали сè уште ги немаме потврдено. Не сакаме да погодуваме бидејќи плаќаш готовина на врата. | We don't have these confirmed yet. We won't guess, because you pay cash at the door. | `src/app/[locale]/shipping-returns/page.tsx` |
+| `ShippingReturns.deliveryBody` | Курирот и цената на испорака сè уште ги немаме потврдено. Не сакаме да погодуваме бидејќи плаќаш готовина на врата. | The courier and delivery cost aren't confirmed yet. We won't guess, because you pay cash at the door. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.deliveryHeading` | Курир, време и цена на испорака | Courier, delivery time and cost | `src/app/[locale]/shipping-returns/page.tsx` |
+| `ShippingReturns.deliveryTime` | Рок на достава: 3–5 работни дена. | Delivery time: 3–5 business days. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.eyebrow` | Правно | Legal | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.h1` | Испорака и враќање | Shipping & returns | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.intro` | Каде испорачуваме, како плаќаш и што да правиш ако нешто не е во ред. | Where we ship, how you pay, and what to do if something's wrong. | `src/app/[locale]/shipping-returns/page.tsx` |
@@ -193,7 +193,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `ShippingReturns.returnsHeading` | Рок за враќање и замена | Returns and exchange window | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.whereHeading` | Каде испорачуваме | Where we ship | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Stock.inStock` | На залиха | In stock | `src/components/drop/StockBadge.tsx` |
-| `Stock.low` | Уште {count} | {count} left | `src/components/drop/StockBadge.tsx`<br>`src/components/product/ProductCard.tsx` |
+| `Stock.low` | Уште {count} | {count} left | `src/components/drop/StockBadge.tsx` |
 | `Stock.soldOut` | Распродадено | Sold out | `src/components/drop/StockBadge.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Styleguide.buyButton` | Копче за купување | Buy button | `src/app/[locale]/styleguide/page.tsx` |
 | `Styleguide.colors` | Боја | Colour | `src/app/[locale]/styleguide/page.tsx` |

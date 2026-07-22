@@ -11,8 +11,11 @@ import { Resend } from "resend";
 // only ever imported by the "use server" order action and by tests — it is never reachable from a
 // client component, so the API key never ships to a browser. It reads env at call time, not load time.
 
-/** From-address stays Resend's shared sender until `trajanov.com` is bought + verified (D-Z.01-2). */
-export const ORDER_FROM_ADDRESS = "onboarding@resend.dev";
+/** From-address is the brand's own domain address (2.05 cutover, D-2.05-3). Deliverability is proven: the
+ *  domain is verified in Resend in the same account that holds RESEND_API_KEY, and Cloudflare Email
+ *  Routing forwards info@ to Vladimir's inbox. This is the ONLY order email the app sends — there is no
+ *  customer confirmation (no customer email is collected, D-Z.01-1) — so it is the one from-address. */
+export const ORDER_FROM_ADDRESS = "info@trajanovv.com";
 
 /** Hard ceiling on the Resend call so a hung request can never stall the customer's order response. */
 const SEND_TIMEOUT_MS = 8000;

@@ -1,9 +1,10 @@
 import type {Metadata} from 'next';
 import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations} from 'next-intl/server';
-import {Placeholder} from '@/components/system/Placeholder';
 import {pageMetadata} from '@/lib/metadata';
 import {
+  EMAIL,
+  EMAIL_MAILTO,
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
   PHONE_DISPLAY,
@@ -38,7 +39,6 @@ export default async function ContactPage({
   const {locale} = await params;
   setRequestLocale(locale);
   const t = await getTranslations('Contact');
-  const tp = await getTranslations('Placeholder');
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-16 sm:px-6">
@@ -82,12 +82,17 @@ export default async function ContactPage({
           </span>
         </a>
 
-        <div className="flex flex-col gap-2 py-2">
+        <a
+          href={EMAIL_MAILTO}
+          className="group flex min-h-11 flex-col gap-1 py-2"
+        >
           <span className="text-eyebrow text-muted-foreground uppercase tracking-[0.14em]">
             {t('emailLabel')}
           </span>
-          <Placeholder>{tp('email')}</Placeholder>
-        </div>
+          <span className="font-display text-h2 text-foreground group-hover:text-mustard underline-offset-4 transition-colors duration-[var(--motion-fast)] group-hover:underline">
+            {EMAIL}
+          </span>
+        </a>
       </section>
     </div>
   );
