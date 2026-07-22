@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-22 |
 | **Branch** | `phase-2.04b-seo-geo-polish` |
-| **PR** | #14 (to `main`) |
+| **PR** | #14 — **MERGED to `main`** (merge `c562195`, 2026-07-22) on Petar's explicit instruction (`D-0-3`) |
 | **Brief** | `briefs/Part-2-Phase-04b-SEO-GEO-Polish-Code.md` |
 
 ---
@@ -68,6 +68,18 @@
 - **`logo.svg` has a transparent background** (mustard wordmark), so it composits onto the dark brand
   ground and is only high-contrast on dark — by design, matching the dark-only brand. The **PNG**
   (`logo-512.png`, the JSON-LD asset) has the solid ground background the brief asked for.
+- **⚠️ DOMAIN CHANGED — discovered at the merge (2026-07-22), reported to Petar, confirmed his.** While
+  smoke-verifying the deploy, production `https://trajanov-v2.vercel.app` was found to **308-redirect to
+  `https://www.trajanovv.com`** — a real custom domain (**`trajanovv.com`, double-v**, matching the IG
+  handle `@trajanovv2026`) attached to the Vercel project **outside this repo**. Petar confirmed the
+  domain is his and chose to **leave `SITE_URL` on the vercel.app origin until the full 2.05 cutover.**
+  Consequences the orchestrator must carry into **2.05**: (a) `SITE_URL` (`src/lib/site.ts`) must flip to
+  `https://www.trajanovv.com`, because **every** absolute URL this phase (and 2.04) emits — canonical,
+  hreflang, JSON-LD `logo`/`@id`, sitemap, OG, llms.txt links — currently points at the redirecting
+  vercel.app host; (b) **`facts.md` §9 is now STALE** — it records the target as `trajanov.com`
+  **single-v**, "NOT YET PURCHASED"; the live domain is double-v and bought. **Code did NOT edit
+  `facts.md` or `SITE_URL`** (owner/orchestrator call, and Petar deferred it). Logged in `current-state.md`
+  (line 1, Domain row, Known issue #10, parallel track).
 
 ---
 
