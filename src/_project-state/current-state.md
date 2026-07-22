@@ -45,7 +45,14 @@ products with Product 03 the baby-blue one, and its product page shows price **1
 selectable sizes S/M/L/XL, visible photo + composition placeholders, the neutral name "Производ 03" /
 "Product 03", and the browsable-but-not-buyable (ended, no live drop) state. **Placeholder register +3
 rows** (#8 photo, #9 fabric/care, #10 real name — all Product 03, owner Vladimir); **owed-verification
-register unchanged**. Decisions `D-Y.02-1/2/3`. Branch `phase-y.02-product-03-stub`; PR to `main`.
+register unchanged**. Decisions `D-Y.02-1/2/3`. Branch `phase-y.02-product-03-stub`; **PR #17 MERGED to
+`main` (merge `25573de`, 2026-07-22) on Petar's explicit instruction (`D-0-3`: operator-authorised, not
+Code); branch deleted.** ⚠️ **The merge-triggered Vercel redeploy does NOT yet show Product 03 on the live
+catalog:** the deployed CODE is correct, but the running site reads the hosted **DB**, and Product 03's
+rows land only when an operator runs **`npm run sync:drop`** against the hosted DB (`D-Y.02-3`) — this PR
+synced the **local** DB only. Until that hosted sync, `www.trajanovv.com/katalog` still shows the two 1.08
+colourways. Running it is safe (INSERT-only, `D-1.04-5`; the drop stays ENDED) and can happen any time
+before Y.01 — or as part of Y.01.
 
 **2.06 CODE HALF COMPLETE — drop day is now a script, and the rehearsal is ready to run (this update,
 2026-07-22).** A Code + operator phase like the 1.08 gate: Code shipped the two repo documents, the safe
