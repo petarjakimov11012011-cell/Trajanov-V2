@@ -47,12 +47,20 @@ selectable sizes S/M/L/XL, visible photo + composition placeholders, the neutral
 rows** (#8 photo, #9 fabric/care, #10 real name — all Product 03, owner Vladimir); **owed-verification
 register unchanged**. Decisions `D-Y.02-1/2/3`. Branch `phase-y.02-product-03-stub`; **PR #17 MERGED to
 `main` (merge `25573de`, 2026-07-22) on Petar's explicit instruction (`D-0-3`: operator-authorised, not
-Code); branch deleted.** ⚠️ **The merge-triggered Vercel redeploy does NOT yet show Product 03 on the live
-catalog:** the deployed CODE is correct, but the running site reads the hosted **DB**, and Product 03's
-rows land only when an operator runs **`npm run sync:drop`** against the hosted DB (`D-Y.02-3`) — this PR
-synced the **local** DB only. Until that hosted sync, `www.trajanovv.com/katalog` still shows the two 1.08
-colourways. Running it is safe (INSERT-only, `D-1.04-5`; the drop stays ENDED) and can happen any time
-before Y.01 — or as part of Y.01.
+Code); branch deleted.** ✅ **HOSTED SYNC DONE — Product 03 is LIVE (2026-07-22, the `D-Y.02-3` deferred
+sync, on Petar's instruction; NOT Y.01/the real content load).** `npm run sync:drop` was run against the
+hosted Frankfurt DB (`SUPABASE_DB_URL` from gitignored `.env.hosted`; confirmed host
+`aws-0-eu-central-1.pooler.supabase.com`, not local — no silent no-op). **Purely additive, INSERT-only
+(`D-1.04-5`):** report `products inserted: 1` (`test-baby-blue`), `variants inserted: 4` (S/M/L/XL stock
+3), `products updated: 2` (mustard/off-white re-written to the same null names / 1199 MKD), `variants
+untouched: 5` (**existing stock preserved**), `rows deleted: 0`. Hosted `test-drop` now carries **3**
+products, **stays ENDED** (window June 2026), **orders = 0**. **No code / migration / `create_order` /
+`expire_reservations` / cart / checkout / `src/config/` edit / new dependency.** Verified on the live
+domain: `www.trajanovv.com/katalog` (+ `/en/catalog`) now lists **three** boxes — `Производ 03` /
+`Product 03`, **1.999 ден / 1,999 MKD**, S/M/L/XL, the same `[PLACEHOLDER: …]` photo slot + box styling
+as the other two, **browsable-but-not-buyable** („Распродадено" / "Sold out"); the product page
+`/katalog/test-baby-blue` loads and emits **no** Product JSON-LD (name still a placeholder). Placeholders
+#8/#9/#10 (photo/fabric/name) remain **open** — the stub is visible, its owed content is still owed.
 
 **2.06 CODE HALF COMPLETE — drop day is now a script, and the rehearsal is ready to run (this update,
 2026-07-22).** A Code + operator phase like the 1.08 gate: Code shipped the two repo documents, the safe

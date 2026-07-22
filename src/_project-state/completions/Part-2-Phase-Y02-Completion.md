@@ -208,7 +208,7 @@ No secret was committed at any point in this branch's history.
 
 | Item | Waiting on | Owner |
 |---|---|---|
-| **Production shows Product 03 only after `npm run sync:drop` against the hosted DB** (`D-Y.02-3`). This PR changes config only; it does not touch the production DB. The same operator step every catalog/drop change needs. | An operator-run hosted sync (or the Y.01 drop-content deploy) | Lazar / operator |
+| ~~**Production shows Product 03 only after `npm run sync:drop` against the hosted DB**~~ (`D-Y.02-3`) — **DONE 2026-07-22 (operator instruction).** The hosted sync was run (INSERT-only: +1 product `test-baby-blue`, +4 variants, existing stock untouched, 0 deleted, drop stays ENDED, orders = 0). Verified live: `www.trajanovv.com/katalog` (+ `/en`) now lists three boxes, Product 03 renders, product page loads, no Product JSON-LD. | ~~operator-run hosted sync~~ **done** | Lazar / operator |
 | Product 03's photo, fabric/care, and real name (placeholder register #8/#9/#10) | Vladimir | Vladimir |
 | Product 03's real drop assignment (its own live drop, real slug) | Real photos + fabric, then Y.01 | Vladimir → Y.01 |
 | Shared size note "величини — примерок" is stale now sizes are VERIFIED (pre-existing, out of scope here) | A copy pass in Y.01 | Lazar / Y.01 |
