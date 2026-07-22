@@ -124,16 +124,18 @@ it must match Трн.мк — which it does. Do not silently harmonise it to the
 | Fact | Value | Status |
 |---|---|---|
 | Phone | **078820520** | **VERIFIED** — owner confirmed for public display, intake 2026-07-14 |
-| Email | **Exists; stored as the `ORDER_NOTIFICATION_EMAIL` env var — the literal address is NEVER written to the repo (`D-Z.01-3`, `D-0-1`)** | **VERIFIED** — owner via Lazar, 2026-07-18 |
+| Email | **info@trajanovv.com** — public contact address + system order-email from-address (a domain address via Cloudflare Email Routing → Vladimir's inbox) | **VERIFIED — cleared for public display** — Lazar/Vladimir, 2026-07-21 |
 | Physical address | None | VERIFIED (as absence) |
 
-**The email now exists (VERIFIED 2026-07-18) and is wired — as of Phase Z.01 — as the internal
-order-notification recipient only.** It is read server-side from `ORDER_NOTIFICATION_EMAIL`; the literal
-value is not in this file, any commit, any fixture, or any log (public-repo rule, `D-0-1`; `D-Z.01-3`).
-It is **NOT published on the Contact page** — that placeholder (register #5) stays pending Vladimir's
-explicit sign-off to show a minor's personal email publicly (`D-Z.01-3`). **That an order actually
-delivers an email to Vladimir's inbox is still owed to Phase 1.08** (needs the live Vercel keys + a live,
-priced drop + a real order end to end).
+**`info@trajanovv.com` is the public contact address and the system order-email from-address (VERIFIED
+for public display — Lazar/Vladimir, 2026-07-21, `D-2.05-3`).** It is a **domain** address: Cloudflare
+Email Routing forwards it to Vladimir's inbox, and the domain is verified in Resend (in the account that
+holds `RESEND_API_KEY`) so order email sends **from** it. As of Phase 2.05 it is **published on the
+Contact page** (placeholder register **#5 cleared**). It is **distinct from the notification-recipient
+inbox** (`ORDER_NOTIFICATION_EMAIL`, Vladimir's own inbox, where order notifications land) — that literal
+recipient address is still NEVER written to this file, any commit, fixture, or log (public-repo rule,
+`D-0-1`; `D-Z.01-3`). Real inbox delivery was verified end to end by the 1.08 operator (`D-1.08-4`); the
+branded `info@` from-address deploys with the 2.05 cutover.
 
 Phone format for display: confirm with Vladimir whether he wants `078 820 520` (local) or
 `+389 78 820 520` (international). Use `tel:+38978820520` in the link either way.
@@ -164,6 +166,8 @@ survive being pasted into an Instagram story or bio link — see the OG requirem
 | Actual price — this drop | **1199 MKD** (the shirts in the current drop) | **VERIFIED** — owner via Lazar, 2026-07-18 |
 | Currency | **MKD (денари)** — the site renders MKD only, never USD | **VERIFIED** — owner via Lazar, 2026-07-18 |
 | Shipping | **North Macedonia only** | VERIFIED (owner, intake) |
+| Delivery time | **3–5 business days** | **VERIFIED** — Owner, 2026-07-21 |
+| Courier + delivery cost | — | **UNVERIFIED — OWED** (Vladimir) |
 | Payment | **Cash on delivery only** | VERIFIED (owner, intake) |
 | Sizes available | **S, M, L, XL** — except the **off-white** shirt, which is **XL only** | **VERIFIED** — owner via Lazar, 2026-07-18 |
 | Fabric / composition / care | — | **UNVERIFIED — OWED** (Vladimir; read off the labels) |
@@ -218,10 +222,14 @@ for Vladimir, on the parallel track, before those images go live.
 
 | Fact | Value | Status |
 |---|---|---|
-| Target domain | **trajanov.com** | **UNVERIFIED — NOT YET PURCHASED** (Lazar) |
+| Domain | **trajanovv.com** (double-v) | **VERIFIED — PURCHASED** — Owner (Lazar), 2026-07-21 |
 
-Not owned yet. Nothing may hardcode it, print it, or put it in schema/OG/sitemap until purchase is
-confirmed. Gates cutover (Phase 2.05).
+Purchased and live. `trajanov.com` (single-v — the target in every planning doc and this file until
+2026-07-21) was **unavailable to buy**; `trajanovv.com` was registered instead and **matches the
+Instagram handle `@trajanovv2026`**, the source of nearly all traffic (`D-2.05-1`). The site is served
+and canonicalised on **`https://www.trajanovv.com`** — the apex `trajanovv.com` and the old
+`trajanov-v2.vercel.app` both 308-redirect to it — so `SITE_URL` (`src/lib/site.ts`) is
+`https://www.trajanovv.com` (`D-2.05-6`). Cutover shipped in **Phase 2.05**.
 
 ---
 

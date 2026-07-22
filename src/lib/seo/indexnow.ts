@@ -28,7 +28,7 @@ export interface PingIndexNowResult {
  * you can only submit URLs on the host you have proven you own, and today that host is a temporary
  * `*.vercel.app` preview (SITE_URL). This helper is exported and documented for a POST-2.05 hook (e.g.
  * fire it from `scripts/sync-drop.ts` after a drop's products change, or from a revalidation webhook)
- * once SITE_URL points at trajanov.com and the key is registered in Bing Webmaster Tools.
+ * now that SITE_URL points at www.trajanovv.com (2.05) and once the key is registered in Bing Webmaster Tools.
  *
  * Best-effort: it never throws — a dead endpoint or a network error resolves to `{ok:false}` — because
  * a search-ping failing must never break whatever real operation triggered it (mirrors the order-email

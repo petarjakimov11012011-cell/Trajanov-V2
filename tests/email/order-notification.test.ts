@@ -74,7 +74,7 @@ describe("composeOrderNotification", () => {
 });
 
 describe("sendOrderNotification", () => {
-  it("sends exactly one email to ORDER_NOTIFICATION_EMAIL from onboarding@resend.dev with the order fields", async () => {
+  it("sends exactly one email to ORDER_NOTIFICATION_EMAIL from info@trajanovv.com with the order fields", async () => {
     configureEnv();
     sendMock.mockResolvedValue({ data: { id: "e_1" }, error: null });
 
@@ -84,7 +84,7 @@ describe("sendOrderNotification", () => {
     expect(sendMock).toHaveBeenCalledTimes(1);
     const payload = sendMock.mock.calls[0][0];
     expect(payload.from).toBe(ORDER_FROM_ADDRESS);
-    expect(payload.from).toBe("onboarding@resend.dev");
+    expect(payload.from).toBe("info@trajanovv.com");
     expect(payload.to).toBe(RECIPIENT);
     expect(payload.subject).toContain("TRJ-0007");
     expect(payload.text).toContain(ORDER.customerName);

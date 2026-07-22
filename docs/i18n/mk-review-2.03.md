@@ -166,17 +166,23 @@ Replace the blanks with your name and date, and change `[ ]` to `[x]`.
 
 **Reviewer 1 — Lazar**
 
-- Name: __________
-- Date: __________
-- [ ] I read every one of the 63 rows, walked the three pages in both languages, and answered the slug
+- Name: Lazar
+- Date: 2026-07-21
+- [x] I read every one of the 63 rows, walked the three pages in both languages, and answered the slug
   question.
 
 **Reviewer 2 — Petar**
 
-- Name: __________
-- Date: __________
-- [ ] I read every one of the 63 rows (and Lazar's verdicts), walked the three pages in both languages,
+- Name: Petar
+- Date: 2026-07-21
+- [x] I read every one of the 63 rows (and Lazar's verdicts), walked the three pages in both languages,
   and answered the slug question.
+
+**Result: passed — no changes.** Scope reviewed: all **63** new 2.03 legal / nav / meta strings **plus
+`Common.skipToContent`** (the 2.04 skip-link string „Прескокни до содржината", `D-2.04-7`, folded into
+this review per the 2.05 brief). Two native Macedonian speakers (Lazar + Petar) found **no** spelling /
+grammar / agreement / terminology fault, no English-in-MK leak, and requested no style change; **no MK
+string was changed.** Stamped in Phase 2.05 (cutover) — clears owed-verification **#10**.
 
 ---
 

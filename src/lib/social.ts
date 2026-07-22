@@ -17,3 +17,9 @@ export const INSTAGRAM_URL = "https://instagram.com/trajanovv2026";
 // local was chosen, matching the 1.02 footer; the tel: link is E.164 either way).
 export const PHONE_DISPLAY = "078 820 520";
 export const PHONE_TEL = "tel:+38978820520";
+
+// Public contact email (facts.md §5, VERIFIED — cleared for public display 2026-07-21). A DOMAIN address
+// (Cloudflare Email Routing → Vladimir's inbox), also the order-email from-address (D-2.05-3). Published
+// on Contact as of 2.05. Distinct from ORDER_NOTIFICATION_EMAIL (the recipient inbox, never in the repo).
+export const EMAIL = "info@trajanovv.com";
+export const EMAIL_MAILTO = "mailto:info@trajanovv.com";

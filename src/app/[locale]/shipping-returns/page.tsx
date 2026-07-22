@@ -64,6 +64,7 @@ export default async function ShippingReturnsPage({
       </LegalSection>
 
       <LegalSection heading={t('deliveryHeading')}>
+        <p>{t('deliveryTime')}</p>
         <p>{t('deliveryBody')}</p>
         <Placeholder>{tp('courier')}</Placeholder>
       </LegalSection>

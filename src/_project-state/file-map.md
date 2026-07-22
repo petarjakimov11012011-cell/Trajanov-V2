@@ -188,7 +188,7 @@ Trajanov-V2/
 │   │   ├── utils.ts                 # cn() — shadcn helper
 │   │   ├── social.ts                # facts-backed public contact constants: IG handle/URL + phone (1.04/1.05)
 │   │   ├── format.ts                # formatMkd(amount,currency,locale) — locale-aware price formatter (1.04, locale-aware 2.01)
-│   │   ├── site.ts                  # SITE_URL origin constant — hreflang/canonical base (2.01, TODO(2.05): trajanov.com)
+│   │   ├── site.ts                  # SITE_URL origin constant — hreflang/canonical base (2.05: https://www.trajanovv.com)
 │   │   ├── metadata.ts              # localeAlternates() (2.01) + pageMetadata()/ogImageUrl() — OG+Twitter+noindex (2.04)
 │   │   ├── seo/                     # structured-data builders (2.04)
 │   │   │   ├── site-jsonld.ts       # Organization + WebSite @graph — no address/logo/SearchAction/partner
