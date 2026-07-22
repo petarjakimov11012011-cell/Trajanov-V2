@@ -10,7 +10,8 @@
     "test": "vitest run",
     "gen:types": "supabase gen types typescript --local > src/types/database.ts",
     "sync:drop": "tsx scripts/sync-drop.ts",
-    "i18n:inventory": "tsx scripts/i18n-inventory.ts"
+    "i18n:inventory": "tsx scripts/i18n-inventory.ts",
+    "assets:brand": "tsx scripts/generate-brand-assets.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
