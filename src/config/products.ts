@@ -13,6 +13,12 @@
 // obviously non-production even though the price is now real. Its committed window is in the PAST
 // (drops.ts) so it renders "ended" and nothing is buyable by default; the gate opens it briefly, then
 // closes it (Task 7 → Task 12). When Vladimir supplies real names, fill nameMk/nameEn here and re-sync.
+//
+// PHASE Y.02 (D-Y.02-1/2): a THIRD product, "Product 03" (baby blue), is added below as a catalog stub —
+// owner-authorised out of order (Lazar, 2026-07-22) ahead of Y.01. Its price (1999 MKD) + sizes (S/M/L/XL)
+// are owner-VERIFIED (facts.md §7); its photo, fabric/care, and real name are OWED, so it ships with the
+// same placeholders as the two above. It joins THIS ended rehearsal drop (the only drop the catalog reads)
+// so it renders browsable-but-not-buyable; it is NOT assigned to any live/real drop — that is Y.01.
 
 import type { ProductConfig } from "./schema";
 
@@ -49,6 +55,29 @@ export const PRODUCTS: Readonly<Record<string, readonly ProductConfig[]>> = {
       careMk: null,
       careEn: null,
       sizes: [{ size: "XL", stock: 3 }],
+    },
+    {
+      // Product 03 — CATALOG STUB, baby blue (D-Y.02-1/2). A third colourway Vladimir has confirmed with
+      // a REAL price (1999 MKD) and REAL sizes (S/M/L/XL) — both owner-VERIFIED (facts.md §7). Its photo,
+      // fabric/care, and real customer-facing name are still OWED, so it ships exactly like the two above:
+      // name_* = null → the UI renders the neutral slot "Производ 03" (sort_order 3 → "03"); no photo/
+      // fabric columns exist yet (D-1.06-3) → visible placeholders. It lives in THIS ended rehearsal drop
+      // only so the catalog lists it browsable-but-not-buyable — the site's default state between drops.
+      // It is NOT in a live/real drop; true drop assignment is Y.01, once real photos exist (D-Y.02-2).
+      // Stock is a nominal placeholder (mirrors the two above) — test-drop is ended, so nothing is sold.
+      slug: "test-baby-blue",
+      nameMk: null,
+      nameEn: null,
+      priceMkd: 1999,
+      photoPath: null,
+      careMk: null,
+      careEn: null,
+      sizes: [
+        { size: "S", stock: 3 },
+        { size: "M", stock: 3 },
+        { size: "L", stock: 3 },
+        { size: "XL", stock: 3 },
+      ],
     },
   ],
 };
