@@ -2483,3 +2483,53 @@ start at `D-2.01-6`.*
   phrasing is satisfied by the single existing sender, surfaced here for the orchestrator.
 - **Links:** `src/app/[locale]/shipping-returns/page.tsx` · `src/messages/{mk,en}.json` ·
   `src/lib/email/order-notification.ts` · `D-Z.01-1` · Phase 2.05 brief Tasks 3, 5
+
+---
+
+### D-2.06-1 · 2026-07-22 · Rehearsal runs ONE order against a drop constrained to a single sellable unit, and reuses that order for the expiry test
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** The rehearsal must show (a) a product/drop reaching **SOLD OUT** from a single order and (b)
+  reservation **expiry** returning stock (the 1.08 backdated-hold method). The committed hosted stock is 3
+  on every size (`src/config/products.ts`), and the whole drop only reads "sold out / ended" when **total**
+  stock across every product+size is 0 (`src/lib/drop/state.ts` `totalStock`). Two separate orders (one to
+  sell out, one to expire) would trip the DB's one-live-order-per-phone index
+  (`orders_one_live_per_phone_per_drop`, live statuses only) unless run from two different phone numbers,
+  and would leave more teardown to do.
+- **Decision:** The open step (`docs/ops/rehearsal-sql/01-open-rehearsal-drop.sql`) zeroes every variant in
+  `test-drop` and puts back **one** unit on one size, so a single order takes the whole drop to SOLD OUT.
+  The expiry step backdates **that same order's** `reserved_until` so the scheduled sweep expires it and
+  returns the unit. One order, one phone, one buyable unit on the public URL at any moment.
+- **Alternatives considered:** (a) two orders across two sizes/phones (sold-out order + separate expiry
+  order) — rejected: needs two phone numbers to dodge the phone-limit index, and adds teardown surface. (b)
+  Leave stock at 3 and only sell one size to 0 — rejected: the *drop* never reads SOLD OUT (other sizes
+  still stocked), and it leaves 14 real-priced units buyable on a public URL during the window.
+- **Downside accepted:** After the expiry step the drop shows *live with 1 unit again* rather than staying
+  SOLD OUT (the SOLD OUT evidence is captured before expiry, so this is fine); and constraining the drop to
+  one unit is a **deliberate human stock write** on hosted — the same "deliberate SQL by someone who has
+  thought about it" the no-auto-restock rule (`D-1.04-5`) intends, done outside `sync:drop`, undone in
+  teardown. No commerce code, migration, or committed config changes.
+- **Links:** `docs/ops/drop-rehearsal-runbook.md` · `docs/ops/rehearsal-sql/` · `D-1.08-3/4` ·
+  `src/lib/drop/state.ts` · `Part-1-Phase-08-Operator-Runbook.md`
+
+---
+
+### D-2.06-2 · 2026-07-22 · Contingency plan POINTS AT X.01 as the recovery path; the X.01 brief itself is flagged-not-written (out of scope for 2.06)
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** Task 1 (technical recovery) says name where the X.01 brief lives and that it is "pre-written
+  to be an afternoon, not a scramble." `D-0-2` mitigation #2 promises X.01 is pre-written. In fact X.01 is
+  listed as an on-demand phase in `Trajanov-V2-Phase-Plan.md`, and the portability rule that *makes* it an
+  afternoon (`D-0-2`, `00_stack-and-config.md`) is in force — but **no executable X.01 brief exists** in
+  `briefs/` yet.
+- **Decision:** `docs/ops/drop-day-contingency.md` names X.01 (its plan location, trigger, owner Code, and
+  the portability rule that makes it fast) and **explicitly flags that the X.01 brief is not yet written**,
+  recommending it be authored before the first real drop. This phase does **not** write the X.01 brief.
+- **Alternatives considered:** Write the X.01 brief now to satisfy "pre-written" literally — rejected:
+  authoring a new on-demand phase brief is out of 2.06's scope (2.06 is the rehearsal + contingency docs),
+  and X.01 has its own trigger and owner. Silently claim X.01 is pre-written — rejected: it isn't, and the
+  contingency plan must be honest about the one gap in the recovery path.
+- **Downside accepted:** The `D-0-2` "pre-written recovery" promise is not literally met until someone
+  writes `briefs/Part-X-Phase-01-*.md`; surfaced here and in the completion report so it isn't lost.
+- **Links:** `docs/ops/drop-day-contingency.md` · `Trajanov-V2-Phase-Plan.md` (X.01) · `D-0-2` ·
+  `00_stack-and-config.md` (portability rule)
