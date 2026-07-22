@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Trajanov">
+  <!--
+    Trajanov favicon (App Router icon convention, Phase 2.04b Task 3). A "T" monogram derived from the
+    Trajanov wordmark — a full wordmark is illegible at 16–32px, so the initial stands in (D-2.04b).
+    Drawn as geometry, not <text>, so it is crisp at any size without depending on the Rubik font being
+    installed; the rounded corners echo Rubik's terminals. Colours are brand.md §3 token VALUES mirrored
+    as literals (an SVG asset cannot read a CSS custom property — same discipline as src/app/og, D-2.04-2):
+    ground #0F1210, mustard #E2A93C. Change brand.md first, then here.
+  -->
+  <rect width="512" height="512" fill="#0F1210"/>
+  <rect x="116" y="144" width="280" height="58" rx="16" fill="#E2A93C"/>
+  <rect x="227" y="144" width="58" height="224" rx="16" fill="#E2A93C"/>
+</svg>

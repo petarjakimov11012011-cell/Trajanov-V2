@@ -2238,3 +2238,116 @@ start at `D-2.01-6`.*
 - **Reason:** Keeps `src/` uniformly on the `@/` alias while letting Node-side unit tests resolve it; the
   84-test suite (incl. the oversell gate) stays green.
 - **Links:** `vitest.config.ts` · `tests/seo/*.test.ts` · Phase 2.04 brief Task 5.
+
+---
+
+### D-2.04b-1 · 2026-07-22 · Introduce a real typographic brand wordmark (Task 2 proceeded)
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor) — **owner-level call flagged for Lazar/Design ratification.**
+- **Decision:** Shipped a minimal typographic wordmark — the word "Trajanov" set in the brand display
+  font (Rubik 700) and brand colours (mustard on ground), as `public/logo.svg` (embedded font) +
+  `public/logo-512.png` — and added it as the Organization `logo` in the JSON-LD. This is a legitimate
+  brand mark, **not** the AI-generated product imagery barred by `D-0-6` (the mark is the brand's own
+  name set in type; the generation pipeline is `scripts/generate-brand-assets.ts`, pure typography).
+- **Alternative rejected:** Skip Task 2 and ship only Tasks 1/3/4, leaving the Organization node without
+  a `logo` until a Design phase produces a mark.
+- **Downside accepted:** A visual-brand decision is being made outside a Design phase. If Lazar wants a
+  properly designed mark first, this wordmark is replaceable in one regeneration + one commit — the mark
+  now sits in the owed register for Lazar/Design sign-off (register #13).
+- **Reason:** The Google search result and AI/answer-engine cards look unfinished without a logo, and a
+  wordmark of the brand's own name invents nothing. Recommended by the brief.
+- **Links:** `public/logo.svg` · `public/logo-512.png` · `scripts/generate-brand-assets.ts` ·
+  `src/lib/seo/site-jsonld.ts` · `brand.md` §3–4 · Phase 2.04b brief Task 2.
+
+---
+
+### D-2.04b-2 · 2026-07-22 · Ship `llms.txt` despite no proven ranking/answer-engine benefit
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** Added an `llms.txt` route (`src/app/llms.txt/route.ts`) serving a facts.md-clean,
+  English-prose, bilingual-URL summary of the brand for AI crawlers/agents.
+- **Alternative rejected:** Do not ship `llms.txt` — it is a young convention with no measured effect on
+  how ChatGPT/Perplexity/Google-AI cite a site.
+- **Downside accepted:** We maintain another factual-claim surface (every line must stay traced to
+  `facts.md`) for an unproven benefit; it can go stale if facts change and nobody updates it.
+- **Reason:** The cost is one small route reusing existing infrastructure, the file is `noindex` and not
+  in the sitemap (no SEO risk), and if answer engines do read it, Trajanov is described in its own honest
+  words rather than guessed at. Asked for by the brief.
+- **Links:** `src/app/llms.txt/route.ts` · `src/lib/seo/routes.ts` · Phase 2.04b brief Task 1.
+
+---
+
+### D-2.04b-3 · 2026-07-22 · One shared indexable-route module for the sitemap and llms.txt
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** Extracted the static indexable-route list + the `SITE_URL`-absolute URL helper into
+  `src/lib/seo/routes.ts` (`INDEXABLE_STATIC_HREFS`, `absoluteUrl`), and refactored `src/app/sitemap.ts`
+  to import them; `llms.txt` imports the same. Neither surface hand-types a slug or the domain.
+- **Alternative rejected:** Copy the route list into `llms.txt` (leaving `sitemap.ts` as-is), or read
+  the sitemap output back.
+- **Downside accepted:** A 2.04 file (`sitemap.ts`) was refactored — a slightly larger diff than the
+  narrow "add llms.txt" change; the sitemap's inline `STATIC_HREFS`/`abs`/`Href` moved out.
+- **Reason:** The brief requires llms.txt to reuse *the same* list the sitemap derives so they cannot
+  drift; a shared module is the only way to make "cannot drift" true rather than aspirational (adding a
+  route now updates both; the shared list is `as const` so llms.txt gets compile-time exhaustiveness).
+  No sitemap test exists to regress and the build + a curl of both surfaces confirm parity.
+- **Links:** `src/lib/seo/routes.ts` · `src/app/sitemap.ts` · `src/app/llms.txt/route.ts` · Phase 2.04b
+  brief Task 1.
+
+---
+
+### D-2.04b-4 · 2026-07-22 · The favicon/app icon is a "T" monogram, not the full wordmark
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** `src/app/icon.svg` + the manifest/apple icons are a geometric "T" monogram (the brand
+  initial, rounded corners echoing Rubik), on the brand ground; the full "Trajanov" wordmark is reserved
+  for `logo.svg`/`logo-512.png`.
+- **Alternative rejected:** Use the full wordmark as the favicon too.
+- **Downside accepted:** The favicon shows an initial, not the whole name — a browser-tab glance reads
+  "T", not "Trajanov". The "T" is arguably a new glyph relative to the wordmark, though it is drawn as the
+  wordmark's own initial, not an invented emblem.
+- **Reason:** A wordmark is illegible at 16–32px; every real brand derives a monogram/mark for the
+  favicon. Drawn as geometry (not `<text>`), the "T" is crisp at any size without depending on Rubik being
+  installed. The existing `favicon.ico` is kept as the legacy fallback.
+- **Links:** `src/app/icon.svg` · `src/app/apple-icon.png` · `public/icon-{192,512}.png` · Phase 2.04b
+  brief Task 3.
+
+---
+
+### D-2.04b-5 · 2026-07-22 · Brand-mark rasters generated via `next/og` (no new dependency); brand token values mirrored as literals in the asset files
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** The PNG marks are rendered by a committed, manually-run script
+  (`scripts/generate-brand-assets.ts`, `npm run assets:brand`) using `next/og` (satori + resvg, already
+  shipped with Next) and the Rubik woff already vendored for the OG cards. The SVG/PNG/manifest asset
+  files carry the `brand.md` §3 colour **values** as literals (`#0F1210`, `#E2A93C`), because an SVG /
+  raster / JSON asset cannot read a CSS custom property.
+- **Alternative rejected:** Add an image toolchain dependency (`sharp`/`canvas`) to rasterize; or draw
+  the marks by hand / with an image model.
+- **Downside accepted:** The token values are duplicated as literals in these files (they must be changed
+  in `brand.md` first, then here) — the same mirroring `globals.css` and `src/app/og` already accept
+  (`D-2.04-2`). The generator is run by hand, not in the build.
+- **Reason:** Zero new dependency (DoD requires recording any new dep; none added). Programmatic
+  typography is also the proof these marks are legitimate type, not `D-0-6` AI imagery. `next/og` is the
+  same engine the OG cards already use, so the render path is trusted.
+- **Links:** `scripts/generate-brand-assets.ts` · `package.json` (`assets:brand`) · `src/app/icon.svg` ·
+  `src/app/manifest.ts` · `D-2.04-2` · Phase 2.04b brief Tasks 2/3.
+
+---
+
+### D-2.04b-6 · 2026-07-22 · IndexNow key committed as a public file; `pingIndexNow` exported but NOT auto-fired
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Decision:** Generated a 32-char hex IndexNow key, committed it as `public/<key>.txt` (served bare at
+  the root) and as `INDEXNOW_KEY` in `src/lib/seo/indexnow.ts`, with a best-effort `pingIndexNow(urls)`
+  helper that builds host/keyLocation from `SITE_URL` — **wired to nothing**.
+- **Alternative rejected:** Wire the ping to fire now (e.g. from `sync:drop`), or defer the whole key
+  file to 2.05.
+- **Downside accepted:** No instant Bing/Yandex recrawl happens until a post-2.05 hook calls the helper
+  and the operator registers the key in Bing Webmaster Tools; the helper ships as dead-but-typed code.
+- **Reason:** Pinging IndexNow before the real domain is live is meaningless — you can only submit URLs
+  on a host you have proven you own, and today that host is a temporary `*.vercel.app` preview. The key
+  is **public by design** (it proves ownership by being fetchable) and is therefore **not a secret under
+  `D-0-1`** — committing and printing it is correct, and it never needs rotating.
+- **Links:** `public/78dec4b97e3fbb0f22d1c8df38050f74.txt` · `src/lib/seo/indexnow.ts` · `D-0-1` ·
+  Phase 2.04b brief Task 4.

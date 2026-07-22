@@ -1,4 +1,4 @@
-NEXT: 2.05 — Cutover: buy `trajanov.com`, flip the `SITE_URL` constant, Cloudflare DNS + Web Analytics, and clear the placeholder + owed-verification registers before launch. **Phase 2.04 — Perf, a11y, SEO — COMPLETE (2026-07-20, branch `phase-2.04-perf-a11y-seo`).** Shipped: `sitemap.xml` (both locales, absolute on `SITE_URL`, slugs from next-intl `getPathname` — no hand-typed slug — plus each DB product; Cart/Checkout/`/styleguide` excluded), `robots.txt` (Sitemap + Disallow `/styleguide`), per-page **noindex** on Cart/Checkout/`/styleguide` (content routes stay indexable), site-wide **Organization + WebSite JSON-LD** (no address, no fabricated logo, no SearchAction, no EAM/partner; `sameAs` = the one IG URL), a **Product JSON-LD** generator gated on a REAL name (emits no node while names are placeholders #4; availability derived from `src/lib/drop/state.ts`, never hardcoded InStock; `image`/`description` omitted while #2/#3), and per-locale **typographic OG share cards** (`next/og`, vendored Rubik Cyrillic woff — the MK card renders native Cyrillic, screenshotted) wired through a central `pageMetadata()` so an absolute `og:image` + `twitter:summary_large_image` sits on **every** route (grep-proven). **a11y: axe zero serious/critical** on Home/Catalog/Product/Checkout/Terms; skip-to-content link + `<main id>`, one H1/page + no heading skips, checkout real `<label>`s + `aria-describedby`/`aria-live` (triggered + verified), a global focus-visible ring, `lang` on the language switch + the About quote, WCAG-2.2 24px tap targets (footer) + 44px cart icon, the reduced-motion rule ships. **Lighthouse (actual, per route/form-factor pasted in the report): Accessibility 100 + Best-Practices 100 on all five routes; Desktop Performance 100; SEO 100 on the real production origin** — the localhost SEO 92 is the cross-origin `canonical` artifact (canonical → `SITE_URL` while testing on `127.0.0.1`), **proven 100 on `https://trajanov-v2.vercel.app/en`**; Checkout SEO 58 is the intentional noindex correctly failing the crawlable audit. **Gaps owed to Lazar:** mobile Performance **94** on Catalog + Checkout (throttled SSR — re-check on PageSpeed Insights after 2.05); the human **OG paste-test** into Instagram/Viber (only a human with those apps can confirm the card). `SITE_URL` unchanged; **no `supabase/`, `create_order`, `expire_reservations`, cart, `src/config/`, `src/types/database.ts`, or npm dependency touched**; `npm test` **84/84** incl. the 10-vs-3 oversell gate (re-run GREEN); build / lint / tsc clean. **PR #13 MERGED to `main` (merge `6375a0d`, 2026-07-20) on Petar's explicit instruction (`D-0-3`: an operator, not Code, authorised the merge); production deploy VERIFIED** — `/sitemap.xml` (both locales + product entries), `/robots.txt`, the MK `/og` card (`image/png`), the Organization+WebSite JSON-LD, and an absolute `og:image` all serve on `https://trajanov-v2.vercel.app`, and the production product page correctly ships **NO** Product node (names still placeholders) with a neutral, non-placeholder OG title. Prior: **Phase 2.03 — Legal + facts audit — COMPLETE (2026-07-19, branch `phase-2.03-legal-facts`).** Three **static** legal pages shipped both locales — Terms (`/uslovi`·`/en/terms`), Privacy (`/privatnost`·`/en/privacy`), Shipping & Returns (`/isporaka-i-vrakjanje`·`/en/shipping-returns`) — built from the `/about`+`/contact` editorial pattern via a shared `LegalPage` shell, all `●` SSG. Responsible party is **Vladimir Trajanov, Струмица, alone** (`D-2.03-1`, Lazar's call) — **no parent named anywhere in the diff**; **no statute/article/withdrawal period cited** (Decision 5); **no cookie banner** (Decision 4); the email **stays unpublished**. Privacy's collected-field list matches the real `orders` columns (`20260715021215_schema.sql`: name/phone/city/address/note — **no email**); the IP line matches `src/lib/rate-limit/hash.ts` (one-way hash, raw IP never stored). Courier/delivery-cost and returns-window ship as **visible `[PLACEHOLDER: …]`** (register #6, #7 — owner Vladimir), not guesses. **Full `facts.md` audit** committed at `docs/legal/facts-audit-2.03.md` — every rendered claim traced; **2 findings** (F-1 the `facts.md` §1 responsible-party contradiction, resolved by the §1 amendment; F-2 the cart's "calculated on delivery", surfaced not reworded, `D-2.03-6`); **zero UNSOURCED remain**; §10 clean (`grep`-checked). `facts.md` §1 amended (both the displayed party and the intake fact kept; open parental-confirmation flag intact). **63→213 message keys** (63 new, MK+EN identical); humanizer pass run; `docs/i18n/mk-review-2.03.md` committed **unsigned**; `string-inventory.md` regenerated (213) + committed. **69 tests pass** (63 + 6 new legal-route pathname assertions) incl. the 10-vs-3 oversell gate; build/lint/tsc clean; parity driven **RED→GREEN**. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, hosted DB, or npm dependency touched.** **Owed-verification register is NO LONGER EMPTY** — 2.03 added **two rows** (#9 no human legal review; #10 MK legal copy unreviewed) — both verify by 2.05 cutover. Placeholder register **+2** (#6, #7). **PR #12 MERGED to `main` (merge `4fcc0bd`) on Petar's explicit instruction (`D-0-3`: an operator, not Code, authorised the merge); production deploy VERIFIED** — the six legal URLs serve on `https://trajanov-v2.vercel.app` (MK slugs `/uslovi`·`/privatnost`·`/isporaka-i-vrakjanje` → 200 direct; `/en/*` → 200; MK Terms renders „Услови на продажба" + „Владимир Трајанов, од Струмица"). Recommended operator housekeeping (L1–L4, L7) still open.
+NEXT: 2.05 — Cutover: buy `trajanov.com`, flip the `SITE_URL` constant, Cloudflare DNS + Web Analytics, and clear the placeholder + owed-verification registers before launch. **Phase 2.04b — SEO/GEO polish — COMPLETE (2026-07-22, branch `phase-2.04b-seo-geo-polish`).** Closed the three GEO/SEO gaps 2.04 left, none touching commerce: (1) **`llms.txt`** now serves at the root (`src/app/llms.txt/route.ts`) — a `noindex`, facts.md-clean English summary listing both-locale absolute URLs, built from a NEW shared route module (`src/lib/seo/routes.ts`) that `sitemap.ts` was refactored onto so the two can't drift (no hand-typed slug, no hardcoded domain); (2) a **real typographic wordmark** ("Trajanov" in Rubik 700 + brand colours) shipped as `public/logo.svg` (embedded font) + `public/logo-512.png`, and the Organization JSON-LD now carries a resolving absolute `logo: ${SITE_URL}/logo-512.png` (the 2.04 "NO logo" refusal is retired — a real mark exists; still `D-0-6`-clean, it's typography not AI imagery); (3) a **modern icon set + web manifest** — `src/app/icon.svg` + `apple-icon.png` (a "T" monogram derived from the wordmark), `public/icon-{192,512}.png`, and `src/app/manifest.ts` (name/short_name Trajanov, brand-token colours, `lang mk`, `start_url /`, installable). Plus (4) an **IndexNow** key served bare at `public/78dec4b97e3fbb0f22d1c8df38050f74.txt` + a `pingIndexNow()` helper (`src/lib/seo/indexnow.ts`) built from `SITE_URL` but **wired to nothing** (pinging is meaningless until the real domain). All PNGs generated by a committed manual script (`scripts/generate-brand-assets.ts` / `npm run assets:brand`) via `next/og` — **no new dependency**. Verified by curl: `/llms.txt` (headers `x-robots-tag: noindex` + `text/plain`, facts-clean body, absolute bilingual URLs matching the sitemap slugs), the bare key file (32 bytes), `/logo-512.png` 200 image, the JSON-LD `logo` in page HTML, `/manifest.webmanifest` JSON, icon/apple/manifest `<link>`s in `<head>`, and sitemap.xml still lists all routes with **zero** llms.txt entries. Home + About rendered clean (no console errors), `logo.svg` embedded-font wordmark confirmed in-browser. `SITE_URL` untouched; **no `supabase/`, `create_order`, `expire_reservations`, cart, stock, `src/config/`, or npm dependency touched**; `npm test` **85/85** incl. the 10-vs-3 oversell gate, build / lint / tsc clean. **Owed to Lazar (registered below):** wordmark brand-direction sign-off (#13), register the IndexNow key in Bing Webmaster Tools post-domain (#14), and the human OG/logo paste-test (#11, extended). Decisions `D-2.04b-1…6`. **PR: open to `main` (this session).** **Phase 2.04 — Perf, a11y, SEO — COMPLETE (2026-07-20, branch `phase-2.04-perf-a11y-seo`).** Shipped: `sitemap.xml` (both locales, absolute on `SITE_URL`, slugs from next-intl `getPathname` — no hand-typed slug — plus each DB product; Cart/Checkout/`/styleguide` excluded), `robots.txt` (Sitemap + Disallow `/styleguide`), per-page **noindex** on Cart/Checkout/`/styleguide` (content routes stay indexable), site-wide **Organization + WebSite JSON-LD** (no address, no fabricated logo, no SearchAction, no EAM/partner; `sameAs` = the one IG URL), a **Product JSON-LD** generator gated on a REAL name (emits no node while names are placeholders #4; availability derived from `src/lib/drop/state.ts`, never hardcoded InStock; `image`/`description` omitted while #2/#3), and per-locale **typographic OG share cards** (`next/og`, vendored Rubik Cyrillic woff — the MK card renders native Cyrillic, screenshotted) wired through a central `pageMetadata()` so an absolute `og:image` + `twitter:summary_large_image` sits on **every** route (grep-proven). **a11y: axe zero serious/critical** on Home/Catalog/Product/Checkout/Terms; skip-to-content link + `<main id>`, one H1/page + no heading skips, checkout real `<label>`s + `aria-describedby`/`aria-live` (triggered + verified), a global focus-visible ring, `lang` on the language switch + the About quote, WCAG-2.2 24px tap targets (footer) + 44px cart icon, the reduced-motion rule ships. **Lighthouse (actual, per route/form-factor pasted in the report): Accessibility 100 + Best-Practices 100 on all five routes; Desktop Performance 100; SEO 100 on the real production origin** — the localhost SEO 92 is the cross-origin `canonical` artifact (canonical → `SITE_URL` while testing on `127.0.0.1`), **proven 100 on `https://trajanov-v2.vercel.app/en`**; Checkout SEO 58 is the intentional noindex correctly failing the crawlable audit. **Gaps owed to Lazar:** mobile Performance **94** on Catalog + Checkout (throttled SSR — re-check on PageSpeed Insights after 2.05); the human **OG paste-test** into Instagram/Viber (only a human with those apps can confirm the card). `SITE_URL` unchanged; **no `supabase/`, `create_order`, `expire_reservations`, cart, `src/config/`, `src/types/database.ts`, or npm dependency touched**; `npm test` **84/84** incl. the 10-vs-3 oversell gate (re-run GREEN); build / lint / tsc clean. **PR #13 MERGED to `main` (merge `6375a0d`, 2026-07-20) on Petar's explicit instruction (`D-0-3`: an operator, not Code, authorised the merge); production deploy VERIFIED** — `/sitemap.xml` (both locales + product entries), `/robots.txt`, the MK `/og` card (`image/png`), the Organization+WebSite JSON-LD, and an absolute `og:image` all serve on `https://trajanov-v2.vercel.app`, and the production product page correctly ships **NO** Product node (names still placeholders) with a neutral, non-placeholder OG title. Prior: **Phase 2.03 — Legal + facts audit — COMPLETE (2026-07-19, branch `phase-2.03-legal-facts`).** Three **static** legal pages shipped both locales — Terms (`/uslovi`·`/en/terms`), Privacy (`/privatnost`·`/en/privacy`), Shipping & Returns (`/isporaka-i-vrakjanje`·`/en/shipping-returns`) — built from the `/about`+`/contact` editorial pattern via a shared `LegalPage` shell, all `●` SSG. Responsible party is **Vladimir Trajanov, Струмица, alone** (`D-2.03-1`, Lazar's call) — **no parent named anywhere in the diff**; **no statute/article/withdrawal period cited** (Decision 5); **no cookie banner** (Decision 4); the email **stays unpublished**. Privacy's collected-field list matches the real `orders` columns (`20260715021215_schema.sql`: name/phone/city/address/note — **no email**); the IP line matches `src/lib/rate-limit/hash.ts` (one-way hash, raw IP never stored). Courier/delivery-cost and returns-window ship as **visible `[PLACEHOLDER: …]`** (register #6, #7 — owner Vladimir), not guesses. **Full `facts.md` audit** committed at `docs/legal/facts-audit-2.03.md` — every rendered claim traced; **2 findings** (F-1 the `facts.md` §1 responsible-party contradiction, resolved by the §1 amendment; F-2 the cart's "calculated on delivery", surfaced not reworded, `D-2.03-6`); **zero UNSOURCED remain**; §10 clean (`grep`-checked). `facts.md` §1 amended (both the displayed party and the intake fact kept; open parental-confirmation flag intact). **63→213 message keys** (63 new, MK+EN identical); humanizer pass run; `docs/i18n/mk-review-2.03.md` committed **unsigned**; `string-inventory.md` regenerated (213) + committed. **69 tests pass** (63 + 6 new legal-route pathname assertions) incl. the 10-vs-3 oversell gate; build/lint/tsc clean; parity driven **RED→GREEN**. **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, `src/config/`, hosted DB, or npm dependency touched.** **Owed-verification register is NO LONGER EMPTY** — 2.03 added **two rows** (#9 no human legal review; #10 MK legal copy unreviewed) — both verify by 2.05 cutover. Placeholder register **+2** (#6, #7). **PR #12 MERGED to `main` (merge `4fcc0bd`) on Petar's explicit instruction (`D-0-3`: an operator, not Code, authorised the merge); production deploy VERIFIED** — the six legal URLs serve on `https://trajanov-v2.vercel.app` (MK slugs `/uslovi`·`/privatnost`·`/isporaka-i-vrakjanje` → 200 direct; `/en/*` → 200; MK Terms renders „Услови на продажба" + „Владимир Трајанов, од Струмица"). Recommended operator housekeeping (L1–L4, L7) still open.
 
 # Current state — Trajanov-V2
 
@@ -6,14 +6,56 @@ NEXT: 2.05 — Cutover: buy `trajanov.com`, flip the `SITE_URL` constant, Cloudf
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-20** · By: **Claude Code (Phase 2.04 — Perf, a11y, SEO, Code)**
+Last updated: **2026-07-22** · By: **Claude Code (Phase 2.04b — SEO/GEO polish, Code)**
 
 ---
 
 ## Status
 
+**2.04b COMPLETE — Trajanov now has a face: a real logo, a full icon set, an `llms.txt`, and an
+IndexNow key (this update, 2026-07-22).** A small pre-cutover polish closing the three GEO/SEO gaps
+2.04 left open — **no commerce logic touched.** (1) **`llms.txt`** serves at the root
+(`src/app/llms.txt/route.ts`, `force-static`): an `# H1` + `>` blockquote + link sections, English
+prose, every claim traced to `facts.md` (brand/Strumica/2026/Vladimir/the one competition win/oversized
+unisex tees/limited drops/COD/NMK-only/max-2/IG/phone — and **nothing** excluded: no price, size,
+fabric, email, address, or review/partner claim). Its links are both-locale **absolute** URLs pulled
+from a **new shared module** `src/lib/seo/routes.ts` (`INDEXABLE_STATIC_HREFS` + `absoluteUrl`) that
+`src/app/sitemap.ts` was refactored onto — so the sitemap and llms.txt read **one** route list and
+cannot drift; the response carries `X-Robots-Tag: noindex` and is **absent from the sitemap** (not a
+page). (2) A **real brand wordmark** (`D-2.04b-1`, owner-level, flagged for sign-off): "Trajanov" set in
+Rubik 700 + brand mustard/ground, as `public/logo.svg` (Rubik embedded as base64 so it renders anywhere)
+and `public/logo-512.png` (on a solid ground square). `src/lib/seo/site-jsonld.ts` now emits
+`logo: ${SITE_URL}/logo-512.png` on the Organization node — the 2.04 "NO logo, no real asset exists"
+refusal is **resolved and its comment rewritten to say why**; still no address, no SearchAction, no
+partner. This is a legitimate typographic mark, **not** the AI product imagery barred by `D-0-6`. (3) A
+**modern icon set + manifest**: `src/app/icon.svg` + `src/app/apple-icon.png` are a geometric **"T"
+monogram** derived from the wordmark (`D-2.04b-4` — a wordmark is illegible at favicon size); `public/
+icon-{192,512}.png` + `src/app/manifest.ts` (name/short_name "Trajanov", brand-token colours, `lang:
+"mk"`, `start_url: "/"`, `display: standalone`, maskable-safe icon) make it installable; the legacy
+`favicon.ico` stays as fallback. (4) An **IndexNow** key (32-char hex) served bare at
+`public/78dec4b97e3fbb0f22d1c8df38050f74.txt`, plus `pingIndexNow(urls)` in `src/lib/seo/indexnow.ts`
+built from `SITE_URL` — **deliberately wired to nothing** (`D-2.04b-6`; a preview host can't own
+submissions). The key is **public by design and NOT a secret under `D-0-1`**. All four PNGs are
+generated by a committed, manually-run script (`scripts/generate-brand-assets.ts` / `npm run
+assets:brand`) using **`next/og` — no new dependency** (`D-2.04b-5`), reusing the Rubik woff already
+vendored for the OG cards. **Verified by Code (curl + in-browser):** `/llms.txt` headers + facts-clean
+body + absolute bilingual URLs matching the sitemap's slugs; the key file returns the bare 32-byte key;
+`/logo-512.png`, `/icon.svg`, `/apple-icon.png`, `/icon-{192,512}.png` all 200 with correct types; the
+homepage HTML carries `"logo":"…/logo-512.png"` in the JSON-LD and the manifest/icon/apple `<link>`s in
+`<head>`; `/manifest.webmanifest` is valid JSON; **sitemap.xml has 0 llms.txt entries** and still lists
+all 7 routes × 2 locales + DB products; Home + About render with **no console errors**; the `logo.svg`
+embedded-font wordmark renders correctly in-browser. **Gates:** `npm test` **85/85** (84 + 1 new
+JSON-LD-logo assertion) incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected
+…, stock 0`; `npm run build` / `npx tsc --noEmit` / `npm run lint` clean. `SITE_URL` unchanged; **no
+`supabase/`, `create_order`, `expire_reservations`, cart, stock, `src/config/`, `src/types/database.ts`,
+or npm dependency touched.** No new placeholder; none cleared/reworded/hidden (#2–#7 byte-unchanged).
+Owed-verification register **+2 rows** (#13 wordmark sign-off; #14 register IndexNow key in Bing) and #11
+extended to cover the logo; placeholder register unchanged. Decisions `D-2.04b-1…6`. Branch
+`phase-2.04b-seo-geo-polish`; **PR open to `main` (this session) — awaiting an operator to merge
+(`D-0-3`).**
+
 **2.04 COMPLETE — the store is fast, accessible, and survives being pasted into an Instagram story
-(this update, 2026-07-20).** Discoverability + share surfaces shipped, none of which 2.03 touched:
+(2026-07-20).** Discoverability + share surfaces shipped, none of which 2.03 touched:
 a dynamic **`/sitemap.xml`** (both locales, every indexable route absolute on `SITE_URL` via next-intl
 `getPathname` + each DB product; Cart/Checkout/`/styleguide` absent), **`/robots.txt`** (Sitemap +
 `Disallow /styleguide`), and per-page **`noindex`** on Cart/Checkout/`/styleguide` while the content
@@ -301,10 +343,10 @@ Prior (1.02): design system + full clickable site, MK default + EN.
 | | |
 |---|---|
 | Part | 2 of 2 — Launch prep |
-| Phase | **2.04 complete — Perf, a11y, SEO** (sitemap + robots + noindex; Organization + WebSite + gated Product JSON-LD; per-locale `next/og` share cards absolute on every route; WCAG 2.2 AA — axe zero serious/critical; Lighthouse A11y/BP 100, Desktop Perf 100, SEO 100 on prod). Next: **2.05** (cutover — domain + Cloudflare) |
-| Branch | `phase-2.04-perf-a11y-seo` → PR **#13** — **MERGED to `main` (merge `6375a0d`, 2026-07-20)** on Petar's instruction; branch deleted. Prior: `phase-2.03-legal-facts` → PR `#12`, merged `4fcc0bd` (2026-07-19); `phase-2.02-mk-review` → PR `#11`, merged `6afae55` |
-| Open PR | **None.** `#13` merged (2026-07-20). Prior merged: 1.01–1.07 `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; 2.01 `#10`; 2.02 `#11`; 2.03 `#12`; 2.04 `#13` |
-| Deployed | **YES — https://trajanov-v2.vercel.app**, production. **2.04 is LIVE and smoke-verified by Code (2026-07-20):** `/sitemap.xml` (both locales + product entries), `/robots.txt`, the MK `/og` card (`image/png`), site Organization+WebSite JSON-LD, and an absolute `og:image` all serve; the product page ships **no** Product node (names still placeholders). **2.01 merged (`#10`) is LIVE and smoke-verified by Code (2026-07-19):** old `/catalog` **308→`/katalog`**, MK `/katalog` **200**, `/en/catalog` **200**, home `<html lang="mk">` + `canonical` + `hrefLang` mk/en/x-default all present. `D-1.03-5`/`D-1.06-4` closed |
+| Phase | **2.04b complete — SEO/GEO polish** (`llms.txt` route; real brand wordmark + Organization JSON-LD `logo`; icon set + web manifest; IndexNow key + un-wired `pingIndexNow`). Prior: **2.04 — Perf, a11y, SEO** (sitemap + robots + noindex; Organization + WebSite + gated Product JSON-LD; per-locale `next/og` share cards; WCAG 2.2 AA; Lighthouse A11y/BP 100, Desktop Perf 100, SEO 100 on prod). Next: **2.05** (cutover — domain + Cloudflare) |
+| Branch | `phase-2.04b-seo-geo-polish` → PR **open to `main`** (this session, awaiting operator merge — `D-0-3`). Prior: `phase-2.04-perf-a11y-seo` → PR `#13`, merged `6375a0d` (2026-07-20); `phase-2.03-legal-facts` → PR `#12`, merged `4fcc0bd` (2026-07-19) |
+| Open PR | **2.04b — open to `main` (this session).** Prior merged: 1.01–1.07 `#1`–`#7`; Z.01 `#8`; 1.08 `#9`; 2.01 `#10`; 2.02 `#11`; 2.03 `#12`; 2.04 `#13` |
+| Deployed | **YES — https://trajanov-v2.vercel.app**, production. **2.04b not yet deployed** (PR open; deploys on merge — will add `/llms.txt`, `/logo-512.png`, the icon set + `/manifest.webmanifest`, and the IndexNow key file). **2.04 is LIVE and smoke-verified by Code (2026-07-20):** `/sitemap.xml` (both locales + product entries), `/robots.txt`, the MK `/og` card (`image/png`), site Organization+WebSite JSON-LD, and an absolute `og:image` all serve; the product page ships **no** Product node (names still placeholders). **2.01 merged (`#10`) is LIVE and smoke-verified by Code (2026-07-19):** old `/catalog` **308→`/katalog`**, MK `/katalog` **200**, `/en/catalog` **200**, home `<html lang="mk">` + `canonical` + `hrefLang` mk/en/x-default all present. `D-1.03-5`/`D-1.06-4` closed |
 | Domain | `trajanov.com` — **not purchased** (2.05) |
 
 ---
@@ -319,6 +361,45 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 ---
 
 ## Built
+
+### SEO/GEO polish (2.04b) — a face for the brand: llms.txt, logo, icons, IndexNow
+
+- **`llms.txt`** `src/app/llms.txt/route.ts` (`force-static`, served at `/llms.txt`): `# Trajanov` H1, a
+  one-paragraph `>` blockquote summary, a details paragraph, and `## Pages` / `## Legal` / `## Contact`
+  link sections. English prose (LLM lingua franca); every claim traced to `facts.md` (see the file header
+  for the line-by-line trace); **excludes** price/size/fabric/email/address/review/partner (`facts.md`
+  §7/§10). Links are both-locale **absolute** URLs from the shared route list; `Content-Type: text/plain;
+  charset=utf-8` + **`X-Robots-Tag: noindex`**; **not** in the sitemap (not a page).
+- **Shared route module** `src/lib/seo/routes.ts` — `INDEXABLE_STATIC_HREFS` (the 7 static indexable
+  routes, `as const`) + `absoluteUrl(href, locale)`. `src/app/sitemap.ts` was **refactored** onto it
+  (dropping its inline `STATIC_HREFS`/`abs`/`Href`), and `llms.txt` reads the same, so the two route sets
+  **cannot drift**; adding a route forces a compile-time label in llms.txt's exhaustive `PAGE_META`.
+- **Brand wordmark** `public/logo.svg` (Rubik 700 embedded as base64 → renders anywhere; transparent
+  ground) + `public/logo-512.png` (mustard wordmark on a solid ground square). `src/lib/seo/site-jsonld.ts`
+  Organization node now carries **`logo: ${SITE_URL}/logo-512.png`** (absolute); the "NO logo" comment was
+  rewritten to explain a real mark now exists — still **no** address / SearchAction / partner. `tests/seo/
+  site-jsonld.test.ts` gained a positive `logo` assertion (and dropped the stale "no logo" one) → 85 tests.
+- **Icon set + manifest** — `src/app/icon.svg` (geometric "T" monogram, brand colours, crisp at any size,
+  font-independent) + `src/app/apple-icon.png` (180); `public/icon-192.png` + `public/icon-512.png` for the
+  manifest; `src/app/manifest.ts` (`name`/`short_name` "Trajanov", facts-clean description, `lang: "mk"`,
+  `start_url: "/"`, `display: "standalone"`, `theme`/`background` = ground token, icons incl. a
+  maskable-safe 512). Next auto-injects the `manifest`/`icon`/`apple-touch-icon` `<link>`s; the legacy
+  `favicon.ico` remains as fallback.
+- **IndexNow** `public/78dec4b97e3fbb0f22d1c8df38050f74.txt` (the bare 32-char hex key) + `src/lib/seo/
+  indexnow.ts` — `INDEXNOW_KEY` + a best-effort `pingIndexNow(urls)` that builds `host`/`keyLocation` from
+  `SITE_URL` and POSTs to `api.indexnow.org`. **Exported, wired to nothing** (`D-2.04b-6`) — a preview host
+  can't own submissions; a post-2.05 hook fires it. Key is **public by design, not a `D-0-1` secret.**
+- **Asset generator** `scripts/generate-brand-assets.ts` (`npm run assets:brand`) — renders the four PNGs +
+  the embedded-font `logo.svg` via **`next/og`** (satori + resvg, already in Next) from the vendored Rubik
+  woff and brand token literals. **No new dependency** (`D-2.04b-5`); run by hand, outputs committed.
+- **Gates**: `npm run build` / `npx tsc --noEmit` / `npm run lint` clean; `npm test` **85/85** (84 + 1) incl.
+  the 10-vs-3 oversell gate. Verified by curl + in-browser (see the register's 2.04b note). **No `supabase/`,
+  `create_order`, `expire_reservations`, cart, stock, `src/config/`, `src/types/database.ts`, or npm
+  dependency touched; `SITE_URL` unchanged.**
+- **Decisions:** `D-2.04b-1` (introduce the wordmark — owner-level, sign-off owed), `D-2.04b-2` (ship
+  `llms.txt`), `D-2.04b-3` (shared route module + sitemap refactor), `D-2.04b-4` ("T" monogram favicon),
+  `D-2.04b-5` (`next/og` generator, no dep; token values mirrored as literals), `D-2.04b-6` (IndexNow key
+  public + `pingIndexNow` un-wired).
 
 ### Perf, a11y, SEO (2.04) — discoverable, accessible, and shareable
 
@@ -724,8 +805,10 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | ~~8~~ | **Branded from-address on `trajanov.com`.** The sender is `onboarding@resend.dev` until the domain is bought + verified (`D-Z.01-2`). **RECLASSIFIED to the 2.05 cutover track (`D-1.08-2`)** — removed from this register's zero-condition, since #8 cannot be cleared without the (unbought) domain and leaving it here would make 1.08's "register to zero" impossible. | Z.01 → | **2.05** (domain purchase + verification) |
 | 9 | **The legal pages have had no human legal review.** Terms, Privacy, and Shipping & Returns were written in-house by Code from `facts.md` and shipped code; **no lawyer has read them**, and the responsible party named is a **minor, alone** (`D-2.03-1`). No statute is cited and nothing legally binding is asserted beyond what the store operationally does — but no professional has confirmed these pages are adequate for a cash-on-delivery consumer contract. Owner: **Lazar + Vladimir**. | 2.03 | **2.05 cutover** |
 | 10 | **New MK legal copy is unreviewed by a native speaker.** The 63 new `Terms` / `Privacy` / `ShippingReturns` (+ `Nav`/`Meta`/`Placeholder`) MK strings are machine-written and have **not** been read by a native Macedonian speaker — legal copy is the worst place for a machine-translation error. Review pack ready and **unsigned** at `docs/i18n/mk-review-2.03.md` (63-row table + slug question for the 3 new slugs + two sign-off blocks). **2.04 added one more machine-written MK string — `Common.skipToContent` („Прескокни до содржината", the skip link, `D-2.04-7`) — fold it into this same review.** Owner: **Lazar + Petar**. | 2.03 | **before 2.05 cutover** |
-| 11 | **OG paste-test — the real traffic path (Plan §10).** Lazar pastes the deployed **MK + EN Home and Product** URLs into an Instagram story/DM **and** Viber and confirms the branded card renders — image **and** title, Cyrillic intact on the MK card. Code proved the card serves at 1200×630 and renders native Cyrillic (screenshot), and that `og:image`/`twitter:image` are absolute on every route — but **only a human with those apps can confirm the actual in-app link preview**; a link-preview/OG-debugger check by Code is **not** a substitute. Verifies **after 2.04 deploys**. Owner: **Lazar**. | 2.04 | **after 2.04 deploy** |
+| 11 | **OG paste-test — the real traffic path (Plan §10).** Lazar pastes the deployed **MK + EN Home and Product** URLs into an Instagram story/DM **and** Viber and confirms the branded card renders — image **and** title, Cyrillic intact on the MK card. Code proved the card serves at 1200×630 and renders native Cyrillic (screenshot), and that `og:image`/`twitter:image` are absolute on every route — but **only a human with those apps can confirm the actual in-app link preview**; a link-preview/OG-debugger check by Code is **not** a substitute. **2.04b adds the brand `logo`** to this check — the same paste should confirm the wordmark reads well where a platform shows the Organization logo, and Lazar should run the deployed Home URL through **Google's Rich Results Test** to see the `logo` resolve/preview. Verifies **after 2.04b deploys**. Owner: **Lazar**. | 2.04 / 2.04b | **after 2.04b deploy** |
 | 12 | **Lighthouse categories that could not reach 95 in-phase** (measured on `next start` + local seed DB, headless Chrome). **(a)** Mobile **Performance 94** on Catalog + Checkout (throttled-mobile SSR with a DB read; Desktop is 100, mobile Home/Product/Legal are 98/97/95). **(b)** Content-route **SEO 92 on localhost is a cross-origin `canonical` artifact** — Code verified **SEO 100 with the canonical audit passing on the real origin `https://trajanov-v2.vercel.app/en`**, so this should read 100 once 2.04 deploys; **(c)** Checkout **SEO 58** is the intentional `noindex` correctly failing the crawlable audit (not a defect). Lazar re-checks (a) + (b) on **PageSpeed Insights** against the live 2.04 deploy. Owner: **Lazar**. | 2.04 | **after 2.04 deploy (PageSpeed Insights)** |
+| 13 | **Wordmark brand-direction sign-off** (`D-2.04b-1`). Code shipped a real typographic wordmark ("Trajanov" in Rubik 700 + brand colours) as `public/logo.svg` / `public/logo-512.png` and wired it into the Organization JSON-LD `logo`, **outside a Design phase**. It invents nothing (the brand's own name in the brand font) and is `D-0-6`-clean, but the *visual-brand call* is Lazar's/Design's. If a properly designed mark is wanted instead, regenerate via `npm run assets:brand` after editing `scripts/generate-brand-assets.ts` (or drop in a hand-made asset at the same paths) — one commit. Owner: **Lazar / Design**. | 2.04b | **before 2.05 cutover** |
+| 14 | **Register the IndexNow key in Bing Webmaster Tools** (`D-2.04b-6`). Key `78dec4b97e3fbb0f22d1c8df38050f74`, served at `${SITE_URL}/78dec4b97e3fbb0f22d1c8df38050f74.txt`. **Public by design, NOT a secret (`D-0-1`).** Ops-only, and only meaningful **after the real domain is live** (2.05) — the key file must resolve on the final host before Bing accepts it, and `pingIndexNow()` stays un-wired until a post-2.05 hook. Owner: **Lazar (ops)**. | 2.04b | **post-2.05 (domain live)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
@@ -764,6 +847,25 @@ clean); the **design sign-off**, **IG click-test**, and **auto-expose toggle OFF
 hosted `test-drop` is left **ended** and carrying the two real-priced colourways (`test-mustard-ochre`
 S/M/L/XL, `test-off-white` XL-only, 1199 MKD, stock 3) — matching the committed config, nothing buyable.*
 
+*Code verified directly in **2.04b** (not owed): `npm run build`, `npx tsc --noEmit`, `npm run lint`, and
+`npm test` (**85/85**) all green, incl. the re-run **10-vs-3 oversell gate** (exactly 3 succeed, 7 rejected,
+stock 0). Against the dev server (curl + in-browser): `/llms.txt` returns `200` with `content-type:
+text/plain; charset=utf-8` + `x-robots-tag: noindex`, a valid `# H1`/`>`-blockquote/link-section body,
+facts.md-clean claims only, and both-locale **absolute** URLs whose slugs match the sitemap
+(`/katalog`·`/za-nas`·`/kontakt`·`/uslovi`·`/privatnost`·`/isporaka-i-vrakjanje` + `/en/*`); the IndexNow
+key file returns the **bare 32-byte key**; `/logo-512.png` `200 image/png`, `/icon.svg` `image/svg+xml`,
+`/apple-icon.png` + `/icon-{192,512}.png` `image/png`; the MK homepage HTML carries
+`"logo":"https://trajanov-v2.vercel.app/logo-512.png"` in the Organization JSON-LD (still no address / no
+SearchAction / `sameAs` = the one IG) and the `manifest`/`icon`/`apple-touch-icon` `<link>`s in `<head>`;
+`/manifest.webmanifest` is valid JSON (name/short_name/lang mk/start_url/display standalone/brand colours/
+icons); **`sitemap.xml` contains 0 `llms.txt` occurrences** and still lists 7 routes × 2 locales + the seed
+DB products. Home + About rendered with **no console errors**; the `logo.svg` embedded-font wordmark and the
+`logo-512.png`/`icon-512.png` marks were eyeballed. The only non-doc source changes are the four new SEO/
+asset files + the shared `routes.ts`, the `site-jsonld.ts` `logo` line (+ its test), `sitemap.ts` refactor,
+`manifest.ts`, `indexnow.ts`, the generator script, `package.json` (`assets:brand` script only), and the
+generated binary assets. **No `supabase/`, `create_order`, `expire_reservations`, cart, stock, `src/config/`,
+`src/types/database.ts`, or npm dependency touched; `SITE_URL` unchanged.**
+
 ***2.03 update (2026-07-19): the register is NO LONGER EMPTY.*** Phase 2.03 added rows **#9** (the legal
 pages have had no human legal review) and **#10** (the new MK legal copy is unreviewed by a native
 speaker). Neither is a build blocker; **both are 2.05-cutover blockers**, owned jointly by Lazar +
@@ -799,6 +901,13 @@ zero-condition.*
 
 Every visible `[PLACEHOLDER: …]` on the site. **Must be empty before cutover (2.05). Launch
 blocker.**
+
+*2.04b update (2026-07-22): **no change to the register.** Phase 2.04b shipped **no new placeholder** and
+**cleared, reworded, hid, or filled none** — #2–#7 are byte-for-byte unchanged. The load-bearing rule
+carried over from 2.04 holds: **no placeholder value reaches `llms.txt`, the logo, or the manifest.**
+`llms.txt` writes only facts.md-VERIFIED claims (no product name/price/photo/fabric slot appears — it
+links the catalog page, not individual products), the manifest description is a facts-clean one-liner, and
+the marks are pure brand typography. The still-null product **names** (#4) never surface in any 2.04b file.*
 
 *2.04 update (2026-07-20): **no change to the register.** Phase 2.04 shipped **no new placeholder** and
 **cleared, reworded, hid, or filled none** — #2–#7 are byte-for-byte unchanged. The load-bearing rule
