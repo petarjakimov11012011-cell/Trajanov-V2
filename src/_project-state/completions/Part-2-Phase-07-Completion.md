@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-23 |
 | **Branch** | `phase-2.07-footer-redesign` |
-| **PR** | [#18](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/18) (open — awaiting operator review/merge) |
+| **PR** | [#18](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/18) — **MERGED** to `main` (merge `27b51ea`, 2026-07-23, on Petar's instruction, `D-0-3`); production deploy verified |
 | **Brief** | `Part-1-Phase-07-Runbook-v2.md` *(handed as the original Phase 1.05 "Site-wide footer" brief — see § 3)* |
 
 ---
