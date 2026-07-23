@@ -87,8 +87,13 @@ errors. **Only `SiteHeader.tsx` changed** (`git diff --stat main`) — **no** fr
 edit, **no** new dependency (`package.json` + lockfile unchanged), **no** new placeholder. `npm run build`
 (exit 0) / `npx tsc --noEmit` / `npm run lint` clean; `npm test` **85/85** incl. the 10-vs-3 oversell gate.
 Decision `D-2.08-6` (D-2.08-5 marked Superseded). Shipped on a **recreated** `phase-2.08-header-redesign`
-branch (the original merged + was deleted); **PR #20 open to `main` — NOT merged** (`D-0-3`). `NEXT:` line
-**unchanged**.
+branch (the original merged + was deleted); **PR #20 MERGED to `main` (merge `7a16221`, 2026-07-23) on
+Petar's explicit instruction (`D-0-3`: operator-authorised, not Code); branch deleted.** (Merge completed via
+a local `--no-ff` merge commit — GitHub's PR API was again stuck on a stale head OID and rejected its own
+merge endpoint; PR #20 was **closed** with a note pointing to `7a16221`, so it shows **Closed** not the
+"Merged" badge, but all fix commits are on `main`.) **Production deploy VERIFIED** — on `https://www.trajanovv.com`
+(desktop, both locales) all seven header items report an **identical vertical center (34.0px, delta 0)**, gaps
+**16 / 16 / 24 / 24 px**, header `position: static`. `NEXT:` line **unchanged**.
 
 **2.07 COMPLETE — the site-wide footer is redesigned (this update, 2026-07-23).** An out-of-band UI phase
 (the Y.02 precedent): the session was handed the original **Phase 1.05** footer brief, but that footer
