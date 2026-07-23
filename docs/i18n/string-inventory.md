@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 219 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 241 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -90,6 +90,28 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Drop.nextDrop` | Следно спуштање | Next drop | `src/components/drop/DropBanner.tsx` |
 | `Drop.remaining` | Преостануваат {count} | {count} left | `src/components/drop/DropBanner.tsx` |
 | `Drop.seconds` | СЕК | SEC | `src/components/drop/Countdown.tsx` |
+| `Faq.a1` | Само додека трае спуштање. Меѓу спуштањата сè може да се разгледа, но ништо не може да се купи. Тајмерот на почетната страница покажува кога се отвора следното. | Only while a drop is on. Between drops you can look at everything, but nothing is buyable. The timer on the home page shows when the next one opens. | _(not found in source)_ |
+| `Faq.a2` | Готовина при преземање, кога пратката ќе пристигне. Нема картички, нема банкарски трансфер, нема плаќање однапред. | Cash on delivery, when the package arrives. No cards, no bank transfer, no paying up front. | _(not found in source)_ |
+| `Faq.a3` | Најмногу 2 парчиња по нарачка. Залихата е вистинска и ограничена — кога ќе се распродаде, готово е. | Two pieces per order, maximum. The stock is real and limited — once it's sold out, it's gone. | _(not found in source)_ |
+| `Faq.a4` | Само во Северна Македонија. Нема испорака во странство. | Within North Macedonia only. No international shipping. | _(not found in source)_ |
+| `Faq.a5` | Рок на достава: 3–5 работни дена. Курирот и цената на испораката сè уште не се потврдени и нема да ги погодуваме — плаќаш готовина на врата. | Delivery takes 3 to 5 business days. The courier and the delivery cost aren't confirmed yet and we're not going to guess them — you pay cash at the door. | _(not found in source)_ |
+| `Faq.a6` | Нарачката ја резервира залихата 48 часа — не се продава веднаш. Те бараме телефонски за да ја потврдиме. Ако не те фатиме, резервацијата истекува и парчето се враќа во продажба. | Your order holds the stock for 48 hours — it isn't sold on the spot. We call you to confirm it. If we can't reach you, the hold expires and the piece goes back on sale. | _(not found in source)_ |
+| `Faq.a7` | Величините стојат на страницата на секое парче, заедно со тоа што е сè уште достапно. Маиците се оверсајз унисекс крој. Точни мерки во сантиметри сè уште не се објавени. | Sizes are listed on each piece's own page, along with what's still available. The t-shirts are an oversized unisex cut. Exact measurements in centimetres aren't published yet. | _(not found in source)_ |
+| `Faq.a8` | Секое спуштање е од 3 до 5 парчиња, во ограничен број. Кога ќе пишува „Распродадено“, навистина е распродадено — залихата се води на серверот, не на екранот. | Each drop is 3 to 5 pieces, in limited numbers. When it says "Sold out", it really is sold out — the stock is counted on the server, not on the screen. | _(not found in source)_ |
+| `Faq.groupDelivery` | Достава | Delivery | _(not found in source)_ |
+| `Faq.groupOrdering` | Нарачка | Ordering | _(not found in source)_ |
+| `Faq.groupPieces` | Парчињата | The pieces | _(not found in source)_ |
+| `Faq.h2` | Често поставувани прашања | Frequently Asked Questions | `src/components/home/HomeFaq.tsx` |
+| `Faq.moreLink` | Пиши или јави се | Email or call | `src/components/home/HomeFaq.tsx` |
+| `Faq.moreQuestion` | Друго прашање? | Another question? | `src/components/home/HomeFaq.tsx` |
+| `Faq.q1` | Кога можам да купам? | When can I buy? | _(not found in source)_ |
+| `Faq.q2` | Како плаќам? | How do I pay? | _(not found in source)_ |
+| `Faq.q3` | Колку парчиња можам да нарачам? | How many pieces can I order? | _(not found in source)_ |
+| `Faq.q4` | Каде испорачувате? | Where do you ship? | _(not found in source)_ |
+| `Faq.q5` | Колку трае доставата? | How long does delivery take? | _(not found in source)_ |
+| `Faq.q6` | Што се случува откако ќе нарачам? | What happens after I order? | _(not found in source)_ |
+| `Faq.q7` | Кои величини ги има? | What sizes are there? | _(not found in source)_ |
+| `Faq.q8` | Зошто парчињата се толку малку? | Why are there so few pieces? | _(not found in source)_ |
 | `Footer.contact` | КОНТАКТ | CONTACT | `src/components/layout/SiteFooter.tsx` |
 | `Footer.rights` | © 2026 Трајанов. Сите права задржани. | © 2026 Trajanov. All rights reserved. | `src/components/layout/SiteFooter.tsx` |
 | `Footer.social` | СЛЕДИ | FOLLOW | `src/components/layout/SiteFooter.tsx` |

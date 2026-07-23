@@ -6,11 +6,89 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-23** · By: **Claude Code (Phase 2.10 — product-card pointer spotlight)**
+Last updated: **2026-07-23** · By: **Claude Code (Phase 2.11 — Home FAQ section)**
 
 ---
 
 ## Status
+
+**2.11 COMPLETE — the Home page now answers the five questions every Instagram buyer asks, under the
+hero (this update, 2026-07-23).** An out-of-band UI phase (the 2.07/2.08/2.09/2.10/Y.02 shape) — **no
+commerce logic touched**, and **line 1 `NEXT:` is unchanged** (the 2.06 operator rehearsal remains
+next; this phase does not advance the critical path). What shipped:
+- **New server component `src/components/home/HomeFaq.tsx`** — `<section>` under the hero, both locales,
+  rendering **eight questions in three static group labels** (Нарачка / Достава / Парчињата — `D-2.11-2`,
+  no interactive tab row) as native **`<details name="home-faq">`/`<summary>`** disclosures (`D-2.11-3`):
+  zero JS, server-rendered, correct keyboard + SR behaviour for free, every answer in the DOM for
+  crawlers, and native **one-open-at-a-time** via the shared `name`. Each summary has the lucide `Plus`
+  icon (`aria-hidden`) that rotates 45° → × when open. Heading is an **`<h2>`** (never a second `h1`),
+  group labels are `<h3>` eyebrows — order stays h1→h2→h3. Below the list: `Faq.moreQuestion` + a
+  localised `<Link href="/contact">` (`Faq.moreLink`) — **no email/phone printed** (footer + Contact
+  already carry them). No `'use client'`, no state, no effects, no `view` prop — renders identically in
+  all three drop states + preview.
+- **New single source `src/lib/faq.ts`** — a typed, ordered structure of three groups (label key +
+  ordered q/a key pairs) + a flattened `FAQ_ITEMS`. **Keys only, no translated strings.** Both the UI
+  (`HomeFaq`) and the JSON-LD (`faq-jsonld`) iterate this — neither hand-lists keys, so the visible and
+  structured answers cannot drift (`D-2.11-5`). Not `server-only`, so the test imports it directly.
+- **New `src/lib/seo/faq-jsonld.ts`** — a pure `faqJsonLd(t)` that builds a `FAQPage` node (one
+  `Question`/`acceptedAnswer` per item, in faq.ts order) from a passed-in translator, rendered on Home
+  via the existing `<JsonLd>` **inside `HomeFaq`** (`D-2.11-7`). **New `tests/seo/faq-jsonld.test.ts`**
+  (23 assertions): 8 questions, non-empty name/text, faq.ts order, node text byte-identical to the
+  catalog, and every faq.ts-referenced key present + non-empty in **both** catalogs.
+- **22 new message keys per locale (44 total)** under a new `Faq` namespace in `src/messages/{mk,en}.json`
+  — 6 structure/label + 8 questions + 8 answers, MK+EN key sets identical (parity test green). MK is the
+  source (shipped as written); the humanizer pass over the EN found nothing to change (tight brand-voice
+  copy, ≤1 em dash per answer, real enumerations not padding). Every answer traces to a `facts.md`
+  VERIFIED entry or an already-reviewed Terms/Shipping string (source-trace table in the brief); the two
+  „сè уште не се потврдени/објавени" sentences in `a5`/`a7` are **deliberate honest prose, not a
+  `[PLACEHOLDER: …]` marker** — no marker added anywhere. MK `a8` uses the repo's „…“ quote convention
+  (`D-2.11-6`).
+- **Scoped CSS in `src/app/globals.css`** — a `.faq-item` block (surface bg, `--color-border` hairline,
+  `--radius-lg`, hover→`--color-surface-2`, summary marker removed, Plus rotation on `[open]`,
+  `::details-content` block-size 0→auto via `interpolate-size: allow-keywords` +
+  `transition-behavior: allow-discrete`). **Zero literal colour** — every value is an existing token, no
+  new token introduced. The global `focus-visible` ring lands on `<summary>` (verified); the global
+  reduced-motion rule already collapses the transitions (no second block added).
+- **Mounted** `<HomeFaq />` in `src/app/[locale]/page.tsx` after `<HomeExperience>` and before
+  `<DevPreviewSwitch>`. **`docs/i18n/string-inventory.md` regenerated 219 → 241**; **`docs/i18n/mk-review-2.11.md`**
+  written **unsigned** (22 MK strings, flags the two deliberate "not confirmed yet" sentences).
+
+**Gates:** `npm run build` (exit 0, "✓ Compiled successfully") / `npx tsc --noEmit` / `npm run lint`
+clean; `npm test` **116/116** (was 93; +23 from the new FAQ JSON-LD suite) incl. `✓ 10 simultaneous
+orders against 3 units → exactly 3 succeed, 7 rejected with insufficient_stock, stock 0` (untouched —
+no commerce code changed) + the i18n catalog-parity test. **Rendered + verified in-browser** (dev
+server, **both locales**, **all three drop states** via the preview switch, at **desktop 1280 + mobile
+390**), by the accessibility tree + computed styles + a real axe run, not by eye alone: exactly **one
+`h1`** and heading order **h1→h2→h3 no skips** in every state; **zero English in the MK build / zero
+Macedonian in the EN build** (the FAQ strings); the disclosure opens (`::details-content` 0px→64px) and
+the icon rotates (transform `none`→`rotate(45deg)`) — proven with transitions disabled to read the
+resting target values; **native one-open-at-a-time** (opening a second row closes the first); real
+click + Enter toggle; the global focus ring (`2px solid #F2C55A`) lands on `<summary>`; WCAG contrast
+question **14.35** / answer **7.31** / group label + more-link **7.85** (all ≥ 4.5); **`axe` reports
+zero violations** (not just zero serious/critical) on `/` **and** `/en`; no horizontal overflow at 390
+or 1280; 56px summary tap target; **no console errors**. `FAQPage` JSON-LD verified by curl: node
+present, **8 `Question`s**, answer text **byte-identical to the catalog** (MK). Screenshots captured:
+desktop (FAQ heading below the product grid) + mobile closed (three group labels + `+` icons + contact
+link) + mobile open ("Where do you ship?" open with the **× icon** + its revealed answer). (The
+mid-page accordion rows resisted desktop screenshot capture on the long dark page — the same browser-
+pane scroll/capture desync 2.07 documented; fully verified via the tree + computed styles + the mobile
+captures instead.)
+
+**Frozen (byte-unchanged, `git diff --name-only main`):** `src/components/home/HomeExperience.tsx` /
+`Countdown.tsx` / `DropBanner.tsx` (hero/countdown/banners) / `src/lib/orders/` / `create_order` /
+`expire_reservations` / `supabase/` / cart / checkout / `src/config/` / `src/lib/drop/` / `src/lib/site.ts`
+(`SITE_URL`) / `facts.md` / `src/lib/seo/{site,product}-jsonld.ts` / `sitemap.ts` / `robots.ts` /
+`llms.txt` / `manifest.ts` / logo+icon assets — the diff is only `src/app/[locale]/page.tsx`,
+`src/app/globals.css`, `src/messages/{mk,en}.json`, `docs/i18n/string-inventory.md` (+ the four new files
+HomeFaq.tsx / faq.ts / faq-jsonld.ts / faq-jsonld.test.ts) and the state/decision/report/mk-review docs.
+**No new dependency** (`package.json` + lockfile unchanged); **no new placeholder** (`grep` clean — the
+diff adds none), **no `[PLACEHOLDER: …]` marker in the section**; **no new token** (CSS + component diff
+is hex/`rgb()`/`hsl()`-free). **Owed-verification register +3** (#24 native MK review of the 22 strings;
+#25 the section on a real phone from an IG link; #26 sign-off that eight questions is the right amount).
+**Placeholder register UNCHANGED** — this phase adds no marker and clears none. Decisions `D-2.11-1…7`
+(five orchestrator + `D-2.11-6` MK quote glyph + `D-2.11-7` JSON-LD co-located in `HomeFaq`). Branch
+`phase-2.11-home-faq`; **PR open to `main` — merged by an operator, not by Code (`D-0-3`).** `NEXT:` line
+**unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.10 COMPLETE — product cards now carry a subtle white pointer spotlight (this update, 2026-07-23).**
 An out-of-band UI phase (the 2.07/2.08/2.09/Y.02 shape) — **no commerce logic touched**, and **line 1
@@ -1261,6 +1339,9 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 21 | **Client sign-off on the header build credit (2.08).** Vladimir (and his parents) confirm they are content for a **third-party company name + outbound link** (Vertex Consulting → an off-site page) to sit in the **top nav of the store on every page** — client-facing and prominent (`D-2.08-2`). Easy to move to the footer later if they'd rather: one component edit. Owner: **Lazar → Vladimir**. | 2.08 | **before the first real drop (client confirms placement)** |
 | ~~22~~ | **Production size order (2.09) — CLEARED 2026-07-23 (post-merge, PR #21 `927381c`).** On `https://www.trajanovv.com`, both locales, all three product pages verified: `/katalog/test-mustard-ochre` + `/en/catalog/test-mustard-ochre` → **S M L XL**; `/katalog/test-baby-blue` + `/en/catalog/test-baby-blue` → **S M L XL**; `/katalog/test-off-white` + `/en/catalog/test-off-white` → **XL**. Conclusive because the pre-fix `localeCompare` rule can only emit `L · M · S · XL`, so `S M L XL` live proves the new comparator is deployed. | 2.09 | **CLEARED — production verified (both locales)** |
 | 23 | **Glow sign-off (2.10).** Eyeball the live glow on `https://www.trajanovv.com/katalog` and `/en/catalog` on a desktop mouse (the white spotlight should follow the cursor and read as a quiet wash, not a halo; sold-out cards must not glow), and confirm on a **phone** that nothing sticks or flickers (touch devices should get nothing — the effect is gated to fine pointers). The intensity is three token values (`--glow-size`, `--glow-opacity-surface`, `--glow-opacity-edge`, mirrored in `brand.md` §5 + `globals.css`) — dial it up or down in one commit. **Hard stop already respected:** `--glow-opacity-surface` ships at `0.05`; anything above `0.10` is an owner call, not Code's. Code verified the effect end-to-end in-browser (hover + keyboard-focus reveal, pointer tracking, no shift, no overflow, both locales) but only a human on a real desktop mouse + a real phone confirms the *feel* and the touch-device no-op. Owner: **Lazar**. | 2.10 | **before the first real drop (live eyeball, desktop mouse + phone)** |
+| 24 | **Native MK review of the 22 new FAQ strings (2.11).** The `Faq` namespace (6 labels + 8 questions + 8 answers) post-dates every prior MK review and renders on the front door. Two native speakers (Lazar + Petar) read all 22 in context and sign `docs/i18n/mk-review-2.11.md` — same process as `mk-review-2.03.md`; the two „сè уште не се потврдени/објавени" sentences (`a5`/`a7`) are deliberately unfinished and must not be polished. Code ran the humanizer over the EN and machine-checked parity, but a machine wrote the MK. Owner: **Lazar + Petar**. | 2.11 | **before the first real drop (both sign-off boxes filled)** |
+| 25 | **The FAQ on a real phone, from an Instagram link (2.11).** Open `https://www.trajanovv.com` on a phone (both locales): rows tap open/closed, text readable, animation smooth, and **nothing overlaps or shifts the hero/countdown**. Code verified structure + no-overflow + 56px tap target + the open/close animation at 390px in the pane, but only a human on a real device confirms the feel and that the hero is undisturbed. Owner: **Lazar**. | 2.11 | **after 2.11 deploys — before the first real drop** |
+| 26 | **Sign-off that eight questions is the right amount for the front door (2.11).** Lazar looks at the rendered Home FAQ and either says yes, or names what to add — the five deliberately-omitted answers (returns window, fabric/care, courier name, delivery cost, exact size measurements) do not exist in `facts.md` yet and their additions come from **Y.01** content, not from Code inventing them. Owner: **Lazar → Vladimir (content)**. | 2.11 | **before the first real drop (content sign-off)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

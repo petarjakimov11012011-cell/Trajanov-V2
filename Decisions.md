@@ -2953,3 +2953,103 @@ start at `D-2.01-6`.*
   colour — noted in a comment beside the rule. Deviates from the brief's literal text (flagged in the
   completion report §3).
 - **Links:** `src/app/globals.css` (`.spotlight-card::before` mask) · Task 3 + DoD of `briefs/Part-2-Phase-10-Code.md`
+
+### D-2.11-1 · 2026-07-23 · The FAQ lives on the Home page, not on its own route
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.11 brief); executed by Claude Code.
+- **Context:** Buyers arriving from an Instagram story ask the same five questions every time (how do I
+  pay, where do you ship, how long, how many, why so few) and today must open Terms or Shipping to
+  answer any of them. The FAQ needs to sit on the front door.
+- **Decision:** Render the eight-question FAQ as a section on Home, under the hero, in both locales.
+- **Alternatives considered:** A dedicated `/chesti-prashanja` · `/en/faq` page linked from the footer
+  (the orchestrator's own recommendation).
+- **Downside accepted:** Home is no longer a single-purpose page — the countdown shares it — and the
+  page gets longer on mobile.
+- **Links:** `src/components/home/HomeFaq.tsx` · `src/app/[locale]/page.tsx`
+
+### D-2.11-2 · 2026-07-23 · The reference design's category tab row is replaced by three static group labels
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the brief); executed by Claude Code.
+- **Context:** The reference mockup filters questions through pill-shaped category tabs. With only
+  eight questions, tabs would hide two-thirds of the answers behind a tap on the one page whose job is
+  to convert, and would add client state to a section that otherwise needs none.
+- **Decision:** Three quiet uppercase group labels — **Нарачка / Достава / Парчињата** — sit inside the
+  list, with every question visible at once. No interactive filtering.
+- **Alternatives considered:** Interactive filter tabs as drawn in the mockup.
+- **Downside accepted:** The horizontal pill row that visually balanced the big heading is gone, so the
+  heading sits closer to the first question — handled with spacing, not a decorative row.
+- **Links:** `src/lib/faq.ts` · `src/components/home/HomeFaq.tsx`
+
+### D-2.11-3 · 2026-07-23 · Native `<details>`/`<summary>` + CSS, not a Radix/shadcn accordion
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the brief); executed by Claude Code.
+- **Context:** The rows need to expand/collapse. A component-library accordion would pull in a new
+  dependency and a client component on a page that does not otherwise need one for this.
+- **Decision:** Use native `<details name="home-faq">`/`<summary>` styled in `globals.css`. It gives
+  correct keyboard and screen-reader behaviour for free, ships zero JS, stays server-rendered, keeps
+  every answer in the DOM for crawlers, and the shared `name` gives native one-open-at-a-time.
+- **Alternatives considered:** `npx shadcn@latest add accordion` (`@radix-ui/react-accordion`) — a new
+  dependency + a client component.
+- **Downside accepted:** The open/close height animation depends on `::details-content` +
+  `interpolate-size`, which some browsers do not yet support — there the panel snaps open while the
+  icon still animates. Acceptable graceful degradation; must NOT be "fixed" with a dependency or JS.
+- **Links:** `src/app/globals.css` (`.faq-item` block) · `src/components/home/HomeFaq.tsx`
+
+### D-2.11-4 · 2026-07-23 · Eight questions only — five deliberately not asked
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the brief); executed by Claude Code.
+- **Context:** The reference has a ~20-question grid. Returns window, fabric/care, courier name,
+  delivery cost and exact size measurements do not exist in `facts.md` (placeholder register #3, #6,
+  #7, #9 and the measurements half of #4).
+- **Decision:** Ask exactly eight questions, all of whose answers trace to a `facts.md` VERIFIED entry
+  or a restatement of an already-reviewed Terms/Shipping string. Do not ask the five that would need a
+  fact we do not have.
+- **Alternatives considered:** Mirror the reference's ~20-question grid and fill the gaps with
+  `[PLACEHOLDER: …]` markers.
+- **Downside accepted:** The section looks thinner than the mockup until Vladimir supplies that content
+  in Y.01. (Adding placeholders would have grown a register that must reach zero before the first real
+  drop — the worse outcome.)
+- **Links:** `src/lib/faq.ts` · source-trace table in `briefs/Part-2-Phase-11-Code.md`
+
+### D-2.11-5 · 2026-07-23 · A `FAQPage` JSON-LD node is emitted on Home, from the same keys as the visible copy
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the brief); executed by Claude Code.
+- **Context:** Structured FAQ data helps search / answer engines, but is a factual-claim surface that
+  must stay honest and cannot be allowed to drift from the visible answers.
+- **Decision:** Emit a `FAQPage` node on Home, built by iterating the same single source
+  (`src/lib/faq.ts`) and resolving the same message keys as the visible section — so the visible and
+  structured answers cannot differ. A test asserts 8 questions, non-empty name/text, faq.ts order, and
+  key existence in both catalogs.
+- **Alternatives considered:** No structured data at all.
+- **Downside accepted:** One more schema surface to keep honest — mitigated by the single-source build.
+- **Links:** `src/lib/seo/faq-jsonld.ts` · `tests/seo/faq-jsonld.test.ts`
+
+### D-2.11-6 · 2026-07-23 · The MK nested "Sold out" quote uses the repo's „…“ convention
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** `Faq.a8` quotes the on-screen sold-out word inside the sentence. The brief rendered it
+  as „Распродадено" (Macedonian low-opening quote). The repo's one existing quoted Macedonian phrase,
+  `About.quote`, uses the pair „…“ (low-9 opening `U+201E`, high-6 closing `U+201C`).
+- **Decision:** Ship `Faq.a8` with the matching pair — „Распродадено“ — for typographic consistency
+  with the rest of the MK build, rather than an ASCII or `U+201D` closing glyph.
+- **Alternatives considered:** (a) A straight/typewriter closing quote — rejected: inconsistent with
+  `About.quote` and not the Macedonian convention. (b) `U+201D` closing — rejected: same reason.
+- **Downside accepted:** The exact closing glyph is a judgement a native reviewer should confirm — so
+  it is called out explicitly in `docs/i18n/mk-review-2.11.md` §4.
+- **Links:** `src/messages/mk.json` (`Faq.a8`) · `docs/i18n/mk-review-2.11.md`
+
+### D-2.11-7 · 2026-07-23 · The `FAQPage` JSON-LD is rendered inside `HomeFaq`, co-located with the visible copy
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** The brief says to render the node "on Home only, via the existing `<JsonLd>` component"
+  but does not say from which component. `HomeFaq` already resolves the locale + `Faq` translator it
+  needs.
+- **Decision:** Render `<JsonLd data={faqJsonLd(...)} />` inside `HomeFaq`'s returned fragment, so the
+  visible section and its structured data are produced by one component from one translator — they
+  mount and unmount together and cannot be wired to Home separately by mistake.
+- **Alternatives considered:** Render the `<JsonLd>` in `src/app/[locale]/page.tsx` next to
+  `<HomeFaq />` — rejected: it would need its own `getTranslations('Faq')` call, duplicating the
+  locale wiring and creating a second place the FAQ data is assembled.
+- **Downside accepted:** A reader looking only at `page.tsx` does not see the JSON-LD emission; it lives
+  one level down in `HomeFaq`. Noted in the completion report.
+- **Links:** `src/components/home/HomeFaq.tsx` · `src/lib/seo/faq-jsonld.ts`

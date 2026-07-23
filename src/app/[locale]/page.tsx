@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import type {Locale} from 'next-intl';
 import {getTranslations} from 'next-intl/server';
 import {HomeExperience} from '@/components/home/HomeExperience';
+import {HomeFaq} from '@/components/home/HomeFaq';
 import {DevPreviewSwitch} from '@/components/system/DevPreviewSwitch';
 import {getActiveDropView, parsePreviewState} from '@/lib/drop/state';
 import {pageMetadata} from '@/lib/metadata';
@@ -37,6 +38,9 @@ export default async function HomePage({
   return (
     <>
       <HomeExperience view={view} />
+      {/* Static content — renders identically in all three drop states and in preview; takes no props
+          from `view` (Phase 2.11). Sits under the hero, above the dev-only preview switch. */}
+      <HomeFaq />
       <DevPreviewSwitch current={previewState} />
     </>
   );
