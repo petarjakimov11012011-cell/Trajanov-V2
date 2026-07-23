@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-23 |
 | **Branch** | `phase-2.10-card-glow` |
-| **PR** | (open to `main` — operator merges, `D-0-3`) |
+| **PR** | [#22](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/22) (open to `main` — operator merges, `D-0-3`) |
 | **Brief** | `briefs/Part-2-Phase-10-Code.md` |
 
 ---
