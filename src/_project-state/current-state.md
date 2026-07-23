@@ -12,6 +12,44 @@ Last updated: **2026-07-22** · By: **Claude Code (Phase Y.02 — Product 03 (ba
 
 ## Status
 
+**2.07 COMPLETE — the site-wide footer is redesigned (this update, 2026-07-23).** An out-of-band UI phase
+(the Y.02 precedent): the session was handed the original **Phase 1.05** footer brief, but that footer
+shipped long ago and the project is ~15 phases past it (live on `www.trajanovv.com`, real 2.03 Privacy page,
+published `info@trajanovv.com`). Rather than execute the stale brief literally — which would **overwrite the
+real Privacy page** with a `[PLACEHOLDER: … 2.03]` stub and **re-introduce the email placeholder** 2.05 already
+cleared — **Petar chose to apply the brief's richer two-zone design as a new phase, preserving the real
+Privacy page + the published email** (`D-2.07-1`). **No commerce logic touched.** What shipped:
+- **`src/components/layout/SiteFooter.tsx` rebuilt** to two zones. **Zone 1** — two columns: `КОНТАКТ`
+  (email `info@trajanovv.com` + phone `078 820 520`) and `СЛЕДИ` (`@trajanovv2026`), each a real `<h2>`
+  eyebrow heading with a 16px Lucide line icon per item. **Zone 2** — a 1px hairline rule, then a
+  `© 2026 Трајанов. Сите права задржани.` row carrying **all five** page links
+  (About/Contact/Terms/Privacy/Shipping) so no live link is dropped. Single stacked column at 375px, two
+  columns at `sm`. Every colour/size/spacing/type value is a `brand.md` token — zero hardcoded values.
+- **Instagram icon:** this `lucide-react` dropped its brand icons, so the social row uses **`AtSign`** (`@`)
+  paired with the handle — honest, no fabricated brand glyph (`D-2.07-2`).
+- **Strings:** a new `Footer` namespace (`contact`/`social`/`rights`) in `src/messages/{mk,en}.json`;
+  page-link labels **reuse** the reviewed `Nav` keys (`D-2.07-3`). MK+EN parity green; `string-inventory.md`
+  regenerated **214 → 217**.
+- **Preserved:** the real 2.03 Privacy page (`/privatnost` + `/en/privacy` → **200** with real „Приватност"
+  content, **not** a stub) and the published email — **no placeholder re-introduced**.
+
+**Gates:** `npm run build` / `npx tsc --noEmit` / `npm run lint` clean; `npm test` **85/85** incl. the
+10-vs-3 oversell gate (untouched — no commerce code changed) + the i18n catalog-parity test. **Rendered +
+measured in-browser** (dev server, both locales, 375px + desktop): real `<h2>` headings, 3 icons; MK
+`КОНТАКТ`/`СЛЕДИ`/`© 2026 Трајанов…` + MK slugs (`/privatnost` etc.); EN `CONTACT`/`FOLLOW`/`© 2026 Trajanov…`
++ `/en/*`; IG `rel="noopener noreferrer" target="_blank"`; phone `tel:+38978820520`. **WCAG 2.2 AA contrast
+(measured on ground `#0F1210`):** muted headings/© row/page-links `#ABA79E` = **7.85:1**; full-contrast
+contact items `#ECE8E0` = **15.42:1** — both pass (need 4.5). Tap targets ≥24px (email 178×34, Privacy 46×28).
+Mobile: single column, sections stack, © row vertical, **no horizontal overflow**. No console errors. (The
+footer-band *screenshot* was blocked by a browser-pane scroll timeout on the dark page; the page paints —
+hero captured — and the footer is fully verified via the accessibility tree + computed styles.) **Frozen:**
+`create_order`/`expire_reservations`/`supabase/migrations/`/cart/checkout/`src/config/` byte-unchanged; **no
+new dependency**; `SITE_URL` unchanged; **no new placeholder** (email published, Privacy real). **Owed to
+Lazar:** design sign-off incl. the `@`-for-Instagram icon (register **#17**) + native review of the 3 new MK
+strings (register **#18**). Decisions `D-2.07-1/2/3`. Branch `phase-2.07-footer-redesign`; **PR not yet
+opened (awaiting operator).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01
+critical path.
+
 **Y.02 COMPLETE — a third product, "Product 03" (baby blue), is now a visible, honest catalog stub
 (this update, 2026-07-22).** An owner-authorised out-of-order insert (`D-Y.02-1`, Lazar, 2026-07-22) —
 it does **NOT** replace the 2.06 operator rehearsal on the critical path (line 1 `NEXT:` is unchanged).
@@ -993,6 +1031,8 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 14 | **Register the IndexNow key in Bing Webmaster Tools** (`D-2.04b-6`). Key `78dec4b97e3fbb0f22d1c8df38050f74`, served at `${SITE_URL}/78dec4b97e3fbb0f22d1c8df38050f74.txt`. **Public by design, NOT a secret (`D-0-1`).** Ops-only, and only meaningful **after the real domain is live** (2.05) — the key file must resolve on the final host before Bing accepts it, and `pingIndexNow()` stays un-wired until a post-2.05 hook. **Now actionable — the domain is live and `SITE_URL` is flipped (2.05); the key file resolves on `https://www.trajanovv.com`.** Owner: **Lazar (ops)**. | 2.04b | **post-2.05 (domain live — now actionable)** |
 | 15 | **Live Turnstile captcha renders + solves on the real-domain checkout.** The site key rotated to `0x4AAAAAAD6pSIvEa1p8GkZX` (new Managed widget, hostnames `trajanovv.com` + `www`, `D-2.05-4`); the server-side `verifyTurnstile` **does not assert hostname** (it checks `success` only), so no code gate depends on the host. But a real browser render + solve on `https://www.trajanovv.com/checkout` needs an **open drop** — deferred to the 2.06 rehearsal. **2.06 Code (2026-07-22): the runbook is ready** — `docs/ops/drop-rehearsal-runbook.md` step 2b (open drop via `docs/ops/rehearsal-sql/01-open-rehearsal-drop.sql`, solve the real Turnstile on `/naracka`, place one order). Still owed until Lazar + Vladimir run it. Owner: **Lazar / 2.06 rehearsal**. | 2.05 | **2.06 rehearsal (runbook ready; operator runs it)** |
 | 16 | **A real order email delivers from `info@trajanovv.com` end to end.** `ORDER_FROM_ADDRESS` is now `info@trajanovv.com` and the domain is Resend-verified (`D-2.05-3`); unit tests (mocked Resend) assert the new from-address. That a live order's notification actually **arrives** in Vladimir's inbox `from: info@trajanovv.com` needs a real order → the 2.06 rehearsal. **2.06 Code (2026-07-22): the runbook is ready** — `docs/ops/drop-rehearsal-runbook.md` step 2d (confirm the email in Vladimir's inbox: subject "Нова нарачка TRJ-0001 — Trajanov", ordered line, customer block, COD copy) + step 0 pre-flight (test that `info@` routes to his inbox). Still owed until the operator runs it. Owner: **Lazar / 2.06 rehearsal**. | 2.05 | **2.06 rehearsal (runbook ready; operator runs it)** |
+| 17 | **Footer redesign — Lazar design sign-off (2.07).** The footer was rebuilt to the two-zone design (contact/social columns + © row) **outside a Design phase**; the Instagram row uses the Lucide **`AtSign`** (`@`) icon because this `lucide-react` ships **no** brand Instagram glyph (`D-2.07-2`). Code verified structure, contrast (every pair passes WCAG 2.2 AA), tap targets (≥24px), MK+EN strings, and mobile stacking — but the **visual-brand call** (the redesign itself + the `@`-for-Instagram icon) is Lazar's/Design's. Eyeball the `https://www.trajanovv.com` footer (any page), **MK + EN, 375px + desktop**. If a real Instagram glyph is wanted, drop an SVG in and swap the `AtSign` import — one commit. Owner: **Lazar / Design**. | 2.07 | **after 2.07 deploy — sign off anytime before the first real drop** |
+| 18 | **New MK footer strings — native review (2.07).** Three MK strings post-date the 2.02 native review and ship exactly as the 1.05 brief proposed them: `Footer.contact` „КОНТАКТ", `Footer.social` „СЛЕДИ", `Footer.rights` „© 2026 Трајанов. Сите права задржани." A native speaker (Lazar/Petar) confirms spelling / agreement / tone — same process as `docs/i18n/mk-review-2.03.md`. Owner: **Lazar / Petar**. | 2.07 | **before the first real drop (MK review pass)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

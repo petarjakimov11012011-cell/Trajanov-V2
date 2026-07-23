@@ -11,6 +11,11 @@
     "location": "Струмица, Северна Македонија",
     "brand": "TRAJANOV"
   },
+  "Footer": {
+    "contact": "КОНТАКТ",
+    "social": "СЛЕДИ",
+    "rights": "© 2026 Трајанов. Сите права задржани."
+  },
   "Home": {
     "title": "Trajanov",
     "tagline": "Наскоро.",

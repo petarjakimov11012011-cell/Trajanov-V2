@@ -2608,3 +2608,70 @@ start at `D-2.01-6`.*
   verified the insert against the **local** DB this phase.
 - **Links:** `scripts/sync-core.ts` (INSERT-only) · `scripts/sync-drop.ts` · `D-1.04-5` · `D-1.04-11` ·
   `D-0-4` · `D-Y.02-2`
+
+### D-2.07-1 · 2026-07-23 · Footer redesign shipped as a new out-of-band phase; the stale 1.05 stub/placeholder steps are NOT executed
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor) + **Petar** (operator chose the redesign path when the session
+  surfaced that the handed 1.05 brief was already satisfied and ~15 phases stale).
+- **Context:** The brief handed to this session was the original **Phase 1.05** footer brief — "build the
+  footer from scratch." But the footer shipped in 1.05 and has been refined since (2.04 a11y), the site is
+  live on `www.trajanovv.com`, the **Privacy page carries real 2.03 legal copy** (not a stub), and the
+  **email is published** (`info@trajanovv.com`, placeholder #5 cleared in 2.05). Executing the brief
+  literally would (a) create a duplicate `Footer.tsx`, (b) **overwrite the real Privacy page** with a
+  `[PLACEHOLDER: … Phase 2.03]` stub, and (c) **re-introduce the email placeholder** 2.05 already cleared —
+  destructive, not additive. Petar chose to apply the brief's *richer two-zone visual design* as a new phase
+  while preserving the real Privacy page and the published email.
+- **Decision:** Ship the redesign as new phase **2.07** on `phase-2.07-footer-redesign`. Rebuild
+  `SiteFooter.tsx` to the brief's two zones — Zone 1: `КОНТАКТ` + `СЛЕДИ` columns with real `<h2>` eyebrow
+  headings + 16px Lucide line icons; Zone 2: a hairline rule + a `© 2026 Трајанов…` row. **Do not** run the
+  brief's stub/placeholder steps. **Enrich** the © row with all five existing page links
+  (About/Contact/Terms/Privacy/Shipping) so no live footer link is dropped. **`NEXT:` line unchanged** — this
+  is out-of-band (the Y.02 precedent) and does not touch the 2.06 → Y.01 critical path.
+- **Alternatives considered:** **(a) Execute the 1.05 brief verbatim** — rejected: destroys the real Privacy
+  page, re-introduces a cleared placeholder, duplicates the component. **(b) Do nothing** (the footer already
+  exists and is correct) — a legitimate reading, offered to Petar, who chose the redesign instead. **(c) The
+  brief-literal two-column footer with only a `Privacy` link in the © row** — rejected: drops the
+  About/Contact/Terms/Shipping links the site has shipped since 1.05 — a link regression on live legal pages.
+- **Downside accepted:** The rendered footer diverges from the 1.05 sketch (five links in the © row, not
+  one), and a Part-2 phase number is spent on a component redesign rather than a planned milestone. The new
+  MK strings + the overall visual are owed a native-review / Lazar design sign-off (register #17/#18).
+- **Links:** `src/components/layout/SiteFooter.tsx` · `src/messages/{mk,en}.json` · `D-1.05-7` ·
+  `D-2.03-1` (real Privacy) · `D-2.05-3` (published email) · `D-Y.02-1` (out-of-band precedent) · `D-2.07-2/3`
+
+### D-2.07-2 · 2026-07-23 · Instagram row uses the Lucide `AtSign` icon — this Lucide has no brand Instagram glyph
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor), while building 2.07.
+- **Context:** The brief asks for an "instagram icon (Lucide)". `lucide-react 1.24.0` has **dropped its brand
+  icons** — there is no `Instagram` export (the build failed on the import). `facts.md` §6 forbids
+  fabricating a social presence, and hand-vendoring a Meta/Instagram brand glyph puts trademarked trade dress
+  into a public repo (`D-0-1`) for more than the brief asked.
+- **Decision:** Use `AtSign` (the `@` mark) for the single social row, paired with the visible
+  `@trajanovv2026` handle. It reads honestly as "social handle" and needs no brand asset. The row still links
+  to the one real Instagram URL, `target="_blank"`, `rel="noopener noreferrer"`.
+- **Alternatives considered:** **(a) Vendor a custom Instagram SVG** — rejected: ships brand trade dress into
+  a public repo, not a Lucide icon, more than asked. **(b) Downgrade `lucide-react` to a version with brand
+  icons** — rejected: a dependency change (against these phases' no-new-deps discipline) to obtain a
+  deprecated, trademark-risky glyph. **(c) No icon on the social row** — rejected: breaks the brief's
+  icon-per-item design and the symmetry with the contact rows.
+- **Downside accepted:** The social icon is a generic `@`, not the recognizable Instagram camera glyph, so
+  the row leans on the handle text + link to convey "Instagram." Whether that reads well is a visual call
+  owed to Lazar (register #17).
+- **Links:** `src/components/layout/SiteFooter.tsx` · `facts.md` §6 · `src/lib/social.ts` · `D-2.07-1`
+
+### D-2.07-3 · 2026-07-23 · Footer strings in a new `Footer` namespace; page-link labels reuse reviewed `Nav` keys
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor), while building 2.07.
+- **Context:** The brief proposed a lowercase `footer` key holding contact/social/privacy/rights. The
+  codebase namespaces are PascalCase (`Nav`, `Home`, `Privacy`, `Meta`), and the privacy/about/terms/shipping
+  labels already exist as **reviewed** `Nav` keys (2.02 native review) — re-adding them under a footer key
+  would duplicate strings and invite drift.
+- **Decision:** Add a `Footer` namespace with exactly three **new** keys — `contact` (КОНТАКТ/CONTACT),
+  `social` (СЛЕДИ/FOLLOW), `rights` (© 2026 …). The five page-link labels **reuse** the existing `Nav` keys.
+  MK+EN kept at key-parity (catalog-parity test green); `string-inventory.md` regenerated **214 → 217**.
+- **Alternatives considered:** **(a) The brief's literal `footer.privacy` key** — rejected: duplicates the
+  reviewed `Nav.privacy` string. **(b) Lowercase `footer` namespace** — rejected: breaks the PascalCase house
+  convention.
+- **Downside accepted:** The three new MK strings post-date the 2.02 native review and are owed a
+  native-speaker pass (register #18) — implemented exactly as the brief proposed, flagged for review.
+- **Links:** `src/messages/{mk,en}.json` · `docs/i18n/string-inventory.md` ·
+  `tests/i18n/catalog-parity.test.ts` · `D-2.07-1`
