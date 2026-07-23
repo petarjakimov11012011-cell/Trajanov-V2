@@ -29,6 +29,13 @@
   --color-focus-ring: #F2C55A;
   --color-mustard-tint-8: color-mix(in srgb, var(--color-mustard) 8%, transparent);
   --color-mustard-tint-6: color-mix(in srgb, var(--color-mustard) 6%, transparent);
+  /* Product-card pointer spotlight (brand.md §3/§5, D-2.10-1). --color-glow is the off-white
+     foreground token at full opacity; the two opacities + size below are read directly via var()
+     in the .spotlight-card block (they are NOT utilities, so only --color-glow gets @theme inline). */
+  --color-glow: color-mix(in srgb, var(--color-foreground) 100%, transparent);
+  --glow-size: 240px;
+  --glow-opacity-surface: 0.05;
+  --glow-opacity-edge: 0.22;
 
   /* ---- type (brand.md §4) ---- */
   --font-display: var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
@@ -105,6 +112,8 @@
   --color-focus-ring: var(--color-focus-ring);
   --color-mustard-tint-8: var(--color-mustard-tint-8);
   --color-mustard-tint-6: var(--color-mustard-tint-6);
+  /* Only --color-glow becomes a utility; --glow-size/-opacity-* are read via var() (brand.md §5). */
+  --color-glow: var(--color-glow);
 
   /* shadcn semantic → utilities (keeps bg-background / bg-card / bg-primary …) */
   --color-background: var(--background);
@@ -189,5 +198,81 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/*
+  Product-card pointer spotlight (Phase 2.10, brand.md §3/§5/§6).
+  A subtle wash of the --color-glow token (the off-white foreground, never pure white) that follows
+  the pointer over the INTERACTIVE product card only — hover/focus, no animation loop, no transform.
+  This is a deliberate, narrowly-scoped exception to brand.md §5 ("shadow is for overlays only,
+  never decoration") and §6 ("motion belongs to the countdown and the drop reveal, nothing else"),
+  logged D-2.10-1. Every colour here is a token — there is no literal hex/rgb/hsl.
+
+  SpotlightCard.tsx writes the pointer position to --glow-x/--glow-y (px, rAF-throttled, on its own
+  element only — never document/window). The whole effect is gated to fine pointers, so a touch
+  device paints nothing and the component's move handler bails before it writes anything.
+*/
+@media (hover: hover) and (pointer: fine) {
+  .spotlight-card {
+    position: relative;
+    /* Own stacking context, so a card's glow can never paint over a neighbouring card. */
+    z-index: 0;
+    /* Well-defined before the pointer has ever entered the card (top-centre). */
+    --glow-x: 50%;
+    --glow-y: 0%;
+  }
+
+  .spotlight-card::before,
+  .spotlight-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Above the card's opaque surface so the glow is visible; the card body itself never clips it,
+       and the low-stock / sold-out badge is untouched (the wash is 5%, the edge is a 1px ring). */
+    z-index: 1;
+    border-radius: var(--radius-lg);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--motion-base) var(--ease-out);
+  }
+
+  /* Surface wash — a soft radial of --color-glow at --glow-opacity-surface, centred on the pointer. */
+  .spotlight-card::after {
+    background: radial-gradient(
+      var(--glow-size) circle at var(--glow-x) var(--glow-y),
+      color-mix(in srgb, var(--color-glow) calc(var(--glow-opacity-surface) * 100%), transparent),
+      transparent 72%
+    );
+  }
+
+  /* Edge light — the same radial at --glow-opacity-edge, masked to the 1px card border so only the
+     hairline nearest the pointer lights up. The mask sentinel is an OPAQUE token (its alpha is all
+     the mask uses — D-2.10-3), not a colour on screen. Where mask-composite is unsupported the card
+     just keeps its normal border — an acceptable graceful degradation. */
+  .spotlight-card::before {
+    border: 1px solid transparent;
+    background: radial-gradient(
+      var(--glow-size) circle at var(--glow-x) var(--glow-y),
+      color-mix(in srgb, var(--color-glow) calc(var(--glow-opacity-edge) * 100%), transparent),
+      transparent 72%
+    );
+    -webkit-mask:
+      linear-gradient(var(--color-foreground), var(--color-foreground)) padding-box,
+      linear-gradient(var(--color-foreground), var(--color-foreground)) border-box;
+    mask:
+      linear-gradient(var(--color-foreground), var(--color-foreground)) padding-box,
+      linear-gradient(var(--color-foreground), var(--color-foreground)) border-box;
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  /* Reveal on pointer hover AND on keyboard focus — the focusable element is the parent <Link>, so
+     keyboard users get the same affordance (the glow rests at its top-centre default). */
+  .spotlight-card:hover::before,
+  .spotlight-card:hover::after,
+  :focus-visible > .spotlight-card::before,
+  :focus-visible > .spotlight-card::after {
+    opacity: 1;
   }
 }

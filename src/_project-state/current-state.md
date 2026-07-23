@@ -6,11 +6,83 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-23** · By: **Claude Code (Phase 2.09 — size buttons in garment order S·M·L·XL)**
+Last updated: **2026-07-23** · By: **Claude Code (Phase 2.10 — product-card pointer spotlight)**
 
 ---
 
 ## Status
+
+**2.10 COMPLETE — product cards now carry a subtle white pointer spotlight (this update, 2026-07-23).**
+An out-of-band UI phase (the 2.07/2.08/2.09/Y.02 shape) — **no commerce logic touched**, and **line 1
+`NEXT:` is unchanged** (the 2.06 operator rehearsal remains next). The catalogue was a grid of flat dark
+cards on a flat dark ground with nothing signalling which card the cursor is on. What shipped:
+- **New client component `src/components/product/SpotlightCard.tsx`** — a thin `'use client'` wrapper that
+  takes the card body as `children`, attaches **one `onPointerMove` to its own element** (never
+  `document`/`window` — `grep -rn "document.addEventListener\|window.addEventListener"
+  src/components/product/` is clean), and on move writes the pointer position to CSS vars `--glow-x`/
+  `--glow-y` in px via `getBoundingClientRect()`, **rAF-throttled** (one write per frame, pending frame
+  cancelled on unmount). It **bails before writing** on any non-mouse pointer and when
+  `window.matchMedia('(hover: hover) and (pointer: fine)')` does not match — so a touch device does no
+  work. No state, no document `useEffect`, no `dangerouslySetInnerHTML`, no inline `<style>`, no `aria-*`/
+  `role` (it is decoration and never a focus target).
+- **Scoped CSS in `src/app/globals.css`** — a single `.spotlight-card` class with a surface-wash `::after`
+  and a 1px edge-light `::before` (the standard border-only mask, `mask-composite: exclude` /
+  `-webkit-mask-composite: xor`), both a `radial-gradient` of `--color-glow` centred on `--glow-x`/
+  `--glow-y`, revealed (`opacity 0→1`, `var(--motion-base)` fade) on `:hover` **and** on
+  `:focus-visible > .spotlight-card` (keyboard users get the same affordance). The **whole block is gated
+  in `@media (hover: hover) and (pointer: fine)`** — touch devices render/listen for nothing. The global
+  reduced-motion rule already flattens the opacity transition; the glow itself is not disabled (a static
+  glow is not motion). **Every colour in the effect is a token — the CSS + component + token diff has zero
+literal hex/`rgb()`/`hsl()`** (the only hex in `git diff main` is doc prose explaining the gate, e.g. this
+sentence and `D-2.10-3`).
+- **Four new tokens** in **both** `brand.md` (§3 `--color-glow`; §5 a Spotlight table with `--glow-size`
+  `240px`, `--glow-opacity-surface` `0.05`, `--glow-opacity-edge` `0.22`) **and** `globals.css` (`:root`,
+  same order, right after `--color-mustard-tint-6`), identical values. Only `--color-glow` gets an
+  `@theme inline` entry; the other three are read via `var()` and generate no utilities. **`--color-glow`
+  is the off-white `--color-foreground`, never pure white** (`D-2.10-1`, decision A).
+- **`ProductCard.tsx` stays a server component** (no `'use client'`). Only the **interactive** branch
+  changed: `inner` is now wrapped in `<SpotlightCard>` **inside** the existing `<Link>`, so the Link keeps
+  its own `focus-visible` ring + rounding. **The sold-out branch is byte-unchanged** — a sold-out card is
+  the non-interactive `<div aria-disabled>` with no `.spotlight-card`, so it never glows (`D-2.10-1`,
+  decision B).
+- **`brand.md` §5 + §6 each gained a carve-out sentence** (`D-2.10-1`, decision C) so the next reader sees
+  the "shadow is decoration-free" / "motion is countdown+reveal only" rules were **consciously** bent for
+  this one effect, not forgotten.
+
+**Notable brief-vs-repo differences (see report §3):** (1) Task 3 wrote the border mask as
+`linear-gradient(#000,#000)`, but the DoD forbids any literal hex in the diff — used
+`linear-gradient(var(--color-foreground),…)` instead (an **opaque token**; a mask reads only alpha, so it
+is functionally identical and keeps the diff hex-free), logged `D-2.10-3`. (2) The DoD says `npm test`
+**85/85**; the repo is at **93** since 2.09 added 8 size-order cases — so the real number is **93/93**.
+
+**Gates:** `npm run build` (exit 0, "Compiled successfully") / `npx tsc --noEmit` / `npm run lint` clean;
+`npm test` **93/93** incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected with
+insufficient_stock, stock 0` (untouched — no commerce code changed) + the i18n catalog-parity test.
+**Rendered + verified in-browser** (dev server, both locales, **375px + desktop**), by computed styles +
+the accessibility tree, not by eye alone: the `.spotlight-card` rule applies only under
+`@media (hover: hover) and (pointer: fine)` (`position: relative`, `z-index: 0`, `--glow-x/y` default
+`50%/0%`, `::after`/`::before` `border-radius: 14px` = `--radius-lg`, resting `opacity: 0`, `0.22s`
+transition, `::before` masked to a 1px border with `mask-composite: exclude`); **hover reveals** the glow
+(computed `::after`/`::before` opacity 0→1 on the hovered card only — no cross-card bleed); the
+`onPointerMove` handler **writes `--glow-x/--glow-y` in px** on move (confirmed changing from the default);
+**keyboard focus reveals** the glow via `:focus-visible > .spotlight-card` (proven with a temporary red
+`::after` probe: the focused card filled red, the non-focused one did not) **and the focus ring is
+unchanged** (the Link's `focus-visible:ring-2 ring-focus-ring ring-offset-2 ring-offset-ground` still
+paints the `#F2C55A` ring — visually confirmed); the **sold-out card has no `.spotlight-card`** and no
+glow (verified on `/styleguide`'s available/low/sold-out row); the **badges are not clipped** (wrapper
+`overflow: visible`, the low-stock „УШТЕ 4"/"4 LEFT" pill visible at desktop + 375px); **no card shifts a
+pixel** (the wrapper is exactly the size of the card body — `wrapsInnerExactly`); **no horizontal overflow
+at 375px** (`scrollWidth == clientWidth == 375`); **no console or dev-server errors** on Home-live /
+`/katalog` / `/en/catalog` / `/styleguide`. **Frozen:** `src/lib/orders/` / `create_order` /
+`expire_reservations` / `supabase/migrations/` / cart / checkout / `src/config/` (incl. `products.ts`) /
+`src/lib/site.ts` (`SITE_URL`) / `src/messages/{mk,en}.json` / `facts.md` / `src/lib/seo/` / `sitemap.ts` /
+`llms.txt` / `manifest.ts` / logo+icon assets — `git diff --name-only main` shows only `brand.md`,
+`src/app/globals.css`, `src/components/product/ProductCard.tsx` (+ the new `SpotlightCard.tsx`) and the
+brief/state/decision/report docs; **no new dependency** (`package.json` + lockfile unchanged); **no new
+placeholder, no message-file edit, zero new user-facing string**. **Owed to Lazar:** intensity sign-off —
+eyeball the live glow and dial the three token values if wanted (register **#23**). Decisions `D-2.10-1/2/3`.
+Branch `phase-2.10-card-glow`; **PR open to `main`** — an operator merges, not Code (`D-0-3`). `NEXT:` line
+**unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.09 COMPLETE — the product-page size buttons now read in garment order S · M · L · XL (this update,
 2026-07-23).** An out-of-band UI phase (the 2.07/2.08/Y.02 shape) — **no commerce logic touched**, and
@@ -1178,6 +1250,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 20 | **Click-test `https://www.vertexconsulting.mk/en`** (`facts.md` § 11, marked VERIFIED — **must be click-tested before it ships**). The credit link opens a **working** page in a **new tab** from the **live** header, on a **phone and on desktop**, in **both locales**. Same rule as the Instagram URL in `facts.md` § 6 — a link to a page that does not resolve is a **broken fact on every page of the site**. Code confirmed the anchor is correct (`target="_blank" rel="noopener noreferrer"`, hidden new-tab text, mustard link) but **cannot confirm the destination resolves**. Owner: **Lazar**. | 2.08 | **before the first real drop (live click-test, both platforms + locales)** |
 | 21 | **Client sign-off on the header build credit (2.08).** Vladimir (and his parents) confirm they are content for a **third-party company name + outbound link** (Vertex Consulting → an off-site page) to sit in the **top nav of the store on every page** — client-facing and prominent (`D-2.08-2`). Easy to move to the footer later if they'd rather: one component edit. Owner: **Lazar → Vladimir**. | 2.08 | **before the first real drop (client confirms placement)** |
 | ~~22~~ | **Production size order (2.09) — CLEARED 2026-07-23 (post-merge, PR #21 `927381c`).** On `https://www.trajanovv.com`, both locales, all three product pages verified: `/katalog/test-mustard-ochre` + `/en/catalog/test-mustard-ochre` → **S M L XL**; `/katalog/test-baby-blue` + `/en/catalog/test-baby-blue` → **S M L XL**; `/katalog/test-off-white` + `/en/catalog/test-off-white` → **XL**. Conclusive because the pre-fix `localeCompare` rule can only emit `L · M · S · XL`, so `S M L XL` live proves the new comparator is deployed. | 2.09 | **CLEARED — production verified (both locales)** |
+| 23 | **Glow sign-off (2.10).** Eyeball the live glow on `https://www.trajanovv.com/katalog` and `/en/catalog` on a desktop mouse (the white spotlight should follow the cursor and read as a quiet wash, not a halo; sold-out cards must not glow), and confirm on a **phone** that nothing sticks or flickers (touch devices should get nothing — the effect is gated to fine pointers). The intensity is three token values (`--glow-size`, `--glow-opacity-surface`, `--glow-opacity-edge`, mirrored in `brand.md` §5 + `globals.css`) — dial it up or down in one commit. **Hard stop already respected:** `--glow-opacity-surface` ships at `0.05`; anything above `0.10` is an owner call, not Code's. Code verified the effect end-to-end in-browser (hover + keyboard-focus reveal, pointer tracking, no shift, no overflow, both locales) but only a human on a real desktop mouse + a real phone confirms the *feel* and the touch-device no-op. Owner: **Lazar**. | 2.10 | **before the first real drop (live eyeball, desktop mouse + phone)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

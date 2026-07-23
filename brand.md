@@ -72,6 +72,7 @@ ledger at the end of this section is the proof, and it reproduces the handover's
 |---|---|---|
 | `--color-mustard-tint-8` | `color-mix(in srgb, var(--color-mustard) 8%, transparent)` | Size-picker selected fill |
 | `--color-mustard-tint-6` | `color-mix(in srgb, var(--color-mustard) 6%, transparent)` | Cart cap-notice fill |
+| `--color-glow` | `color-mix(in srgb, var(--color-foreground) 100%, transparent)` | Product-card pointer spotlight — the off-white foreground, never pure white (`D-2.10-1`) |
 
 ### Contrast ledger — WCAG 2.2 AA, all computed and passing
 
@@ -138,6 +139,19 @@ value that isn't a scale step is a bug.
 
 Dark, flat design — shadow is for overlays only, never decoration.
 
+**Spotlight (product-card pointer glow) — one logged, narrowly-scoped exception (`D-2.10-1`).** The
+interactive product card carries a subtle glow of the `--color-glow` token that follows the pointer.
+That glow is decoration, so it is a deliberate, operator-approved exception to the "shadow is for
+overlays only, never decoration" rule directly above — carved out **only** for product cards, on
+hover/focus, fine-pointer only, with no animation loop and no transform. Nothing else on the site
+may use it.
+
+| Token | Value | Use |
+|---|---|---|
+| `--glow-size` | `240px` | Spotlight radius on the card surface |
+| `--glow-opacity-surface` | `0.05` | Surface wash under the pointer |
+| `--glow-opacity-edge` | `0.22` | The 1px card edge, lit under the pointer |
+
 ---
 
 ## 6. Motion
@@ -152,6 +166,14 @@ Dark, flat design — shadow is for overlays only, never decoration.
 **`prefers-reduced-motion` is respected everywhere** — including the countdown (digits still update
 as values, never as a flip/spinner) and the drop reveal (swap in place, no transform/fade). The live
 dot is static under reduced motion.
+
+**One logged, narrowly-scoped exception to "motion belongs to the countdown and the drop reveal,
+nothing else" (§2 direction) — the product-card pointer spotlight (`D-2.10-1`).** The card glow is
+pointer-tracked, so it is motion, and it is a deliberate, operator-approved exception carved out
+**only** for product cards, on hover/focus, fine-pointer only. It is a plain opacity fade of a wash
+whose position follows the cursor — no keyframe loop, no transform — so under
+`prefers-reduced-motion: reduce` the global rule flattens its opacity transition to nothing and the
+glow simply becomes static (a static glow is not motion); the glow itself is not disabled.
 
 ---
 

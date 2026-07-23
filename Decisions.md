@@ -2885,3 +2885,71 @@ start at `D-2.01-6`.*
   drops it). Mitigated by mirroring `products.ts` byte-for-byte and by shuffling the insert order so
   the render is a genuine test of the fix.
 - **Links:** `src/config/products.ts` · `supabase/seed.sql` · Task 6 of `briefs/Part-2-Phase-09-Code.md`
+
+### D-2.10-1 · 2026-07-23 · Product-card pointer spotlight — a logged, narrow exception to brand.md §5 (decoration) and §6 (motion)
+- **Status:** Accepted
+- **Decided by:** Orchestrator (pre-decided in the Phase 2.10 brief, decision C); executed by Claude Code.
+- **Context:** The catalogue is a grid of flat dark cards on a flat dark ground with nothing marking
+  which card the cursor is on. `brand.md` §5 says "shadow is for overlays only, never decoration"
+  and the §2 direction says "motion belongs to the countdown and the drop reveal, nothing else." A
+  pointer-tracked glow is both decoration and motion — so shipping it silently would look like the
+  rules had been forgotten.
+- **Decision:** Ship a subtle white glow (the `--color-glow` token = the off-white `--color-foreground`,
+  **never** pure white) on the **interactive** product card, keyed to the pointer, on hover/focus only.
+  Log it as this exception and add a carve-out sentence to `brand.md` §5 and §6 so the next reader sees
+  the rule was consciously bent, not missed. The exception is **narrow**: product cards only, hover +
+  keyboard-focus only, fine-pointer only, no animation loop, no transform.
+- **Alternatives considered:** (a) Add the glow without touching `brand.md` — rejected: it would read
+  as an un-owned violation of two stated rules. (b) Use pure `#FFFFFF` — rejected (decision A): every
+  white on this site is the warm off-white foreground token; a cooler second white reads as a
+  different palette. (c) A coloured/hue-rotating glow like the source component — rejected: the colour
+  is explicitly not wanted.
+- **Downside accepted:** Two brand rules now each carry a documented exception, and the card has one
+  decorative, motion-bearing effect that must stay scoped (a future reader could cite it to justify
+  more). Contained by keeping the effect on a single class used only by `ProductCard`'s interactive
+  branch, and by the fine-pointer + reduced-motion gates.
+- **Links:** `brand.md` §3/§5/§6 · `src/app/globals.css` (`.spotlight-card`) ·
+  `src/components/product/SpotlightCard.tsx` · `briefs/Part-2-Phase-10-Code.md`
+
+### D-2.10-2 · 2026-07-23 · Rewrote the supplied 21st.dev `GlowCard`, did not paste it
+- **Status:** Accepted
+- **Decided by:** Orchestrator (pre-decided in the Phase 2.10 brief); executed by Claude Code.
+- **Context:** The operator supplied a 21st.dev "spotlight card" (`GlowCard`) as the reference for the
+  *effect*. As written it is unusable here for six concrete reasons.
+- **Decision:** Rebuild the effect from scratch against this repo's rules. Each of the source's six
+  problems is resolved: (1) a `document`-level `pointermove` listener per card → **one `onPointerMove`
+  on the card's own element**, rAF-throttled; (2) `background-attachment: fixed` (viewport-anchored,
+  janky on mobile Safari) → **a plain positioned pseudo-element**; (3) a per-card
+  `<style dangerouslySetInnerHTML>` with unscoped `[data-glow]` → **one scoped `.spotlight-card` block
+  in `globals.css`**, no JSX-injected CSS; (4) hardcoded `hsl()` / a 3px border → **tokens only, a 1px
+  hairline**; (5) fixed `w-64 h-80` + `aspect-[3/4]` fighting the grid → **no sizing; wraps the
+  existing card body untouched**; (6) no `prefers-reduced-motion`, no pointer guard, colourful
+  hue-rotation → **fine-pointer + mouse-only guards, the global reduced-motion rule, off-white only**.
+- **Alternatives considered:** Paste the component and patch it — rejected: it would drag in the
+  document listeners, the injected global CSS, and the hardcoded colours, i.e. every reason it was
+  rejected.
+- **Downside accepted:** We own and maintain the effect code rather than a third-party component.
+  Correct here — the component could not have shipped under this repo's rules regardless.
+- **Links:** `src/components/product/SpotlightCard.tsx` · `src/app/globals.css` · `briefs/Part-2-Phase-10-Code.md`
+
+### D-2.10-3 · 2026-07-23 · Border-mask sentinel is the opaque `--color-foreground` token, not the brief's literal `#000`
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** Task 3 specifies the standard border-only mask as
+  `linear-gradient(#000,#000) padding-box, linear-gradient(#000,#000) border-box`. But the phase's own
+  Definition of Done requires **zero literal hex / `rgb()` / `hsl()` in `git diff main`**, and the CSS
+  rule "every colour comes from a token." `#000` in a mask is a hex literal — the two instructions
+  conflict.
+- **Decision:** Use `linear-gradient(var(--color-foreground), var(--color-foreground))` for both mask
+  layers. A mask reads only the **alpha** channel; `--color-foreground` is fully opaque (alpha 1),
+  identical to `#000` for masking purposes, so the border-only result is unchanged — while the diff
+  stays hex-free and every value is a token. The visible border/glow region is decided by
+  `mask-composite: exclude` / `-webkit-mask-composite: xor`, never by the sentinel's colour.
+- **Alternatives considered:** (a) Keep `#000` as written — rejected: fails the DoD's "zero literal
+  hex" grep gate. (b) Use the `black` keyword — rejected: it dodges the hex grep but is still a
+  hardcoded colour, violating "every colour comes from a token." (c) `currentColor` — rejected:
+  ties the mask to inherited text colour for no benefit and is less obviously opaque to a reader.
+- **Downside accepted:** A reader must know the mask sentinel is an alpha-only stencil, not a visible
+  colour — noted in a comment beside the rule. Deviates from the brief's literal text (flagged in the
+  completion report §3).
+- **Links:** `src/app/globals.css` (`.spotlight-card::before` mask) · Task 3 + DoD of `briefs/Part-2-Phase-10-Code.md`
