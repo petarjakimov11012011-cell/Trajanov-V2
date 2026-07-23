@@ -11,6 +11,11 @@
     "location": "Strumica, North Macedonia",
     "brand": "TRAJANOV"
   },
+  "Footer": {
+    "contact": "CONTACT",
+    "social": "FOLLOW",
+    "rights": "© 2026 Trajanov. All rights reserved."
+  },
   "Home": {
     "title": "Trajanov",
     "tagline": "Coming soon.",
