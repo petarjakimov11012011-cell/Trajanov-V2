@@ -6,11 +6,60 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-23** · By: **Claude Code (Phase 2.08 — header redesign: nav + build credit)**
+Last updated: **2026-07-23** · By: **Claude Code (Phase 2.09 — size buttons in garment order S·M·L·XL)**
 
 ---
 
 ## Status
+
+**2.09 COMPLETE — the product-page size buttons now read in garment order S · M · L · XL (this update,
+2026-07-23).** An out-of-band UI phase (the 2.07/2.08/Y.02 shape) — **no commerce logic touched**, and
+**line 1 `NEXT:` is unchanged** (the 2.06 operator rehearsal remains next). The buy cluster previously
+listed sizes **L · M · S · XL** (alphabetical), which reads as broken on the one screen where a customer
+decides. What shipped:
+- **New pure module `src/lib/drop/size-order.ts`** — `CANONICAL_SIZE_ORDER` (`XS · S · M · L · XL · XXL ·
+  XXXL`) + `compareSizeLabels(a, b)`. It ranks by clothing position, **case-insensitive + whitespace-
+  trimmed**, treats `2XL`→`XXL` and `3XL`→`XXXL`, and puts any **unknown** label (e.g. "One size") after
+  every known size, alphabetically among themselves — a **total, deterministic** order. It **never mutates
+  a label**: the UI renders the original DB string, unchanged. **No `import "server-only"`**, so it is
+  unit-testable by a plain vitest run (`D-2.09-3`).
+- **`src/lib/drop/state.ts`** — the one alphabetical sort in `toProductView()`
+  (`.sort((a, b) => a.size.localeCompare(b.size))`, the ONLY place size order was decided anywhere in
+  `src/`) replaced with `compareSizeLabels`; the surrounding comment now explains why the order is
+  canonical, not alphabetical. **Nothing else in the file changed.** `grep -rn "localeCompare" src/`
+  returns **no hit in `state.ts`**.
+- **New test `tests/drop/size-order.test.ts`** (8 cases) written **first and run RED**, then GREEN — the
+  RED was made behavioural: a temporary alphabetical stub produced `L · M · S · XL` and failed 3
+  assertions (the S/M/L/XL ordering, the 2XL/3XL aliases, unknown-after-known), proving the test catches
+  the real bug before the fix landed.
+- **One shared code path for every product (`D-2.09-2`)** — the fix corrects Product 01
+  (`test-mustard-ochre`) and Product 03 (`test-baby-blue`); Product 02 (`test-off-white`) runs through the
+  same changed line but has a single XL variant, so the sort is a provable no-op and its rendered size row
+  (**XL**) is byte-identical. **No per-product override.** `src/config/products.ts` untouched.
+
+**Gates:** `npm run build` (exit 0, "✓ Compiled successfully") / `npx tsc --noEmit` / `npm run lint` clean;
+`npm test` **93/93** (was 85; +8 new size-order cases) incl. `✓ 10 simultaneous orders against 3 units →
+exactly 3 succeed, 7 rejected with insufficient_stock, stock 0` (untouched — no commerce code changed).
+**Rendered in-browser against the LOCAL DB, both locales:** all three product pages verified —
+`/katalog/test-mustard-ochre` + `/en/catalog/test-mustard-ochre` → **S M L XL**, `/katalog/test-baby-blue`
++ `/en/catalog/test-baby-blue` → **S M L XL**, `/katalog/test-off-white` + `/en/catalog/test-off-white` →
+**XL, unchanged**. To exercise the fix, the local variants were seeded in a **deliberately non-canonical
+order** (`XL S L M` / `L XL S M`), so the correct render proves the comparator orders them, not Postgres.
+Size selection still toggles (`aria-pressed`), the selected-size mustard styling and the "Sold out"/ended
+states are intact, and add-to-cart still works (forced `?preview=live`: select L → "Add to cart" → "Added.
+View cart"). **Frozen:** `src/lib/orders/` / `create_order` / `expire_reservations` / `supabase/migrations/`
+/ cart / checkout / `src/config/` (incl. `products.ts`) / `src/lib/site.ts` / `SiteHeader.tsx` /
+`SiteFooter.tsx` / `src/lib/seo/` / `sitemap.ts` / `llms.txt` / `manifest.ts` / message files / `facts.md` /
+`brand.md` — `git diff --stat main` shows only `src/lib/drop/state.ts`, the two new files, the brief, and
+the state/decision/report docs; **no new dependency** (`package.json` + lockfile unchanged); **no new
+placeholder, no message-file edit**. **Local-only note (`D-2.09-4`):** the three catalogue products live in
+`products.ts` and only reach a DB via `npm run sync:drop`, which this phase freezes — so the local
+catalogue was hand-seeded (local, non-committed, idempotent, mirrors `products.ts`; not sync, not reset,
+not hosted) purely to render the evidence; a future `supabase db reset` reapplies `seed.sql` and drops it.
+**Owed to the operator:** production verification of the size order on `https://www.trajanovv.com` after
+merge, both locales — register **#22**. Decisions `D-2.09-1…4`. Branch `phase-2.09-size-order`; **PR open to
+`main` — NOT merged** (an operator merges on explicit instruction, `D-0-3`). `NEXT:` line **unchanged** —
+out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.08 COMPLETE — the site-wide header is redesigned (this update, 2026-07-23).** An out-of-band UI
 phase (the 2.07/Y.02 precedent) — **no commerce logic touched**, and **line 1 `NEXT:` is unchanged**
@@ -1122,6 +1171,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 19 | **New MK `Credit` strings — native review (2.08).** Two strings post-date the 2.02/2.03 reviews and render on **every** page: `Credit.builtBy` „Изработено од Vertex Consulting" (rich-text; only the company name is linked, and it stays untranslated) and `Credit.opensInNewTab` „се отвора во нов прозорец" (the visually-hidden new-tab announcement). Two native speakers read both **in context, in the browser**, and sign the review pack — same process as `docs/i18n/mk-review-2.03.md`. Owner: **Lazar + Petar**. | 2.08 | **before the first real drop (MK review pass)** |
 | 20 | **Click-test `https://www.vertexconsulting.mk/en`** (`facts.md` § 11, marked VERIFIED — **must be click-tested before it ships**). The credit link opens a **working** page in a **new tab** from the **live** header, on a **phone and on desktop**, in **both locales**. Same rule as the Instagram URL in `facts.md` § 6 — a link to a page that does not resolve is a **broken fact on every page of the site**. Code confirmed the anchor is correct (`target="_blank" rel="noopener noreferrer"`, hidden new-tab text, mustard link) but **cannot confirm the destination resolves**. Owner: **Lazar**. | 2.08 | **before the first real drop (live click-test, both platforms + locales)** |
 | 21 | **Client sign-off on the header build credit (2.08).** Vladimir (and his parents) confirm they are content for a **third-party company name + outbound link** (Vertex Consulting → an off-site page) to sit in the **top nav of the store on every page** — client-facing and prominent (`D-2.08-2`). Easy to move to the footer later if they'd rather: one component edit. Owner: **Lazar → Vladimir**. | 2.08 | **before the first real drop (client confirms placement)** |
+| 22 | **Production size order (2.09).** On `https://www.trajanovv.com` after merge, both locales, confirm the product pages read sizes in garment order: `/katalog/test-mustard-ochre` + `/en/catalog/test-mustard-ochre` → **S M L XL**; `/katalog/test-baby-blue` + `/en/catalog/test-baby-blue` → **S M L XL**; `/katalog/test-off-white` + `/en/catalog/test-off-white` → **XL** (unchanged). Code verified this in-browser against the **local** DB (with deliberately shuffled variant rows) but cannot verify production until the operator deploys. Record it in this file the way 2.08 recorded its production verification. Owner: **Lazar / operator**. | 2.09 | **after an operator merges + deploys (both locales)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

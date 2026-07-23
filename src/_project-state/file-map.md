@@ -6,7 +6,7 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-22** · By: **Claude Code (Phase 2.04b — SEO/GEO polish, Code)**
+Last updated: **2026-07-23** · By: **Claude Code (Phase 2.09 — size buttons in garment order, Code)**
 
 ---
 
@@ -204,7 +204,8 @@ Trajanov-V2/
 │   │   │   ├── client.ts            # browser client, anon key (1.03)
 │   │   │   └── server.ts            # server client, service role — `import "server-only"` (1.03)
 │   │   ├── drop/
-│   │   │   └── state.ts             # SERVER-ONLY drop state + product mapping incl. variantId/dropSlug (1.04; stand-in order context removed 1.06)
+│   │   │   ├── size-order.ts        # PURE canonical garment-size comparator (S·M·L·XL); NOT server-only → unit-tested (2.09, D-2.09-3)
+│   │   │   └── state.ts             # SERVER-ONLY drop state + product mapping incl. variantId/dropSlug (1.04; size sort → size-order.ts 2.09)
 │   │   ├── orders/
 │   │   │   ├── order-errors.ts      # create_order() SQLSTATE → identifier vocabulary (1.03, +TR006)
 │   │   │   ├── process-order.ts     # testable order pipeline core (turnstile→ratelimit→create_order)
@@ -274,6 +275,8 @@ Trajanov-V2/
 │   │   ├── time.test.ts            # DST resolver — summer 18:00Z + winter 19:00Z (D-1.04-4)
 │   │   ├── sync.test.ts            # no-reset-stock, idempotent, refuses null price / price-after-open
 │   │   └── cron.test.ts            # both pg_cron jobs scheduled + active from db reset
+│   ├── drop/
+│   │   └── size-order.test.ts      # PURE unit test — canonical size comparator (S·M·L·XL), 8 cases, RED→GREEN (2.09)
 │   ├── rls/anon-access.test.ts     # anon wall: orders unreadable, variants readable, no writes/rpc
 │   └── orders/
 │       ├── create-order.test.ts    # happy path, drop window (D-1.03-7), full error vocabulary
@@ -339,3 +342,4 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-23 | 2.07 (Code) | **Site-wide footer redesign (out-of-band UI, Y.02-style).** Rewrote `src/components/layout/SiteFooter.tsx` to the 1.05 brief's two-zone design (Zone 1: `КОНТАКТ`+`СЛЕДИ` columns, real `<h2>` eyebrow headings, 16px Lucide icons — `Mail`/`Phone`/**`AtSign`** since this Lucide has no brand Instagram glyph, `D-2.07-2`; Zone 2: hairline + `© 2026 Трајанов…` row with all five page links). Modified `src/messages/{mk,en}.json` (new `Footer` namespace: `contact`/`social`/`rights`; page-link labels reuse `Nav`), `docs/i18n/string-inventory.md` (regen → **217**), `Decisions.md` (`D-2.07-1/2/3`), `current-state.md` (status block + owed register #17/#18; `NEXT:` unchanged), `file-map.md`. Added `completions/Part-2-Phase-07-Completion.md`. **Real 2.03 Privacy page + published `info@trajanovv.com` preserved — the stale brief's stub/placeholder steps were NOT executed** (`D-2.07-1`). **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, checkout, `src/config/`, `SITE_URL`, or new dependency touched.** `D-2.07-*`. | Claude Code |
 | 2026-07-23 | 2.08 (Code) | **Site-wide header redesign (out-of-band UI, 2.07-style).** Rebuilt `src/components/layout/SiteHeader.tsx` (now `'use client'`, `D-2.08-4`) to the target layout — wordmark → build credit → **Catalog·About·Contact** → **MK·EN** → cart (cart last); reuses reviewed `Nav.catalog/about/contact` (no Home/Reviews/Blog/Book link); active-page underline + `aria-current`; **non-sticky** on a solid ground (`D-2.08-3`); deterministic 3-row mobile grid with the credit on its own row (`D-2.08-5`); tokens only, no hex/px literal. Restyled `src/components/layout/LanguageSwitch.tsx` to the `MK · EN` dot pattern (styling only — switch behaviour unchanged). Modified `src/messages/{mk,en}.json` (new `Credit` namespace: `builtBy` rich-text + `opensInNewTab`), `facts.md` (§ 11 Site build credit VERIFIED + change log), `docs/i18n/string-inventory.md` (regen **217 → 219**), `Decisions.md` (`D-2.08-1…5`), `current-state.md` (status block + owed register #19/#20/#21; `NEXT:` unchanged), `file-map.md`. Added `completions/Part-2-Phase-08-Completion.md`, `briefs/Part-2-Phase-08-Code.md`. **No files added under `src/`** (existing components modified only) — the tree above is unchanged. **No `src/lib/orders/`, `create_order`, `expire_reservations`, `supabase/migrations/`, cart, checkout, `src/config/`, `SITE_URL`, the footer, `src/lib/seo/`, `sitemap.ts`, `llms.txt`, `manifest.ts`, logo/icon assets, or new dependency touched.** `D-2.08-*`. | Claude Code |
 | 2026-07-23 | 2.08 fix (Code) | **Header alignment fix (`D-2.08-6`, supersedes `D-2.08-5`).** Rebuilt `src/components/layout/SiteHeader.tsx` as one `items-center` + `justify-between` flex row of two groups (wordmark+credit \| nav·MK·EN·cart) so all seven items share one centerline (verified: identical vertical center, delta 0 at 1280px); two gap tokens (`gap-4` nav, `gap-6` nav→MK·EN→cart); wraps on mobile, no overflow at 320/375. Modified `Decisions.md` (`D-2.08-6`; `D-2.08-5` → Superseded), `current-state.md`, `completions/Part-2-Phase-08-Completion.md`, `file-map.md`. **Only `SiteHeader.tsx` changed in code — no frozen path, no message/`facts.md` edit, no new dependency.** `D-2.08-6`. | Claude Code |
+| 2026-07-23 | 2.09 (Code) | **Size buttons in garment order S·M·L·XL (out-of-band UI).** Added `src/lib/drop/size-order.ts` (`CANONICAL_SIZE_ORDER` + `compareSizeLabels` — pure, NOT server-only, unit-testable) and `tests/drop/size-order.test.ts` (8 cases, written first + run RED via a temporary alphabetical stub → GREEN). Modified `src/lib/drop/state.ts` (`toProductView` sort: `localeCompare` → `compareSizeLabels`; comment rewritten — the ONE place size order was decided in `src/`), `Decisions.md` (`D-2.09-1…4`), `current-state.md` (status block + owed register #22; `NEXT:` unchanged), `file-map.md`. Added `completions/Part-2-Phase-09-Completion.md`, `briefs/Part-2-Phase-09-Code.md`. **`.claude/launch.json`** gained a second dev config (`trajanov-dev-2909`, port 3011) — local tooling, gitignored dir (not committed). **No `src/lib/orders/`, `create_order`, `expire_reservations`, `supabase/migrations/`, cart, checkout, `src/config/` (incl. `products.ts`), `SITE_URL`, header/footer, `src/lib/seo/`, `sitemap.ts`, `llms.txt`, `manifest.ts`, message files, `facts.md`, `brand.md`, or new dependency touched.** `D-2.09-*`. | Claude Code |
