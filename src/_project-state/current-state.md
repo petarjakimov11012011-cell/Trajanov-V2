@@ -87,8 +87,14 @@ is hex/`rgb()`/`hsl()`-free). **Owed-verification register +3** (#24 native MK r
 #25 the section on a real phone from an IG link; #26 sign-off that eight questions is the right amount).
 **Placeholder register UNCHANGED** — this phase adds no marker and clears none. Decisions `D-2.11-1…7`
 (five orchestrator + `D-2.11-6` MK quote glyph + `D-2.11-7` JSON-LD co-located in `HomeFaq`). Branch
-`phase-2.11-home-faq`; **PR open to `main` — merged by an operator, not by Code (`D-0-3`).** `NEXT:` line
-**unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
+`phase-2.11-home-faq`; **PR [#23](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/23)
+MERGED to `main` (merge `ee3e89e`, 2026-07-23) on Petar's explicit instruction (`D-0-3`:
+operator-authorised, not Code); branch deleted.** (Clean GitHub PR merge — the stale-head OID issue that
+hit 2.07/2.08 did not recur; PR #23 shows the "Merged" badge.) **Production deploy VERIFIED** — on the
+live `https://www.trajanovv.com/` the Home page renders the FAQ under the hero (h2 „Често поставувани
+прашања" / "Frequently Asked Questions", the three group labels, all eight native `<details>` rows), and
+the page HTML carries the `"@type":"FAQPage"` JSON-LD node with 8 `Question`s whose text matches the
+rendered copy. `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.10 COMPLETE — product cards now carry a subtle white pointer spotlight (this update, 2026-07-23).**
 An out-of-band UI phase (the 2.07/2.08/2.09/Y.02 shape) — **no commerce logic touched**, and **line 1
