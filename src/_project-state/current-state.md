@@ -57,9 +57,15 @@ placeholder, no message-file edit**. **Local-only note (`D-2.09-4`):** the three
 catalogue was hand-seeded (local, non-committed, idempotent, mirrors `products.ts`; not sync, not reset,
 not hosted) purely to render the evidence; a future `supabase db reset` reapplies `seed.sql` and drops it.
 **Owed to the operator:** production verification of the size order on `https://www.trajanovv.com` after
-merge, both locales — register **#22**. Decisions `D-2.09-1…4`. Branch `phase-2.09-size-order`; **PR #21 open
-to `main` — NOT merged** (an operator merges on explicit instruction, `D-0-3`). `NEXT:` line **unchanged** —
-out-of-band, does not touch the 2.06 → Y.01 critical path.
+merge, both locales — register **#22**. Decisions `D-2.09-1…4`. Branch `phase-2.09-size-order`; **PR #21
+MERGED to `main` (merge `927381c`, 2026-07-23) on Petar's explicit instruction (`D-0-3`: operator-authorised,
+not Code); branch deleted.** (Clean GitHub PR merge this time — the stale-head OID issue that hit 2.07/2.08
+did not recur; PR #21 shows the "Merged" badge.) **Production deploy VERIFIED** — on `https://www.trajanovv.com`,
+both locales, `/katalog/test-mustard-ochre` (+ `/en/catalog/…`) and `/katalog/test-baby-blue` (+ `/en/…`)
+render **S M L XL**, and `/katalog/test-off-white` (+ `/en/…`) renders **XL** — so **owed #22 is CLEARED**.
+(The check is conclusive: the old `localeCompare` rule can only ever emit `L · M · S · XL`, so `S M L XL`
+on the live site proves the new comparator is deployed.) `NEXT:` line **unchanged** — out-of-band, does not
+touch the 2.06 → Y.01 critical path.
 
 **2.08 COMPLETE — the site-wide header is redesigned (this update, 2026-07-23).** An out-of-band UI
 phase (the 2.07/Y.02 precedent) — **no commerce logic touched**, and **line 1 `NEXT:` is unchanged**
@@ -1171,7 +1177,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 19 | **New MK `Credit` strings — native review (2.08).** Two strings post-date the 2.02/2.03 reviews and render on **every** page: `Credit.builtBy` „Изработено од Vertex Consulting" (rich-text; only the company name is linked, and it stays untranslated) and `Credit.opensInNewTab` „се отвора во нов прозорец" (the visually-hidden new-tab announcement). Two native speakers read both **in context, in the browser**, and sign the review pack — same process as `docs/i18n/mk-review-2.03.md`. Owner: **Lazar + Petar**. | 2.08 | **before the first real drop (MK review pass)** |
 | 20 | **Click-test `https://www.vertexconsulting.mk/en`** (`facts.md` § 11, marked VERIFIED — **must be click-tested before it ships**). The credit link opens a **working** page in a **new tab** from the **live** header, on a **phone and on desktop**, in **both locales**. Same rule as the Instagram URL in `facts.md` § 6 — a link to a page that does not resolve is a **broken fact on every page of the site**. Code confirmed the anchor is correct (`target="_blank" rel="noopener noreferrer"`, hidden new-tab text, mustard link) but **cannot confirm the destination resolves**. Owner: **Lazar**. | 2.08 | **before the first real drop (live click-test, both platforms + locales)** |
 | 21 | **Client sign-off on the header build credit (2.08).** Vladimir (and his parents) confirm they are content for a **third-party company name + outbound link** (Vertex Consulting → an off-site page) to sit in the **top nav of the store on every page** — client-facing and prominent (`D-2.08-2`). Easy to move to the footer later if they'd rather: one component edit. Owner: **Lazar → Vladimir**. | 2.08 | **before the first real drop (client confirms placement)** |
-| 22 | **Production size order (2.09).** On `https://www.trajanovv.com` after merge, both locales, confirm the product pages read sizes in garment order: `/katalog/test-mustard-ochre` + `/en/catalog/test-mustard-ochre` → **S M L XL**; `/katalog/test-baby-blue` + `/en/catalog/test-baby-blue` → **S M L XL**; `/katalog/test-off-white` + `/en/catalog/test-off-white` → **XL** (unchanged). Code verified this in-browser against the **local** DB (with deliberately shuffled variant rows) but cannot verify production until the operator deploys. Record it in this file the way 2.08 recorded its production verification. Owner: **Lazar / operator**. | 2.09 | **after an operator merges + deploys (both locales)** |
+| ~~22~~ | **Production size order (2.09) — CLEARED 2026-07-23 (post-merge, PR #21 `927381c`).** On `https://www.trajanovv.com`, both locales, all three product pages verified: `/katalog/test-mustard-ochre` + `/en/catalog/test-mustard-ochre` → **S M L XL**; `/katalog/test-baby-blue` + `/en/catalog/test-baby-blue` → **S M L XL**; `/katalog/test-off-white` + `/en/catalog/test-off-white` → **XL**. Conclusive because the pre-fix `localeCompare` rule can only emit `L · M · S · XL`, so `S M L XL` live proves the new comparator is deployed. | 2.09 | **CLEARED — production verified (both locales)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-23 |
 | **Branch** | `phase-2.09-size-order` |
-| **PR** | [#21](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/21) — open to `main`, **NOT merged** (`D-0-3`) |
+| **PR** | [#21](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/21) — **MERGED** to `main` (`927381c`, 2026-07-23) on Petar's explicit instruction (`D-0-3`); branch deleted. **Production deploy VERIFIED** (see § 6). |
 | **Brief** | `briefs/Part-2-Phase-09-Code.md` |
 
 ---
@@ -177,11 +177,12 @@ did not disturb it. **New total: 93** (was 85).
 
 | # | Item | Exact URL / steps | What "pass" looks like |
 |---|---|---|---|
-| 22 | **Production size order** | After merge + deploy, on `https://www.trajanovv.com`, both locales: `/katalog/test-mustard-ochre` (+ `/en/catalog/...`), `/katalog/test-baby-blue` (+ `/en/...`), `/katalog/test-off-white` (+ `/en/...`) | Products 01 + 03 show **S M L XL**; Product 02 shows **XL**. Record it in `current-state.md` the way 2.08 recorded its production verification |
+| ~~22~~ | **Production size order — CLEARED 2026-07-23** (post-merge) | `https://www.trajanovv.com` — `/katalog/test-mustard-ochre` (+ `/en/…`), `/katalog/test-baby-blue` (+ `/en/…`), `/katalog/test-off-white` (+ `/en/…`), both locales | ✅ Products 01 + 03 show **S M L XL**; Product 02 shows **XL**. Recorded in `current-state.md`. |
 
-Only 1 owed item — no verification phase triggered. Code verified the behaviour in-browser against the
-**local** DB (with deliberately shuffled rows); production can only be confirmed after the operator
-deploys.
+**Owed #22 CLEARED at merge.** Petar merged PR #21 (`927381c`) the same session; the Vercel deploy landed
+and all six live product pages verified via `curl` — Products 01/03 → `S M L XL`, Product 02 → `XL`, both
+locales. Conclusive because the pre-fix `localeCompare` rule can only emit `L · M · S · XL`, so `S M L XL`
+on the live domain proves the new comparator is deployed. **No owed items remain for this phase.**
 
 ---
 
@@ -225,7 +226,10 @@ Supabase dev keys, which are the CLI's public defaults, and was never committed.
 
 | Item | Waiting on | Owner |
 |---|---|---|
-| Production verification of the size order (owed #22) | The operator merges + deploys | Lazar / operator |
+| _(none)_ | — | — |
+
+Owed #22 (production verification) was **cleared the same session** — Petar merged PR #21 and the live
+site was verified in both locales. Nothing carries over.
 
 Frozen paths confirmed byte-unchanged vs `main`: `src/lib/orders/`, `create_order`,
 `expire_reservations`, `supabase/migrations/`, `src/components/{cart,checkout}/`, `src/config/` (incl.
