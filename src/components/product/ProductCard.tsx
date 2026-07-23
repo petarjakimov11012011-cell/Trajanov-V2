@@ -5,6 +5,7 @@ import {formatMkd} from '@/lib/format';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {Placeholder} from '@/components/system/Placeholder';
 import {StockBadge} from '@/components/drop/StockBadge';
+import {SpotlightCard} from '@/components/product/SpotlightCard';
 import type {ProductView} from '@/types/drop';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -96,7 +97,10 @@ export function ProductCard({product}: {product: ProductView}) {
       href={{pathname: '/catalog/[slug]', params: {slug: product.slug}}}
       className="rounded-[var(--radius-lg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ground"
     >
-      {inner}
+      {/* Pointer-tracked white glow (D-2.10). Inside the Link so the focus-visible ring + rounding
+          stay on the Link; a thin client wrapper feeds it the pointer position. Sold-out cards keep
+          the non-interactive branch above and never get this. */}
+      <SpotlightCard>{inner}</SpotlightCard>
     </Link>
   );
 }
