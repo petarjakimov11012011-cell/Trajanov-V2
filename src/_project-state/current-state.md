@@ -87,7 +87,7 @@ errors. **Only `SiteHeader.tsx` changed** (`git diff --stat main`) — **no** fr
 edit, **no** new dependency (`package.json` + lockfile unchanged), **no** new placeholder. `npm run build`
 (exit 0) / `npx tsc --noEmit` / `npm run lint` clean; `npm test` **85/85** incl. the 10-vs-3 oversell gate.
 Decision `D-2.08-6` (D-2.08-5 marked Superseded). Shipped on a **recreated** `phase-2.08-header-redesign`
-branch (the original merged + was deleted); **new PR open to `main` — NOT merged** (`D-0-3`). `NEXT:` line
+branch (the original merged + was deleted); **PR #20 open to `main` — NOT merged** (`D-0-3`). `NEXT:` line
 **unchanged**.
 
 **2.07 COMPLETE — the site-wide footer is redesigned (this update, 2026-07-23).** An out-of-band UI phase

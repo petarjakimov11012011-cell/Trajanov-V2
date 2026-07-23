@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-23 |
 | **Branch** | `phase-2.08-header-redesign` |
-| **PR** | Original: [#19](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/19) (merged to `main` via `d40541b`). **Alignment fix: a NEW PR on a recreated `phase-2.08-header-redesign` branch — NOT merged** (`D-0-3`). |
+| **PR** | Original: [#19](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/19) (merged to `main` via `d40541b`). **Alignment fix: [#20](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/20) on a recreated `phase-2.08-header-redesign` branch — NOT merged** (`D-0-3`). |
 | **Brief** | `briefs/Part-2-Phase-08-Code.md` |
 
 ---
