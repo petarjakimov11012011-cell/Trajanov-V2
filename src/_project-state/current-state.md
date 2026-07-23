@@ -69,6 +69,27 @@ linking `https://www.vertexconsulting.mk/en` (`target="_blank"`) and exactly **C
 the 2.07 footer is intact. `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical
 path.
 
+**2.08 ALIGNMENT FIX — the header is now on one shared centerline (`D-2.08-6`, supersedes `D-2.08-5`; this
+update, 2026-07-23).** After 2.08 merged, Petar reported the header rendered but **nothing was aligned**: on
+the desktop row the wordmark, credit and three nav links floated on the text **baseline** while MK·EN and the
+cart sat on the vertical **center** (the D-2.08-5 layout used `sm:items-baseline` + a `sm:self-center` on the
+controls), and the gaps were uneven. **Fix:** `SiteHeader.tsx` is rebuilt as **one flex row, `items-center` +
+`justify-between`**, two groups — LEFT (wordmark + credit), RIGHT (nav, then MK·EN, then cart). Every
+container is `items-center`; **no baseline nudge, no `self-*` override, no margin-top on any item.** The cart
+keeps its 44px target but is centered (sets row height, not anyone's offset). Gaps are exactly two tokens:
+**`gap-4` (16px)** between the three nav links, **`gap-6` (24px)** used identically for nav → MK·EN and
+MK·EN → cart. Narrow screens wrap (`flex-wrap` / `sm:flex-nowrap`). **Verified by computed geometry (not by
+eye):** at 1280px all seven items report an identical vertical center **34.0px, max delta 0**; gaps measured
+**16 / 16 / 24 / 24 px**. Contrast re-measured on `#0F1210` (credit 7.85 · Vertex link 8.95 · nav default
+7.85 · nav active 15.42 · lang active 15.42 · lang inactive 7.85 — all ≥ 4.5); active underline + `aria-current`
+intact; header still `position: static`; **no horizontal overflow at 320px or 375px, both locales**; no console
+errors. **Only `SiteHeader.tsx` changed** (`git diff --stat main`) — **no** frozen path, **no** message/`facts.md`
+edit, **no** new dependency (`package.json` + lockfile unchanged), **no** new placeholder. `npm run build`
+(exit 0) / `npx tsc --noEmit` / `npm run lint` clean; `npm test` **85/85** incl. the 10-vs-3 oversell gate.
+Decision `D-2.08-6` (D-2.08-5 marked Superseded). Shipped on a **recreated** `phase-2.08-header-redesign`
+branch (the original merged + was deleted); **new PR open to `main` — NOT merged** (`D-0-3`). `NEXT:` line
+**unchanged**.
+
 **2.07 COMPLETE — the site-wide footer is redesigned (this update, 2026-07-23).** An out-of-band UI phase
 (the Y.02 precedent): the session was handed the original **Phase 1.05** footer brief, but that footer
 shipped long ago and the project is ~15 phases past it (live on `www.trajanovv.com`, real 2.03 Privacy page,

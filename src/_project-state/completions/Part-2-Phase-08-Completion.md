@@ -8,8 +8,30 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-23 |
 | **Branch** | `phase-2.08-header-redesign` |
-| **PR** | [#19](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/19) — open to `main`, **NOT merged** (operator merges on explicit instruction, `D-0-3`) |
+| **PR** | Original: [#19](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/19) (merged to `main` via `d40541b`). **Alignment fix: a NEW PR on a recreated `phase-2.08-header-redesign` branch — NOT merged** (`D-0-3`). |
 | **Brief** | `briefs/Part-2-Phase-08-Code.md` |
+
+---
+
+> ## ⚠️ Update — 2026-07-23: header alignment corrected (`D-2.08-6`, supersedes `D-2.08-5`)
+>
+> After 2.08 merged, Petar reported the header rendered but **nothing was aligned**: on the desktop row the
+> wordmark, credit and three nav links floated on the text **baseline** while MK·EN and the cart sat on the
+> vertical **center**, and the gaps were uneven. Root cause: the D-2.08-5 layout used `sm:items-baseline` on
+> the row plus `sm:self-center` on the MK·EN+cart cluster.
+>
+> **Fix (`D-2.08-6`):** the header is now **one flex row, `items-center` + `justify-between`**, two groups —
+> LEFT (wordmark + credit), RIGHT (nav, then MK·EN, then cart). Every container is `items-center`; **no
+> baseline nudge, no `self-*` override, no margin-top on any item.** The cart keeps its 44px target but is
+> centered (it sets row height, not anyone's offset). Gaps are exactly two tokens: **`gap-4` (16px)** between
+> the three nav links, **`gap-6` (24px)** used identically for nav → MK·EN and MK·EN → cart. Narrow screens
+> wrap (`flex-wrap` / `sm:flex-nowrap`) with no overflow at 320px.
+>
+> **Verified by computed geometry (not by eye):** at 1280px all seven items report an identical vertical
+> center **34.0px, max delta 0**; gaps measured **16 / 16 / 24 / 24 px**. Only `SiteHeader.tsx` changed — no
+> frozen path, no message/`facts.md` edit, no dependency. Contrast re-measured (all ≥ 4.5), no overflow at
+> 320/375 both locales, build/tsc/lint clean, `npm test` **85/85** incl. the oversell gate. Details fold into
+> the sections below.
 
 ---
 
@@ -18,7 +40,7 @@
 - The site-wide header is rebuilt to four buyer-facing things and nothing else: the wordmark (→ home),
   the **Catalog · About · Contact** nav, the **MK · EN** switch, and the cart — in that exact
   left-to-right order, **cart last**, on every page in both locales. No Home/Reviews/Blog/Book link.
-- A **"Built by Vertex Consulting"** build credit sits next to the wordmark (muted, baseline-aligned).
+- A **"Built by Vertex Consulting"** build credit sits next to the wordmark (muted, on the shared centerline).
   Only the words *Vertex Consulting* are the link → `https://www.vertexconsulting.mk/en`, new tab, with
   a locale-correct visually-hidden "opens in a new tab". It is a `facts.md` § 11 VERIFIED fact and is
   contained to the header (absent from JSON-LD, OG, `llms.txt`, sitemap, footer, legal pages).
@@ -39,9 +61,10 @@
 | D-2.08-2 | *(pre-decided)* Build credit ships as a `facts.md` § 11 VERIFIED entry, in the header | A placeholder (false — a real fact exists); footer-only placement (less prominent) | A third-party name sits in the top nav of a minor's store on every page; the link is an off-site exit from the buy path |
 | D-2.08-3 | The redesigned header is **not sticky** — the pre-existing `sticky top-0 … backdrop-blur` is dropped for a static header on a solid ground | Preserve the existing sticky/backdrop-blur | Behaviour change: on long pages the nav/cart scroll away with the page instead of staying pinned |
 | D-2.08-4 | `SiteHeader` is a **Client Component** so the nav can read `usePathname()` for the active indicator | A separate `'use client'` nav sub-component (keeps header a Server Component) | The small header hydrates as client JS on every page (still SSRs its HTML — no content/SEO cost) |
-| D-2.08-5 | **Canonical DOM order** + a **deterministic 3-row mobile grid** (credit on its own full-width row) | A `flex-wrap` that flips 2↔3 rows by width; grouping the mobile rows in the DOM | Credit is on its own row at all mobile widths (the "fallback" is the mobile default), so a wide phone is one row taller than the 2-row ideal; mobile visual order isn't a perfect match to DOM order (a minor reading nuance for chrome) |
+| D-2.08-5 | ~~Canonical DOM order + a deterministic 3-row mobile grid~~ — **SUPERSEDED by D-2.08-6** (its grid/`items-baseline` desktop row misaligned the seven items) | — | — |
+| D-2.08-6 | Header is **one `items-center` / `justify-between` flex row** of two groups (wordmark+credit \| nav·MK·EN·cart); two gap tokens (`gap-4` nav, `gap-6` nav→MK·EN→cart); wraps on mobile | Only swap `items-baseline`→`items-center` (leaves uneven grid gaps + `self-center` special case); a single non-wrapping row (overflows at 320–375px) | Mobile is up to three wrapped rows and the long credit wraps to two lines at 320px — taller than one desktop row, but overflow-free and fully visible |
 
-All five are in `Decisions.md` with full context.
+All are in `Decisions.md` with full context (D-2.08-5 marked `Superseded by D-2.08-6`).
 
 ---
 
