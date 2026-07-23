@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 217 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 219 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -78,6 +78,8 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Contact.instagramLabel` | Инстаграм | Instagram | `src/app/[locale]/contact/page.tsx` |
 | `Contact.instagramNote` | Тука се објавуваат спуштањата. Ова е главниот канал. | Drops are announced here. This is the main channel. | `src/app/[locale]/contact/page.tsx` |
 | `Contact.phoneLabel` | Телефон | Phone | `src/app/[locale]/contact/page.tsx` |
+| `Credit.builtBy` | Изработено од <link>Vertex Consulting</link> | Built by <link>Vertex Consulting</link> | `src/components/layout/SiteHeader.tsx` |
+| `Credit.opensInNewTab` | се отвора во нов прозорец | opens in a new tab | `src/components/layout/SiteHeader.tsx` |
 | `Drop.days` | ДЕНА | DAYS | `src/components/drop/Countdown.tsx` |
 | `Drop.ended` | Спуштањето заврши | Drop ended | `src/components/drop/DropBanner.tsx` |
 | `Drop.endedFollow` | Следи {handle} за следното. | Follow {handle} for the next one. | `src/components/drop/DropBanner.tsx` |
@@ -122,11 +124,11 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Meta.styleguideTitle` | Дизајн-систем — Trajanov | Design system — Trajanov | `src/app/[locale]/styleguide/page.tsx` |
 | `Meta.termsDescription` | Како тече нарачката: готовина при преземање, испорака само во Северна Македонија, резервација 48 часа. | How ordering works: cash on delivery, shipping within North Macedonia only, 48-hour reservation. | `src/app/[locale]/terms/page.tsx` |
 | `Meta.termsTitle` | Услови на продажба — Trajanov | Terms of sale — Trajanov | `src/app/[locale]/terms/page.tsx` |
-| `Nav.about` | За брендот | About | `src/components/layout/SiteFooter.tsx` |
+| `Nav.about` | За брендот | About | `src/components/layout/SiteFooter.tsx`<br>`src/components/layout/SiteHeader.tsx` |
 | `Nav.brand` | TRAJANOV | TRAJANOV | `src/components/layout/SiteHeader.tsx` |
 | `Nav.cart` | Кошничка | Cart | `src/components/layout/SiteHeader.tsx` |
 | `Nav.catalog` | Каталог | Catalog | `src/components/layout/SiteHeader.tsx` |
-| `Nav.contact` | Контакт | Contact | `src/components/layout/SiteFooter.tsx` |
+| `Nav.contact` | Контакт | Contact | `src/components/layout/SiteFooter.tsx`<br>`src/components/layout/SiteHeader.tsx` |
 | `Nav.home` | Почетна | Home | _(not found in source)_ |
 | `Nav.location` | Струмица, Северна Македонија | Strumica, North Macedonia | _(not found in source)_ |
 | `Nav.privacy` | Приватност | Privacy | `src/components/layout/SiteFooter.tsx` |

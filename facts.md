@@ -277,6 +277,20 @@ Say so in the completion report and it comes back to the orchestrator.
 
 ---
 
+## 11. Site build credit
+
+| Fact | Value | Status | Source |
+|---|---|---|---|
+| Site built by | **Vertex Consulting** | VERIFIED | Operator (Lazar), 2026-07-23 — Vertex Consulting is the operators' own consultancy and authorised the credit |
+| Vertex Consulting URL | `https://www.vertexconsulting.mk/en` | VERIFIED — **must be click-tested before it ships** | Operator (Lazar), 2026-07-23 |
+
+**This is a build credit and nothing more.** Vertex Consulting is **not** a partner, sponsor,
+stockist, collaborator or supplier of Trajanov and must never be presented as one. It appears in the
+site header only. It does **not** go in the Organization or WebSite JSON-LD, `sameAs`, OG metadata,
+`llms.txt`, the sitemap, the footer, or any legal page.
+
+---
+
 ## Change log
 
 | Date | Change | By |
@@ -287,3 +301,4 @@ Say so in the completion report and it comes back to the orchestrator.
 | 2026-07-18 | **§ 7 Price + sizes → VERIFIED (Phase 1.08 Code brief, Task 1, `D-1.08-1`).** Price **1199 MKD** for this drop and currency **MKD** marked VERIFIED (provenance: owner via Lazar, 2026-07-18); the old "~$65 / ~3,700 MKD INDICATIVE ONLY" ceiling is **SUPERSEDED** — a real price now exists. Sizes **S/M/L/XL** VERIFIED, with the **off-white** shirt **XL-only**. Fabric/composition/care and per-size measurements stay **UNVERIFIED — OWED**. Edit made by Code on explicit orchestrator instruction (the gate runs against a real-priced rehearsal drop, `D-1.08-1`) and surfaced in the completion report — not a silent add. | Claude Code (per 1.08 brief) |
 | 2026-07-19 | **§ 1 Responsible party amended (Phase 2.03 Code, `D-2.03-1`).** The row now records that the party **displayed** on Terms + Privacy is **Vladimir Trajanov, alone** (Lazar's call), while keeping the underlying VERIFIED intake fact (Vladimir Trajanov and his parents) visible in the same cell — neither overwritten nor deleted. The §1 open flag (confirm legal responsibility with the parents before cutover) is **unchanged and still open**. Full walk of every rendered claim recorded in `docs/legal/facts-audit-2.03.md`; no other claim needed a `facts.md` change. Edit made by Code on explicit orchestrator instruction and surfaced in the completion report — not a silent add. | Claude Code (per 2.03 brief) |
 | 2026-07-22 | **§ 7 Product 03 — baby blue added (Phase Y.02 Code, Task 1, `D-Y.02-1`).** A **third colourway, baby blue**, working name "Product 03": **price 1999 MKD VERIFIED** (owner, 2026-07-22) and **sizes S/M/L/XL VERIFIED** (owner); the colourway itself is **owner-stated, NOT photographed** (explicitly not "VERIFIED (photos)" like the other two); **photos + fabric/care UNVERIFIED — OWED** (Vladimir); the real customer-facing name is OWED. Recorded as a new `### Product 03` sub-block in § 7. Owner-authorised out-of-order insert (Lazar, 2026-07-22). Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.02 brief) |
+| 2026-07-23 | **§ 11 Site build credit added (Phase 2.08 Code).** New section recording the site as built by **Vertex Consulting** (VERIFIED, operator/Lazar, 2026-07-23) and its URL `https://www.vertexconsulting.mk/en` (VERIFIED — click-test owed before ship). Scoped hard: a build credit in the site header only, **not** a partner/sponsor/stockist, and barred from JSON-LD/`sameAs`/OG/`llms.txt`/sitemap/footer/legal pages. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per 2.08 brief) |

@@ -16,6 +16,10 @@
     "social": "СЛЕДИ",
     "rights": "© 2026 Трајанов. Сите права задржани."
   },
+  "Credit": {
+    "builtBy": "Изработено од <link>Vertex Consulting</link>",
+    "opensInNewTab": "се отвора во нов прозорец"
+  },
   "Home": {
     "title": "Trajanov",
     "tagline": "Наскоро.",

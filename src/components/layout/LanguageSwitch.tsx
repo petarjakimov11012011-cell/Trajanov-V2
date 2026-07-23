@@ -1,12 +1,14 @@
 'use client';
 
+import {Fragment} from 'react';
 import {useLocale, useTranslations} from 'next-intl';
 import {useParams} from 'next/navigation';
 import {usePathname, useRouter} from '@/i18n/navigation';
 import {routing} from '@/i18n/routing';
 import {cn} from '@/lib/utils';
 
-// MK / EN pill. Active segment mustard-filled with near-black label; inactive muted.
+// MK · EN, dot-separated (Phase 2.08 restyle). Current locale at full contrast, the other muted;
+// styling only — the switch logic below is unchanged from 2.01.
 //
 // Switches locale IN PLACE and keeps the customer on the same page across the slug change (D-2.01,
 // Task 9): `/katalog/majica-01` ↔ `/en/catalog/majica-01`, `/naracka` ↔ `/en/checkout`. `usePathname`
@@ -43,31 +45,34 @@ export function LanguageSwitch({className}: {className?: string}) {
 
   return (
     <div
-      className={cn(
-        'border-border-strong inline-flex items-center rounded-[var(--radius-full)] border p-0.5',
-        className,
-      )}
+      className={cn('inline-flex items-center gap-2', className)}
       role="group"
       aria-label={t('switchLanguage')}
     >
-      {routing.locales.map((loc) => {
+      {routing.locales.map((loc, i) => {
         const active = loc === locale;
         return (
-          <button
-            key={loc}
-            type="button"
-            lang={loc}
-            aria-pressed={active}
-            onClick={() => switchTo(loc)}
-            className={cn(
-              'font-display rounded-[var(--radius-full)] px-3 py-1 text-xs font-bold uppercase tracking-wide transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
-              active
-                ? 'bg-mustard text-on-mustard'
-                : 'text-muted-foreground hover:text-foreground',
+          <Fragment key={loc}>
+            {i > 0 && (
+              <span aria-hidden className="text-muted-foreground select-none">
+                ·
+              </span>
             )}
-          >
-            {labels[loc]}
-          </button>
+            <button
+              type="button"
+              lang={loc}
+              aria-pressed={active}
+              onClick={() => switchTo(loc)}
+              className={cn(
+                'font-display inline-flex min-h-6 min-w-6 items-center justify-center rounded-[var(--radius-sm)] text-small font-bold uppercase tracking-wide transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+                active
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {labels[loc]}
+            </button>
+          </Fragment>
         );
       })}
     </div>

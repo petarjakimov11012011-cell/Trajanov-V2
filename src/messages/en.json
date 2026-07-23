@@ -16,6 +16,10 @@
     "social": "FOLLOW",
     "rights": "© 2026 Trajanov. All rights reserved."
   },
+  "Credit": {
+    "builtBy": "Built by <link>Vertex Consulting</link>",
+    "opensInNewTab": "opens in a new tab"
+  },
   "Home": {
     "title": "Trajanov",
     "tagline": "Coming soon.",

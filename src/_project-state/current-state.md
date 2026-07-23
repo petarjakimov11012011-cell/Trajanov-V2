@@ -6,11 +6,61 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-22** · By: **Claude Code (Phase Y.02 — Product 03 (baby blue) catalog stub)**
+Last updated: **2026-07-23** · By: **Claude Code (Phase 2.08 — header redesign: nav + build credit)**
 
 ---
 
 ## Status
+
+**2.08 COMPLETE — the site-wide header is redesigned (this update, 2026-07-23).** An out-of-band UI
+phase (the 2.07/Y.02 precedent) — **no commerce logic touched**, and **line 1 `NEXT:` is unchanged**
+(2.06 operator rehearsal remains next). What shipped:
+- **`src/components/layout/SiteHeader.tsx` rebuilt** to the target layout: wordmark → build credit →
+  **Catalog · About · Contact** → **MK · EN** → cart, in that exact left-to-right order (**cart last**),
+  on **every** page in both locales. The three page links reuse the reviewed `Nav.catalog/about/contact`
+  keys — **no** Home/Reviews/Blog/Book link (the wordmark is the only route to Home; grep-proven). An
+  **active-page underline** (mustard `border-b-2`, space reserved so the row can't shift) + `aria-current`
+  marks the current page. Every colour/size/spacing/radius/type value is a `brand.md` token — **zero hex,
+  zero raw px literal**.
+- **Build credit** „Изработено од **Vertex Consulting**" / "Built by **Vertex Consulting**", subordinate +
+  muted, baseline-aligned to the wordmark. **Only "Vertex Consulting" is the link** → `https://www.vertexconsulting.mk/en`,
+  `target="_blank" rel="noopener noreferrer"`, mustard, with a locale-correct **visually-hidden** "opens in
+  a new tab" / „се отвора во нов прозорец". The credit is a **`facts.md` § 11 VERIFIED** fact (`D-2.08-2`) —
+  a build credit **only**, contained to the header: grep-proven **zero** "vertex" in JSON-LD, OG/twitter
+  meta, `llms.txt`, `sitemap.xml`, `robots.txt`, the footer, and the legal pages (source **and** emitted).
+- **`LanguageSwitch` restyled** to the `MK · EN` dot pattern (active full-contrast, inactive muted, `·`
+  separator) — **behaviour unchanged** (switches locale in place, preserves page + query/`?preview`;
+  re-verified live: `/en/contact` → `/kontakt`, `/en/catalog` → `/katalog`).
+- **Non-sticky** (`D-2.08-3`): the old `sticky top-0 … backdrop-blur` was dropped for a **static** header
+  on a **solid** `--color-ground` — **this is the notable brief-vs-repo difference** (the brief lists a
+  sticky header as out of scope; the repo had one), so on long pages the nav/cart now scroll away with the
+  page. **`SiteHeader` is now a client component** (`D-2.08-4`) so the nav can read `usePathname()`.
+  **Mobile** is a deterministic 3-row grid — row 1 wordmark | MK·EN·cart, row 2 nav, row 3 the credit on
+  its own full width above the hairline — so the long MK credit is never shrunk or hidden (`D-2.08-5`).
+- **Strings:** new `Credit` namespace (`builtBy` next-intl rich-text + `opensInNewTab`) in
+  `src/messages/{mk,en}.json`; MK+EN parity driven **RED→GREEN**; `string-inventory.md` regenerated
+  **217 → 219**.
+
+**Gates:** `npm run build` (exit 0, "Compiled successfully") / `npx tsc --noEmit` / `npm run lint` clean;
+`npm test` **85/85** incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected with
+insufficient_stock, stock 0` (untouched — no commerce code changed) + the i18n catalog-parity test.
+**Rendered + measured in-browser** (dev server, both locales, at **desktop + 375px + 320px**): correct
+L-to-R order + cart-last (accessibility tree), active underline + `aria-current` on the current page (row
+does not shift), `header{position:static}` on `#0F1210`, **no horizontal overflow at 320/375 either
+locale**, no console errors on Home/Catalog/About/Contact both locales. **WCAG 2.2 AA contrast (measured on
+ground `#0F1210`):** credit muted **7.85**, Vertex link (mustard) **8.95**, nav default **7.85**, nav active
+**15.42**, lang active **15.42**, lang inactive **7.85** — all ≥ 4.5. Tap targets: all interactive ≥ 24px
+(lang buttons 24×24 via `min-w-6`/`min-h-6`), **cart 44×44**. **Frozen:** `src/lib/orders/` /
+`create_order` / `expire_reservations` / `supabase/migrations/` / cart / checkout / `src/config/` /
+`src/lib/site.ts` (`SITE_URL`) / **the footer** / `src/lib/seo/` / `sitemap.ts` / `llms.txt` / `manifest.ts`
+/ logo+icon assets **byte-unchanged** (`git diff --stat main`); **no new dependency** (`package.json` +
+lockfile unchanged); **no new placeholder**. **Owed to Lazar:** native MK review of the 2 new `Credit`
+strings (register **#19**), **click-test `https://www.vertexconsulting.mk/en`** (register **#20** — a link
+to a page that does not resolve is a broken fact on every page of the site), and **client sign-off**
+(Vladimir + parents) on a third-party credit + outbound link in the top nav of the store on every page
+(register **#21**). Decisions `D-2.08-1…5`. Branch `phase-2.08-header-redesign`; **PR #19 open to `main` —
+NOT merged** (an operator merges on explicit instruction, `D-0-3`). `NEXT:` line **unchanged** — out-of-band,
+does not touch the 2.06 → Y.01 critical path.
 
 **2.07 COMPLETE — the site-wide footer is redesigned (this update, 2026-07-23).** An out-of-band UI phase
 (the Y.02 precedent): the session was handed the original **Phase 1.05** footer brief, but that footer
@@ -1036,6 +1086,9 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 16 | **A real order email delivers from `info@trajanovv.com` end to end.** `ORDER_FROM_ADDRESS` is now `info@trajanovv.com` and the domain is Resend-verified (`D-2.05-3`); unit tests (mocked Resend) assert the new from-address. That a live order's notification actually **arrives** in Vladimir's inbox `from: info@trajanovv.com` needs a real order → the 2.06 rehearsal. **2.06 Code (2026-07-22): the runbook is ready** — `docs/ops/drop-rehearsal-runbook.md` step 2d (confirm the email in Vladimir's inbox: subject "Нова нарачка TRJ-0001 — Trajanov", ordered line, customer block, COD copy) + step 0 pre-flight (test that `info@` routes to his inbox). Still owed until the operator runs it. Owner: **Lazar / 2.06 rehearsal**. | 2.05 | **2.06 rehearsal (runbook ready; operator runs it)** |
 | 17 | **Footer redesign — Lazar design sign-off (2.07).** The footer was rebuilt to the two-zone design (contact/social columns + © row) **outside a Design phase**; the Instagram row uses the Lucide **`AtSign`** (`@`) icon because this `lucide-react` ships **no** brand Instagram glyph (`D-2.07-2`). Code verified structure, contrast (every pair passes WCAG 2.2 AA), tap targets (≥24px), MK+EN strings, and mobile stacking — but the **visual-brand call** (the redesign itself + the `@`-for-Instagram icon) is Lazar's/Design's. Eyeball the `https://www.trajanovv.com` footer (any page), **MK + EN, 375px + desktop**. If a real Instagram glyph is wanted, drop an SVG in and swap the `AtSign` import — one commit. Owner: **Lazar / Design**. | 2.07 | **after 2.07 deploy — sign off anytime before the first real drop** |
 | 18 | **New MK footer strings — native review (2.07).** Three MK strings post-date the 2.02 native review and ship exactly as the 1.05 brief proposed them: `Footer.contact` „КОНТАКТ", `Footer.social` „СЛЕДИ", `Footer.rights` „© 2026 Трајанов. Сите права задржани." A native speaker (Lazar/Petar) confirms spelling / agreement / tone — same process as `docs/i18n/mk-review-2.03.md`. Owner: **Lazar / Petar**. | 2.07 | **before the first real drop (MK review pass)** |
+| 19 | **New MK `Credit` strings — native review (2.08).** Two strings post-date the 2.02/2.03 reviews and render on **every** page: `Credit.builtBy` „Изработено од Vertex Consulting" (rich-text; only the company name is linked, and it stays untranslated) and `Credit.opensInNewTab` „се отвора во нов прозорец" (the visually-hidden new-tab announcement). Two native speakers read both **in context, in the browser**, and sign the review pack — same process as `docs/i18n/mk-review-2.03.md`. Owner: **Lazar + Petar**. | 2.08 | **before the first real drop (MK review pass)** |
+| 20 | **Click-test `https://www.vertexconsulting.mk/en`** (`facts.md` § 11, marked VERIFIED — **must be click-tested before it ships**). The credit link opens a **working** page in a **new tab** from the **live** header, on a **phone and on desktop**, in **both locales**. Same rule as the Instagram URL in `facts.md` § 6 — a link to a page that does not resolve is a **broken fact on every page of the site**. Code confirmed the anchor is correct (`target="_blank" rel="noopener noreferrer"`, hidden new-tab text, mustard link) but **cannot confirm the destination resolves**. Owner: **Lazar**. | 2.08 | **before the first real drop (live click-test, both platforms + locales)** |
+| 21 | **Client sign-off on the header build credit (2.08).** Vladimir (and his parents) confirm they are content for a **third-party company name + outbound link** (Vertex Consulting → an off-site page) to sit in the **top nav of the store on every page** — client-facing and prominent (`D-2.08-2`). Easy to move to the footer later if they'd rather: one component edit. Owner: **Lazar → Vladimir**. | 2.08 | **before the first real drop (client confirms placement)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

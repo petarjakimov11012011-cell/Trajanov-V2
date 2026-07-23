@@ -2675,3 +2675,105 @@ start at `D-2.01-6`.*
   native-speaker pass (register #18) — implemented exactly as the brief proposed, flagged for review.
 - **Links:** `src/messages/{mk,en}.json` · `docs/i18n/string-inventory.md` ·
   `tests/i18n/catalog-parity.test.ts` · `D-2.07-1`
+
+## Phase 2.08 — Header redesign (nav + build credit)
+
+### D-2.08-1 · 2026-07-23 · Header redesign runs as an out-of-band UI phase (pre-decided by the orchestrator)
+- **Status:** Accepted
+- **Decided by:** Orchestrator (pre-decided in the brief); executed by Claude Code.
+- **Context:** The header change (trim the nav to Catalog/About/Contact, add the "Built by Vertex
+  Consulting" credit, keep the MK/EN switch) is a UI polish item, not on the critical path. The next
+  planned work is the 2.06 operator rehearsal → Y.01, and this does not touch it. Same shape as 2.07
+  (footer redesign, `D-2.07-1`) and Y.02.
+- **Decision:** Ship it as out-of-band phase **2.08** on `phase-2.08-header-redesign`. **Line 1 of
+  `current-state.md` (the `NEXT:` line) is unchanged** — 2.06's operator rehearsal remains next.
+- **Alternatives considered:** Fold it into a scheduled phase — rejected (pre-decided).
+- **Downside accepted:** Another entry between now and the rehearsal, and a UI change lands on the live
+  site outside the planned sequence.
+- **Links:** `briefs/Part-2-Phase-08-Code.md` · `D-2.07-1` · `D-Y.02-1`
+
+### D-2.08-2 · 2026-07-23 · The build credit ships as a `facts.md` § 11 VERIFIED entry, in the header (pre-decided by the orchestrator)
+- **Status:** Accepted
+- **Decided by:** Orchestrator (pre-decided in the brief); executed by Claude Code.
+- **Context:** The "Built by Vertex Consulting" credit is a rendered factual claim, so it needs a
+  VERIFIED `facts.md` source before it can ship (Content-truth rule). The operator (Lazar) supplied it
+  as a real fact: Vertex Consulting is the operators' own consultancy and authorised the credit
+  (2026-07-23). It appears in the site header only, and is **barred** from JSON-LD / `sameAs` / OG /
+  `llms.txt` / sitemap / footer / legal pages — it is a build credit, not a partner/sponsor/stockist.
+- **Decision:** Add `facts.md` § 11 (Site build credit) VERIFIED, render the credit in the header, and
+  contain it there. URL `https://www.vertexconsulting.mk/en` marked VERIFIED but **click-test owed**
+  before ship (same rule as the Instagram URL, `facts.md` § 6).
+- **Alternatives considered:** **(a) A `[PLACEHOLDER: …]`** — rejected: there is a real, operator-supplied
+  fact, so a placeholder would be false. **(b) Footer-only placement** (the conventional spot) — rejected:
+  less prominent than the top nav, which the orchestrator wanted.
+- **Downside accepted:** A third-party company name now sits in the top nav of a minor's store on every
+  page, and the link is an off-site exit from the buy path.
+- **Links:** `facts.md` § 11 · `src/components/layout/SiteHeader.tsx` · `src/messages/{mk,en}.json`
+  (`Credit` namespace) · owed-verification register #19/#20/#21
+
+### D-2.08-3 · 2026-07-23 · The redesigned header is NOT sticky (the pre-existing `sticky top-0` is dropped)
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor), while rebuilding `SiteHeader.tsx`.
+- **Context:** The old header was `sticky top-0 z-40 … backdrop-blur` — it followed the viewport on
+  scroll over a semi-transparent ground. The brief's **Out of scope** list names "a sticky/scroll-shrink
+  header," and its target-header spec describes a plain one-row (desktop) / two-row (mobile) block with a
+  bottom hairline and says nothing about sticky. Repo-vs-brief difference: the repo had a sticky header;
+  the brief lists a sticky header as out of scope.
+- **Decision:** Rebuild the header as a **static** (non-sticky) block on a **solid** `--color-ground`
+  (`#0F1210`), dropping `sticky`/`z-40`/`backdrop-blur`. This matches the brief's out-of-scope line and
+  gives a clean, single-colour "header ground" for the DoD's measured-contrast requirement.
+- **Alternatives considered:** **(a) Preserve the existing `sticky top-0 … backdrop-blur`** — rejected:
+  the brief lists a sticky header as out of scope, and a translucent scrolling ground makes "contrast on
+  the header ground" ambiguous. **(b) Sticky but opaque** — same objection.
+- **Downside accepted:** A behaviour change to the live site beyond pure layout — on long pages (product,
+  legal) the nav and cart now scroll away with the page instead of staying pinned; a returning buyer must
+  scroll up to reach them. Surfaced to the operator (this is the notable brief-vs-repo difference).
+- **Links:** `src/components/layout/SiteHeader.tsx` · brief "Out of scope" · brand.md § 3 (`--color-ground`)
+
+### D-2.08-4 · 2026-07-23 · `SiteHeader` is a Client Component so the nav can read `usePathname()` for the active-page indicator
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** The brief requires an active-page underline + `aria-current="page"` on the current nav
+  link. Detecting the current route needs `usePathname()` (a client hook). The old header was a Server
+  Component.
+- **Decision:** Mark `SiteHeader.tsx` `'use client'` and compute `isActive(href)` from `usePathname()`.
+  Keeps all header code in the one in-scope file; `useTranslations` / `t.rich` / the typed `Link` all work
+  in a client component under the existing `NextIntlClientProvider`.
+- **Alternatives considered:** Extract a separate `'use client'` nav sub-component and keep `SiteHeader` a
+  Server Component — rejected: adds an unlisted file for a header that is already tiny and already pulls in
+  the client `LanguageSwitch`.
+- **Downside accepted:** The whole (small) header now hydrates as client JS on every page rather than the
+  nav alone. It still server-renders its initial HTML, so there is no content/SEO cost.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `src/i18n/navigation.ts` (`usePathname`)
+
+### D-2.08-5 · 2026-07-23 · Canonical DOM order + a deterministic 3-row mobile grid (credit on its own full-width row)
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** The brief specifies **different** per-breakpoint arrangements — desktop is one row
+  (wordmark · credit … nav · MK·EN · cart); mobile is two rows (row 1 wordmark / MK·EN·cart, row 2 credit
+  / nav), with a fallback: "if row 2 cannot fit at 320px … move the build credit to its own third row above
+  the hairline … the credit must be visible at every breakpoint." In practice the long MK credit
+  („Изработено од Vertex Consulting") and the three MK nav links do **not** co-fit on one row at 320–375px,
+  so the 2-row mobile is not achievable for the default (MK) locale at the tested widths. Separately,
+  because the two breakpoints want different orders, DOM order can match the visual order of only one of
+  them.
+- **Decision:** (a) Put the DOM/reading order in the **canonical** sequence the brief states —
+  wordmark → credit → Catalog → About → Contact → MK·EN → cart — so the accessibility tree itself is valid
+  order-evidence and desktop focus order matches the visual row. (b) Lay mobile out as a **deterministic
+  CSS grid of three rows**: row 1 wordmark | MK·EN·cart, row 2 the nav (right), row 3 the credit on its own
+  full width directly above the hairline. Desktop switches the same element to a baseline-aligned flex row
+  (nav pushed right with `ml-auto`). Cart is the last item on every breakpoint.
+- **Alternatives considered:** **(a) A `flex-wrap` that flips 2-row↔3-row by available width** — rejected:
+  its wrap point is content/width-dependent and can misbehave between 375–640px (credit landing beside the
+  cart), and it couples DOM grouping to the mobile rows, which forces the desktop focus order to jump
+  (wordmark → lang → cart → credit → nav). **(b) Group the mobile rows in the DOM** (wordmark+controls, then
+  credit+nav) — rejected: makes the accessibility-tree order differ from the brief's stated order and gives
+  a jumpy desktop focus order.
+- **Downside accepted:** On mobile the credit is on its own row (row 3) at **all** mobile widths, not only
+  ≤320px — i.e., the brief's "fallback" layout is the mobile default — so on a wide phone where a 2-row could
+  have fit, the header is one row taller than the brief's ideal. And because the two breakpoints want
+  different orders, the mobile visual order (controls on row 1, credit read 2nd but shown on row 3) is not a
+  perfect match to the top-to-bottom DOM order — an accepted minor reading nuance for header chrome. Verified
+  in-browser: no horizontal overflow at 320px or 375px in either locale; the credit is fully visible at every
+  breakpoint.
+- **Links:** `src/components/layout/SiteHeader.tsx` · brief "The target header" / "Mobile (< 640px)"
