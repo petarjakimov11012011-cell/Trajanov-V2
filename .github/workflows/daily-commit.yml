@@ -1,0 +1,41 @@
+name: Daily empty commit
+
+# Pushes one empty commit to the default branch every day to keep the
+# repo active. Runs on a schedule and can also be triggered manually.
+#
+# NOTE: `schedule` triggers only run from the workflow file on the
+# repository's DEFAULT branch (main), so this file must live on main.
+
+on:
+  schedule:
+    # Every day at 03:17 UTC. The offset (not on the hour) avoids the
+    # heavy congestion GitHub sees for `0 * * * *` crons, which get delayed.
+    - cron: "17 3 * * *"
+  # Lets you run it by hand from the Actions tab to test it.
+  workflow_dispatch: {}
+
+# The built-in GITHUB_TOKEN needs write access to push the commit.
+permissions:
+  contents: write
+
+# Prevent overlapping runs if a previous one is still going.
+concurrency:
+  group: daily-empty-commit
+  cancel-in-progress: false
+
+jobs:
+  empty-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create and push empty commit
+        run: |
+          git commit --allow-empty -m "chore: daily keep-alive commit [skip ci]"
+          git push
