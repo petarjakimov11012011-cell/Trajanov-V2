@@ -82,8 +82,17 @@ brief/state/decision/report docs; **no new dependency** (`package.json` + lockfi
 placeholder, no message-file edit, zero new user-facing string**. **Owed to Lazar:** intensity sign-off —
 eyeball the live glow and dial the three token values if wanted (register **#23**). Decisions `D-2.10-1/2/3`.
 Branch `phase-2.10-card-glow`; **PR [#22](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/22)
-open to `main`** — an operator merges, not Code (`D-0-3`). `NEXT:` line **unchanged** — out-of-band, does
-not touch the 2.06 → Y.01 critical path.
+MERGED to `main` (merge `8524198`, 2026-07-23) on Petar's explicit instruction (`D-0-3`: operator-authorised,
+not Code); branch deleted.** (Clean GitHub PR merge — the stale-head OID issue that hit 2.07/2.08 did not
+recur; PR #22 shows the "Merged" badge.) **Production deploy VERIFIED** — on the live `https://www.trajanovv.com`
+the deployed CSS grep-matches the local production build exactly (12× `spotlight-card`, 8× `--color-glow`,
+`--glow-size`, both opacity tokens, `mask-composite`), and in-browser on `/en/styleguide` the `.spotlight-card`
+rule **applies under `@media (hover: hover) and (pointer: fine)`** (`position: relative`, `z-index: 0`,
+`--glow-x/y` default `50%/0%`, `::after` = `radial-gradient(240px … #ece8e0 …)` at resting `opacity: 0`,
+`::before` `mask-composite: exclude`, `--color-glow` = the foreground token); **2 interactive sample cards
+carry the glow and the sold-out card has none.** The subjective feel/intensity eyeball on a real desktop
+mouse + phone stays owed (register **#23**). `NEXT:` line **unchanged** — out-of-band, does not touch the
+2.06 → Y.01 critical path.
 
 **2.09 COMPLETE — the product-page size buttons now read in garment order S · M · L · XL (this update,
 2026-07-23).** An out-of-band UI phase (the 2.07/2.08/Y.02 shape) — **no commerce logic touched**, and

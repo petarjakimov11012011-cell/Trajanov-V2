@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-23 |
 | **Branch** | `phase-2.10-card-glow` |
-| **PR** | [#22](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/22) (open to `main` — operator merges, `D-0-3`) |
+| **PR** | [#22](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/22) — **MERGED** to `main` (merge `8524198`, 2026-07-23, on Petar's explicit instruction, `D-0-3`); branch deleted. **Production deploy VERIFIED** on `www.trajanovv.com` (deployed CSS grep-matches the build; `.spotlight-card` rule applies under the fine-pointer media query on `/en/styleguide`; sold-out card has no glow). |
 | **Brief** | `briefs/Part-2-Phase-10-Code.md` |
 
 ---
