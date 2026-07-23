@@ -46,9 +46,9 @@ hero captured — and the footer is fully verified via the accessibility tree + 
 `create_order`/`expire_reservations`/`supabase/migrations/`/cart/checkout/`src/config/` byte-unchanged; **no
 new dependency**; `SITE_URL` unchanged; **no new placeholder** (email published, Privacy real). **Owed to
 Lazar:** design sign-off incl. the `@`-for-Instagram icon (register **#17**) + native review of the 3 new MK
-strings (register **#18**). Decisions `D-2.07-1/2/3`. Branch `phase-2.07-footer-redesign`; **PR not yet
-opened (awaiting operator).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01
-critical path.
+strings (register **#18**). Decisions `D-2.07-1/2/3`. Branch `phase-2.07-footer-redesign`; **PR #18 open to `main`**
+(awaiting operator review/merge — `D-0-3`: Code does not self-merge). `NEXT:` line **unchanged** —
+out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **Y.02 COMPLETE — a third product, "Product 03" (baby blue), is now a visible, honest catalog stub
 (this update, 2026-07-22).** An owner-authorised out-of-order insert (`D-Y.02-1`, Lazar, 2026-07-22) —

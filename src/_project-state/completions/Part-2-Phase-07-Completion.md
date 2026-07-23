@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-23 |
 | **Branch** | `phase-2.07-footer-redesign` |
-| **PR** | *(not yet opened — awaiting operator)* |
+| **PR** | [#18](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/18) (open — awaiting operator review/merge) |
 | **Brief** | `Part-1-Phase-07-Runbook-v2.md` *(handed as the original Phase 1.05 "Site-wide footer" brief — see § 3)* |
 
 ---
