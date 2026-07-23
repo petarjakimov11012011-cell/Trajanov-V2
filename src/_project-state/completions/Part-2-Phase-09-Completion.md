@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-23 |
 | **Branch** | `phase-2.09-size-order` |
-| **PR** | _open to `main` — **NOT merged** (`D-0-3`); number recorded in a follow-up commit_ |
+| **PR** | [#21](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/21) — open to `main`, **NOT merged** (`D-0-3`) |
 | **Brief** | `briefs/Part-2-Phase-09-Code.md` |
 
 ---

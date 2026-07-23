@@ -57,8 +57,8 @@ placeholder, no message-file edit**. **Local-only note (`D-2.09-4`):** the three
 catalogue was hand-seeded (local, non-committed, idempotent, mirrors `products.ts`; not sync, not reset,
 not hosted) purely to render the evidence; a future `supabase db reset` reapplies `seed.sql` and drops it.
 **Owed to the operator:** production verification of the size order on `https://www.trajanovv.com` after
-merge, both locales — register **#22**. Decisions `D-2.09-1…4`. Branch `phase-2.09-size-order`; **PR open to
-`main` — NOT merged** (an operator merges on explicit instruction, `D-0-3`). `NEXT:` line **unchanged** —
+merge, both locales — register **#22**. Decisions `D-2.09-1…4`. Branch `phase-2.09-size-order`; **PR #21 open
+to `main` — NOT merged** (an operator merges on explicit instruction, `D-0-3`). `NEXT:` line **unchanged** —
 out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.08 COMPLETE — the site-wide header is redesigned (this update, 2026-07-23).** An out-of-band UI
