@@ -276,3 +276,78 @@
     opacity: 1;
   }
 }
+
+/*
+  Home FAQ disclosure rows (Phase 2.11, brand.md §3/§5/§6).
+  Native <details>/<summary> — zero JS, correct keyboard + screen-reader behaviour for free (D-2.11-3).
+  Every colour, radius, duration and easing is an existing token; there is no literal colour here.
+
+  The open/close height animation rides `::details-content` + `interpolate-size: allow-keywords`;
+  browsers without that pair snap the panel open while the icon still rotates — an accepted graceful
+  degradation, NOT to be "fixed" with JS or a dependency (D-2.11-3). The global prefers-reduced-motion
+  rule above already collapses every transition here, so there is deliberately no second one.
+*/
+.faq-item {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: background-color var(--motion-fast) var(--ease-out);
+  /* Enables the block-size 0 → auto interpolation on ::details-content below (inherited property). */
+  interpolate-size: allow-keywords;
+}
+
+/* Lift the surface one step on hover. */
+.faq-item:hover {
+  background-color: var(--color-surface-2);
+}
+
+/* The clickable question row. Only our Plus icon shows — the native disclosure marker is removed.
+   Keyboard focus lands here and picks up the global :focus-visible ring (globals.css base layer). */
+.faq-item > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  font-weight: 500;
+  list-style: none;
+}
+
+.faq-item > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Right-aligned decoration; rotates 45° (Plus → ×) when the row opens. */
+.faq-item .faq-icon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-muted-foreground);
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.faq-item[open] .faq-icon {
+  transform: rotate(45deg);
+}
+
+/* The answer copy, quieter than the question. */
+.faq-item .faq-answer {
+  padding: 0 1.25rem 1rem;
+  color: var(--color-muted-foreground);
+}
+
+/* Height animation on the disclosure content. `content-visibility` rides along as a discrete property
+   (allow-discrete) so the answer stays visible while the panel collapses. */
+.faq-item::details-content {
+  overflow: hidden;
+  block-size: 0;
+  transition-property: block-size, content-visibility;
+  transition-duration: var(--motion-base);
+  transition-timing-function: var(--ease-out);
+  transition-behavior: allow-discrete;
+}
+
+.faq-item[open]::details-content {
+  block-size: auto;
+}
