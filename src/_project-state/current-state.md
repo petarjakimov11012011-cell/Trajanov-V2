@@ -58,9 +58,16 @@ lockfile unchanged); **no new placeholder**. **Owed to Lazar:** native MK review
 strings (register **#19**), **click-test `https://www.vertexconsulting.mk/en`** (register **#20** — a link
 to a page that does not resolve is a broken fact on every page of the site), and **client sign-off**
 (Vladimir + parents) on a third-party credit + outbound link in the top nav of the store on every page
-(register **#21**). Decisions `D-2.08-1…5`. Branch `phase-2.08-header-redesign`; **PR #19 open to `main` —
-NOT merged** (an operator merges on explicit instruction, `D-0-3`). `NEXT:` line **unchanged** — out-of-band,
-does not touch the 2.06 → Y.01 critical path.
+(register **#21**). Decisions `D-2.08-1…5`. Branch `phase-2.08-header-redesign`; **PR #19 MERGED to `main`
+(merge `d40541b`, 2026-07-23) on Petar's explicit instruction (`D-0-3`: operator-authorised, not Code);
+branch deleted.** (Merge completed via a local `--no-ff` merge commit: GitHub's PR API was stuck on a stale
+head OID — its merge endpoint kept returning "head branch is out of date" while the authoritative ref was
+current — so the GitHub PR shows **Closed** rather than the "Merged" badge, but **all 2.08 commits are on
+`main`**, verified reachable from `d40541b`.) **Production deploy VERIFIED** — `https://www.trajanovv.com`
+now renders the redesigned header: **non-sticky** (`position: static`) with „Built by Vertex Consulting"
+linking `https://www.vertexconsulting.mk/en` (`target="_blank"`) and exactly **Catalog · About · Contact**;
+the 2.07 footer is intact. `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical
+path.
 
 **2.07 COMPLETE — the site-wide footer is redesigned (this update, 2026-07-23).** An out-of-band UI phase
 (the Y.02 precedent): the session was handed the original **Phase 1.05** footer brief, but that footer
