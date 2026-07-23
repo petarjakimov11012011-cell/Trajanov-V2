@@ -2747,7 +2747,7 @@ start at `D-2.01-6`.*
 - **Links:** `src/components/layout/SiteHeader.tsx` · `src/i18n/navigation.ts` (`usePathname`)
 
 ### D-2.08-5 · 2026-07-23 · Canonical DOM order + a deterministic 3-row mobile grid (credit on its own full-width row)
-- **Status:** Accepted
+- **Status:** Superseded by D-2.08-6 (the grid/baseline layout misaligned the seven header items on the desktop row; replaced by a single items-center flex row)
 - **Decided by:** Claude Code (executor).
 - **Context:** The brief specifies **different** per-breakpoint arrangements — desktop is one row
   (wordmark · credit … nav · MK·EN · cart); mobile is two rows (row 1 wordmark / MK·EN·cart, row 2 credit
@@ -2777,3 +2777,40 @@ start at `D-2.01-6`.*
   in-browser: no horizontal overflow at 320px or 375px in either locale; the credit is fully visible at every
   breakpoint.
 - **Links:** `src/components/layout/SiteHeader.tsx` · brief "The target header" / "Mobile (< 640px)"
+
+### D-2.08-6 · 2026-07-23 · Header is one items-center / justify-between flex row of two groups — fixes the seven-item alignment (supersedes D-2.08-5's layout)
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor), on Petar's report that the shipped header was misaligned.
+- **Context:** The D-2.08-5 layout (a grid on mobile that flexed to `sm:items-baseline` on desktop, with the
+  MK·EN + cart cluster forced back to `sm:self-center`) put the wordmark, the credit and the three nav links
+  on the **text baseline** while MK·EN and the cart sat on the **vertical center** — so on the desktop row
+  the first five items visibly floated above the line the switch and cart sat on. The gaps were also uneven
+  (the grid's `gap-x-4` applied between some items while `ml-auto` set others), so nav → MK·EN → cart did not
+  match the spacing between the nav links.
+- **Decision:** Rebuild the header as **one flex row, `items-center` + `justify-between`**, with two groups:
+  a LEFT group (wordmark + credit) and a RIGHT group (the three nav links, then MK·EN, then the cart). Every
+  container is `items-center`; **no item carries a baseline nudge, a `self-*` override, or a margin-top**. The
+  cart keeps its 44px tap target but, being in an `items-center` row, is centered rather than setting anyone's
+  offset (it still sets the row height, but all seven items center within it). Gaps use exactly **two tokens**:
+  `gap-4` (16px) between the three nav links, and `gap-6` (24px) used identically for nav → MK·EN and
+  MK·EN → cart (the right group's `gap-x-6` gives nav → MK·EN; the MK·EN+cart sub-group's `gap-6` gives
+  MK·EN → cart). On narrow screens the single row **wraps** (`flex-wrap`, `sm:flex-nowrap`): the right group
+  drops below the left group and then splits (nav, then MK·EN+cart) — no horizontal overflow at 320px, and the
+  credit stays visible (it wraps its own text at the narrowest widths). **Verified by computed geometry, not by
+  eye:** at 1280px all seven items report an identical vertical center (34.0px, max delta **0**); measured gaps
+  are 16/16/24/24px. Contrast re-measured (credit 7.85 · Vertex link 8.95 · nav default 7.85 · nav active
+  15.42 · lang active 15.42 · lang inactive 7.85, all ≥ 4.5); credit link tap target restored to 24px;
+  no overflow at 320/375 in either locale; build/tsc/lint clean, `npm test` 85/85 incl. the oversell gate.
+- **Alternatives considered:** **(a) Keep D-2.08-5 and only swap `sm:items-baseline` → `sm:items-center`** —
+  rejected: it would center the items but leave the uneven grid gaps and the `self-center` special-case, and
+  the grid's per-item placement is exactly the kind of per-item offset the report asked to remove. **(b) A
+  single non-wrapping row at all widths** — rejected: it overflows at 320–375px (nav + MK·EN + cart alone
+  exceed a phone width), violating the no-overflow rule. **(c) Force the credit onto its own row on mobile
+  again (the old grid)** — rejected: the wrap now handles it and keeps one shared structure across
+  breakpoints.
+- **Downside accepted:** On mobile the header is up to three wrapped rows (left group, nav, MK·EN+cart), and
+  at 320px the long credit wraps to two lines — taller than a single desktop row, but overflow-free and fully
+  visible. Nothing else regresses (D-2.08-1/2/3/4 stand; DOM/reading order stays wordmark → credit → nav →
+  MK·EN → cart).
+- **Links:** `src/components/layout/SiteHeader.tsx` · supersedes `D-2.08-5` · `D-2.08-3` (non-sticky) ·
+  `D-2.08-4` (client component)
