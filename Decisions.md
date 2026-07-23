@@ -2814,3 +2814,74 @@ start at `D-2.01-6`.*
   MK·EN → cart).
 - **Links:** `src/components/layout/SiteHeader.tsx` · supersedes `D-2.08-5` · `D-2.08-3` (non-sticky) ·
   `D-2.08-4` (client component)
+
+### D-2.09-1 · 2026-07-23 · Size-order fix runs as an out-of-band UI phase; `NEXT:` unchanged
+- **Status:** Accepted
+- **Decided by:** Orchestrator (pre-decided in the Phase 2.09 brief); executed by Claude Code.
+- **Context:** The product-page size buttons render L · M · S · XL (alphabetical), which reads as
+  broken on the one screen where a customer decides. It is a one-line behavioural bug, not part of
+  the real content load.
+- **Decision:** Ship the fix now as its own out-of-band UI phase (the 2.07/2.08/Y.02 shape), leaving
+  line 1 `NEXT:` (the 2.06 operator rehearsal) exactly as it is.
+- **Alternatives considered:** Fold it into Y.01 with the real content load — rejected: it would sit
+  behind the whole content load and leave the buy cluster visibly wrong on the live site until then.
+- **Downside accepted:** Another decision entry and another deploy between now and the rehearsal, for
+  a one-line behavioural change.
+- **Links:** `src/lib/drop/size-order.ts` · `src/lib/drop/state.ts` · `briefs/Part-2-Phase-09-Code.md`
+
+### D-2.09-2 · 2026-07-23 · One shared canonical size order for every product; no per-product override
+- **Status:** Accepted
+- **Decided by:** Orchestrator (pre-decided in the Phase 2.09 brief); executed by Claude Code.
+- **Context:** `toProductView()` in `src/lib/drop/state.ts` is the single place size order is decided
+  for every product (`grep -rn "localeCompare" src/` returned only that one line). Postgres does not
+  guarantee variant row order, so the sort there — not `products.ts` — decides what renders.
+- **Decision:** Fix the order once, centrally, with one canonical garment-size rule applied to all
+  products. Product 02 (`test-off-white`, XL only) passes through the same changed line; a
+  single-item sort is a provable no-op, so its rendered output is byte-identical.
+- **Alternatives considered:** (a) Hardcode the order per product — rejected: silently breaks the
+  moment Vladimir's real drop adds a product. (b) Reorder rows in `products.ts` and hope Postgres
+  returns them in that order — rejected: row order is not guaranteed on read, so it fixes nothing
+  reliably, and `products.ts` is frozen this phase.
+- **Downside accepted:** The operator scoped the visible change to Products 01 and 03, yet Product 02
+  necessarily runs through the same edited line — accepted because its single XL variant makes the
+  sort provably a no-op.
+- **Links:** `src/lib/drop/state.ts` · `src/config/products.ts` (unchanged)
+
+### D-2.09-3 · 2026-07-23 · The comparator lives in its own pure module with a unit test, not inline in `state.ts`
+- **Status:** Accepted
+- **Decided by:** Orchestrator (pre-decided in the Phase 2.09 brief); executed by Claude Code.
+- **Context:** `state.ts` starts with `import "server-only"`, so it cannot be imported by a plain
+  vitest run — an inline sort there could not be unit-tested.
+- **Decision:** Put the rule in a new pure module `src/lib/drop/size-order.ts` (canonical list +
+  `compareSizeLabels(a, b)`), with **no** `server-only` import, and a dedicated unit test
+  (`tests/drop/size-order.test.ts`). `state.ts` imports and calls it.
+- **Alternatives considered:** An inline `.sort()` in `state.ts` (one file, no new test) — rejected:
+  it is unreachable by a unit test, so the ordering rule would ship unproven.
+- **Downside accepted:** One more file and one more test to maintain; the ordering rule now sits one
+  import away from the code that uses it.
+- **Links:** `src/lib/drop/size-order.ts` · `tests/drop/size-order.test.ts` · `src/lib/drop/state.ts`
+
+### D-2.09-4 · 2026-07-23 · Local render evidence via a hand-written local seed, because `sync:drop` is frozen
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** The DoD requires rendering the three real catalogue product pages
+  (`test-mustard-ochre`, `test-off-white`, `test-baby-blue`) locally. Those slugs live in
+  `src/config/products.ts` and normally reach a database only via `npm run sync:drop` — which this
+  phase explicitly freezes (and Task 6 forbids sync/reset/hosted). The local DB held only the
+  test-suite seed products (`test-tee-*`), so the catalogue was empty of these three.
+- **Decision:** Seed the three products (+ their variants and the past-dated `test-drop`) directly
+  into the **local** database with a one-off, idempotent SQL insert that mirrors `products.ts`
+  exactly. The variants were inserted in a **deliberately non-canonical order** (`XL S L M` /
+  `L XL S M`) so that a page rendering S · M · L · XL proves the comparator is ordering them, not
+  Postgres. This is a local-only, non-committed data operation — not `sync:drop`, not `--linked`,
+  not a reset, no hosted write, and it changes no git-tracked file.
+- **Alternatives considered:** (a) Run `npm run sync:drop` against local — rejected: explicitly
+  frozen this phase (it is Y.01's content-load tool). (b) `supabase db reset` to reapply a seed —
+  rejected: Task 6 forbids reset and it would wipe the other operator's local state. (c) Point the
+  dev server at the hosted DB (which already has the three products) — rejected: Task 6 says local
+  database only, never the hosted project.
+- **Downside accepted:** The rendered evidence depends on a hand-written local seed rather than the
+  real config→DB path; the seed is disposable (a future `supabase db reset` reapplies `seed.sql` and
+  drops it). Mitigated by mirroring `products.ts` byte-for-byte and by shuffling the insert order so
+  the render is a genuine test of the fix.
+- **Links:** `src/config/products.ts` · `supabase/seed.sql` · Task 6 of `briefs/Part-2-Phase-09-Code.md`

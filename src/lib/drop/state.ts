@@ -1,6 +1,7 @@
 import "server-only";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { LOW_STOCK_THRESHOLD } from "@/config/schema";
+import { compareSizeLabels } from "@/lib/drop/size-order";
 import type { DropState, StockLevel, ProductView, SizeOption } from "@/types/drop";
 
 // SERVER-ONLY drop-state (Task 4, D-1.04-9). Drop state (countdown / live / ended) and stock are
@@ -94,9 +95,12 @@ function stockLevel(remaining: number): StockLevel {
 
 function toProductView(p: RawProduct): ProductView {
   const remaining = p.variants.reduce((s, v) => s + v.stock, 0);
+  // Sort into the canonical garment order (S · M · L · XL …), NOT alphabetically — Postgres does not
+  // guarantee variant row order, so this explicit sort decides what the size row shows. `compareSizeLabels`
+  // ranks by clothing size; the label kept is the DB's original string, unmodified (D-2.09-3).
   const sizes: SizeOption[] = p.variants
     .slice()
-    .sort((a, b) => a.size.localeCompare(b.size))
+    .sort((a, b) => compareSizeLabels(a.size, b.size))
     .map((v) => ({ variantId: v.id, label: v.size, available: v.stock > 0 }));
   return {
     slug: p.slug,
