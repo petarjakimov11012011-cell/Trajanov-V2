@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-23 |
 | **Branch** | `phase-2.08-header-redesign` |
-| **PR** | open to `main` — **NOT merged** (operator merges on explicit instruction, `D-0-3`) |
+| **PR** | [#19](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/19) — open to `main`, **NOT merged** (operator merges on explicit instruction, `D-0-3`) |
 | **Brief** | `briefs/Part-2-Phase-08-Code.md` |
 
 ---

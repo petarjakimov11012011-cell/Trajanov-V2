@@ -58,7 +58,7 @@ lockfile unchanged); **no new placeholder**. **Owed to Lazar:** native MK review
 strings (register **#19**), **click-test `https://www.vertexconsulting.mk/en`** (register **#20** — a link
 to a page that does not resolve is a broken fact on every page of the site), and **client sign-off**
 (Vladimir + parents) on a third-party credit + outbound link in the top nav of the store on every page
-(register **#21**). Decisions `D-2.08-1…5`. Branch `phase-2.08-header-redesign`; **PR open to `main` —
+(register **#21**). Decisions `D-2.08-1…5`. Branch `phase-2.08-header-redesign`; **PR #19 open to `main` —
 NOT merged** (an operator merges on explicit instruction, `D-0-3`). `NEXT:` line **unchanged** — out-of-band,
 does not touch the 2.06 → Y.01 critical path.
 
