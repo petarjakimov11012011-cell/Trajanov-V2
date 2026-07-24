@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-25 |
 | **Branch** | `phase-2.15-mobile-overlay-menu` |
-| **PR** | [#27](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/27) → `main` — **opened, NOT merged** (an operator merges, `D-0-3`) |
+| **PR** | [#27](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/27) → `main` — **MERGED** (merge `5fb65d2`, 2026-07-25, on Petar's explicit instruction, `D-0-3`); branch deleted; **production deploy VERIFIED** (full-screen overlay driven live on `www.trajanovv.com`, both locales — see §12) |
 | **Brief** | Part 2 · Phase 15 · Code — Full-screen mobile menu (overlay drawer) |
 
 ---
@@ -254,3 +254,28 @@ No secret was committed at any point in this branch's history.
 
 **`NEXT:` line I set:** unchanged — `NEXT: 2.06 operator half — the LIVE drop rehearsal …` (out-of-band phase;
 line 1 must not move).
+
+---
+
+## 12. Production verification (post-merge)
+
+PR #27 merged to `main` (merge `5fb65d2`) on Petar's explicit instruction (`D-0-3`); the Vercel redeploy went
+live and was verified on `https://www.trajanovv.com`. **This time the external-site browser pane shrank below
+1024px** (2.14 could not), so the actual mobile overlay was driven on the live site in **both locales** — a
+stronger check than 2.14's HTML-only mobile confirmation.
+
+- **New build deployed:** the header carries the burger with `aria-controls="mobile-menu"`; the old 2.14 burger
+  (`aria-controls="site-nav"`) is gone.
+- **Desktop (effective 1280):** burger `display:none`; nav **Catalog · About · Contact** at **offset 0px** from
+  the container content-box centre; all **8 header items on one centreline (delta 0)**; credit + MK·EN + cart
+  present; `scrollWidth == clientWidth` — the 2.13 desktop result is untouched on production.
+- **Mobile (390), EN:** tapping the burger opens the overlay — `position: fixed`, opaque `bg-ground`
+  (`rgb(15,18,16)`), `z-40`, covers the viewport (390×844); `document.body.style.overflow = hidden`; focus on
+  the X ("Close"); order **top bar (TRAJANOV + Close) → Catalog·About·Contact·Cart (`text-h2` 24px) → divider →
+  centred MK·EN → centred "Built by Vertex Consulting"**; `scrollWidth == clientWidth`.
+- **Mobile (390), MK (via `NEXT_LOCALE`):** X `aria-label` is **„Затвори"** (the new string, live), rows are
+  **Каталог · За брендот · Контакт · Кошничка**, credit „Изработено од Vertex Consulting…"; no overflow.
+- Screenshots captured on production: **EN 390 open**, **MK 390 open**.
+
+**Still owed (#30):** the real-device feel and a native-speaker read of the MK „Затвори" label — only a human
+on a real phone can confirm those.

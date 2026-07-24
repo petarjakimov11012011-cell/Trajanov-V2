@@ -98,9 +98,20 @@ locales; the MK „Затвори" label is a new MK string not covered by the 2
 (all six orchestrator-made, appended verbatim) + `D-2.15-7` (Claude Code — the resize belt-and-suspenders);
 `D-2.14-2/5/6/7` marked `Superseded by D-2.15-1/2/1/4` (bodies intact). **`file-map.md` needs no tree change**
 (no file added, moved, or deleted). Branch `phase-2.15-mobile-overlay-menu`; **PR
-[#27](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/27) opened to `main`, NOT merged
-(an operator merges, `D-0-3`).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01
-critical path.
+[#27](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/27) MERGED to `main` (merge `5fb65d2`,
+2026-07-25) on Petar's explicit instruction (`D-0-3`: operator-authorised, not Code); branch deleted** (clean
+GitHub PR merge; PR #27 shows the "Merged" badge). **Production deploy VERIFIED — and this time the mobile
+overlay was driven on the live site in BOTH locales** (unlike 2.14, the external-site pane shrank below 1024px):
+on `https://www.trajanovv.com` the deployed header carries the **new** burger (`aria-controls="mobile-menu"`;
+the old 2.14 `aria-controls="site-nav"` burger is gone), and at effective **1280** the desktop render is the
+2.13 grid untouched (burger `display:none`, nav **Catalog · About · Contact** at **offset 0px**, all 8 items on
+one centreline delta 0, no overflow). Resized to **390** the burger opens the full-screen overlay: `position:
+fixed`, opaque `bg-ground` (`rgb(15,18,16)`), `z-40`, covers the viewport, body scroll locked, focus on the X;
+order top-bar → **Catalog·About·Contact·Cart** (`text-h2` 24px) → divider → centred MK·EN → centred "Built by
+Vertex Consulting"; no overflow. **EN** shows the X `aria-label` **"Close"**; **MK** (via `NEXT_LOCALE`) shows
+**„Затвори"** and the localised rows (Каталог · За брендот · Контакт · Кошничка) — the new MK string is live.
+The **real-phone feel + the native-MK „Затвори" read stay owed #30** (Lazar + Petar). `NEXT:` line **unchanged**
+— out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.14 COMPLETE — the phone header is now one clean line with the three page links behind a burger menu
 (this update, 2026-07-24).** An out-of-band **UI-only** phase (the 2.07/2.08/2.09/2.10/2.11/2.12/2.13/Y.02
