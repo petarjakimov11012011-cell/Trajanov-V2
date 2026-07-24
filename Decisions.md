@@ -3139,3 +3139,121 @@ start at `D-2.01-6`.*
   1024px. Raising to `xl` would push EN's clean 1024px single-row into the two-row layout to fix a non-broken
   MK wrap, so `lg` was retained. No type token was shrunk and no label truncated or reworded.
 - **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.13-1` · `D-2.13-2`
+
+### D-2.14-1 · 2026-07-24 · The burger appears below lg (1024px); at lg and above nothing changes
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
+- **Decision:** The burger appears below `lg` (1024px). At `lg` and above nothing changes.
+- **Alternative rejected:** Switching at `md` (768px), which would keep the visible second-row nav on
+  tablets.
+- **Downside accepted:** Viewports 768–1023px lose the always-visible nav and gain one tap.
+- **Reason:** `lg` is exactly where the nav currently drops to its own row (`D-2.13-2/3`), so the burger
+  **replaces** that row — one rule, one breakpoint, no third layout to maintain.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.13-2` · `D-2.13-3`
+
+### D-2.14-2 · 2026-07-24 · An in-flow disclosure panel, not a modal drawer or overlay
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
+- **Decision:** The panel expands inside the header block and pushes the page down; it does not slide over
+  the page, does not portal, does not lock scroll, does not dim the background.
+- **Alternative rejected:** A Sheet/Dialog drawer built on `@base-ui/react` or a generated
+  `components/ui/sheet`.
+- **Downside accepted:** No slide-in-from-the-edge feel; it is a plain expand.
+- **Reason:** Three links do not need a portal, a focus trap and a scroll lock, `D-2.11-3` set the house
+  precedent (zero-dependency disclosure, graceful degradation), and a first-ever UI primitive is a new
+  surface that can break on drop day.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.11-3`
+
+### D-2.14-3 · 2026-07-24 · React state, not native `<details>/<summary>`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
+- **Decision:** The open/close state is React `useState`, not a native `<details>/<summary>` disclosure.
+- **Alternative rejected:** `<details>`, the 2.11 FAQ pattern.
+- **Downside accepted:** A small amount of JS in the header, and with JS disabled the menu will not open.
+- **Reason:** `<details>` does **not** close itself when a link inside it is activated, so the customer
+  would land on the next page with the menu hanging open. Mitigation for the JS-off case, stated honestly:
+  About, Contact, Terms, Privacy and Shipping are in the footer on every page, and `/catalog` is linked
+  from Home, About, Cart, Checkout and the product page — no route becomes unreachable.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.11-3`
+
+### D-2.14-4 · 2026-07-24 · One new message key, `Nav.menu`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
+- **Decision:** One new message key, `Nav.menu` — MK „Мени" / EN "Menu", used as the button's
+  `aria-label`. State is carried by `aria-expanded`, so there is **no** second "close menu" string.
+- **Alternative rejected:** A label that swaps to "Close menu" when open.
+- **Downside accepted:** The accessible name does not describe the close action. 241 → **242** keys.
+- **Links:** `src/messages/mk.json` · `src/messages/en.json` (`Nav.menu`)
+
+### D-2.14-5 · 2026-07-24 · MK·EN and the cart stay outside the menu, always visible
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
+- **Decision:** Only the three page links go behind the burger. MK·EN and the cart stay outside the menu,
+  always visible.
+- **Alternative rejected:** Sweeping the language switch into the panel for a cleaner row.
+- **Downside accepted:** The phone header row carries four controls (burger, МК, EN, cart) and must be
+  proven not to overflow at 320px.
+- **Reason:** The cart is the buy path and nothing on the buy path goes behind a tap; the language switch
+  is how an English reader escapes a Macedonian page.
+- **Links:** `src/components/layout/SiteHeader.tsx`
+
+### D-2.14-6 · 2026-07-24 · The existing `<nav>` element *is* the panel; DOM order is unchanged from 2.13
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
+- **Decision:** No element is reordered, no `order-*` utility is used, nothing moves in the markup: the
+  same `<nav>` is hidden below `lg` until opened, and is unchanged at `lg`. Because the panel therefore
+  sits *before* its trigger in the DOM, **focus moves to the first link when the menu opens and returns to
+  the button when it closes.**
+- **Alternative rejected:** Moving the `<nav>` to be the last child so it follows the button.
+- **Downside accepted:** Programmatic focus movement on a non-modal disclosure is slightly unusual.
+- **Reason:** Reordering the DOM would break the reading order 2.13 deliberately established (wordmark →
+  credit → Catalog → About → Contact → MK·EN → cart) and would make a screen reader announce the centre
+  column last at desktop widths.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.13-1`
+
+### D-2.14-7 · 2026-07-24 · In the open panel the active page is a filled row, not the underline
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
+- **Decision:** Below `lg` the active link gets `bg-surface` + `text-foreground` and no visible bottom
+  border; at `lg` and above the 2px `--color-mustard` underline is unchanged.
+- **Alternative rejected:** Keeping the bottom border in the stacked panel.
+- **Downside accepted:** One state has two presentations.
+- **Reason:** A full-width bottom border under a stacked menu row reads as a divider between items, not as
+  "you are here".
+- **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.13-1`
+
+### D-2.14-8 · 2026-07-24 · No open/close animation
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
+- **Decision:** The panel appears and disappears; only the button's existing colour transition remains.
+- **Alternative rejected:** A height transition like `.faq-item`.
+- **Downside accepted:** It snaps.
+- **Reason:** `brand.md` § 6 — motion belongs to the countdown and the drop reveal and nothing else — and
+  no animation means no new CSS block and nothing extra to do for `prefers-reduced-motion`.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `brand.md` § 6
+
+### D-2.14-9 · 2026-07-24 · Close the menu on route change with the render-time reset pattern, not a pathname `useEffect`
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly during execution, forced by a lint gate).
+- **Context:** Task 5 of the brief specifies "a `useEffect` on `usePathname()` closes it on any route
+  change, so a back/forward navigation cannot leave it open." The naive form of that — an effect body that
+  synchronously calls `setOpen(false)` — is a **lint error** here: eslint's
+  `react-hooks/set-state-in-effect` (bundled in `eslint-config-next`, a required Task 7 gate) rejects it,
+  and `npm run lint` must exit 0 (a red lint is not a PR, `CLAUDE.md`). The repo has no precedent for a
+  synchronous setState in an effect — every existing effect (`Countdown`, `HomeExperience`) calls setState
+  only inside a callback.
+- **Decision:** Close the menu on route change with React's documented "reset state when a value changes"
+  render-time pattern instead of an effect: keep the last pathname in state (`lastPathname`) and, during
+  render, if `pathname !== lastPathname`, call `setLastPathname(pathname)` + `setOpen(false)`. This closes
+  the menu on **any** route change — a link tap to a different page **and** a browser back/forward —
+  exactly as the brief's effect would, and the DoD's observable check ("Navigate: tapping Catalog loads
+  the page with the panel closed") is met (verified both locales). Each link *also* closes the menu in its
+  `onClick` (the brief requires this too), which additionally covers a tap on the *current* page's own link
+  (no pathname change).
+- **Alternative rejected:** Keep the pathname `useEffect` and silence the rule with an inline
+  `// eslint-disable-next-line react-hooks/set-state-in-effect`. Rejected because it suppresses a
+  legitimate signal, whereas the render-time pattern is the endorsed fix the lint message itself links to
+  (react.dev/learn/you-might-not-need-an-effect) and costs one fewer render.
+- **Downside accepted:** Deviates from the brief's literal "useEffect" wording and adds one state variable
+  (`lastPathname`); a reader expecting an effect must read the comment to see why there isn't one.
+- **Links:** `src/components/layout/SiteHeader.tsx` · Brief Task 5 · Brief Task 7 (lint gate) · `D-2.14-3`

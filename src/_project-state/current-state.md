@@ -6,11 +6,99 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-24** · By: **Claude Code (Phase 2.13 — Header nav centred)**
+Last updated: **2026-07-24** · By: **Claude Code (Phase 2.14 — Mobile nav menu (burger))**
 
 ---
 
 ## Status
+
+**2.14 COMPLETE — the phone header is now one clean line with the three page links behind a burger menu
+(this update, 2026-07-24).** An out-of-band **UI-only** phase (the 2.07/2.08/2.09/2.10/2.11/2.12/2.13/Y.02
+shape) — **no commerce, no schema touched**, exactly **one** new message key per catalog, and **line 1
+`NEXT:` is unchanged** (the 2.06 operator rehearsal remains next; this phase does not advance the critical
+path). Below `lg` (1024px) the nav used to drop to its own centred second row above every page; that row is
+now replaced by the burger button people expect, one tap from the links. What shipped:
+- **`src/components/layout/SiteHeader.tsx` — the burger button + the open/close state + the panel styling
+  of the existing `<nav>`.** The burger is a `<button type="button" lg:hidden>` added as the **first child
+  of the right-hand controls group, before `<LanguageSwitch />`**, so DOM/reading order becomes wordmark →
+  credit → nav → **burger** → MK·EN → cart (cart still last). Its size/interaction classes are **identical
+  to the cart control** (`h-11 w-11`, 44px WCAG-2.2 target; `rounded-[var(--radius-md)]`,
+  `hover:bg-surface`, the shared focus ring); icon is lucide `Menu` when closed / `X` when open
+  (`h-5 w-5`, `strokeWidth 1.75`, matching `ShoppingBag`); `aria-label={t('menu')}` · `aria-expanded` ·
+  `aria-controls="site-nav"`. The gap to MK·EN reuses the group's existing `gap-6` (**no new gap value**).
+- **The existing `<nav>` *is* the panel — DOM unchanged (`D-2.14-6`), `id="site-nav"` added** (grep-proven
+  unused; `main-content` is still the only other id). Grid placement is byte-identical to 2.13
+  (`col-span-2 col-start-1 row-start-2 lg:col-span-1 lg:col-start-2 lg:row-start-1`). Below `lg` it is
+  `hidden` when closed / `flex` when open, plus `lg:flex` so it is **always** visible at `lg` regardless of
+  state — every stacked style (`flex-col items-stretch`, full-width `w-full min-h-11 px-3
+  rounded-[var(--radius-md)]` link rows) is reverted by an `lg:` variant, so the desktop render is correct
+  whether open or closed. **No resize listener, no `matchMedia`, no state reset on resize.** Reuses the
+  existing `gap-4` (2.13's "two gap tokens only" stays literally true). Active link in the open panel is a
+  **filled `bg-surface` row with a transparent border** (`D-2.14-7`); at `lg` the 2px `--color-mustard`
+  underline is unchanged. `isActive`/`aria-current`/type classes/focus ring untouched.
+- **Behaviour:** `useState(false)`; the button toggles it. **On open** focus moves to the first link
+  (`navRef.querySelector('a').focus()`); **Escape** (bound only while open, torn down on close) and the
+  **button** return focus to the button. **Each link's `onClick` closes it**, and a **render-time reset**
+  closes it on any route change (back/forward included). The route-change close uses React's documented
+  "reset state when a value changes" render pattern, **not** a pathname `useEffect` — the naive
+  `setOpen(false)` in an effect is a hard **lint error** here (`react-hooks/set-state-in-effect` in
+  `eslint-config-next`, a Task 7 gate); the render-time pattern is the fix the lint message itself links to
+  and is behaviourally identical (`D-2.14-9`). **No scroll lock, no body class, no portal, no overlay, no
+  click-outside handler, no animation** (`D-2.14-2/8`).
+- **Strings:** exactly one key added per catalog — `Nav.menu` (MK „Мени" / EN "Menu"), last in the `Nav`
+  namespace (`D-2.14-4`). Catalogs **241 → 242**; `docs/i18n/string-inventory.md` regenerated (header reads
+  **242**, the only added row is `Nav.menu`). **No `@base-ui/react` import, no shadcn primitive, no new
+  dependency** (`package.json` + lockfile byte-unchanged); `src/components/ui/` still holds only `.gitkeep`.
+
+**Gates:** `npm run build` (exit 0, "✓ Compiled successfully", full route tree) / `npx tsc --noEmit` (exit
+0) / `npm run lint` (clean, exit 0 — the render-time reset is what makes it green) all pass; `npm test`
+**116/116** (unchanged count) incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7
+rejected with insufficient_stock, stock 0` (untouched — no commerce code changed) + the i18n catalog-parity
+suite, now covering **242** keys. **Rendered + measured in-browser** (dev server, **both locales** via `/`
+(MK, `NEXT_LOCALE`) + `/en`, at **320 / 390 / 768 / 1024 / 1280**), by `getBoundingClientRect()` + computed
+styles, not by eye:
+- **320 & 390, both locales, menu closed:** panel computes `display: none` (nav second row gone → the
+  grid is one row) and `scrollWidth == clientWidth` (320==320, 390==390). Burger **44×44** and cart
+  **44×44** (both ≥ WCAG 44); at 390 they share a centreline (cy 51.8).
+- **320 & 390, both locales, menu open:** the three links are a vertical stack (`flex-direction: column`),
+  each row **44px** tall, and **no overflow** (`scrollWidth == clientWidth`).
+- **768, both locales, closed:** below `lg` → burger visible, panel `display: none`, no overflow.
+- **1024 & 1280, both locales:** burger computes **`display: none`**, the nav is visible (`display: flex`),
+  and the nav's centre X is **offset 0px** (≤ ±4px) from the container content-box centre. **At 1280 all 8
+  header items share one vertical centre (cy 34, delta 0)** — the 2.13 desktop result is untouched.
+- **Interaction (MK 390):** clicking the burger sets `aria-expanded="true"`, shows the panel (icon → `X`),
+  and `document.activeElement` is the first link ("Каталог"). **Escape** closes it, sets
+  `aria-expanded="false"` (icon → `Menu`), and `document.activeElement` is the burger button again.
+- **Navigate:** tapping "Catalog" in the open panel loads the catalog page **with the panel closed** —
+  verified both locales (`/katalog`, `/en/catalog`; menu `aria-expanded="false"`, `display: none` on
+  arrival).
+- **Active state:** on `/katalog` and `/en/catalog` the Catalog link carries `aria-current="page"` — a
+  filled `bg-surface` (`rgb(23,26,24)` = `#171a18`) row with a transparent bottom border in the open panel
+  at 390, and the 2px `rgb(226,169,60)` (`--color-mustard`) underline with transparent bg at 1280.
+- **Header console errors: zero new.** The Next dev overlay still shows the **pre-existing, out-of-scope**
+  `ProductCard.tsx:59` MK price hydration mismatch ("1,500 ден" server vs "1.500 ден" client) on the Home
+  live-drop grid — confirmed via the dev-server log (stack trace roots in `HomePage → HomeExperience →
+  ProductCard`, zero header involvement); `ProductCard.tsx` is **byte-unchanged** vs `main`, so it is
+  inherited, not introduced. Hard stop #6 forbids touching it; still open, flagged for a separate task.
+Screenshots captured: **MK 390 closed**, **MK 390 open**, **EN 390 open**, **MK 1280**, **EN 1280**.
+
+**Frozen (byte-unchanged, `git diff --name-only main` lists only `SiteHeader.tsx`, `mk.json`, `en.json`,
+`string-inventory.md` + the state/decision/report docs):** `ProductCard.tsx` / `HomeExperience.tsx` /
+`SiteFooter.tsx` / `LanguageSwitch.tsx` / `src/app/[locale]/layout.tsx` / `src/app/globals.css` /
+`brand.md` / `facts.md` / `src/lib/orders/` / `create_order` / `expire_reservations` / `supabase/` / cart /
+checkout / `Turnstile.tsx` / `src/config/` / `src/lib/drop/` / `src/lib/site.ts` (`SITE_URL`) /
+`src/lib/seo/*` / `sitemap.ts` / `robots.ts` / `manifest.ts` / `llms.txt` / logo+icon assets /
+`package.json` + lockfile (**no new dependency**). **No new token, no new CSS block, no hex literal, no raw
+px literal** in the diff (grep-proven; the only `order-`-substring hits are `border-*` classes, precise
+grep `\border-(first|last|none|[0-9]+)` empty). **No new placeholder**, **no `[PLACEHOLDER: …]` marker**;
+**placeholder register UNCHANGED**; **no new fact** (a menu label is not a factual claim). **Owed-verification
+register +1** (#29 — burger menu sign-off on the live deploy, on a real phone, both locales; the MK label
+„Мени" is a new MK string not covered by the 2.03 review stamp). Decisions `D-2.14-1…8` (all eight
+orchestrator-made, appended verbatim) + `D-2.14-9` (Claude Code, the render-time-reset lint resolution).
+**`file-map.md` needs no tree change** (no file added, moved, or deleted). Branch
+`phase-2.14-mobile-nav-menu`; **PR [#26](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/26)
+opened to `main`, left UNMERGED — an operator merges (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band,
+does not touch the 2.06 → Y.01 critical path.
 
 **2.13 COMPLETE — the header nav (Catalog · About · Contact) is now on the true page centreline (this
 update, 2026-07-24).** An out-of-band **UI-only** phase (the 2.07/2.08/2.09/2.10/2.11/2.12/Y.02 shape) —
@@ -1500,6 +1588,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 26 | **Sign-off that eight questions is the right amount for the front door (2.11).** Lazar looks at the rendered Home FAQ and either says yes, or names what to add — the five deliberately-omitted answers (returns window, fabric/care, courier name, delivery cost, exact size measurements) do not exist in `facts.md` yet and their additions come from **Y.01** content, not from Code inventing them. Owner: **Lazar → Vladimir (content)**. | 2.11 | **before the first real drop (content sign-off)** |
 | 27 | **Native MK review of the new Home hero sub-line (2.12).** `Home.sub` is now the brand line „Пронајди сродна, во свет продадени души." — **operator-authored and shipped byte-exact** (`D-2.12-2`), so this is its **first** native read. Unlike every other MK string on the site, it is **deliberately not a word-for-word translation** of the English and is deliberately shorter (the noun after „сродна" is elided). Two native speakers (Lazar + Petar) read it **in place on the Home hero** (countdown + ended states, phone + desktop) and answer the one question in `docs/i18n/mk-review-2.12.md`: **does it read as correct, finished Macedonian, or as a fragment?** — then sign or return a correction. Owner: **Lazar + Petar**. | 2.12 | **before the first real drop (both sign-off boxes filled)** |
 | 28 | **Header layout sign-off (2.13).** The header nav was moved onto the true page centreline via a three-column grid, **outside a Design phase**. Code measured it end-to-end (no horizontal overflow at 320/390/768/1024/1280, both locales; nav centre at offset 0px everywhere; active-link underline + `aria-current` intact both locales) but the **visual-brand call** — does the centred nav read right, and is the large intentional gap between the nav and the MK·EN/cart cluster on wide screens (inherent to true centring, `D-2.13-1`) acceptable — is Lazar's. View `https://www.trajanovv.com/` **and** `/en` on a **desktop browser and a phone** after the merge deploys and confirm the nav position reads right. Note the deliberate MK-at-1024 behaviour: the credit wraps under the wordmark while the nav stays centred (`D-2.13-3`, `lg` kept not raised to `xl`) — if the two-line MK block at 1024–~1150 is unwanted, raising the switch to `xl` is a one-line change. Owner: **Lazar**. | 2.13 | **after 2.13 deploys — before the first real drop (desktop + phone, both locales)** |
+| 29 | **Burger menu sign-off on the live deploy, on a real phone, both locales (2.14).** Open `https://www.trajanovv.com` on a phone. Tap the burger; tap each of the three links; use the back button; switch to EN and repeat. Pass = the header is one line with the menu closed; the menu opens and closes cleanly; every link goes to the right page and the menu is **closed on arrival**; nothing overflows sideways; and the MK label **„Мени"** reads correctly to a native speaker (it is a **new MK string, not covered by the 2.03 review stamp**). Code measured this end-to-end in the pane (burger + cart both ≥ 44×44, no overflow closed/open at 320/390, focus → first link on open, Escape → button, link-tap closes on arrival, active filled `bg-surface` row at 390 + 2px mustard underline at 1280 — both locales) — but the real-device feel + the native-MK read are Lazar's. Owner: **Lazar** (+ **Petar** for the MK label). | 2.14 | **after 2.14 deploys — before the first real drop (real phone, both locales)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
