@@ -6,11 +6,76 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-23** · By: **Claude Code (Phase 2.11 — Home FAQ section)**
+Last updated: **2026-07-24** · By: **Claude Code (Phase 2.12 — Home hero sub-line)**
 
 ---
 
 ## Status
+
+**2.12 COMPLETE — the Home hero sub-line is now a brand line, not a facts line (this update, 2026-07-24).**
+An out-of-band **copy-only** phase (the 2.07/2.08/2.09/2.10/2.11/Y.02 shape) — **no component, no commerce,
+no schema touched**, and **line 1 `NEXT:` is unchanged** (the 2.06 operator rehearsal remains next; this
+phase does not advance the critical path). The paragraph under the Home headline recited logistics (3–5
+pieces, real stock, cash on delivery) — facts now answered eight ways in the FAQ directly below it (2.11).
+What shipped:
+- **`Home.sub` replaced in both catalogs** — MK „Пронајди сродна, во свет продадени души." / EN „Find a
+  kindred soul, in a world full of sold souls." — **shipped byte-exact as the operator supplied them**
+  (`D-2.12-2`). The MK is **deliberately not a word-for-word translation** of the EN and is deliberately
+  shorter; the EN is deliberately a comma splice. Code edited neither language. This is a **two-string
+  change**: `Home.sub` renders at **three sites in `HomeExperience.tsx`** (no-view fallback, `ended`,
+  `countdown`) × two locales = **six rendered surfaces from two edited values**; it is **not** rendered in
+  the `live` branch (that state shows the product grid). `grep -rn "'sub'" src/` returns **only**
+  `HomeExperience.tsx`, three sites — confirmed before and after.
+- **The new line makes no factual claim** — it is brand voice, so **no `facts.md` entry** was added and
+  `facts.md` is **byte-unchanged**. The three VERIFIED facts the old line carried each still render
+  elsewhere in **both** locales (grep-proven, §8 of the report): drops **3–5 pieces / limited** →
+  `Faq.a8` + `About.body3` + `Meta.homeDescription`; **cash on delivery** → `Faq.a2` + `Cart.codNote` +
+  `Checkout.codSummary` + `Common.shippingNotice` + `Meta.*`; **ships North Macedonia only** →
+  `Common.shippingNotice` + `Product.shippingBody` + `About.body3` + `Faq.a4`.
+- **`Meta.homeDescription` (the search snippet) is untouched** (`D-2.12-3`) — it still reads "Oversized
+  unisex t-shirts from Strumica. Drops of 3 to 5 pieces, real limited stock, cash on delivery." The
+  search snippet and the on-page hero now say different things, deliberately; **not** harmonised. (The
+  brief calls this key `Metadata.homeDescription`; the actual namespace in the catalogs is `Meta`.)
+- **Humanizer** run over the two new strings per Task 3 — **nothing acted on** (`D-2.12-2` ships them
+  verbatim). Its pattern list fired **nothing** (no AI vocabulary, no em dash, no rule-of-three, no
+  copula avoidance, no promo-vocab, no curly quotes, no filler/hedging); the only recorded observations
+  are the two *deliberate* operator choices — the EN comma splice and the MK elided noun after „сродна".
+- **Inventory regenerated** `docs/i18n/string-inventory.md` — header still **241 keys**; the `Home.sub`
+  row shows the new MK+EN text and still points at `src/components/home/HomeExperience.tsx`; **one line
+  changed**. **`docs/i18n/mk-review-2.12.md`** written **unsigned** — covers the one MK string, states it
+  is operator-authored/shipped-verbatim, that the reviewer reads the Macedonian **on its own terms**
+  (not against the EN), and asks the one question: **finished Macedonian, or a fragment?**
+
+**Gates:** `npm run build` (exit 0, "✓ Compiled successfully") / `npx tsc --noEmit` / `npm run lint` clean;
+`npm test` **116/116** incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected
+with insufficient_stock, stock 0` (untouched — no commerce code changed) + the i18n catalog-parity test
+(`has identical key sets`, `has no empty value`). **Rendered + verified in-browser** (dev server, **both
+locales** via `/` (MK, `NEXT_LOCALE`) + `/en`, at **1280 + 390**, using `?preview=` to reach each state),
+by the accessibility tree + computed styles, not by eye alone: **countdown** — the new line renders under
+the headline, correct language in each build (MK „Пронајди сродна…", EN „Find a kindred soul…"); **ended**
+— same; **live** — the sub-line is **absent** (product grid), unchanged from today. **Zero English in the
+MK build / zero Macedonian in the EN build** for this string in every state checked. **No horizontal
+overflow at 390** either locale (`scrollWidth == clientWidth == 390`); the paragraph wraps inside
+`max-w-md` (448px) and clears the link below it by **24px** (no collision). **Exactly one `<h1>` per
+state**; heading order unchanged (this phase touches no heading). Paragraph still uses
+`text-muted-foreground` (`rgb(171,167,158)` = `#ABA79E`) on the same ground `#0F1210` — measured contrast
+**7.85:1** (unchanged, ≥ 4.5). **No console errors.** Screenshots captured: **MK countdown 390**, **EN
+countdown 390**, **MK countdown desktop 1280**.
+
+**Frozen (byte-unchanged, `git diff --name-only main`):** `src/components/home/HomeExperience.tsx` /
+`Countdown.tsx` / `DropBanner.tsx` / `HomeFaq.tsx` / `src/app/[locale]/page.tsx` / `src/app/globals.css` /
+`src/lib/orders/` / `create_order` / `expire_reservations` / `supabase/` / cart / checkout / `src/config/` /
+`src/lib/drop/` / `src/lib/site.ts` (`SITE_URL`) / `facts.md` / `brand.md` / `src/lib/seo/*` / `sitemap.ts` /
+`robots.ts` / `manifest.ts` / `llms.txt` / logo+icon assets — and **every other message key in both
+catalogs, including `Meta.homeDescription`**. The diff is only `src/messages/{mk,en}.json` (one value each),
+`docs/i18n/string-inventory.md` (one row), the new `docs/i18n/mk-review-2.12.md`, and the
+state/decision/report/file-map docs. **No new dependency** (`package.json` + lockfile unchanged); **no new
+message key** (still **241**); **no new placeholder**, **no `[PLACEHOLDER: …]` marker**; **no new token**.
+**Owed-verification register +1** (#27 native MK review of the new `Home.sub` string, owner Lazar + Petar).
+**Placeholder register UNCHANGED** — this phase adds none and clears none. Decisions `D-2.12-1/2/3` (all
+three pre-made by the orchestrator in the brief, appended verbatim). Branch `phase-2.12-home-sub-line`;
+**PR open to `main` — left for an operator to merge (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band,
+does not touch the 2.06 → Y.01 critical path.
 
 **2.11 COMPLETE — the Home page now answers the five questions every Instagram buyer asks, under the
 hero (this update, 2026-07-23).** An out-of-band UI phase (the 2.07/2.08/2.09/2.10/Y.02 shape) — **no
@@ -1348,6 +1413,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 24 | **Native MK review of the 22 new FAQ strings (2.11).** The `Faq` namespace (6 labels + 8 questions + 8 answers) post-dates every prior MK review and renders on the front door. Two native speakers (Lazar + Petar) read all 22 in context and sign `docs/i18n/mk-review-2.11.md` — same process as `mk-review-2.03.md`; the two „сè уште не се потврдени/објавени" sentences (`a5`/`a7`) are deliberately unfinished and must not be polished. Code ran the humanizer over the EN and machine-checked parity, but a machine wrote the MK. Owner: **Lazar + Petar**. | 2.11 | **before the first real drop (both sign-off boxes filled)** |
 | 25 | **The FAQ on a real phone, from an Instagram link (2.11).** Open `https://www.trajanovv.com` on a phone (both locales): rows tap open/closed, text readable, animation smooth, and **nothing overlaps or shifts the hero/countdown**. Code verified structure + no-overflow + 56px tap target + the open/close animation at 390px in the pane, but only a human on a real device confirms the feel and that the hero is undisturbed. Owner: **Lazar**. | 2.11 | **after 2.11 deploys — before the first real drop** |
 | 26 | **Sign-off that eight questions is the right amount for the front door (2.11).** Lazar looks at the rendered Home FAQ and either says yes, or names what to add — the five deliberately-omitted answers (returns window, fabric/care, courier name, delivery cost, exact size measurements) do not exist in `facts.md` yet and their additions come from **Y.01** content, not from Code inventing them. Owner: **Lazar → Vladimir (content)**. | 2.11 | **before the first real drop (content sign-off)** |
+| 27 | **Native MK review of the new Home hero sub-line (2.12).** `Home.sub` is now the brand line „Пронајди сродна, во свет продадени души." — **operator-authored and shipped byte-exact** (`D-2.12-2`), so this is its **first** native read. Unlike every other MK string on the site, it is **deliberately not a word-for-word translation** of the English and is deliberately shorter (the noun after „сродна" is elided). Two native speakers (Lazar + Petar) read it **in place on the Home hero** (countdown + ended states, phone + desktop) and answer the one question in `docs/i18n/mk-review-2.12.md`: **does it read as correct, finished Macedonian, or as a fragment?** — then sign or return a correction. Owner: **Lazar + Petar**. | 2.12 | **before the first real drop (both sign-off boxes filled)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
