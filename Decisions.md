@@ -2779,7 +2779,7 @@ start at `D-2.01-6`.*
 - **Links:** `src/components/layout/SiteHeader.tsx` · brief "The target header" / "Mobile (< 640px)"
 
 ### D-2.08-6 · 2026-07-23 · Header is one items-center / justify-between flex row of two groups — fixes the seven-item alignment (supersedes D-2.08-5's layout)
-- **Status:** Accepted
+- **Status:** Superseded by D-2.13-1 (layout only — the one-centreline fix stands)
 - **Decided by:** Claude Code (executor), on Petar's report that the shipped header was misaligned.
 - **Context:** The D-2.08-5 layout (a grid on mobile that flexed to `sm:items-baseline` on desktop, with the
   MK·EN + cart cluster forced back to `sm:self-center`) put the wordmark, the credit and the three nav links
@@ -3094,3 +3094,48 @@ start at `D-2.01-6`.*
 - **Downside accepted:** Snippet and hero diverge — accepted, because the snippet's job is to state
   what is for sale and the hero's job is not. Do not "harmonise" them.
 - **Links:** `src/messages/mk.json` · `src/messages/en.json` (`Meta.homeDescription`)
+
+### D-2.13-1 · 2026-07-24 · Header becomes a three-column grid; the nav sits on the true page centreline
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.13 brief); executed by Claude Code.
+- **Decision:** Header becomes a three-column grid; the nav sits on the true page centreline. Supersedes
+  the layout half of D-2.08-6 (one `justify-between` flex row of two groups). The container becomes a CSS
+  grid whose outer columns are `minmax(0,1fr)` and whose middle column is `auto`, so the nav is centred on
+  the container's centreline regardless of how wide the left and right groups are.
+- **Alternative rejected:** Keep the flex row and simply make the `<nav>` a third `justify-between` child
+  — rejected because the left group (wordmark + a long MK credit) is roughly three times the width of the
+  right group, so `justify-between` would leave the nav visibly right of centre, which is the complaint.
+- **Downside accepted:** The visual gap between the nav and the MK·EN / cart cluster is now large and
+  asymmetric-looking on wide screens — that is inherent to true centring and is not a bug. D-2.08-6's
+  alignment fix (one centreline, no baseline nudges, two gap tokens) is carried forward unchanged.
+- **Links:** `src/components/layout/SiteHeader.tsx` · supersedes the layout half of `D-2.08-6` ·
+  `D-2.08-3` (non-sticky) · `D-2.08-4` (client component)
+
+### D-2.13-2 · 2026-07-24 · Below the switch breakpoint the nav gets its own centred row
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.13 brief); executed by Claude Code.
+- **Decision:** Below the switch breakpoint the nav gets its own centred row. It does not stay in the
+  right-hand cluster.
+- **Alternative rejected:** Keep the nav right-aligned alongside MK·EN + cart on narrow screens — rejected
+  because the request is "centre the nav" and a header that centres it only on desktop reads as a bug on a
+  phone, which is where most traffic lands.
+- **Downside accepted:** On some narrow widths the header is one row taller than it is today.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.13-1`
+
+### D-2.13-3 · 2026-07-24 · The switch breakpoint is lg (1024px), and copy is never sacrificed to make a row fit
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.13 brief); executed by Claude Code.
+- **Decision:** The switch breakpoint is `lg` (1024px), and copy is never sacrificed to make a row fit. At
+  768px the Macedonian header content (the long „Изработено од Vertex Consulting" credit plus the longer MK
+  nav labels) does not comfortably co-fit on one row with the nav centred.
+- **Alternative rejected:** Switch at `md` — rejected as too tight to hold in MK.
+- **Downside accepted:** Tablets 768–1023px get the two-row layout rather than the desktop row. If
+  measurement shows the three-column row still does not fit at 1024px in MK, raise the switch to `xl` (1280)
+  — never shrink a type token, never truncate, hide, or reword the credit or a nav label.
+- **Execution note (Claude Code, 2026-07-24):** Measurement (Task 4) evaluated the `xl` conditional and the
+  switch was **kept at `lg`**. At 1024px the MK three-column row fits with **no horizontal overflow** and the
+  nav centred at **offset 0px**; the left group wraps to a clean two-line wordmark-over-credit block (the
+  overflow-ladder rung 1 that the reference markup's `flex-wrap` already provides). EN fits on one line at
+  1024px. Raising to `xl` would push EN's clean 1024px single-row into the two-row layout to fix a non-broken
+  MK wrap, so `lg` was retained. No type token was shrunk and no label truncated or reworded.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.13-1` · `D-2.13-2`
