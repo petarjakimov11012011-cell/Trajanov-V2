@@ -6,11 +6,78 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-24** · By: **Claude Code (Phase 2.12 — Home hero sub-line)**
+Last updated: **2026-07-24** · By: **Claude Code (Phase 2.13 — Header nav centred)**
 
 ---
 
 ## Status
+
+**2.13 COMPLETE — the header nav (Catalog · About · Contact) is now on the true page centreline (this
+update, 2026-07-24).** An out-of-band **UI-only** phase (the 2.07/2.08/2.09/2.10/2.11/2.12/Y.02 shape) —
+**no commerce, no schema, no message key touched**, and **line 1 `NEXT:` is unchanged** (the 2.06 operator
+rehearsal remains next; this phase does not advance the critical path). The three page links used to sit
+jammed against MK·EN + cart on the far right; they now sit on the header's real centreline (brand left /
+nav centre / controls right). What shipped:
+- **`src/components/layout/SiteHeader.tsx` restructured to a CSS grid** — the one flat `justify-between`
+  flex row of two groups became a three-child grid in reading order: LEFT (wordmark + credit) · `<nav>` ·
+  RIGHT (MK·EN + cart). Container `grid-cols-[minmax(0,1fr)_auto]` below `lg`,
+  `lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]` at `lg`. The two outer columns are `minmax(0,1fr)` and
+  the middle is `auto`, so the nav is centred on the container's centreline regardless of how wide the left
+  and right groups are (`D-2.13-1`). The inner markup of all three groups — links, link classes, the
+  `isActive`/`aria-current` logic, the `t.rich` credit, the cart `h-11 w-11` tap target + count badge — was
+  **moved verbatim**; only container classes + grid placement changed. Achieved with grid placement only
+  (`col-start`/`row-start`/`col-span`), **never `order-*`**, so DOM/reading order stays wordmark → credit →
+  Catalog → About → Contact → MK·EN → cart, cart last.
+- **Below `lg` (1024px) the nav drops to its own centred row** (`col-span-2 row-start-2`), spanning both
+  columns and `justify-center` (`D-2.13-2`); at `lg` it becomes the middle `auto` column of the
+  three-column row (`D-2.13-3`: MK's long „Изработено од Vertex Consulting" credit + longer MK nav labels
+  do not co-fit one row with the nav centred until `lg`). Two gap tokens only: `gap-4` between the nav
+  links, `gap-6` between MK·EN and cart. Non-sticky, solid `bg-ground` (`D-2.08-3` carried forward); still
+  a **client component** with `usePathname()` driving the active-link underline (`D-2.08-4`).
+- **`D-2.13-3` `xl` conditional evaluated and `lg` retained** — at 1024px the MK three-column row fits
+  (no overflow, nav offset 0px) with the left group wrapping to a clean two-line wordmark-over-credit block
+  (the reference markup's `flex-wrap`, overflow-ladder rung 1); EN fits on one line at 1024. Raising to `xl`
+  would degrade EN's clean 1024 single-row to fix a non-broken MK wrap, so `lg` stands. No type token
+  shrunk, no label truncated/hidden/reworded.
+
+**Gates:** `npm run build` (exit 0, full route tree) / `npx tsc --noEmit` (exit 0) / `npm run lint` clean;
+`npm test` **116/116** incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected with
+insufficient_stock, stock 0` (untouched — no commerce code changed) + the i18n catalog-parity test.
+**Rendered + measured in-browser** (dev server, **both locales** via `/` (MK, `NEXT_LOCALE`) + `/en`, at
+**320 / 390 / 768 / 1024 / 1280**), by `getBoundingClientRect()` + computed styles, not by eye:
+- **`scrollWidth == clientWidth` at every width, both locales** (320/390/768/1024/1280 all equal) — **no
+  horizontal overflow anywhere; overflow-ladder rung used = NONE.**
+- **Nav centre X within ±4px of the container content-box centre X at every width, both locales — measured
+  offset was exactly 0px in all ten cases.** At ≥1024 the nav is the middle grid column; below 1024 it is
+  on its own row (`navOwnRow` true at 768/390/320) and still centred (offset 0).
+- **One centreline within each row:** at **1280 both locales + 1024 EN** all seven items share an identical
+  vertical centre (delta **0**, e.g. all at 34.0px @ 1280). Where the left group wraps (1024 MK; 390/320
+  both locales) the wordmark/credit stack by design (rung 1) — but the nav links share one centreline
+  (delta 0) and the main-row controls share one centreline; `grep` proves **no `self-*`/`mt-`/
+  `items-baseline` utility** anywhere, so there is no baseline-nudge regression.
+- **Active link on `/catalog`** shows `aria-current="page"` + a 2px `--color-mustard` (`rgb(226,169,60)`)
+  bottom border, inactive links transparent — verified **both** locales (`/katalog` + `/en/catalog`).
+- **Header console errors: zero.** (The Next dev overlay shows **one pre-existing, out-of-scope** hydration
+  mismatch in `ProductCard.tsx:59` — MK price "1,500 ден" server vs "1.500 ден" client, a `formatMkd`
+  locale-separator divergence in the live-drop grid; it originates entirely in ProductCard/HomeExperience,
+  `ProductCard.tsx` is byte-identical to `main`, so it is unrelated to the header and present on `main`.
+  Flagged for a separate task; hard stop #6 forbids touching ProductCard here.)
+Screenshots captured: **MK 390**, **MK 1280**, **EN 1280** (nav centred in each; MK 390 shows the nav on
+its own centred second row with the credit wrapped under the wordmark).
+
+**Frozen (byte-unchanged, `git diff --name-only main` lists only `SiteHeader.tsx` + the state/decision/report
+docs):** `src/messages/{mk,en}.json` (zero new/changed strings — still **241** keys) / `brand.md` /
+`src/app/globals.css` (zero new/changed tokens, no new CSS block) / `facts.md` / `SiteFooter.tsx` /
+`LanguageSwitch.tsx` / `src/app/[locale]/layout.tsx` / `src/lib/orders/` / `create_order` /
+`expire_reservations` / `supabase/` / cart / checkout / `Turnstile.tsx` / `src/config/` / `src/lib/drop/` /
+`src/lib/site.ts` (`SITE_URL`) / `src/lib/seo/*` / `sitemap.ts` / `robots.ts` / `manifest.ts` / `llms.txt` /
+logo+icon assets / `package.json` + lockfile (**no new dependency**). **No new placeholder**, **no
+`[PLACEHOLDER: …]` marker**. **Owed-verification register +1** (#28 — Lazar header-layout sign-off on the
+live deploy, desktop + phone, both locales). **Placeholder register UNCHANGED.** Decisions `D-2.13-1/2/3`
+(all three orchestrator-made, appended verbatim; `D-2.08-6` marked `Superseded by D-2.13-1 (layout only —
+the one-centreline fix stands)`). Branch `phase-2.13-header-nav-centre`; **PR open to `main`, left for an
+operator to merge (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01
+critical path.
 
 **2.12 COMPLETE — the Home hero sub-line is now a brand line, not a facts line (this update, 2026-07-24).**
 An out-of-band **copy-only** phase (the 2.07/2.08/2.09/2.10/2.11/Y.02 shape) — **no component, no commerce,
@@ -1422,6 +1489,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 25 | **The FAQ on a real phone, from an Instagram link (2.11).** Open `https://www.trajanovv.com` on a phone (both locales): rows tap open/closed, text readable, animation smooth, and **nothing overlaps or shifts the hero/countdown**. Code verified structure + no-overflow + 56px tap target + the open/close animation at 390px in the pane, but only a human on a real device confirms the feel and that the hero is undisturbed. Owner: **Lazar**. | 2.11 | **after 2.11 deploys — before the first real drop** |
 | 26 | **Sign-off that eight questions is the right amount for the front door (2.11).** Lazar looks at the rendered Home FAQ and either says yes, or names what to add — the five deliberately-omitted answers (returns window, fabric/care, courier name, delivery cost, exact size measurements) do not exist in `facts.md` yet and their additions come from **Y.01** content, not from Code inventing them. Owner: **Lazar → Vladimir (content)**. | 2.11 | **before the first real drop (content sign-off)** |
 | 27 | **Native MK review of the new Home hero sub-line (2.12).** `Home.sub` is now the brand line „Пронајди сродна, во свет продадени души." — **operator-authored and shipped byte-exact** (`D-2.12-2`), so this is its **first** native read. Unlike every other MK string on the site, it is **deliberately not a word-for-word translation** of the English and is deliberately shorter (the noun after „сродна" is elided). Two native speakers (Lazar + Petar) read it **in place on the Home hero** (countdown + ended states, phone + desktop) and answer the one question in `docs/i18n/mk-review-2.12.md`: **does it read as correct, finished Macedonian, or as a fragment?** — then sign or return a correction. Owner: **Lazar + Petar**. | 2.12 | **before the first real drop (both sign-off boxes filled)** |
+| 28 | **Header layout sign-off (2.13).** The header nav was moved onto the true page centreline via a three-column grid, **outside a Design phase**. Code measured it end-to-end (no horizontal overflow at 320/390/768/1024/1280, both locales; nav centre at offset 0px everywhere; active-link underline + `aria-current` intact both locales) but the **visual-brand call** — does the centred nav read right, and is the large intentional gap between the nav and the MK·EN/cart cluster on wide screens (inherent to true centring, `D-2.13-1`) acceptable — is Lazar's. View `https://www.trajanovv.com/` **and** `/en` on a **desktop browser and a phone** after the merge deploys and confirm the nav position reads right. Note the deliberate MK-at-1024 behaviour: the credit wraps under the wordmark while the nav stays centred (`D-2.13-3`, `lg` kept not raised to `xl`) — if the two-line MK block at 1024–~1150 is unwanted, raising the switch to `xl` is a one-line change. Owner: **Lazar**. | 2.13 | **after 2.13 deploys — before the first real drop (desktop + phone, both locales)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
