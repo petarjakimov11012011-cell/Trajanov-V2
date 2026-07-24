@@ -6,11 +6,101 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-24** · By: **Claude Code (Phase 2.14 — Mobile nav menu (burger))**
+Last updated: **2026-07-25** · By: **Claude Code (Phase 2.15 — Full-screen mobile menu (overlay drawer))**
 
 ---
 
 ## Status
+
+**2.15 COMPLETE — the phone menu is now a full-screen opaque overlay drawer, not the 2.14 in-flow expand
+(this update, 2026-07-25).** An out-of-band **UI-only** phase (the 2.07–2.14 shape) — **no commerce, no
+schema touched**, exactly **one** new message key per catalog, and **line 1 `NEXT:` is unchanged** (the 2.06
+operator rehearsal remains next; this phase does not advance the critical path). Below `lg` (1024px), tapping
+the burger used to expand the three links in-flow and push the page down; it now opens a full-screen
+`position: fixed inset-0`, opaque `bg-ground`, `role="dialog" aria-modal` panel that takes over the screen —
+everything tucked inside except the TRAJANOV wordmark, matching the owner-approved reference. What shipped:
+- **`src/components/layout/SiteHeader.tsx` — split into a desktop bar + a mobile bar + the overlay.** The one
+  component now carries **two layouts** (`D-2.15-6`): at ≥ `lg` the finished **2.13 grid** (wordmark + credit ·
+  centred Catalog·About·Contact nav · MK·EN + cart) renders **byte-identically** — the non-wordmark pieces are
+  simply gated `hidden lg:*` (credit `hidden lg:block`; the centre `<nav>` `hidden lg:flex` keeping its 2.13
+  grid placement + 2px `border-mustard` **bottom**-border active indicator; a `hidden lg:flex` cluster holds
+  MK·EN + cart with `gap-6`). Below `lg` the header row is **wordmark (left) + burger (right)** only.
+- **The burger** (`lg:hidden`, `h-11 w-11` = 44px, lucide `Menu`, `aria-label={t('menu')}` · `aria-expanded` ·
+  `aria-controls="mobile-menu"`) **opens only** (`setOpen(true)`); the **X inside the overlay closes**
+  (`D-2.15-1`, supersedes `D-2.14-2/6`).
+- **The overlay** (`fixed inset-0 z-40 bg-ground overflow-y-auto lg:hidden`, mounted when open) renders its
+  own top bar — wordmark home-link (left) + **X** close (right, `aria-label={t('close')}`) — then the stacked
+  **large left-aligned** rows **Catalog · About · Contact · Cart** (`text-h2`, `min-h-11`, `border-l-2 pl-4`;
+  active → **left** 2px `border-mustard` + `text-foreground`, `D-2.15-4` supersedes `D-2.14-7`; Cart carries the
+  `ShoppingBag` icon + the verbatim count badge), a `border-t border-border` divider, the **centred** MK·EN, and
+  the **centred** "Built by Vertex Consulting" credit (only the company name linked, `target="_blank"`). MK·EN,
+  the cart, and the credit all moved **inside** — the closed bar is wordmark + burger only (`D-2.15-2`,
+  supersedes `D-2.14-5`). The overlay is self-contained and simply covers the header bar behind it (`D-2.15-3`).
+- **Modal contract** (`D-2.15-1`): `useState(false)`; open on the burger; **close** on the X, on **Escape**, on
+  any link/cart/wordmark tap, and on route change (the **render-time reset** pattern from 2.14 kept — `D-2.14-9`;
+  no pathname `useEffect`). On open, focus moves to the **X**; on close by Escape **or the X**, focus returns to
+  the **burger**. **Focus trap** (Tab/Shift+Tab cycle only within the 9 overlay focusables, wrapping at the
+  edges). **Scroll lock** (`document.body.style.overflow='hidden'`, restored on close/unmount). **Resize safety**
+  — a `matchMedia('(min-width:1024px)')` `change` listener **plus** a plain `resize` re-check of the same query
+  (`D-2.15-7`, belt-and-suspenders so a resize-to-desktop-while-open always closes it and releases the lock).
+  **No animation** (`D-2.14-8` in force).
+- **Strings:** exactly one key added per catalog — `Nav.close` (МК „Затвори" / EN "Close"), after `menu` in the
+  `Nav` namespace (`D-2.15-5`). Catalogs **242 → 243**; `docs/i18n/string-inventory.md` regenerated (header reads
+  **243**, only added row is `Nav.close`). **No `@base-ui/react` import, no shadcn primitive, no new dependency**
+  (`package.json` + lockfile byte-unchanged); `src/components/ui/` still holds only `.gitkeep`.
+
+**Gates:** `npm run build` (exit 0, "✓ Compiled successfully", full route tree) / `npx tsc --noEmit` (exit 0) /
+`npm run lint` (clean, exit 0) all pass; `npm test` **116/116** (unchanged count — the header carries no tests)
+incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected with insufficient_stock, stock
+0` (untouched — no commerce code changed) + the i18n catalog-parity suite, now covering **243** keys.
+**Rendered + measured in-browser** (dev server, **both locales** via `/` (MK, `NEXT_LOCALE`) + `/en`, at **320 /
+390 / 768 / 1024 / 1280**), by `getBoundingClientRect()` + computed styles, not by eye:
+- **320 & 390, both locales, closed:** the header is **one row — only the wordmark + burger** (credit, nav, and
+  the MK·EN/cart cluster all compute `display:none`); burger **44×44**; `scrollWidth == clientWidth`
+  (320==320, 390==390).
+- **320 & 390, both locales, open:** the overlay computes `position: fixed`, covers the viewport (390×844),
+  opaque `bg-ground` (`rgb(15,18,16)` = `#0F1210`), `z-40`; order is **top bar → Catalog·About·Contact·Cart →
+  divider → centred MK·EN → centred credit**; rows are `text-h2` (**24px** at ≤390) and **none wrap**;
+  `scrollWidth == clientWidth`.
+- **768, both locales, closed:** below `lg` → burger visible, nav + cluster `display:none`, no overflow.
+- **1024 & 1280, both locales:** burger + overlay compute **`display:none`**; credit + centred nav + MK·EN +
+  cart all render; nav centre X at **offset 0px** (≤ ±4px) from the container content-box centre; **at 1280 all
+  8 header items share one centreline (cy 34, delta 0)** — the 2.13 desktop result is untouched;
+  `scrollWidth == clientWidth`.
+- **Interaction (MK/EN 390):** the burger sets `aria-expanded="true"`, mounts the dialog, moves focus to the
+  **X** („Затвори"/"Close"), and locks body scroll. **Escape** closes it, sets `aria-expanded="false"`, restores
+  body scroll, and returns focus to the **burger**; the **X** does the same (focus → burger). **Focus trap:**
+  9 focusables, Tab at the last wraps to the first and Shift+Tab at the first wraps to the last. **Navigate:**
+  tapping **Catalog** loads `/katalog` (`/en/catalog`) with the overlay **closed on arrival** and body scroll
+  restored; tapping **Cart** loads `/kosnicka` (`/en/cart`) closed. **Active state:** on `/katalog` +
+  `/en/catalog` the open-overlay Catalog row carries `aria-current="page"` + a **left** 2px `rgb(226,169,60)`
+  accent; at 1280 the desktop Catalog link still shows the **bottom** 2px mustard border. **Resize safety:**
+  opening at 390 then a viewport ≥ 1024 closes the overlay and restores body scroll (no stranded lock).
+- **Header console errors: zero new.** The Next dev overlay still shows the **pre-existing, out-of-scope**
+  `ProductCard.tsx:59` MK price hydration mismatch ("1,500 ден" server vs "1.500 ден" client) on the Home
+  live-drop grid — confirmed via the dev-server log (stack roots in `HomePage → HomeExperience → ProductCard →
+  SpotlightCard`, **zero header involvement**); `ProductCard.tsx` is **byte-unchanged** vs `main`, so it is
+  inherited, not introduced. Hard stop #5 forbids touching it; still open, flagged for a separate task.
+Screenshots captured: **MK 390 closed**, **MK 390 open**, **EN 390 open**, **MK 1280**, **EN 1280**.
+
+**Frozen (byte-unchanged, `git diff --name-only main` lists only `SiteHeader.tsx`, `mk.json`, `en.json`,
+`string-inventory.md` + the state/decision/report docs):** `ProductCard.tsx` / `HomeExperience.tsx` /
+`SiteFooter.tsx` / `LanguageSwitch.tsx` (internals — reused only, passed no prop) / `src/app/[locale]/layout.tsx`
+/ `src/app/globals.css` / `brand.md` / `facts.md` / `src/lib/orders/` / `create_order` / `expire_reservations` /
+`supabase/` / cart / checkout / `Turnstile.tsx` / `src/config/` / `src/lib/drop/` / `src/lib/site.ts` /
+`src/lib/seo/*` / `sitemap.ts` / `robots.ts` / `manifest.ts` / `llms.txt` / logo+icon assets / `package.json` +
+lockfile (**no new dependency**). **No new token, no new CSS block in `globals.css`, no hex literal, no raw px
+literal** in the diff (grep-proven; the precise `\border-(first|last|none|[0-9]+)` order-utility grep is empty).
+**No new placeholder**, **no `[PLACEHOLDER: …]` marker**; **placeholder register UNCHANGED**; **no new fact** (a
+menu label is not a factual claim; the credit still renders on every page, now inside the menu below `lg`).
+**Owed-verification register +1** (#30 — full-screen menu sign-off on the live deploy, on a real phone, both
+locales; the MK „Затвори" label is a new MK string not covered by the 2.03 review stamp). Decisions `D-2.15-1…6`
+(all six orchestrator-made, appended verbatim) + `D-2.15-7` (Claude Code — the resize belt-and-suspenders);
+`D-2.14-2/5/6/7` marked `Superseded by D-2.15-1/2/1/4` (bodies intact). **`file-map.md` needs no tree change**
+(no file added, moved, or deleted). Branch `phase-2.15-mobile-overlay-menu`; **PR
+[#27](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/27) opened to `main`, NOT merged
+(an operator merges, `D-0-3`).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01
+critical path.
 
 **2.14 COMPLETE — the phone header is now one clean line with the three page links behind a burger menu
 (this update, 2026-07-24).** An out-of-band **UI-only** phase (the 2.07/2.08/2.09/2.10/2.11/2.12/2.13/Y.02
@@ -1599,6 +1689,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 27 | **Native MK review of the new Home hero sub-line (2.12).** `Home.sub` is now the brand line „Пронајди сродна, во свет продадени души." — **operator-authored and shipped byte-exact** (`D-2.12-2`), so this is its **first** native read. Unlike every other MK string on the site, it is **deliberately not a word-for-word translation** of the English and is deliberately shorter (the noun after „сродна" is elided). Two native speakers (Lazar + Petar) read it **in place on the Home hero** (countdown + ended states, phone + desktop) and answer the one question in `docs/i18n/mk-review-2.12.md`: **does it read as correct, finished Macedonian, or as a fragment?** — then sign or return a correction. Owner: **Lazar + Petar**. | 2.12 | **before the first real drop (both sign-off boxes filled)** |
 | 28 | **Header layout sign-off (2.13).** The header nav was moved onto the true page centreline via a three-column grid, **outside a Design phase**. Code measured it end-to-end (no horizontal overflow at 320/390/768/1024/1280, both locales; nav centre at offset 0px everywhere; active-link underline + `aria-current` intact both locales) but the **visual-brand call** — does the centred nav read right, and is the large intentional gap between the nav and the MK·EN/cart cluster on wide screens (inherent to true centring, `D-2.13-1`) acceptable — is Lazar's. View `https://www.trajanovv.com/` **and** `/en` on a **desktop browser and a phone** after the merge deploys and confirm the nav position reads right. Note the deliberate MK-at-1024 behaviour: the credit wraps under the wordmark while the nav stays centred (`D-2.13-3`, `lg` kept not raised to `xl`) — if the two-line MK block at 1024–~1150 is unwanted, raising the switch to `xl` is a one-line change. Owner: **Lazar**. | 2.13 | **after 2.13 deploys — before the first real drop (desktop + phone, both locales)** |
 | 29 | **Burger menu sign-off on the live deploy, on a real phone, both locales (2.14).** Open `https://www.trajanovv.com` on a phone. Tap the burger; tap each of the three links; use the back button; switch to EN and repeat. Pass = the header is one line with the menu closed; the menu opens and closes cleanly; every link goes to the right page and the menu is **closed on arrival**; nothing overflows sideways; and the MK label **„Мени"** reads correctly to a native speaker (it is a **new MK string, not covered by the 2.03 review stamp**). Code measured this end-to-end in the pane (burger + cart both ≥ 44×44, no overflow closed/open at 320/390, focus → first link on open, Escape → button, link-tap closes on arrival, active filled `bg-surface` row at 390 + 2px mustard underline at 1280 — both locales) — but the real-device feel + the native-MK read are Lazar's. Owner: **Lazar** (+ **Petar** for the MK label). | 2.14 | **after 2.14 deploys — before the first real drop (real phone, both locales)** |
+| 30 | **Full-screen menu sign-off on the live deploy, on a real phone, both locales (2.15).** Open `https://www.trajanovv.com` on a phone. Tap the burger; confirm the menu takes the **whole screen**; tap each row (Catalog, About, Contact, Cart); use the **X** and the **back button**; switch to EN and repeat. Pass = the closed header is **wordmark + burger only**; the menu is a full-screen **opaque** panel matching the reference (wordmark + X top bar, left-aligned links with a **left** accent on the active one, divider, centred MK·EN, centred credit); every row navigates correctly and closes the menu; nothing overflows sideways; and the MK **„Затвори"** label reads correctly to a native speaker (a **new MK string, not covered by the 2.03 review stamp**). Code measured this end-to-end in the pane (both locales, 320/390/768/1024/1280): closed = wordmark + burger only, no overflow; open = fixed opaque `bg-ground` dialog covering the viewport, correct order, `text-h2` rows with no wrap/overflow; focus → X on open, Escape/X → burger, focus trap wraps, link/cart taps navigate + close on arrival, active left 2px mustard accent; desktop unchanged (burger `display:none`, nav offset 0px, one centreline); resize-to-desktop closes + releases the scroll lock — but the real-device feel + the native-MK read are Lazar's/Petar's. Owner: **Lazar** (+ **Petar** for the MK label). | 2.15 | **after 2.15 deploys — before the first real drop (real phone, both locales)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

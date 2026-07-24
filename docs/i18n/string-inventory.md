@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 242 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 243 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -150,6 +150,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Nav.brand` | TRAJANOV | TRAJANOV | `src/components/layout/SiteHeader.tsx` |
 | `Nav.cart` | Кошничка | Cart | `src/components/layout/SiteHeader.tsx` |
 | `Nav.catalog` | Каталог | Catalog | `src/components/layout/SiteHeader.tsx` |
+| `Nav.close` | Затвори | Close | `src/components/layout/SiteHeader.tsx` |
 | `Nav.contact` | Контакт | Contact | `src/components/layout/SiteFooter.tsx`<br>`src/components/layout/SiteHeader.tsx` |
 | `Nav.home` | Почетна | Home | _(not found in source)_ |
 | `Nav.location` | Струмица, Северна Македонија | Strumica, North Macedonia | _(not found in source)_ |

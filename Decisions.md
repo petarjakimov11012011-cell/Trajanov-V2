@@ -3152,7 +3152,7 @@ start at `D-2.01-6`.*
 - **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.13-2` · `D-2.13-3`
 
 ### D-2.14-2 · 2026-07-24 · An in-flow disclosure panel, not a modal drawer or overlay
-- **Status:** Accepted
+- **Status:** Superseded by D-2.15-1
 - **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
 - **Decision:** The panel expands inside the header block and pushes the page down; it does not slide over
   the page, does not portal, does not lock scroll, does not dim the background.
@@ -3186,7 +3186,7 @@ start at `D-2.01-6`.*
 - **Links:** `src/messages/mk.json` · `src/messages/en.json` (`Nav.menu`)
 
 ### D-2.14-5 · 2026-07-24 · MK·EN and the cart stay outside the menu, always visible
-- **Status:** Accepted
+- **Status:** Superseded by D-2.15-2
 - **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
 - **Decision:** Only the three page links go behind the burger. MK·EN and the cart stay outside the menu,
   always visible.
@@ -3198,7 +3198,7 @@ start at `D-2.01-6`.*
 - **Links:** `src/components/layout/SiteHeader.tsx`
 
 ### D-2.14-6 · 2026-07-24 · The existing `<nav>` element *is* the panel; DOM order is unchanged from 2.13
-- **Status:** Accepted
+- **Status:** Superseded by D-2.15-1
 - **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
 - **Decision:** No element is reordered, no `order-*` utility is used, nothing moves in the markup: the
   same `<nav>` is hidden below `lg` until opened, and is unchanged at `lg`. Because the panel therefore
@@ -3212,7 +3212,7 @@ start at `D-2.01-6`.*
 - **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.13-1`
 
 ### D-2.14-7 · 2026-07-24 · In the open panel the active page is a filled row, not the underline
-- **Status:** Accepted
+- **Status:** Superseded by D-2.15-4
 - **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.14 brief); executed by Claude Code.
 - **Decision:** Below `lg` the active link gets `bg-surface` + `text-foreground` and no visible bottom
   border; at `lg` and above the 2px `--color-mustard` underline is unchanged.
@@ -3257,3 +3257,99 @@ start at `D-2.01-6`.*
 - **Downside accepted:** Deviates from the brief's literal "useEffect" wording and adds one state variable
   (`lastPathname`); a reader expecting an effect must read the comment to see why there isn't one.
 - **Links:** `src/components/layout/SiteHeader.tsx` · Brief Task 5 · Brief Task 7 (lint gate) · `D-2.14-3`
+
+### D-2.15-1 · 2026-07-25 · A full-screen modal overlay, not the 2.14 in-flow expand
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.15 brief); executed by Claude Code.
+- **Supersedes:** `D-2.14-2` and `D-2.14-6`.
+- **Decision:** Below `lg`, tapping the burger opens a `position: fixed inset-0`, opaque `bg-ground` panel
+  that covers the viewport, with `role="dialog"` + `aria-modal="true"`. It is **hand-rolled** (no new
+  primitive, no `@base-ui`, no portal library).
+- **Alternative rejected:** Keep the in-flow disclosure, or build it on `@base-ui`/a generated shadcn Dialog.
+- **Downside accepted:** A modal needs a focus trap and a scroll lock (more code than an expand), and with
+  JavaScript disabled the menu will not open — a real cost, mitigated honestly by the fact that
+  About/Contact/Terms/Privacy/Shipping are in the footer on every page and `/catalog` is linked from
+  Home/About/Cart/Checkout/Product, so no route becomes unreachable.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.11-3` · supersedes `D-2.14-2`/`D-2.14-6`
+
+### D-2.15-2 · 2026-07-25 · Below lg, everything except the wordmark moves inside the overlay
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.15 brief); executed by Claude Code.
+- **Supersedes:** `D-2.14-5`.
+- **Decision:** Below `lg`, the page links, MK·EN, the cart, and the build credit all move inside the
+  overlay. The closed mobile header is wordmark + burger only.
+- **Alternative rejected:** Keep MK·EN and the cart in the header bar.
+- **Downside accepted:** On a phone, on drop day, the cart (the buy path) sits behind one tap rather than
+  being always visible, and the build credit is no longer always visible (it is not in the footer either).
+  Both are the owner's explicit instruction ("everything inside except the wordmark") and match the
+  reference; both are one line to reverse if the owner changes his mind.
+- **Links:** `src/components/layout/SiteHeader.tsx` · supersedes `D-2.14-5`
+
+### D-2.15-3 · 2026-07-25 · The overlay is self-contained and renders its own top bar
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.15 brief); executed by Claude Code.
+- **Decision:** The overlay renders its own top bar (wordmark home-link on the left, X close on the right)
+  and simply covers the header bar behind it.
+- **Alternative rejected:** Keep a single header above the overlay via z-index and pad the overlay down by
+  the header's height.
+- **Downside accepted:** The wordmark `<Link href="/">` markup appears twice (once in the header, once in
+  the overlay). Reason: it avoids a brittle magic-number header-height offset and reproduces the reference
+  exactly (wordmark + X as the panel's own top row).
+- **Links:** `src/components/layout/SiteHeader.tsx`
+
+### D-2.15-4 · 2026-07-25 · The active link in the overlay is a left vertical accent bar
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.15 brief); executed by Claude Code.
+- **Supersedes:** `D-2.14-7`.
+- **Decision:** Active → `border-l-2 border-mustard` + `text-foreground`; inactive → `border-l-2
+  border-transparent` + `text-muted-foreground`. Rows are left-aligned.
+- **Alternative rejected:** Keep the 2.14 filled `bg-surface` centred row.
+- **Downside accepted:** None material — this is the reference's own treatment.
+- **Links:** `src/components/layout/SiteHeader.tsx` · supersedes `D-2.14-7`
+
+### D-2.15-5 · 2026-07-25 · One new string, Nav.close
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.15 brief); executed by Claude Code.
+- **Decision:** One new string, `Nav.close` (МК „Затвори" / EN "Close"), for the X button's `aria-label`;
+  `Nav.menu` stays for the burger. 242 → **243** keys.
+- **Alternative rejected:** Reuse `Nav.menu` for the X and rely on `aria-expanded`.
+- **Downside accepted:** None — a modal's close control should carry its own accessible name.
+- **Links:** `src/messages/mk.json` · `src/messages/en.json` (`Nav.close`)
+
+### D-2.15-6 · 2026-07-25 · Desktop (≥ lg) is unchanged; the burger and overlay are lg:hidden
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.15 brief); executed by Claude Code.
+- **Decision:** Desktop (≥ `lg`) is unchanged; the burger and overlay are `lg:hidden` and the 2.13 grid
+  header is preserved. This keeps `D-2.14-1` (the `lg` breakpoint) and `D-2.14-8` (no open/close animation)
+  in force. Not a reversal — stated so the boundary is explicit.
+- **Alternative rejected:** Restyling the desktop nav too.
+- **Downside accepted:** One component now carries two distinct layouts (a desktop bar and a mobile bar +
+  overlay), which is more markup. Reason: the owner's change is a phone-only change; the finished desktop
+  layout must not regress.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `D-2.14-1` · `D-2.14-8`
+
+### D-2.15-7 · 2026-07-25 · Also re-check the media query on a plain `resize`, alongside the matchMedia listener
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly during execution, forced by verification).
+- **Context:** Task 6 specifies a `matchMedia('(min-width: 1024px)')` `change` listener that calls
+  `setOpen(false)` when the viewport crosses to desktop, so a resize-while-open cannot strand a locked
+  body. That listener is present and is correct for real browsers (Chrome/Safari/Firefox all fire the
+  matchMedia `change` event on a viewport crossing 1024px). But the browser-pane's `resize_window`
+  (a CDP device-metrics override) updates `matchMedia(...).matches` **without dispatching** the `change`
+  event — so the brief's DoD item ("opening at 390 then widening to ≥ 1024 closes it and restores body
+  scroll") could not be driven, and, more importantly, the scroll-lock release could silently fail in any
+  environment where the matchMedia change event is unreliable.
+- **Decision:** Keep the brief's matchMedia `change` listener **and** attach the same guard
+  (`if (mql.matches) setOpen(false)`) to a plain `window` `resize` listener. Belt-and-suspenders: the
+  matchMedia change handles real browsers precisely; the resize re-check guarantees the lock always
+  releases and makes the behaviour verifiable in-pane (a dispatched `resize` at 1024 closed the overlay
+  and restored `document.body.style.overflow`). Both `setOpen` calls are inside event *callbacks*, so the
+  `react-hooks/set-state-in-effect` gate stays green.
+- **Alternative rejected:** Ship the matchMedia-only listener as literally specified and mark the
+  resize-safety DoD item "unverifiable in the harness". Rejected: the resize re-check is strictly more
+  robust against the exact failure (a stranded scroll lock on desktop) the brief is trying to prevent,
+  and it costs three lines.
+- **Downside accepted:** A `resize` listener fires on every viewport resize (cheap: one `matches` read,
+  and `setOpen(false)` is a no-op when already closed / below `lg`); the implementation is a superset of
+  the brief's literal wording, so a reader must read the comment to see why both listeners exist.
+- **Links:** `src/components/layout/SiteHeader.tsx` · Brief Task 6 (resize safety) · `D-2.15-1`
