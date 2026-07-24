@@ -10,7 +10,8 @@
     "shipping": "Испорака и враќање",
     "location": "Струмица, Северна Македонија",
     "brand": "TRAJANOV",
-    "menu": "Мени"
+    "menu": "Мени",
+    "close": "Затвори"
   },
   "Footer": {
     "contact": "КОНТАКТ",
