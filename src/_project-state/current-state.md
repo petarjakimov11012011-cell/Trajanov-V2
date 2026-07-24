@@ -97,8 +97,18 @@ register +1** (#29 — burger menu sign-off on the live deploy, on a real phone,
 orchestrator-made, appended verbatim) + `D-2.14-9` (Claude Code, the render-time-reset lint resolution).
 **`file-map.md` needs no tree change** (no file added, moved, or deleted). Branch
 `phase-2.14-mobile-nav-menu`; **PR [#26](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/26)
-opened to `main`, left UNMERGED — an operator merges (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band,
-does not touch the 2.06 → Y.01 critical path.
+MERGED to `main` (merge `554ec04`, 2026-07-24) on Petar's explicit instruction (`D-0-3`: operator-authorised,
+not Code); branch deleted** (clean fast-forward — the stale-head OID issue that hit 2.07/2.08 did not recur;
+PR #26 shows the "Merged" badge). **Production deploy VERIFIED** — on the live `https://www.trajanovv.com`
+the deployed HTML carries the burger button (`aria-controls="site-nav"`, lucide `Menu` icon, `lg:hidden`),
+the panel (`id="site-nav"`), and the both-locale `aria-label` (MK **„Мени"** at `/`, EN **"Menu"** at
+`/en`); and the live **desktop** render (browser pane, effective 1280px) shows the burger computing
+**`display: none`**, the nav **Catalog · About · Contact** centred at **offset 0px**, all header items on one
+centreline (delta 0), and no horizontal overflow — the 2.13 desktop result is untouched. The external-site
+pane could **not** be shrunk below 1024px CSS width (its `innerWidth` stays 1280 regardless of the frame), so
+the **mobile stacked-panel** render was not re-driven on production — but it is present in the deployed HTML
+and was fully measured on localhost against byte-identical built code; the real-phone mobile confirmation
+stays **owed #29**. `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.13 COMPLETE — the header nav (Catalog · About · Contact) is now on the true page centreline (this
 update, 2026-07-24).** An out-of-band **UI-only** phase (the 2.07/2.08/2.09/2.10/2.11/2.12/Y.02 shape) —

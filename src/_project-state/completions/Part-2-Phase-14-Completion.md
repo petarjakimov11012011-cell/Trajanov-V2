@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-24 |
 | **Branch** | `phase-2.14-mobile-nav-menu` |
-| **PR** | [#26](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/26) → `main`, **left unmerged** (an operator merges, `D-0-3`) |
+| **PR** | [#26](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/26) → `main` — **MERGED** (merge `554ec04`, 2026-07-24, on Petar's explicit instruction, `D-0-3`); branch deleted; production deploy verified |
 | **Brief** | Part 2 · Phase 14 · Code — Mobile menu (burger) in the site header |
 
 ---
