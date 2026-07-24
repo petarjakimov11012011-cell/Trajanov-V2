@@ -74,9 +74,16 @@ message key** (still **241**); **no new placeholder**, **no `[PLACEHOLDER: …]`
 **Owed-verification register +1** (#27 native MK review of the new `Home.sub` string, owner Lazar + Petar).
 **Placeholder register UNCHANGED** — this phase adds none and clears none. Decisions `D-2.12-1/2/3` (all
 three pre-made by the orchestrator in the brief, appended verbatim). Branch `phase-2.12-home-sub-line`;
-**PR [#24](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/24) open to `main` — left for an
-operator to merge (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01
-critical path.
+**PR [#24](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/24) MERGED to `main` (merge
+`b92de08`, 2026-07-24) on Petar's explicit instruction (`D-0-3`: operator-authorised, not Code); branch
+deleted.** (Clean GitHub PR merge — the stale-head OID issue that hit 2.07/2.08 did not recur; PR #24 shows
+the "Merged" badge.) **Production deploy VERIFIED** — on the live `https://www.trajanovv.com/` the Home
+hero renders the new brand line (MK „Пронајди сродна, во свет продадени души." at `/`, EN „Find a kindred
+soul, in a world full of sold souls." at `/en`; the committed drop is ENDED so the hero shows the sub-line),
+the **old facts line is gone** (no „3 до 5 парчиња. Вистински…" in the hero), and **`Meta.homeDescription`
+is untouched** — the `<meta name="description">` still reads „…Спуштања од 3 до 5 парчиња, вистински
+ограничени залихи, готовина при преземање." (hero and snippet diverge by design, `D-2.12-3`). `NEXT:` line
+**unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.11 COMPLETE — the Home page now answers the five questions every Instagram buyer asks, under the
 hero (this update, 2026-07-23).** An out-of-band UI phase (the 2.07/2.08/2.09/2.10/Y.02 shape) — **no
