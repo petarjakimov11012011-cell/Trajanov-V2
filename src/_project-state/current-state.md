@@ -75,9 +75,19 @@ logo+icon assets / `package.json` + lockfile (**no new dependency**). **No new p
 `[PLACEHOLDER: …]` marker**. **Owed-verification register +1** (#28 — Lazar header-layout sign-off on the
 live deploy, desktop + phone, both locales). **Placeholder register UNCHANGED.** Decisions `D-2.13-1/2/3`
 (all three orchestrator-made, appended verbatim; `D-2.08-6` marked `Superseded by D-2.13-1 (layout only —
-the one-centreline fix stands)`). Branch `phase-2.13-header-nav-centre`; **PR open to `main`, left for an
-operator to merge (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01
-critical path.
+the one-centreline fix stands)`). Branch `phase-2.13-header-nav-centre`; **PR
+[#25](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/25) MERGED to `main` (merge `aa18746`,
+2026-07-24) on Petar's explicit instruction (`D-0-3`: operator-authorised, not Code); branch deleted.**
+(Clean GitHub PR merge — the stale-head OID issue that hit 2.07/2.08 did not recur; PR #25 shows the
+"Merged" badge.) **Production deploy VERIFIED** — on the live `https://www.trajanovv.com` the header is now
+a **three-column CSS grid** (`display: grid`, `grid-template-columns: 425.77px 204.47px 425.77px` — equal
+outer `minmax(0,1fr)` columns + an `auto` middle), the nav is **Catalog · About · Contact** centred at
+**offset 0px** from the container content-box centre, all header items report **one centreline (delta 0)**,
+and there is **no horizontal overflow** — the old `justify-between` flex row is gone. (Production served the
+**EN** render — its middleware honours the browser Accept-Language over the `NEXT_LOCALE` cookie; the header
+is a single locale-shared component, so MK ships the same grid, and the **MK visual on a real device is
+Lazar's owed #28 sign-off**, which covers both locales.) `NEXT:` line **unchanged** — out-of-band, does not
+touch the 2.06 → Y.01 critical path.
 
 **2.12 COMPLETE — the Home hero sub-line is now a brand line, not a facts line (this update, 2026-07-24).**
 An out-of-band **copy-only** phase (the 2.07/2.08/2.09/2.10/2.11/Y.02 shape) — **no component, no commerce,
