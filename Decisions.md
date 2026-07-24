@@ -3053,3 +3053,44 @@ start at `D-2.01-6`.*
 - **Downside accepted:** A reader looking only at `page.tsx` does not see the JSON-LD emission; it lives
   one level down in `HomeFaq`. Noted in the completion report.
 - **Links:** `src/components/home/HomeFaq.tsx` · `src/lib/seo/faq-jsonld.ts`
+
+### D-2.12-1 · 2026-07-24 · The Home hero sub-line becomes a brand line, not a facts line
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the brief); executed by Claude Code.
+- **Context:** The paragraph under the Home headline (`Home.sub`) recited three `facts.md` VERIFIED
+  claims — drops of 3–5 pieces, real limited stock, cash on delivery. Since Phase 2.11 those facts
+  are answered eight ways in the FAQ directly below the hero.
+- **Decision:** Replace the factual line with a brand line in both locales. The three facts leave the
+  highest-attention slot on the site.
+- **Alternatives considered:** Keep the factual line and place the brand line elsewhere on Home.
+- **Downside accepted:** A first-time visitor no longer learns *how payment works* in the first
+  screenful; they learn it one scroll down, in the FAQ.
+- **Links:** `src/messages/mk.json` · `src/messages/en.json` (`Home.sub`) ·
+  `src/components/home/HomeExperience.tsx`
+
+### D-2.12-2 · 2026-07-24 · Both strings ship byte-exact as the operator supplied them; Code edits neither language
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the brief); executed by Claude Code.
+- **Context:** MK is the source language on this project and EN is a translation of it — **except
+  here.** The operator supplied both lines. The Macedonian is deliberately **not** a literal
+  translation of the English and is deliberately shorter; the English is deliberately a comma splice.
+- **Decision:** Ship both strings byte-exact as supplied. Code does not smooth the Macedonian, does
+  not re-punctuate, and does not align the two languages word-for-word.
+- **Alternatives considered:** Code smooths the Macedonian, or aligns the two languages word-for-word.
+- **Downside accepted:** If the MK line reads wrong to a native eye, it ships wrong and is corrected in
+  a follow-up phase rather than caught inside this one — which is exactly why the MK review pack
+  (`docs/i18n/mk-review-2.12.md`) exists.
+- **Links:** `src/messages/mk.json` · `src/messages/en.json` (`Home.sub`) · `docs/i18n/mk-review-2.12.md`
+
+### D-2.12-3 · 2026-07-24 · `Meta.homeDescription` (the search snippet) is not touched
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the brief); executed by Claude Code.
+- **Context:** `Meta.homeDescription` still reads "Oversized unisex t-shirts from Strumica. Drops of 3
+  to 5 pieces, real limited stock, cash on delivery." — the search-result snippet for Home. The brief
+  refers to this key as `Metadata.homeDescription`; the actual namespace in the catalogs is `Meta`.
+- **Decision:** Leave the snippet unchanged. The search-result snippet and the on-page hero now say
+  different things — deliberately.
+- **Alternatives considered:** Change the search snippet to match the new hero line.
+- **Downside accepted:** Snippet and hero diverge — accepted, because the snippet's job is to state
+  what is for sale and the hero's job is not. Do not "harmonise" them.
+- **Links:** `src/messages/mk.json` · `src/messages/en.json` (`Meta.homeDescription`)

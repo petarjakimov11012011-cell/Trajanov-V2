@@ -120,7 +120,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Home.eyebrow` | Следно спуштање | Next drop | _(not found in source)_ |
 | `Home.headline` | Кога тајмерот ќе стигне нула, спуштањето е во живо. | When the timer hits zero, the drop is live. | `src/components/home/HomeExperience.tsx` |
 | `Home.opening` | Се отвора… | Opening… | `src/components/home/HomeExperience.tsx` |
-| `Home.sub` | 3 до 5 парчиња. Вистински, ограничени залихи. Готовина при преземање. | 3 to 5 pieces. Real, limited stock. Cash on delivery. | `src/components/home/HomeExperience.tsx` |
+| `Home.sub` | Пронајди сродна, во свет продадени души. | Find a kindred soul, in a world full of sold souls. | `src/components/home/HomeExperience.tsx` |
 | `Home.tagline` | Наскоро. | Coming soon. | _(not found in source)_ |
 | `Home.title` | Trajanov | Trajanov | `src/components/home/HomeExperience.tsx` |
 | `Meta.aboutDescription` | Еден бренд, еден дизајнер од Струмица. Приказната зад Trajanov. | One brand, one designer from Strumica. The story behind Trajanov. | `src/app/[locale]/about/page.tsx` |
