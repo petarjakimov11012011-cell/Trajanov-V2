@@ -99,8 +99,18 @@ no factual claim; `facts.md` byte-unchanged). **Owed-verification register +1** 
 the live deploy, on a real phone, both locales; includes the live reduced-motion read the pane could not
 emulate). Decisions `D-2.16-1…5` (all five orchestrator-made, appended verbatim; no `D-2.16-6`). **`file-map.md`
 needs no tree change** (no file added, moved, or deleted); **`00_stack-and-config.md` unchanged** (no dependency,
-no config). Branch `phase-2.16-hero-reveal`; **PR to `main` open — NOT self-merged** (`D-0-3`: an operator
-authorises the merge). `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
+no config). Branch `phase-2.16-hero-reveal`; **PR [#28](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/28)
+MERGED to `main` (merge `1fe9dc4`, 2026-07-25) on Petar's explicit instruction (`D-0-3`: operator-authorised,
+not Code); branch deleted** (clean GitHub PR merge; PR #28 shows the "Merged" badge). **Production deploy
+VERIFIED** — on the live `https://www.trajanovv.com/` the deployed home HTML carries `reveal-group` on the hero
+`<section>`, and the served CSS bundle (`/_next/static/chunks/…css`) contains `@keyframes trajanov-reveal`, all
+three tokens (`--motion-stagger:70ms`, `--motion-reveal-shift:.75rem`, `--motion-reveal-blur:.5rem`), the base
+`.reveal-group>*{animation:trajanov-reveal var(--motion-drop)…}` rule, the staggered `nth-child` delays, **and**
+the reduced-motion `@media(prefers-reduced-motion:reduce){.reveal-group>*{animation:none}}` override — the exact
+merged code is serving. (The committed drop is ENDED and `?preview=` is refused in production, so the *live*
+product-grid cascade is not observable on prod HTML; it was fully driven on localhost against byte-identical
+built code, and the reveal CSS above is deployed.) The **real-device feel + the live reduced-motion read stay
+owed #31** (Lazar + Petar). `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.15 COMPLETE — the phone menu is now a full-screen opaque overlay drawer, not the 2.14 in-flow expand
 (this update, 2026-07-25).** An out-of-band **UI-only** phase (the 2.07–2.14 shape) — **no commerce, no
