@@ -37,7 +37,7 @@ export function HomeExperience({view}: {view: DropView | null}) {
   if (!view) {
     return (
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 sm:px-6">
-        <section className="flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center">
+        <section className="reveal-group flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center">
           <DropCountdownEyebrow />
           <h1 className="font-display text-h2 text-foreground mx-auto max-w-2xl font-bold text-balance">
             {t('headline')}
@@ -56,14 +56,14 @@ export function HomeExperience({view}: {view: DropView | null}) {
               page so heading order never skips a level (WCAG 2.2 — Task 8). */}
           <h1 className="sr-only">{t('title')}</h1>
           <DropLiveBanner remaining={view.remaining} />
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <div className="reveal-group grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {view.products.map((p) => (
               <ProductCard key={p.slug} product={p} />
             ))}
           </div>
         </section>
       ) : view.state === 'ended' ? (
-        <section className="flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center">
+        <section className="reveal-group flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center">
           <DropEndedBanner className="max-w-md justify-center" />
           <h1 className="font-display text-h2 text-foreground mx-auto max-w-2xl font-bold text-balance">
             {t('headline')}
@@ -77,7 +77,7 @@ export function HomeExperience({view}: {view: DropView | null}) {
           </Link>
         </section>
       ) : (
-        <section className="flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center">
+        <section className="reveal-group flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center">
           <DropCountdownEyebrow />
           <Countdown
             target={view.startsAtMs}

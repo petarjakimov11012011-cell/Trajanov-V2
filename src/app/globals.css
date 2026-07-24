@@ -69,6 +69,10 @@
   --motion-base: 220ms;
   --motion-drop: 480ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Home hero reveal (brand.md §6, D-2.16-4). Reuses --motion-drop for the duration. */
+  --motion-stagger: 70ms;
+  --motion-reveal-shift: 0.75rem;
+  --motion-reveal-blur: 0.5rem;
 
   /* ---- shadcn semantic layer, mapped onto the brand palette ---- */
   --background: var(--color-ground);
@@ -350,4 +354,50 @@
 
 .faq-item[open]::details-content {
   block-size: auto;
+}
+
+/*
+  Home hero reveal (Phase 2.16, brand.md §6, D-2.16-1…5).
+  A first-paint-only staggered entrance for the Home hero. Deliberate, narrowly-scoped exception to
+  "motion belongs to the countdown and the drop reveal, nothing else" — the second one, after the
+  product-card spotlight (D-2.10-1). Used on FOUR call sites, all in HomeExperience.tsx:
+    - the no-view section, the countdown section, the ended section  → on the <section>
+    - the live drop                                                  → on the product GRID (D-2.16-5)
+  It is used nowhere else on the site. Do not add a fifth call site without a new decision.
+  Only opacity, transform and filter animate — none of the three reflows, so this cannot introduce
+  layout shift, and the countdown's own "must not shift as digits change" rule is untouched.
+  The stagger is positional (nth-child). Re-ordering a hero section's children re-orders the
+  animation; that is the accepted downside of D-2.16-2.
+*/
+@keyframes trajanov-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-reveal-shift));
+    filter: blur(var(--motion-reveal-blur));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.reveal-group > * {
+  animation: trajanov-reveal var(--motion-drop) var(--ease-out) both;
+}
+.reveal-group > *:nth-child(1) { animation-delay: calc(var(--motion-stagger) * 0); }
+.reveal-group > *:nth-child(2) { animation-delay: calc(var(--motion-stagger) * 1); }
+.reveal-group > *:nth-child(3) { animation-delay: calc(var(--motion-stagger) * 2); }
+.reveal-group > *:nth-child(4) { animation-delay: calc(var(--motion-stagger) * 3); }
+.reveal-group > *:nth-child(5) { animation-delay: calc(var(--motion-stagger) * 4); }
+.reveal-group > *:nth-child(6) { animation-delay: calc(var(--motion-stagger) * 5); }
+.reveal-group > *:nth-child(7) { animation-delay: calc(var(--motion-stagger) * 6); }
+.reveal-group > *:nth-child(8) { animation-delay: calc(var(--motion-stagger) * 7); }
+/* A drop can carry more products than the grid columns; everything past the 8th shares the last
+   step rather than trailing off into a long tail. */
+.reveal-group > *:nth-child(n + 9) { animation-delay: calc(var(--motion-stagger) * 8); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-group > * {
+    animation: none;
+  }
 }

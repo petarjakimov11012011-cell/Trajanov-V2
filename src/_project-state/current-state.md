@@ -6,11 +6,101 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-25** · By: **Claude Code (Phase 2.15 — Full-screen mobile menu (overlay drawer))**
+Last updated: **2026-07-25** · By: **Claude Code (Phase 2.16 — Home hero reveal animation)**
 
 ---
 
 ## Status
+
+**2.16 COMPLETE — the Home hero now reveals with a short staggered blur-in on first paint (this update,
+2026-07-25).** An out-of-band **UI-only** phase (the 2.07–2.15 / Y.02 shape) — **no commerce, no schema, no
+string, no fact, no dependency touched**, and **line 1 `NEXT:` is unchanged** (the 2.06 operator rehearsal
+remains next; this phase does not advance the critical path). The hero used to paint all at once with the
+header; it now fades its children up 0.75rem and un-blurs, 70ms apart, so the countdown lands first and the
+supporting copy follows — the `brand.md` §2 hierarchy ("the countdown is the loudest object; everything defers
+to it"). One idea was taken from Lazar's 21st.dev reference block — a staggered blur-in — **reimplemented in
+plain CSS**; everything else in that reference (framer-motion, `AnimatedGroup`/`TextEffect`, shadcn/button, the
+pill link, the fabricated logo wall, the night-background/mail2/Unsplash imagery) was rejected and is **absent
+from the diff**. What shipped:
+- **`src/app/globals.css` — three tokens + one scoped block.** `:root` gains `--motion-stagger: 70ms`,
+  `--motion-reveal-shift: 0.75rem`, `--motion-reveal-blur: 0.5rem` directly under `--ease-out` (mirrored from
+  `brand.md` §6). A new documented block adds `@keyframes trajanov-reveal` (from `opacity:0` +
+  `translateY(var(--motion-reveal-shift))` + `blur(var(--motion-reveal-blur))` → to full/`0`/`0`) and
+  `.reveal-group > *` (`animation: trajanov-reveal var(--motion-drop) var(--ease-out) both`) with per-child
+  `animation-delay: calc(var(--motion-stagger) * n)` for `nth-child(1..8)` and a shared last step for
+  `nth-child(n+9)`. **Every value in the reveal block is a `var()`** — no literal hex/px/ms (the sole `70ms`
+  literal is the `:root` token definition, exactly like `--motion-drop: 480ms`). The duration **reuses
+  `--motion-drop` (480ms)** — no new duration token (`D-2.16-4`). Only opacity/transform/filter animate, so
+  none of the three reflow → no layout shift.
+- **Reduced motion (`D-2.16-3`, `brand.md` §6).** A dedicated `@media (prefers-reduced-motion: reduce) {
+  .reveal-group > * { animation: none } }` immediately after the block — the global reduced-motion rule
+  flattens `animation-duration` but keeps `animation-delay` + `animation-name`, so alone it would leave the
+  hero invisible for the length of the stagger; `animation: none` resets name/duration/delay/fill in one
+  declaration so every child renders in its final state on frame 1.
+- **`src/components/home/HomeExperience.tsx` — four `className` additions, nothing else** (`D-2.16-2`). Diff
+  is exactly `reveal-group ` prepended to: the no-view `<section>`, the **live product grid `<div>`** (`D-2.16-5`
+  — **not** the section above it, so the LIVE banner + sr-only `<h1>` paint solid and only cards cascade), the
+  ended `<section>`, and the countdown `<section>`. **No new import, prop, state, link, or re-order.** DOM is
+  byte-identical to `main`, so `Countdown.tsx` / `DropBanner.tsx` / `ProductCard.tsx` stay byte-unchanged and
+  the stagger is positional (`nth-child`, accepted downside of `D-2.16-2`).
+- **`brand.md` §6 — three token rows + the exception paragraph extended** to record `D-2.16-3` alongside
+  `D-2.10-1` (Code edits `brand.md`, precedented by `D-1.02-1`/`D-2.10-1`, `D-2.16-4`): the Home hero reveal is
+  first-paint-only on the Home hero sections + the live-drop grid, disabled entirely under reduced motion, and
+  **not** to be reused on any other page without a new owner-level decision.
+
+**Gates:** `npm run build` (exit 0, "✓ Compiled successfully in 3.0s", full route tree) / `npx tsc --noEmit`
+(exit 0) / `npm run lint` (clean, exit 0); `npm test` **116/116** (unchanged count — no commerce/test file
+touched) incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected with
+insufficient_stock, stock 0` + the i18n catalog-parity suite (still **243** keys). **Rendered + measured
+in-browser** (dev server, **both locales** via `/` (MK, `NEXT_LOCALE`) + `/en`, at **390** + **1280**, using
+`?preview=` to reach each drop state), by the Web Animations API + `getBoundingClientRect()` + computed styles,
+not by eye:
+- **Countdown:** the section's six children carry `animation-name: trajanov-reveal`, `animation-delay`
+  **0 / 70 / 140 / 210 / 280 / 350ms**, `duration 480ms`, `fill both`, easing `cubic-bezier(0.16,1,0.3,1)`, in
+  order eyebrow → **countdown** → headline → sub → catalog link → about link; the last starts at 350ms, the
+  sequence ends at **830ms (< 1s)**. Seeked to **t=100ms** the eyebrow is opacity 0.766, the **countdown is
+  opacity 0.341 (animating second, after the eyebrow, before the headline)**, children 3–6 still at `from` —
+  the positional stagger is proven.
+- **Live:** only the product grid is `.reveal-group`; the grid's **own** `animation-name` is `none` and the
+  LIVE banner + sr-only `<h1>` compute `animation-name: none` (paint solid on frame 1); the two product-card
+  `<a>` children cascade at 0 / 70ms (`D-2.16-5`).
+- **Ended:** four children stagger (banner 0, h1 70, p 140, **About link 210ms — last**).
+- **No layout shift / rects identical to `main`:** seeked to settled (t=1000ms) every child reaches
+  `matrix(1,0,0,1,0,0)` / `blur(0px)` / `opacity 1`, and **every settled rect equals the class-removed base
+  layout to the pixel** (`settledEqualsBase: true` at 390 MK countdown, 1280 EN countdown, 1280 MK ended) —
+  since `.reveal-group` adds only `animation` to children and no rule styles the parent, base == `main`.
+  `scrollWidth == clientWidth` at 390 and 1280, both locales (no horizontal overflow).
+- **Countdown digit shift:** inherited — `Countdown.tsx` (byte-unchanged) uses `tabular min-w-[2ch]`; the
+  reveal animates the container only, not the digits, so the "must not shift as digits tick" rule is untouched.
+- **Reduced motion:** the served stylesheet carries `@media (prefers-reduced-motion: reduce) { .reveal-group >
+  * { animation: … none } }`; the behavioural outcome of `animation: none` (verified by cancelling the WAAPI
+  animations) is **opacity 1 / transform none / filter none on frame 1 for all six children**. The Browser
+  pane cannot toggle the DevTools media-emulation flag, so the *live* reduced-motion read folds into owed **#31**.
+- **Keyboard:** both hero links are focusable (`tabIndex 0`, `pointer-events: auto`, no inert ancestor) — the
+  `filter`/`opacity` animation traps nothing — and the global `:focus-visible` ring
+  (`2px solid var(--color-focus-ring)`, offset 2px) is present.
+- **Console: zero new errors.** The known **pre-existing, out-of-scope** `ProductCard.tsx:59` MK price
+  hydration mismatch on the live grid is inherited (`ProductCard.tsx` byte-unchanged vs `main`); hard stop #6
+  forbids touching it — recorded unchanged, not fixed.
+Screenshots captured (all seeked to settled for visibility): **MK 390 countdown**, **MK 390 live**, **EN 1280
+countdown**, **MK 1280 ended**.
+
+**Frozen (byte-unchanged, `git diff --name-only main` lists only `brand.md`, `src/app/globals.css`,
+`src/components/home/HomeExperience.tsx` + the state/decision/report docs):** `Countdown.tsx` / `DropBanner.tsx`
+/ `ProductCard.tsx` / `src/components/layout/*` (`SiteHeader.tsx` etc.) / `HomeFaq.tsx` / cart / checkout /
+`src/messages/{mk,en}.json` (still **243** keys) / `docs/i18n/string-inventory.md` / `facts.md` / `src/lib/**` /
+`create_order` / `expire_reservations` / `supabase/**` / `src/config/**` / `src/lib/site.ts` / `sitemap.ts` /
+`robots.ts` / `manifest.ts` / `package.json` + lockfile (**no new dependency** — `git diff main --
+package.json package-lock.json` empty; `grep -rn "from 'motion" src/` still empty, `D-2.16-1`). **`grep -rn
+"framer-motion\|AnimatedGroup\|TextEffect\|unsplash\|imagekit\|tailus" src/` returns nothing in shipped code**
+(the one hit is pre-existing prose in this file noting framer-motion is *unused*). **No new placeholder**, **no
+`[PLACEHOLDER: …]` marker**; **placeholder register UNCHANGED**; **no new fact** (a first-paint animation makes
+no factual claim; `facts.md` byte-unchanged). **Owed-verification register +1** (#31 — hero reveal sign-off on
+the live deploy, on a real phone, both locales; includes the live reduced-motion read the pane could not
+emulate). Decisions `D-2.16-1…5` (all five orchestrator-made, appended verbatim; no `D-2.16-6`). **`file-map.md`
+needs no tree change** (no file added, moved, or deleted); **`00_stack-and-config.md` unchanged** (no dependency,
+no config). Branch `phase-2.16-hero-reveal`; **PR to `main` open — NOT self-merged** (`D-0-3`: an operator
+authorises the merge). `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.15 COMPLETE — the phone menu is now a full-screen opaque overlay drawer, not the 2.14 in-flow expand
 (this update, 2026-07-25).** An out-of-band **UI-only** phase (the 2.07–2.14 shape) — **no commerce, no
@@ -1701,6 +1791,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 28 | **Header layout sign-off (2.13).** The header nav was moved onto the true page centreline via a three-column grid, **outside a Design phase**. Code measured it end-to-end (no horizontal overflow at 320/390/768/1024/1280, both locales; nav centre at offset 0px everywhere; active-link underline + `aria-current` intact both locales) but the **visual-brand call** — does the centred nav read right, and is the large intentional gap between the nav and the MK·EN/cart cluster on wide screens (inherent to true centring, `D-2.13-1`) acceptable — is Lazar's. View `https://www.trajanovv.com/` **and** `/en` on a **desktop browser and a phone** after the merge deploys and confirm the nav position reads right. Note the deliberate MK-at-1024 behaviour: the credit wraps under the wordmark while the nav stays centred (`D-2.13-3`, `lg` kept not raised to `xl`) — if the two-line MK block at 1024–~1150 is unwanted, raising the switch to `xl` is a one-line change. Owner: **Lazar**. | 2.13 | **after 2.13 deploys — before the first real drop (desktop + phone, both locales)** |
 | 29 | **Burger menu sign-off on the live deploy, on a real phone, both locales (2.14).** Open `https://www.trajanovv.com` on a phone. Tap the burger; tap each of the three links; use the back button; switch to EN and repeat. Pass = the header is one line with the menu closed; the menu opens and closes cleanly; every link goes to the right page and the menu is **closed on arrival**; nothing overflows sideways; and the MK label **„Мени"** reads correctly to a native speaker (it is a **new MK string, not covered by the 2.03 review stamp**). Code measured this end-to-end in the pane (burger + cart both ≥ 44×44, no overflow closed/open at 320/390, focus → first link on open, Escape → button, link-tap closes on arrival, active filled `bg-surface` row at 390 + 2px mustard underline at 1280 — both locales) — but the real-device feel + the native-MK read are Lazar's. Owner: **Lazar** (+ **Petar** for the MK label). | 2.14 | **after 2.14 deploys — before the first real drop (real phone, both locales)** |
 | 30 | **Full-screen menu sign-off on the live deploy, on a real phone, both locales (2.15).** Open `https://www.trajanovv.com` on a phone. Tap the burger; confirm the menu takes the **whole screen**; tap each row (Catalog, About, Contact, Cart); use the **X** and the **back button**; switch to EN and repeat. Pass = the closed header is **wordmark + burger only**; the menu is a full-screen **opaque** panel matching the reference (wordmark + X top bar, left-aligned links with a **left** accent on the active one, divider, centred MK·EN, centred credit); every row navigates correctly and closes the menu; nothing overflows sideways; and the MK **„Затвори"** label reads correctly to a native speaker (a **new MK string, not covered by the 2.03 review stamp**). Code measured this end-to-end in the pane (both locales, 320/390/768/1024/1280): closed = wordmark + burger only, no overflow; open = fixed opaque `bg-ground` dialog covering the viewport, correct order, `text-h2` rows with no wrap/overflow; focus → X on open, Escape/X → burger, focus trap wraps, link/cart taps navigate + close on arrival, active left 2px mustard accent; desktop unchanged (burger `display:none`, nav offset 0px, one centreline); resize-to-desktop closes + releases the scroll lock — but the real-device feel + the native-MK read are Lazar's/Petar's. Owner: **Lazar** (+ **Petar** for the MK label). | 2.15 | **after 2.15 deploys — before the first real drop (real phone, both locales)** |
+| 31 | **Hero reveal sign-off on the live deploy, on a real phone, both locales (2.16).** Open `https://www.trajanovv.com` and `/en` on a phone after the deploy. Pass = **the countdown arrives first and reads immediately; the sequence feels quick, not staged; nothing jumps or reflows as it settles.** Also confirm the **reduced-motion** behaviour on a device with "Reduce Motion" enabled (iOS Settings → Accessibility → Motion; Android → Remove animations): the hero should appear **fully visible on the first frame with no fade** — Code verified the served CSS rule + the `animation: none` outcome (opacity 1 / transform none / filter none on frame 1 for all six children) but the in-app Browser pane could not toggle the DevTools reduced-motion emulation, so the live device read is owed. Code measured the reveal end-to-end in the pane (both locales, 390 + 1280, all three drop states via `?preview=`): delays 0/70/140/210/280/350ms, last ends at 830ms; live banner + heading paint solid, only cards cascade; ended About-link last; **settled rects identical to `main` to the pixel** (`settledEqualsBase: true`), no overflow/shift at 390 & 1280; countdown digits still tabular; both links keyboard-focusable with the focus ring; zero new console errors — but the real-device *feel* + the live reduced-motion read are Lazar's/Petar's. Owner: **Lazar** (+ **Petar**). | 2.16 | **after 2.16 deploys — before the first real drop (real phone, both locales)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
