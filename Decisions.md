@@ -3353,3 +3353,70 @@ start at `D-2.01-6`.*
   and `setOpen(false)` is a no-op when already closed / below `lg`); the implementation is a superset of
   the brief's literal wording, so a reader must read the comment to see why both listeners exist.
 - **Links:** `src/components/layout/SiteHeader.tsx` · Brief Task 6 (resize safety) · `D-2.15-1`
+
+### D-2.16-1 · 2026-07-25 · The reveal is plain CSS `@keyframes`, not the `motion` library and not `framer-motion`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.16 brief); executed by Claude Code.
+- **Decision:** The Home hero reveal is a plain CSS `@keyframes trajanov-reveal` in `globals.css`,
+  applied via a `.reveal-group` class — no `motion`/`framer-motion` import.
+- **Alternative rejected:** Porting `AnimatedGroup` and importing `motion/react` (the library is already
+  a dependency, so this was the obvious route). Rejected on three grounds: (a) it would make
+  `HomeExperience` the first component in the project to ship the animation runtime, on the one route
+  whose Lighthouse mobile Performance score is a launch gate; (b) the global CSS reduced-motion rule
+  does not reach JS-driven animation, so a `useReducedMotion()` gate would have to be maintained by
+  hand forever; (c) `AnimatedGroup` wraps every child in a `motion.div`, which would insert wrapper
+  elements into a `flex flex-col items-center` section and change the hero's layout.
+- **Downside accepted:** **No spring bounce.** The reference's `type: 'spring', bounce: 0.3` overshoot
+  cannot be expressed in a CSS keyframe; `--ease-out` (`cubic-bezier(0.16, 1, 0.3, 1)`) is used instead,
+  which decelerates hard but never overshoots. The result is calmer than the reference — on-brand
+  ("restraint over effects", `brand.md` §2) and not a defect to be fixed later with a dependency.
+- **Links:** `src/app/globals.css` (`.reveal-group`, `@keyframes trajanov-reveal`) · `brand.md` §6 · `D-2.10-1`
+
+### D-2.16-2 · 2026-07-25 · The animation is applied with one class on the existing container, targeting `> *`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.16 brief); executed by Claude Code.
+- **Decision:** The reveal is applied by one `.reveal-group` class on the existing container, targeting
+  `> *` — not per-child classes, not wrapper elements, not inline styles.
+- **Alternative rejected:** A `<Reveal index={n}>` component wrapping each hero element.
+- **Downside accepted:** The stagger order is positional (`nth-child`), so re-ordering the hero's
+  children silently re-orders the animation. Mitigated by a comment in the CSS block naming the four
+  call sites. The gain is that the DOM does not change at all — no new element, no new attribute on any
+  child — so `Countdown.tsx`, `DropBanner.tsx` and `ProductCard.tsx` stay byte-unchanged and the hero's
+  flex layout is provably identical before and after.
+- **Links:** `src/app/globals.css` · `src/components/home/HomeExperience.tsx` · `D-2.16-1`
+
+### D-2.16-3 · 2026-07-25 · A second narrowly-scoped exception to `brand.md` §6, after `D-2.10-1`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.16 brief); executed by Claude Code.
+- **Decision:** A second narrowly-scoped exception to `brand.md` §6 ("motion belongs to the countdown
+  and the drop reveal, nothing else"), after `D-2.10-1`. The exception is capped at **the Home hero
+  sections and the live-drop product grid, on first paint only**, and is stated as a hard boundary in
+  `brand.md` §6: this class is used on Home and nowhere else.
+- **Alternative rejected:** Applying the reveal sitewide (About, Catalog, Product, legal pages) for
+  consistency.
+- **Downside accepted:** The §6 rule now carries two exceptions and is weaker than when it was written.
+  Any future page that wants it comes back as an owner-level decision, not as a quiet reuse of an
+  existing class.
+- **Links:** `brand.md` §6 · `src/app/globals.css` · `D-2.10-1`
+
+### D-2.16-4 · 2026-07-25 · Three new motion tokens; the duration is *not* new
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.16 brief); executed by Claude Code.
+- **Decision:** `--motion-stagger` (70ms), `--motion-reveal-shift` (0.75rem) and `--motion-reveal-blur`
+  (0.5rem) are added to `brand.md` §6 and mirrored into `globals.css`. The duration reuses the existing
+  `--motion-drop` (480ms), because `brand.md` already defines that token as the drop reveal.
+- **Alternative rejected:** A fourth `--motion-reveal` duration token.
+- **Downside accepted:** Claude Code edits `brand.md`, which is normally Design's artifact — precedented
+  by `D-1.02-1` and `D-2.10-1`, and required by the rule that tokens live in `brand.md` and nowhere else.
+- **Links:** `brand.md` §6 · `src/app/globals.css` (`:root` motion block) · `D-1.02-1` · `D-2.10-1`
+
+### D-2.16-5 · 2026-07-25 · On the live drop, the class goes on the product grid, not on the section
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.16 brief); executed by Claude Code.
+- **Decision:** On the live drop, `.reveal-group` goes on the product grid, not on the section — so the
+  LIVE banner and the drop heading paint solid and instantly, and only the product cards cascade.
+- **Alternative rejected:** Staggering the whole live section (banner → grid as one block).
+- **Downside accepted:** The live state animates differently from the countdown state — deliberately.
+  The banner is the status line and must not appear to load; the cards arriving one after another *is*
+  the drop reveal `brand.md` §6 sanctions.
+- **Links:** `src/components/home/HomeExperience.tsx` (live branch) · `brand.md` §6

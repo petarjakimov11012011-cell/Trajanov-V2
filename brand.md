@@ -162,6 +162,9 @@ may use it.
 | `--motion-base` | `220ms` | Transitions |
 | `--motion-drop` | `480ms` | The drop reveal — the one moment worth animating |
 | `--ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` | Default easing for all of the above |
+| `--motion-stagger` | `70ms` | Gap between siblings in the Home hero reveal |
+| `--motion-reveal-shift` | `0.75rem` | Distance the revealing element travels up |
+| `--motion-reveal-blur` | `0.5rem` | Blur the revealing element starts from |
 
 **`prefers-reduced-motion` is respected everywhere** — including the countdown (digits still update
 as values, never as a flip/spinner) and the drop reveal (swap in place, no transform/fade). The live
@@ -174,6 +177,12 @@ pointer-tracked, so it is motion, and it is a deliberate, operator-approved exce
 whose position follows the cursor — no keyframe loop, no transform — so under
 `prefers-reduced-motion: reduce` the global rule flattens its opacity transition to nothing and the
 glow simply becomes static (a static glow is not motion); the glow itself is not disabled.
+
+**A second logged, narrowly-scoped exception — the Home hero reveal (`D-2.16-3`).** A first-paint-only
+staggered blur-in entrance applied to the Home hero sections and the live-drop product grid, disabled
+entirely under `prefers-reduced-motion: reduce` (the `.reveal-group` class sets `animation: none`, so
+every hero child renders in its final state on the first frame); it is **not** to be reused on any
+other page (About, Catalog, Product, legal) without a new owner-level decision.
 
 ---
 
