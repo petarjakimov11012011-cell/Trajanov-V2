@@ -96,8 +96,9 @@ register +1** (#29 — burger menu sign-off on the live deploy, on a real phone,
 „Мени" is a new MK string not covered by the 2.03 review stamp). Decisions `D-2.14-1…8` (all eight
 orchestrator-made, appended verbatim) + `D-2.14-9` (Claude Code, the render-time-reset lint resolution).
 **`file-map.md` needs no tree change** (no file added, moved, or deleted). Branch
-`phase-2.14-mobile-nav-menu`; **PR opened to `main`, left UNMERGED — an operator merges (`D-0-3`).** `NEXT:`
-line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
+`phase-2.14-mobile-nav-menu`; **PR [#26](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/26)
+opened to `main`, left UNMERGED — an operator merges (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band,
+does not touch the 2.06 → Y.01 critical path.
 
 **2.13 COMPLETE — the header nav (Catalog · About · Contact) is now on the true page centreline (this
 update, 2026-07-24).** An out-of-band **UI-only** phase (the 2.07/2.08/2.09/2.10/2.11/2.12/Y.02 shape) —

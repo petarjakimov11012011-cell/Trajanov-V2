@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-24 |
 | **Branch** | `phase-2.14-mobile-nav-menu` |
-| **PR** | opened to `main`, **left unmerged** (an operator merges, `D-0-3`) |
+| **PR** | [#26](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/26) → `main`, **left unmerged** (an operator merges, `D-0-3`) |
 | **Brief** | Part 2 · Phase 14 · Code — Mobile menu (burger) in the site header |
 
 ---
