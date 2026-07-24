@@ -74,8 +74,9 @@ message key** (still **241**); **no new placeholder**, **no `[PLACEHOLDER: …]`
 **Owed-verification register +1** (#27 native MK review of the new `Home.sub` string, owner Lazar + Petar).
 **Placeholder register UNCHANGED** — this phase adds none and clears none. Decisions `D-2.12-1/2/3` (all
 three pre-made by the orchestrator in the brief, appended verbatim). Branch `phase-2.12-home-sub-line`;
-**PR open to `main` — left for an operator to merge (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band,
-does not touch the 2.06 → Y.01 critical path.
+**PR [#24](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/24) open to `main` — left for an
+operator to merge (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01
+critical path.
 
 **2.11 COMPLETE — the Home page now answers the five questions every Instagram buyer asks, under the
 hero (this update, 2026-07-23).** An out-of-band UI phase (the 2.07/2.08/2.09/2.10/Y.02 shape) — **no

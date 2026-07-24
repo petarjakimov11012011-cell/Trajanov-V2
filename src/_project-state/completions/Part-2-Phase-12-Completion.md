@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-24 |
 | **Branch** | `phase-2.12-home-sub-line` |
-| **PR** | #N (opened; **left for an operator to merge** — `D-0-3`) |
+| **PR** | [#24](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/24) (opened; **left for an operator to merge** — `D-0-3`) |
 | **Brief** | `briefs/Part-2-Phase-12-Code.md` |
 
 ---
