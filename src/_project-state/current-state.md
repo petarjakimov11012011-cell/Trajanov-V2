@@ -108,8 +108,24 @@ gradient makes no factual claim). **Owed-verification register +1** (#36). Decis
 orchestrator-made and appended verbatim, **one (`D-2.19-6`) made by Claude Code from measurement and flagged
 for ratification**. **`file-map.md` needs no tree change** (only the new completion report; the tree lists the
 `completions/` directory, not each report). **`00_stack-and-config.md` unchanged** (no dependency, no config).
-Branch `phase-2.19-wordmark-shine`; PR to `main`, **not self-merged** (`D-0-3`). `NEXT:` line **unchanged** —
-out-of-band, does not touch the 2.06 → Y.01 critical path.
+Branch `phase-2.19-wordmark-shine`; **PR [#31](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/31)
+MERGED to `main` (merge `132e555`, 2026-07-25) on Petar's explicit instruction (`D-0-3`: operator-authorised,
+not Code); branch deleted** (clean GitHub PR merge, remote + local refs pruned). **Production deploy VERIFIED**
+— on the live `https://www.trajanovv.com/` the served CSS bundle carries `--motion-shine:.9s`, the registered
+`@property --wordmark-x{syntax:"<percentage>";inherits:false;initial-value:100%}`,
+`@keyframes trajanov-wordmark-shine{0%{--wordmark-x:-40%}to{--wordmark-x:140%}}`, the
+`@media (hover:hover) and (pointer:fine)` gate on `.wordmark-shine:hover,.wordmark-shine:focus-visible`, the
+shipped `animation:trajanov-wordmark-shine var(--motion-shine) linear 1`, and the dedicated
+`@media (prefers-reduced-motion:reduce)` rule (`-webkit-text-fill-color:currentColor;background-image:none;
+animation:none`) — with **zero literal hex/`rgb(`/`hsl(`/`--primary`** in the emitted block, and the 2.18
+values (`--motion-slow:.42s`, `--ease-smooth`, `--motion-reveal:.76s`, `--header-bar-max-scrolled:48rem`)
+all still intact. Driven live in-browser on production at 1280: hovering the wordmark produces an animation
+with `duration 0.9s`, `timing-function linear`, `iteration-count 1`, frames `-40%` @0 · `0%` @200 · `50%`
+@450 · `100%` @700 · `136%` @880, and `getBoundingClientRect()` **identical at every frame**
+(`89,23,135.039,24`); `<header>` still computes `transform/filter/backdrop-filter: none`. The **real-device
+feel + the `D-2.19-6` (linear easing) ratify-or-strike + the touch-device inertness read + the live
+reduced-motion read stay owed #36** (Lazar + Petar). `NEXT:` line **unchanged** — out-of-band, does not touch
+the 2.06 → Y.01 critical path.
 
 **2.18 COMPLETE — the scroll-reactive header now settles instead of snapping, drops its build credit
 out of the pill as it contracts, and contracts a little further; the Home hero reveal is retimed to read
