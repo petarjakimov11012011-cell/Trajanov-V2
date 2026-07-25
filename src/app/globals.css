@@ -40,6 +40,11 @@
   --glow-size: 240px;
   --glow-opacity-surface: 0.05;
   --glow-opacity-edge: 0.22;
+  /* The wordmark shine band (brand.md §3, D-2.20-1). A deliberate, narrowly-scoped exception to
+     "never pure white" (D-2.10-1) — scoped to this ONE sweep. --color-glow stays off-white for the
+     product-card spotlight. Read via var() in the .wordmark-shine block, so it is NOT a utility
+     (the --glow-* / --header-* / --motion-shine precedent — do not add it to @theme inline). */
+  --color-shine: #FFFFFF;
 
   /* ---- type (brand.md §4) ---- */
   --font-display: var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
@@ -529,11 +534,15 @@
   -webkit- form is the oldest, most uniformly supported of the two in WebKit (mask-composite is the
   part of the mask route Safari has historically been weakest on — see the D-2.10-3 note above).
 
-  Colours are tokens only (D-2.19-5): the glyph rests on --color-foreground and the travelling band is
-  a color-mix of --color-mustard into it, per the §3 derived-tints rule. No literal hex/rgb/hsl here.
-  The reference's shadcn primary-colour token does not exist in this codebase and would resolve to
-  nothing. Mustard is 9.0:1 on ground and foreground is 15.4:1, so every intermediate colour in the
-  sweep sits above AA by construction — the wordmark cannot go illegible mid-animation.
+  Colours are tokens only (D-2.19-5, recoloured by D-2.20-1/2): the glyph rests on --color-foreground
+  and the travelling band is --color-shine, pure white. No literal hex/rgb/hsl here. The reference's
+  shadcn primary-colour token does not exist in this codebase and would resolve to nothing. 2.19
+  shipped a mustard band, which DARKENED the letters on the way past (band centre 10.84:1 against the
+  resting glyph's 15.4:1) and tinted them brand yellow — a shadow with a colour cast, not a highlight.
+  White is 18.4:1 on ground, so the band brightens instead; the two outer stops stay
+  --color-foreground and the sweep never dips below the resting colour (D-2.20-2). Every painted pixel
+  is therefore between 15.4:1 and 18.4:1 — above AA by construction, and the mark cannot go illegible
+  or go dimmer mid-animation.
 
   NOTHING here puts transform / filter / backdrop-filter / will-change / contain on <header> or on any
   ancestor of the mobile overlay — any of those would make <header> a containing block for its
@@ -578,7 +587,7 @@
     background-image: linear-gradient(
       100deg,
       var(--color-foreground) calc(var(--wordmark-x) - 24%),
-      color-mix(in srgb, var(--color-mustard) 65%, var(--color-foreground)) var(--wordmark-x),
+      var(--color-shine) var(--wordmark-x),
       var(--color-foreground) calc(var(--wordmark-x) + 24%)
     );
     -webkit-background-clip: text;
@@ -599,7 +608,8 @@
        raised against --ease-out on the header contract; --ease-smooth is header-contract-only, so the
        answer here is constant speed, which is how light actually moves across a surface. `linear` is a
        keyword, not an inlined design value (same category as 2.18's authorised `visibility 0s linear`).
-       Revert = replace this one word with var(--ease-out). */
+       Revert = replace this one word with var(--ease-out). RATIFIED by the owner as D-2.20-3 — the
+       easing stays `linear`; the ratify-or-strike item is closed. */
     animation: trajanov-wordmark-shine var(--motion-shine) linear 1;
   }
 }
