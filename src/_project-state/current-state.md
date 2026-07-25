@@ -6,11 +6,124 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-25** · By: **Claude Code (Phase 2.17 — scroll-reactive header)**
+Last updated: **2026-07-25** · By: **Claude Code (Phase 2.18 — header retime + credit drop-out)**
 
 ---
 
 ## Status
+
+**2.18 COMPLETE — the scroll-reactive header now settles instead of snapping, drops its build credit
+out of the pill as it contracts, and contracts a little further; the Home hero reveal is retimed to read
+as deliberate (this update, 2026-07-25).** An out-of-band **UI-only retune of 2.17 + 2.16** — **no new
+element, link, string, state, listener, dependency; no commerce, schema, or fact touched**, and **line 1
+`NEXT:` is unchanged** (the 2.06 operator rehearsal remains next; this phase does not advance the critical
+path). The scroll mechanism, sticky positioning, `data-scrolled` switch and the blur all stay exactly as
+2.17 shipped. **⚠️ One item Lazar has not explicitly approved (`D-2.18-5`):** the **hero retime** (`--motion-drop`
+480ms borrow → dedicated `--motion-reveal` 760ms, stagger 70ms → 110ms) was folded in alongside the header
+fix — it is the "A" option put to him after 2.16 and never separately answered; one token pair, isolated in
+Task 5, trivially revertible, flagged for him to confirm or strike in review (owed **#35**). What shipped:
+- **`src/app/globals.css` — three new `:root` tokens + retimed two existing blocks + one new credit block.**
+  `:root` gains `--motion-slow: 420ms` (`D-2.18-1` — the header's own duration, **not** a change to the shared
+  `--motion-base`, which also times the FAQ ~249 + the block ~358), `--ease-smooth: cubic-bezier(0.65,0,0.35,1)`
+  (`D-2.18-2` — a symmetric ease-in-out, **header only**; `--ease-out` stays the site default), and
+  `--motion-reveal: 760ms` (`D-2.18-5`). Two existing values change: `--header-bar-max-scrolled` **56rem → 48rem**
+  (`D-2.18-5`, the credit no longer sits in the bar) and `--motion-stagger` **70ms → 110ms** (`D-2.18-5`). All
+  three new tokens are read via `var()` and are **not** utilities (the `--glow-*`/`--motion-*` precedent — not
+  added to `@theme inline`). In the `.header-shell`/`.header-bar` block, **all nine** `var(--motion-base)
+  var(--ease-out)` transition pairs became `var(--motion-slow) var(--ease-smooth)` — nothing else in that block
+  moved (same properties, order, scrolled values bar the max-width token). A new `.header-credit` block fades the
+  credit out on scroll via **`position: absolute` (no insets) + `opacity` + `visibility` + `pointer-events`**
+  (`D-2.18-3/4`): the element leaves the flex flow instantly at its static position, and `visibility` is
+  transitioned with a `var(--motion-slow)` delay so the Vertex link stays focusable until the fade finishes then
+  leaves the tab order (an opacity-0 link is still tabbable — a WCAG 2.2 failure otherwise). The `.reveal-group > *`
+  animation duration went `var(--motion-drop)` → `var(--motion-reveal)`; the keyframes/easing/`both`/nth-child
+  delays/reduced-motion rule are untouched (the 110ms stagger flows from the retimed token). **`--motion-fast`,
+  `--motion-base`, `--motion-drop`, `--ease-out` all keep their pre-2.18 values** (120/220/480ms + the ease); this
+  phase **adds** tokens, it does not repoint existing ones. No `!important`, no `display: none` on the credit, no
+  literal hex/px/ms added beyond the brief-authorised `0s`/`linear` in the visibility step.
+- **Reduced motion.** No new rule added (the credit fade + header contract are plain CSS transitions, flattened by
+  the existing global `@media (prefers-reduced-motion: reduce)` ~217; the hero's own `animation: none` rule ~418 is
+  unchanged). CSSOM-verified: exactly two reduced-motion blocks (global + `.reveal-group`), neither names the header.
+- **`src/components/layout/SiteHeader.tsx` — ONE className.** `header-credit ` prepended to the header-bar credit
+  `<p>` (~line 210). `git diff main -- SiteHeader.tsx` is **one changed line**. The overlay's own credit (~348) is
+  **not** touched and does not carry the class; `renderCredit()`, the scroll effect, threshold, overlay, focus trap,
+  scroll lock — all byte-unchanged. No conditional render, no new state, no `aria-hidden` in JSX (`visibility: hidden`
+  handles the a11y tree).
+- **`brand.md` §5/§6.** §5 `--header-bar-max-scrolled` 56rem → 48rem with a note that the width assumes the credit
+  is not in the bar; §6 motion table +3 rows (`--motion-slow`, `--ease-smooth`, `--motion-reveal`) and `--motion-stagger`
+  70 → 110ms; the §6 header-exception prose updated from "retimed to `--motion-base`" to the `--motion-slow`/`--ease-smooth`
+  timing + the credit drop-out. `brand.md` and the `globals.css` `:root` agree on every value.
+
+**Gates:** `npm run build` (exit 0, "✓ Compiled successfully in 2.4s", full route tree) / `npx tsc --noEmit` (exit 0)
+/ `npm run lint` (clean, exit 0); `npm test` **116/116** (unchanged count — no test file touched) incl. `✓ 10
+simultaneous orders against 3 units → exactly 3 succeed, 7 rejected with insufficient_stock, stock 0` + the i18n
+catalog-parity suite (still **243** keys; `git diff main -- package.json package-lock.json src/messages/` empty).
+**Rendered + measured in-browser** (dev server, **both locales** via `/` (MK, `NEXT_LOCALE`) + `/en`, at
+**320/390/768/1024/1280**, on **Home, Catalog, Checkout**), by `getBoundingClientRect()` + computed styles +
+focus-reachability probes, not by eye (transitions neutralised with a temporary `transition:none` to read settled
+targets past the pane's frozen compositor clock — the 2.17 method):
+- **At `scrollY = 0`** (all three routes × both widths × both locales): `data-scrolled` **null**, `<header>` **71px**
+  (= post-2.17 `main`, the +2px `D-2.17-7` carries forward unchanged), bar `max-width 1152px`, **credit `position:
+  static`, opacity 1, visible** — the 2.17 `D-2.17-3` resting invariant holds. The `.header-bar` transitions now
+  compute **`0.42s` on `cubic-bezier(0.65, 0, 0.35, 1)`** (×7), the credit **`0.42s` opacity + `0s` visibility on
+  `cubic-bezier(0.65,0,0.35,1), linear`**.
+- **Scrolled** (`data-scrolled="true"`): bar computes **`max-width 768px` (48rem)**, `border-radius 14px`,
+  `margin-top 8px`, `background color(srgb …/0.82)` (82% translucent), `backdrop-filter blur(12px)`; `<header>`'s own
+  bg + bottom border compute transparent and `filter/backdrop-filter/transform` all **`none`** (containing-block trap
+  of hard stop #4/2.17-#2 avoided). The **credit computes `position: absolute`, `opacity 0`, `visibility hidden`,
+  `pointer-events none`**.
+- **Nothing but the credit moves during the contract.** Nav centre X stays on the container centreline (1280 MK/EN:
+  640.0 vs 640; 1024 MK: 512 vs 512 — offset ≤ 0.01px); the cart's right edge tracks only the max-width change (1280:
+  content-box right 1000, cart right 999; 1024: 872 / 871 — within the pill). **No wrap, no vertical movement, no
+  header height change** — bar stays a single 70px row, header 79px scrolled (margin-top 8 + 70 + border, the 2.17
+  float, unchanged).
+- **Keyboard:** on a scrolled page `link.focus()` on the Vertex credit link is a **no-op** (`visibility: hidden`
+  removed it from the tab order — `document.activeElement` stayed on `body`); scroll back to top and the same
+  `focus()` **lands on the Vertex link** — reachable again. `D-2.18-4` proven both ways.
+- **The 48rem pill does not crowd or wrap at 1024 and 1280, MK first** (MK strings are longer): at 1280 the wordmark
+  (ends 416), centred nav (513–767, centre 640), MK·EN and cart (955–999) all sit inside the 768px pill with room;
+  at 1024 the same, cart right 871 within content-box right 872. EN is shorter → safe. Single row, no wrap, no overflow.
+- **Hero reveal (measured on the actual `.reveal-group` children, both preview states):** ended hero 4 children delays
+  **0/110/220/330ms** → ends **1090ms (1.09s)**; countdown hero 6 children delays **0/110/220/330/440/550ms** → ends
+  **1310ms (1.31s)**. Both **< 1.5s** (duration `760ms` confirmed on every child). Live-drop grid cascades at 0/110ms.
+- **Reduced motion:** structurally confirmed (no header-specific rule; global rule + the hero's own `animation:none`
+  cover it). The pane cannot toggle DevTools reduced-motion emulation → the *live* device read folds into owed **#35**.
+- **Mobile overlay unaffected at 390:** the header-bar credit is `display:none` below `lg` (the class is inert there);
+  only **one** element carries `header-credit`. Opening the burger **while the page is scrolled** still gives a
+  `position: fixed` `z-40` opaque panel covering 390×844 with body scroll locked, and the overlay's **own** credit
+  does **not** carry `header-credit` — its Vertex link stays focusable (verified: `overlayCreditHasHeaderCreditClass:
+  false`, `overlayVertexLinkFocusable: true`). Close via the X returns focus to the burger and releases the scroll lock.
+- **No horizontal overflow** at **320/390/768/1024/1280** in **both** states (`scrollWidth == clientWidth` throughout).
+- **Console: zero new errors.** The only issue (Next dev "1 Issue") is the **pre-existing, out-of-scope**
+  `ProductCard.tsx:59` MK price hydration mismatch on the Home live grid (server "1,500 ден" vs client "1.500 ден";
+  stack roots `HomePage → HomeExperience → ProductCard → SpotlightCard`, **zero header involvement**;
+  `ProductCard.tsx` byte-unchanged) — recorded unchanged, not fixed (hard stop mirrors 2.17).
+Screenshots captured: **MK 1280 top** (credit „Изработено од Vertex Consulting" visible), **MK 1280 scrolled** (pill,
+credit dropped out), **EN 1280 scrolled** (pill, „Catalog · About · Contact", credit gone), **MK 390 scrolled**
+(full-width translucent pill, wordmark + burger). (Per 2.17, the sticky pill mis-composites in some scrolled
+screenshots — a Browser-pane artifact; captured at a small offset over the mustard banner so the pill's appearance +
+the credit's absence show correctly; the geometry is proven by `getBoundingClientRect` regardless.)
+
+**Owed left to the live deploy (Lazar + Petar):** **#35** — retimed-header + hero sign-off on a real phone, both
+locales (bar settles rather than snaps; credit fades cleanly with nothing else shifting; hero reads as deliberate;
+**confirm or strike `D-2.18-5`, the hero retime**; the live reduced-motion read; a post-deploy PageSpeed re-run since
+a local Lighthouse isn't comparable — a longer transition shouldn't cost anything, report if it does). This is the
+brief's owed row (numbered "#34" in the brief); the register was already at **#34** because 2.17 shipped **+3**
+(one more than its brief's "+2"), so the actual next number is **#35** — the "+1" count is right, the absolute number
+in the brief was one behind.
+
+**Frozen (byte-unchanged, `git diff --name-only main` lists only `brand.md`, `src/app/globals.css`,
+`src/components/layout/SiteHeader.tsx` + the state/decision/report docs):** `src/messages/{mk,en}.json` (still **243**
+keys) / `docs/i18n/string-inventory.md` / `HomeExperience.tsx` / `Countdown.tsx` / `ProductCard.tsx` / the overlay + focus
+trap + scroll lock in `SiteHeader.tsx` / `SiteFooter.tsx` / `LanguageSwitch.tsx` / cart / checkout / `Turnstile.tsx` /
+`src/lib/**` / `create_order` / `expire_reservations` / `supabase/**` / `src/config/**` / `facts.md` / `package.json` +
+lockfile (**no new dependency**). **No new placeholder**, **no `[PLACEHOLDER: …]` marker**; **placeholder register
+UNCHANGED**; **no new fact** (a timing curve + a fade make no factual claim). **Owed-verification register +1** (#35).
+Decisions `D-2.18-1…5` (all five orchestrator-made, appended verbatim; no Claude-Code-only decision this phase — the CSS
+was shippable as written, unlike 2.17). **`file-map.md` needs no tree change** (only the new completion report was added;
+the tree lists the `completions/` directory, not each report). **`00_stack-and-config.md` unchanged** (no dependency, no
+config). Branch `phase-2.18-header-retime`; **PR open to `main`, NOT self-merged** (`D-0-3`). `NEXT:` line **unchanged** —
+out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.17 COMPLETE — the site header now sticks to the top and, once you scroll, contracts into a
 translucent blurred pill (this update, 2026-07-25).** An out-of-band **UI-only** phase (the 2.07–2.16
@@ -1940,6 +2053,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 32 | **Scroll-reactive header sign-off on a real phone, both locales (2.17).** Open `https://www.trajanovv.com` and `/en` on a phone after the deploy; scroll the Home page down past the FAQ and back up. Pass = the bar **contracts smoothly into the rounded translucent pill and stays readable over content**, and it does **not** feel like it is eating the screen (`D-2.17-4` — a permanently sticky ~60px bar on a 390px viewport; if it does feel too heavy, the fix is one `lg:`-gating media query). Three things fold into this row: (a) the real-device **feel** of the sticky pill at every width; (b) confirm the **+2px resting-height delta is imperceptible** — the resting header is 2px taller than the pre-2.17 geometry because `.header-bar` carries a transparent 1px border in both states (`D-2.17-7`, operator-accepted, ship-verbatim); (c) the **reduced-motion** read — with "Reduce Motion" enabled (iOS Settings → Accessibility → Motion; Android → Remove animations) the header should **snap** between states with no ease (the global `prefers-reduced-motion` rule flattens the transition; Code confirmed no second rule was added and the global rule exists, but the in-app Browser pane could not toggle the DevTools reduced-motion emulation, so the live read is owed). Code measured the header end-to-end in the pane (both locales, 320/390/768/1024/1280, all four routes Home/Catalog/Product/Checkout): at `scrollY 0` sticky `top:0` `z-30`, opaque ground, square, `max-w-6xl`, nav centre offset 0px, `filter/backdrop-filter/transform none`; past the threshold `data-scrolled="true"`, bar `max-width 896px`, `border-radius 14px`, `margin-top 8px`, translucent `background 82%`, `backdrop-filter blur(12px)`, `<header>` bg + bottom border transparent; scroll-back fully resets; no horizontal overflow in either state at any width; 2.15 overlay still fixed inset-0 opaque full-viewport with scroll lock + focus-on-X while scrolled; contrast worst-case (pill over the mustard live banner) 5.68:1 nav / 11.16:1 wordmark — but the real-device *feel*, the +2px read, and the live reduced-motion read are Lazar's/Petar's. Owner: **Lazar** (+ **Petar**). | 2.17 | **after 2.17 deploys — before the first real drop (real phone, both locales)** |
 | 33 | **Safari / iOS `backdrop-filter` blur check (2.17).** On the same phone, in **Safari** (not just Chrome), scroll the Home page down. Pass = the scrolled bar is **genuinely blurred**, not merely translucent — the content behind it goes soft. Code confirmed the served CSS pill rule carries **both** `-webkit-backdrop-filter: blur(var(--header-blur))` and `backdrop-filter: blur(var(--header-blur))` (verified against the raw served CSS bytes), but the in-app Browser pane is Chromium, so **no WebKit engine was available** to confirm the blur actually renders on iOS Safari. Owner: **Lazar**. | 2.17 | **after 2.17 deploys — before the first real drop (iOS Safari)** |
 | 34 | **Lighthouse mobile Performance re-run on Home + Catalog (2.17).** After the deploy, run PageSpeed Insights (mobile) on `https://www.trajanovv.com/` and `/en/catalog` and record the Performance number; compare to the pre-2.17 baseline (mobile **94** on Catalog + Checkout, per 2.04). `backdrop-filter` on a sticky element repaints on scroll and is the one realistic way this phase could cost points — though the blur is on the small ~896px pill only, active only while scrolled, so the risk is low. Code could **not** produce a comparable number locally: a dev/localhost Lighthouse is not comparable to the production PageSpeed baseline (no CDN, different throttling), and the meaningful measurement is on the deployed build — the same "re-check on PageSpeed after deploy" pattern 2.04 used for the 94 mobile scores. **If it drops below 94, report it — do not absorb it silently** (`D-2.17-4`'s media-query fallback also removes the mobile blur if needed). Owner: **Lazar / Petar**. | 2.17 | **after 2.17 deploys — before the first real drop** |
+| 35 | **Retimed header + hero sign-off on the live deploy, both locales (2.18).** On `https://www.trajanovv.com` and `/en`, desktop and phone, scroll Home down and back up. Pass = **the bar settles rather than snaps** (now `--motion-slow` 420ms on the symmetric `--ease-smooth`, `D-2.18-1/2`); **the "Built by Vertex Consulting" credit fades cleanly out of the pill with nothing else shifting** (`D-2.18-3/4` — desktop `lg:` only; on a phone the credit already lives in the burger overlay, untouched); and **the Home hero reads as deliberate rather than hurried** (`--motion-reveal` 760ms, stagger 110ms). Three things fold into this row: **(a) confirm or strike `D-2.18-5` — the hero retime was folded in without an explicit yes** (it is one token pair, isolated in Task 5, trivially revertible); (b) the **live reduced-motion read** — with "Reduce Motion" on, the header should snap and the hero render final-state on frame 1 (Code confirmed no new reduced-motion rule and the global rule covers, but the in-app Browser pane can't toggle the DevTools emulation); (c) a **post-deploy PageSpeed (mobile) re-run** on `/` + `/en/catalog` vs the pre-2.17 baseline (**94**) — a longer transition should not cost anything, report it if it does. Code measured the header + hero end-to-end in the pane (both locales, 320/390/768/1024/1280, Home/Catalog/Checkout): at `scrollY 0` credit `position: static`/visible, bar `max-width 1152px`, transitions `0.42s` on `cubic-bezier(0.65,0,0.35,1)`; scrolled bar `max-width 768px` (48rem), credit `absolute`/`opacity 0`/`visibility hidden`/`pointer-events none`, `<header>` `filter/transform none`; nav centred (offset ≤ 0.01px), no wrap/overflow, 48rem pill fits MK + EN at 1024 + 1280; Vertex link unreachable scrolled / reachable at top; ended hero 1.09s, countdown 1.31s, both < 1.5s; mobile overlay + its own credit unaffected while scrolled — but the real-device *feel*, the `D-2.18-5` call, the live reduced-motion read, and the PageSpeed number are Lazar's/Petar's. Owner: **Lazar** (+ **Petar**). | 2.18 | **after 2.18 deploys — before the first real drop (real phone, both locales)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

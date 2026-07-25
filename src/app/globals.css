@@ -65,20 +65,31 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.875rem;
   --radius-full: 9999px;
-  /* Scroll-reactive header bar (brand.md §5, D-2.17-1…6). Read via var() in the .header-bar block,
-     so neither is a utility (the --glow-* precedent). */
+  /* Scroll-reactive header bar (brand.md §5, D-2.17-1…6 / D-2.18-5). Read via var() in the .header-bar
+     block, so neither is a utility (the --glow-* precedent). The credit fades out of the bar as it
+     contracts (D-2.18-3/4), so the bar carries less and contracts further: 56rem → 48rem (D-2.18-5). */
   --header-blur: 12px;
-  --header-bar-max-scrolled: 56rem;
+  --header-bar-max-scrolled: 48rem;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --shadow-lg: 0 16px 40px -12px rgb(0 0 0 / 0.7);
 
   /* ---- motion (brand.md §6) ---- */
   --motion-fast: 120ms;
   --motion-base: 220ms;
+  /* Scroll-reactive header contract (brand.md §6, D-2.18-1). Its OWN duration — NOT a change to
+     --motion-base, which also times the FAQ (~249) + the block at ~358; slowing those to fix the
+     header is a side effect nobody asked for. Read via var() in the .header-shell/.header-bar block. */
+  --motion-slow: 420ms;
   --motion-drop: 480ms;
+  /* Home hero reveal duration (brand.md §6, D-2.18-5), replacing the borrowed --motion-drop. */
+  --motion-reveal: 760ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  /* Home hero reveal (brand.md §6, D-2.16-4). Reuses --motion-drop for the duration. */
-  --motion-stagger: 70ms;
+  /* Symmetric ease-in-out, HEADER ONLY (brand.md §6, D-2.18-2). Replaces --ease-out on the header;
+     --ease-out stays the site default everywhere else. Read via var() in the header block. */
+  --ease-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Home hero reveal (brand.md §6, D-2.16-4 / D-2.18-5): duration is --motion-reveal (above), stagger
+     is 110ms. */
+  --motion-stagger: 110ms;
   --motion-reveal-shift: 0.75rem;
   --motion-reveal-blur: 0.5rem;
 
@@ -390,7 +401,7 @@
   }
 }
 .reveal-group > * {
-  animation: trajanov-reveal var(--motion-drop) var(--ease-out) both;
+  animation: trajanov-reveal var(--motion-reveal) var(--ease-out) both;
 }
 .reveal-group > *:nth-child(1) { animation-delay: calc(var(--motion-stagger) * 0); }
 .reveal-group > *:nth-child(2) { animation-delay: calc(var(--motion-stagger) * 1); }
@@ -433,8 +444,8 @@
 */
 .header-shell {
   transition:
-    background-color var(--motion-base) var(--ease-out),
-    border-color var(--motion-base) var(--ease-out);
+    background-color var(--motion-slow) var(--ease-smooth),
+    border-color var(--motion-slow) var(--ease-smooth);
 }
 .header-shell[data-scrolled='true'] {
   background-color: transparent;
@@ -443,13 +454,13 @@
 .header-bar {
   border: 1px solid transparent;
   transition:
-    max-width var(--motion-base) var(--ease-out),
-    margin-top var(--motion-base) var(--ease-out),
-    background-color var(--motion-base) var(--ease-out),
-    border-color var(--motion-base) var(--ease-out),
-    border-radius var(--motion-base) var(--ease-out),
-    -webkit-backdrop-filter var(--motion-base) var(--ease-out),
-    backdrop-filter var(--motion-base) var(--ease-out);
+    max-width var(--motion-slow) var(--ease-smooth),
+    margin-top var(--motion-slow) var(--ease-smooth),
+    background-color var(--motion-slow) var(--ease-smooth),
+    border-color var(--motion-slow) var(--ease-smooth),
+    border-radius var(--motion-slow) var(--ease-smooth),
+    -webkit-backdrop-filter var(--motion-slow) var(--ease-smooth),
+    backdrop-filter var(--motion-slow) var(--ease-smooth);
 }
 .header-shell[data-scrolled='true'] .header-bar {
   max-width: var(--header-bar-max-scrolled);
@@ -459,4 +470,35 @@
   border-radius: var(--radius-lg);
   -webkit-backdrop-filter: blur(var(--header-blur));
   backdrop-filter: blur(var(--header-blur));
+}
+
+/*
+  The build credit leaves the bar as it contracts (D-2.18-3/4). `position: absolute` with NO insets
+  keeps the element at its static position and takes it out of the flex flow immediately, so the
+  left grid column stops reserving space for it — while the fade is still running.
+  Nothing else moves when it goes, because the header grid is minmax(0,1fr) auto minmax(0,1fr): the
+  centre nav is centred by the fr units, not by the width of the left column's contents (D-2.13-1).
+  IF THAT GRID IS EVER CHANGED AWAY FROM fr-BASED CENTRING, this rule starts causing a visible jump
+  and must be revisited.
+  `visibility` is transitioned with a delay equal to the fade, so the Vertex link stays focusable
+  until it is actually gone and then leaves the tab order — an opacity-0 link is still tabbable, and
+  a keyboard user landing on an invisible link is a WCAG 2.2 failure (D-2.18-4).
+  Desktop only in practice: the element is `hidden lg:block`, and the overlay's own copy of the
+  credit (SiteHeader.tsx ~348) does NOT carry this class and is unaffected.
+*/
+.header-credit {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--motion-slow) var(--ease-smooth),
+    visibility 0s linear 0s;
+}
+.header-shell[data-scrolled='true'] .header-credit {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--motion-slow) var(--ease-smooth),
+    visibility 0s linear var(--motion-slow);
 }
