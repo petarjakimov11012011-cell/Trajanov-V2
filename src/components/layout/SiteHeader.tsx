@@ -207,7 +207,7 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
             {t('brand')}
           </Link>
           {/* Credit moves into the overlay for mobile (D-2.15-2); shown in the bar only at lg. */}
-          <p className="text-muted-foreground text-small hidden min-w-0 lg:block">
+          <p className="header-credit text-muted-foreground text-small hidden min-w-0 lg:block">
             {renderCredit()}
           </p>
         </div>

@@ -138,7 +138,7 @@ value that isn't a scale step is a bug.
 | `--shadow-sm` | `0 1px 2px 0 rgb(0 0 0 / 0.4)` | Raised chips (rare) |
 | `--shadow-lg` | `0 16px 40px -12px rgb(0 0 0 / 0.7)` | Overlays: cart drawer, dialogs |
 | `--header-blur` | `12px` | `backdrop-filter` radius on the scrolled header bar (`D-2.17-1…6`) |
-| `--header-bar-max-scrolled` | `56rem` | Max width the header bar contracts to when scrolled (`max-w-6xl` 72rem → 56rem, `D-2.17-3`) |
+| `--header-bar-max-scrolled` | `48rem` | Max width the header bar contracts to when scrolled (`max-w-6xl` 72rem → 48rem, `D-2.18-5`). **Assumes the build credit is not in the bar** — the credit fades out as the bar contracts (`D-2.18-3`), so the bar carries less and can contract further than the 2.17 `56rem` |
 
 Dark, flat design — shadow is for overlays only, never decoration.
 
@@ -163,9 +163,12 @@ may use it.
 |---|---|---|
 | `--motion-fast` | `120ms` | Hover, focus |
 | `--motion-base` | `220ms` | Transitions |
+| `--motion-slow` | `420ms` | The scroll-reactive header contract (`D-2.18-1`) — its own duration, **not** a change to `--motion-base` (which also times the FAQ + the block at ~358) |
 | `--motion-drop` | `480ms` | The drop reveal — the one moment worth animating |
+| `--motion-reveal` | `760ms` | Home hero reveal duration, replacing the borrowed `--motion-drop` (`D-2.18-5`) |
 | `--ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` | Default easing for all of the above |
-| `--motion-stagger` | `70ms` | Gap between siblings in the Home hero reveal |
+| `--ease-smooth` | `cubic-bezier(0.65, 0, 0.35, 1)` | Symmetric ease-in-out. **Header only** (`D-2.18-2`) — `--ease-out` stays the site default everywhere else |
+| `--motion-stagger` | `110ms` | Gap between siblings in the Home hero reveal |
 | `--motion-reveal-shift` | `0.75rem` | Distance the revealing element travels up |
 | `--motion-reveal-blur` | `0.5rem` | Blur the revealing element starts from |
 
@@ -191,9 +194,13 @@ other page (About, Catalog, Product, legal) without a new owner-level decision.
 first two are first-paint or hover effects on a single surface. This one is **scroll-driven and
 site-wide**: `SiteHeader` sticks to the top of every page in both locales and, past a small scroll
 offset, contracts into a translucent, blurred, rounded pill via a CSS transition on
-`background-color` / `border-color` / `max-width` / `border-radius` / `backdrop-filter`, retimed to
-`--motion-base`. Because it is a plain CSS transition, the global `prefers-reduced-motion: reduce`
-rule already flattens it to a snap. **This is a genuine widening of the rule, not another carve-out:**
+`background-color` / `border-color` / `max-width` / `border-radius` / `backdrop-filter`, timed on the
+dedicated `--motion-slow` (420ms) over `--ease-smooth` (`D-2.18-1/2` — a slower, symmetric curve so
+the pill settles rather than snaps; 2.17 shipped this on `--motion-base` over `--ease-out`). As it
+contracts, the "Built by Vertex Consulting" build credit fades out of the bar (`D-2.18-3/4`), so the
+bar carries less and contracts further (`--header-bar-max-scrolled` 56rem → 48rem, `D-2.18-5`). Because
+it is a plain CSS transition, the global `prefers-reduced-motion: reduce` rule already flattens it to a
+snap. **This is a genuine widening of the rule, not another carve-out:**
 with three exceptions now on the books — one of them scroll-driven and on every route — "motion
 belongs to the countdown and the drop reveal, nothing else" is no longer literally true. Read §6 from
 here on as a **presumption against decoration**, not an absolute. Any fourth motion request is an

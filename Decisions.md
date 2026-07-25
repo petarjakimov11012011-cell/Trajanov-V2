@@ -3529,3 +3529,75 @@ start at `D-2.01-6`.*
   but it is a real, measured deviation from `D-2.17-3` — flagged for Lazar's real-device sign-off
   (owed #32). Not compensated with negative margin/padding (hard stop #4 forbids that).
 - **Links:** `src/app/globals.css` (`.header-bar`) · `D-2.17-3` · Phase 2.17 hard stop #4
+
+### D-2.18-1 · 2026-07-25 · A dedicated `--motion-slow` token for the header, not a change to `--motion-base`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.18 brief); executed by Claude Code.
+- **Decision:** The scroll-reactive header contract is retimed from `--motion-base` (220ms) to a new
+  dedicated `--motion-slow` (420ms). The header gets its own duration token.
+- **Alternative rejected:** Raising `--motion-base` itself from 220ms to 420ms — a one-line change.
+  Rejected because `--motion-base` also times the FAQ disclosure (`globals.css` ~249) and the block at
+  ~358; slowing those to fix the header is a side effect nobody asked for.
+- **Downside accepted:** A fourth duration token, so the motion scale is now
+  `fast / base / slow / drop / reveal` and a future reader has to choose between five rather than three.
+- **Links:** `brand.md` §6 · `src/app/globals.css` (`:root`, `.header-shell`/`.header-bar`)
+
+### D-2.18-2 · 2026-07-25 · A new `--ease-smooth` curve for the header, replacing `--ease-out` there only
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.18 brief); executed by Claude Code.
+- **Decision:** The header transition moves onto a new symmetric ease-in-out `--ease-smooth`
+  (`cubic-bezier(0.65, 0, 0.35, 1)`), replacing `--ease-out` on the header only. `--ease-out` stays the
+  site's default and is unchanged everywhere else.
+- **Alternative rejected:** Keeping `--ease-out` and only raising the duration — rejected because at
+  420ms that front-loaded curve reads as *fast, then drift*, which is less smooth than 220ms, not more.
+  A symmetric ease-in-out accelerates and decelerates evenly, which is what "smooth" means here.
+- **Downside accepted:** The header now moves on a different curve from the rest of the site, so it is
+  deliberately a little apart from the hover transitions around it.
+- **Links:** `brand.md` §6 · `src/app/globals.css` (`:root`, `.header-shell`/`.header-bar`) · `D-2.18-1`
+
+### D-2.18-3 · 2026-07-25 · The credit is taken out of flow with `position: absolute` while it fades
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.18 brief); executed by Claude Code.
+- **Decision:** As the bar contracts, the desktop build credit fades out and is taken out of the flex
+  flow with `position: absolute` and **no insets set** — not `display: none`, not a conditional render,
+  not a `max-width` collapse. With no insets the element stays at its static position and leaves the
+  flex flow instantly, so the left grid column stops reserving space for it while the opacity is still
+  animating. Nothing else reflows because the header grid is `minmax(0,1fr) auto minmax(0,1fr)`: the
+  centre nav is centred by the fr units, not by the width of the left column's contents (`D-2.13-1`).
+- **Alternative rejected:** `display: none` (cannot be transitioned), a conditional render
+  (`{!scrolled && …}` pops it out with no fade), and a `max-width` collapse (needs `white-space: nowrap`,
+  which changes how the credit wraps *at scroll-top* and breaks 2.17's byte-identical resting invariant).
+- **Downside accepted:** The credit is gone from layout the instant the threshold trips, while its
+  opacity is still animating — if the header grid is ever changed away from fr-based centring, this
+  starts causing a visible jump. The CSS block says so in a load-bearing comment.
+- **Links:** `src/app/globals.css` (`.header-credit`) · `src/components/layout/SiteHeader.tsx` · `D-2.13-1`
+
+### D-2.18-4 · 2026-07-25 · `visibility: hidden` is transitioned in behind the fade, so the Vertex link leaves the tab order
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.18 brief); executed by Claude Code.
+- **Decision:** `visibility: hidden` is transitioned onto the credit with `0s linear var(--motion-slow)`
+  so it flips only after the opacity fade completes (and back instantly on the way in), removing the
+  Vertex link from the tab order once it is actually gone.
+- **Alternative rejected:** `pointer-events: none` alone, which fixes the mouse but not the keyboard —
+  an `opacity: 0` link is still focusable and still in the accessibility tree, so a keyboard user tabbing
+  a scrolled page would land on an invisible link (a WCAG 2.2 failure). (`pointer-events: none` is kept
+  in addition, for the mouse.)
+- **Downside accepted:** None.
+- **Links:** `src/app/globals.css` (`.header-credit`) · `D-2.18-3`
+
+### D-2.18-5 · 2026-07-25 · The scrolled bar contracts further, 56rem → 48rem, and the Home hero reveal is retimed at the same time
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.18 brief); executed by Claude Code.
+- **Decision:** Two things fold together because both complaints are the same complaint — the motion is
+  too quick to read. (a) The scrolled bar's `--header-bar-max-scrolled` goes 56rem → 48rem: 56rem was
+  sized around content (the credit) that is no longer in the bar. (b) The Home hero reveal is retimed —
+  duration off the borrowed `--motion-drop` (480ms) onto a dedicated `--motion-reveal` (760ms), stagger
+  70ms → 110ms. `--motion-drop` itself is left at 480ms and untouched, so `brand.md`'s definition of the
+  drop reveal still means what it says. Measured: ended hero (4 children) ends at ~1.09s, countdown hero
+  (6 children) at ~1.31s — both under the 1.5s ceiling.
+- **Alternative rejected:** Shipping the header fix alone and holding the hero for its own phase —
+  rejected as two PRs for one adjustment.
+- **Downside accepted:** Lazar has not explicitly signed off on the hero retime; it is the "A" option put
+  to him after 2.16 and never separately answered. It is one token pair, isolated in Task 5, and
+  trivially revertible — called out at the top of the completion report so he can strike it in review.
+- **Links:** `brand.md` §5/§6 · `src/app/globals.css` (`:root`, `.reveal-group`) · `D-2.16-3`
