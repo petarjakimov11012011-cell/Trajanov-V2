@@ -28,11 +28,17 @@ import {LanguageSwitch} from './LanguageSwitch';
 //
 // Every colour / size / spacing / radius / type / motion value is a brand.md token — no hex, no raw px
 // literal. Client component so the nav can read usePathname() for the active-page state (D-2.08-4).
+
+// Scroll offset at which the header contracts. Not a design token — a scroll position, not a
+// rendered value (brand.md §8 covers colour/size/spacing/type/motion, not this).
+const SCROLL_THRESHOLD_PX = 32;
+
 export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
   const t = useTranslations('Nav');
   const tc = useTranslations('Credit');
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [lastPathname, setLastPathname] = useState(pathname);
   const burgerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -119,6 +125,23 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
     };
   }, []);
 
+  // Scroll-reactive header (D-2.17-1…3). Past this offset the bar contracts into the pill; the
+  // styling itself lives in the .header-shell / .header-bar block in globals.css (D-2.17-2).
+  // setState here is inside the listener / rAF *callbacks*, never in the effect body, so it is fine
+  // under react-hooks/set-state-in-effect (the same constraint the 2.15 effects work within).
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > SCROLL_THRESHOLD_PX);
+    window.addEventListener('scroll', onScroll, {passive: true});
+    // Sync once on mount via rAF, not in the effect body: a back/forward navigation can restore a
+    // scrolled position before this ever fires, and without this the bar would render at its
+    // scroll-top state until the customer moved.
+    const raf = requestAnimationFrame(onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   // A page link is active on its own route and on nested routes (a product page keeps Catalog lit).
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
@@ -167,8 +190,17 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
     });
 
   return (
-    <header className="bg-ground border-border border-b">
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+    // `sticky top-0` keeps the header in flow (D-2.17-1) so no route needs a top offset. z-30 sits
+    // below the overlay's z-40 (a child of this header) and the skip link's focus:z-50 (a sibling).
+    // `data-scrolled` is the ONLY styling switch: past the scroll threshold the .header-shell /
+    // .header-bar block in globals.css contracts the inner bar into a translucent blurred pill and
+    // fades this shell's own background + border to transparent (D-2.17-2/3). Nothing here may put
+    // transform/filter/backdrop-filter on <header> — that would trap the fixed overlay (hard stop #2).
+    <header
+      className="header-shell bg-ground border-border sticky top-0 z-30 border-b"
+      data-scrolled={scrolled ? 'true' : undefined}
+    >
+      <div className="header-bar mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
         {/* 1 — left: wordmark (all widths) + build credit (desktop only). */}
         <div className="col-start-1 row-start-1 flex min-w-0 flex-wrap items-center gap-3">
           <Link href="/" className={wordmarkClass}>

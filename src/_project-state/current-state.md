@@ -6,11 +6,133 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-25** · By: **Claude Code (Phase 2.16 — Home hero reveal animation)**
+Last updated: **2026-07-25** · By: **Claude Code (Phase 2.17 — scroll-reactive header)**
 
 ---
 
 ## Status
+
+**2.17 COMPLETE — the site header now sticks to the top and, once you scroll, contracts into a
+translucent blurred pill (this update, 2026-07-25).** An out-of-band **UI-only** phase (the 2.07–2.16
+shape) — **no commerce, no schema, no string, no fact, no dependency touched**, and **line 1 `NEXT:` is
+unchanged** (the 2.06 operator rehearsal remains next; this phase does not advance the critical path).
+`SiteHeader` renders on **every page in both locales**, so the blast radius is site-wide (incl. the
+Checkout header) — verified accordingly. The header used to scroll away and never return; it now stays
+pinned and, past a small offset, the inner bar narrows, rounds, gains a translucent blurred background,
+and floats over the page. One behaviour was taken from Lazar's `hero-section-1.tsx` reference — the
+scroll-reactive contract-and-blur — **reimplemented as a CSS transition on a `sticky` header**;
+everything else in that reference (`framer-motion`, `AnimatedGroup`/`TextEffect`, shadcn/button, the
+`Login`/`Sign Up`/`Get Started` buttons, `position: fixed`, the tailus logo, the reference's own
+burger/`X`) was rejected and is **absent from the diff**. What shipped:
+- **`src/app/globals.css` — three tokens + one scoped block.** `:root` gains `--color-ground-translucent`
+  (`color-mix(in srgb, var(--color-ground) 82%, transparent)`, beside `--color-mustard-tint-*`) and
+  `--header-blur: 12px` + `--header-bar-max-scrolled: 56rem` (beside `--radius-*`), each mirrored from
+  `brand.md` §3/§5 with a reference comment. All three are **read via `var()`** in the CSS block and are
+  **not** utilities (the `--glow-*` precedent — not added to `@theme inline`). A new **unlayered** block
+  after `.reveal-group` styles `.header-shell` / `.header-bar`: at rest nothing changes; on
+  `data-scrolled="true"` the shell's bg + bottom border fade transparent and the inner `.header-bar`
+  contracts to `max-width 56rem`, gains `margin-top 0.5rem`, `background var(--color-ground-translucent)`,
+  `border-color var(--color-border)`, `border-radius var(--radius-lg)`, and
+  `backdrop-filter: blur(var(--header-blur))` (with the `-webkit-` prefix). **Every value in the block is
+  a `var()`** except a `1px` hairline border (the same idiom as `.spotlight-card`) and a `0.5rem`
+  margin — `--space-2` is **not** a real token here (Tailwind v4 emits `calc(var(--spacing) * n)`, not
+  `--space-N`), so the literal was written per the brief rather than inventing a token. The transition is
+  retimed to `--motion-base`; no `!important` anywhere.
+- **Reduced motion.** The header transition is a plain CSS transition, so the **existing** global
+  `@media (prefers-reduced-motion: reduce)` rule (~line 198) flattens `transition-duration` to 0.001ms —
+  the header snaps instead of easing. **No second reduced-motion rule was added** (CSSOM-verified: zero
+  reduced-motion rules mention `.header-shell`/`.header-bar`).
+- **`src/components/layout/SiteHeader.tsx` — additions only** (`D-2.17-2/6`). One `const
+  SCROLL_THRESHOLD_PX = 32` at module scope; one `const [scrolled, setScrolled] = useState(false)`; one
+  **new, separate** `useEffect` that adds a `{passive:true}` `scroll` listener (`setScrolled(window.scrollY
+  > SCROLL_THRESHOLD_PX)`) plus a `requestAnimationFrame(onScroll)` mount-sync for back/forward restored
+  scroll positions (setState only inside the listener/rAF callbacks — clean under
+  `react-hooks/set-state-in-effect`). Two className additions + one attribute: `<header>` gains
+  `header-shell … sticky top-0 z-30` and `data-scrolled={scrolled ? 'true' : undefined}` (with a comment
+  naming the CSS block); the inner grid `<div>` gets `header-bar` prepended. **The overlay, focus trap,
+  scroll lock, resize effect, and render-time pathname reset are byte-unchanged** (hard stop #3).
+- **`brand.md` §3/§5/§6.** §3 Derived-tints table +1 row (`--color-ground-translucent`), §5 radius/shadow
+  table +2 rows (`--header-blur`, `--header-bar-max-scrolled`), §6 exception paragraph **extended** with
+  a third, honestly-worded exception (`D-2.17-5`): the header transition is scroll-driven and site-wide,
+  so §6 is now a *presumption against decoration*, not an absolute — a fourth motion request is an
+  owner-level decision.
+
+**⚠️ One operator-ratified deviation (`D-2.17-7`):** the base `.header-bar { border: 1px solid transparent }`
+(present in **both** states, per Task 3, so the scrolled border is a colour transition not a box-model
+jump) makes the **resting header 2px taller than `main`** (`<header>` 69px → 71px; content pushed down 2px
+site-wide, incl. Checkout). This contradicts the letter of `D-2.17-3` ("scroll-top byte-identical to
+`main`, to the pixel") and trips hard stop #4 — you cannot have both the border-in-both-states (no
+inter-state jump) and a pixel-identical resting box. Code surfaced the measured numbers; **Petar chose to
+ship the brief's CSS verbatim**, accepting the +2px (alternative — a layout-neutral edge via inset
+`box-shadow`/`outline` — rejected). Flagged for Lazar's real-device sign-off (owed #32).
+
+**Gates:** `npm run build` (exit 0, "✓ Compiled successfully") / `npx tsc --noEmit` (exit 0) / `npm run
+lint` (clean, exit 0 — **no `react-hooks/set-state-in-effect`** violation from the new effect) all pass;
+`npm test` **116/116** (unchanged count — the header carries no tests) incl. `✓ 10 simultaneous orders
+against 3 units → exactly 3 succeed, 7 rejected with insufficient_stock, stock 0` + the i18n
+catalog-parity suite (still **243** keys). **Rendered + measured in-browser** (dev server, **both
+locales** via MK cookie + `/en`, at **320/390/768/1024/1280**, on **Home, Catalog, Product, Checkout**),
+by `getBoundingClientRect()` + computed styles + `elementsFromPoint` hit-testing, not by eye:
+- **At `scrollY = 0`, all four routes × both widths × both locales:** `<header>` computes `position:
+  sticky`, `top: 0px`, `z-index: 30`, `bg rgb(15,18,16)`, `border-bottom rgb(42,46,43)`,
+  `filter/backdrop-filter/transform none`, `will-change auto`; inner bar `max-width 1152px`,
+  `border-radius 0px`, transparent bg/border; **nav centre offset 0px** (2.13 result intact both
+  locales); `<main>` first child directly under the header (`y` == header height). Resting **height 71px**
+  vs `main`'s **69px** — the +2px from `D-2.17-7`, the only scroll-top deviation.
+- **Past the threshold:** `data-scrolled="true"`; `<header>` stays pinned (`elementFromPoint(centre,10)`
+  returns the `.header-bar`, wordmark at viewport-y 21); the bar computes `max-width 896px` (56rem),
+  `border-radius 14px`, `margin-top 8px`, `background color(srgb …/0.82)` (82% ground translucent),
+  `border-color rgb(42,46,43)`, `backdrop-filter blur(12px)`; `<header>`'s own bg + bottom border compute
+  transparent; `filter/backdrop-filter/transform none` on `<header>` (the containing-block trap of hard
+  stop #2 avoided). **Applies at 390 too** (mobile, `D-2.17-4`): full-width rounded translucent pill.
+- **Scroll back to top** returns every value to the resting set — no stuck pill, no residual blur.
+- **No horizontal overflow** in **either** state at **320/390/768/1024/1280**, both locales
+  (`scrollWidth == clientWidth`). **No layout shift** — sticky doesn't push content (in-flow).
+- **Contrast, worst-case computed** (pill = 82% ground over the brightest realistic content, conservative
+  since the blur averages content darker): nav muted text ≥ **5.68:1** over the mustard live banner
+  (**4.58:1** even over hypothetical pure white), wordmark ≥ **11.16:1** — all ≥ 4.5 (nav) / ≥ 3 (wordmark
+  large text). The 82% opacity holds text above AA over content; not raised.
+- **2.15 mobile overlay while scrolled (390, both locales):** opening the burger with the page scrolled +
+  header in pill state still gives `position: fixed`, inset 0, full **390×844** opaque `bg-ground` panel,
+  `z-40`, **body scroll locked**, focus on the **X** („Затвори" MK / "Close" EN), 9 focusables; **Escape**
+  closes it, returns focus to the burger, and **releases the scroll lock**. The `D-2.17-1` downside
+  (overlay's `body{overflow:hidden}` un-sticks the header) is confirmed **harmless**.
+- **Skip link:** with `focus:z-50` simulated, the skip-to-content link paints **above** the header's new
+  `z-30` stacking context (index 0 in `elementsFromPoint`; z-50 sibling > z-30 sibling) — no regression.
+  Live `:focus` render not capturable in-pane (the pane's window doesn't hold OS focus).
+- **Console: zero new errors.** The only issue is the **pre-existing, out-of-scope** `ProductCard.tsx:59`
+  MK price hydration mismatch on the Home live grid (server "1,500 ден" vs client "1.500 ден"; component
+  stack roots in `HomePage → HomeExperience → ProductCard → SpotlightCard`, **zero header involvement**;
+  `ProductCard.tsx` byte-unchanged) — hard stop #8, recorded unchanged, not fixed.
+- **Reduced motion / Safari blur / Lighthouse:** structurally verified (no second RM rule; global rule
+  covers; `-webkit-backdrop-filter` present in the served bytes) but the pane can't emulate DevTools
+  reduced-motion, is Chromium (no WebKit), and a local Lighthouse isn't comparable to the production
+  baseline — these live reads are **owed #32/#33/#34**.
+Screenshots captured: **MK 390 top**, **MK 390 scrolled (pill)**, **MK 390 overlay-open-while-scrolled**,
+**EN 1280 top**, **EN 1280 scrolled (pill)**. (The sticky pill's *vertical position* mis-composited in the
+scrolled screenshots — a known Browser-pane sticky-layer screenshot artifact; the pill's appearance
+renders correctly and `getBoundingClientRect` + hit-testing prove it is pinned at `top:0`.)
+
+**Frozen (byte-unchanged, `git diff --name-only main` lists only `brand.md`, `src/app/globals.css`,
+`src/components/layout/SiteHeader.tsx` + the state/decision/report docs):** `src/messages/{mk,en}.json`
+(still **243** keys — `git diff main -- src/messages/` empty) / `docs/i18n/string-inventory.md` /
+`src/app/[locale]/layout.tsx` / every page under `src/app/[locale]/` / `SiteFooter.tsx` /
+`LanguageSwitch.tsx` / `src/components/home/*` (incl. `HomeExperience.tsx`, `Countdown.tsx`,
+`ProductCard.tsx`) / cart / checkout / `Turnstile.tsx` / `src/lib/**` / `create_order` /
+`expire_reservations` / `supabase/**` / `src/config/**` / `facts.md` / `package.json` + lockfile
+(**no new dependency** — `grep -rn "from 'motion\|framer-motion\|AnimatedGroup\|TextEffect\|Sign Up\|Get
+Started\|tailus\|unsplash" src/` returns nothing in shipped code). **No new placeholder**, **no
+`[PLACEHOLDER: …]` marker**; **placeholder register UNCHANGED**; **no new fact** (a scroll behaviour makes
+no factual claim). **Owed-verification register +3** (#32 sticky-header sign-off on a real phone incl. the
++2px feel + the live reduced-motion read; #33 Safari/iOS blur; #34 Lighthouse mobile perf re-run). This is
+**one more than the brief's "+2"** — Code added #34 because a comparable Lighthouse number could not be
+produced locally (post-deploy PageSpeed is the valid measurement). Decisions `D-2.17-1…6` (all six
+orchestrator-made, appended verbatim) + `D-2.17-7` (Claude Code, operator-ratified — the +2px resting
+delta). **`file-map.md` needs no tree change** (no file added, moved, or deleted); **`00_stack-and-config.md`
+unchanged** (no dependency, no config). Branch `phase-2.17-scroll-header`; **PR open to `main` — NOT
+self-merged (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical
+path. (Note: `main` had moved by one **empty `github-actions[bot]` keep-alive commit** `bd15ed1`
+`[skip ci]` since PR #28; the branch is based on it — benign, not a concurrent phase.)
 
 **2.16 COMPLETE — the Home hero now reveals with a short staggered blur-in on first paint (this update,
 2026-07-25).** An out-of-band **UI-only** phase (the 2.07–2.15 / Y.02 shape) — **no commerce, no schema, no
@@ -1802,6 +1924,9 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 29 | **Burger menu sign-off on the live deploy, on a real phone, both locales (2.14).** Open `https://www.trajanovv.com` on a phone. Tap the burger; tap each of the three links; use the back button; switch to EN and repeat. Pass = the header is one line with the menu closed; the menu opens and closes cleanly; every link goes to the right page and the menu is **closed on arrival**; nothing overflows sideways; and the MK label **„Мени"** reads correctly to a native speaker (it is a **new MK string, not covered by the 2.03 review stamp**). Code measured this end-to-end in the pane (burger + cart both ≥ 44×44, no overflow closed/open at 320/390, focus → first link on open, Escape → button, link-tap closes on arrival, active filled `bg-surface` row at 390 + 2px mustard underline at 1280 — both locales) — but the real-device feel + the native-MK read are Lazar's. Owner: **Lazar** (+ **Petar** for the MK label). | 2.14 | **after 2.14 deploys — before the first real drop (real phone, both locales)** |
 | 30 | **Full-screen menu sign-off on the live deploy, on a real phone, both locales (2.15).** Open `https://www.trajanovv.com` on a phone. Tap the burger; confirm the menu takes the **whole screen**; tap each row (Catalog, About, Contact, Cart); use the **X** and the **back button**; switch to EN and repeat. Pass = the closed header is **wordmark + burger only**; the menu is a full-screen **opaque** panel matching the reference (wordmark + X top bar, left-aligned links with a **left** accent on the active one, divider, centred MK·EN, centred credit); every row navigates correctly and closes the menu; nothing overflows sideways; and the MK **„Затвори"** label reads correctly to a native speaker (a **new MK string, not covered by the 2.03 review stamp**). Code measured this end-to-end in the pane (both locales, 320/390/768/1024/1280): closed = wordmark + burger only, no overflow; open = fixed opaque `bg-ground` dialog covering the viewport, correct order, `text-h2` rows with no wrap/overflow; focus → X on open, Escape/X → burger, focus trap wraps, link/cart taps navigate + close on arrival, active left 2px mustard accent; desktop unchanged (burger `display:none`, nav offset 0px, one centreline); resize-to-desktop closes + releases the scroll lock — but the real-device feel + the native-MK read are Lazar's/Petar's. Owner: **Lazar** (+ **Petar** for the MK label). | 2.15 | **after 2.15 deploys — before the first real drop (real phone, both locales)** |
 | 31 | **Hero reveal sign-off on the live deploy, on a real phone, both locales (2.16).** Open `https://www.trajanovv.com` and `/en` on a phone after the deploy. Pass = **the countdown arrives first and reads immediately; the sequence feels quick, not staged; nothing jumps or reflows as it settles.** Also confirm the **reduced-motion** behaviour on a device with "Reduce Motion" enabled (iOS Settings → Accessibility → Motion; Android → Remove animations): the hero should appear **fully visible on the first frame with no fade** — Code verified the served CSS rule + the `animation: none` outcome (opacity 1 / transform none / filter none on frame 1 for all six children) but the in-app Browser pane could not toggle the DevTools reduced-motion emulation, so the live device read is owed. Code measured the reveal end-to-end in the pane (both locales, 390 + 1280, all three drop states via `?preview=`): delays 0/70/140/210/280/350ms, last ends at 830ms; live banner + heading paint solid, only cards cascade; ended About-link last; **settled rects identical to `main` to the pixel** (`settledEqualsBase: true`), no overflow/shift at 390 & 1280; countdown digits still tabular; both links keyboard-focusable with the focus ring; zero new console errors — but the real-device *feel* + the live reduced-motion read are Lazar's/Petar's. Owner: **Lazar** (+ **Petar**). | 2.16 | **after 2.16 deploys — before the first real drop (real phone, both locales)** |
+| 32 | **Scroll-reactive header sign-off on a real phone, both locales (2.17).** Open `https://www.trajanovv.com` and `/en` on a phone after the deploy; scroll the Home page down past the FAQ and back up. Pass = the bar **contracts smoothly into the rounded translucent pill and stays readable over content**, and it does **not** feel like it is eating the screen (`D-2.17-4` — a permanently sticky ~60px bar on a 390px viewport; if it does feel too heavy, the fix is one `lg:`-gating media query). Three things fold into this row: (a) the real-device **feel** of the sticky pill at every width; (b) confirm the **+2px resting-height delta is imperceptible** — the resting header is 2px taller than the pre-2.17 geometry because `.header-bar` carries a transparent 1px border in both states (`D-2.17-7`, operator-accepted, ship-verbatim); (c) the **reduced-motion** read — with "Reduce Motion" enabled (iOS Settings → Accessibility → Motion; Android → Remove animations) the header should **snap** between states with no ease (the global `prefers-reduced-motion` rule flattens the transition; Code confirmed no second rule was added and the global rule exists, but the in-app Browser pane could not toggle the DevTools reduced-motion emulation, so the live read is owed). Code measured the header end-to-end in the pane (both locales, 320/390/768/1024/1280, all four routes Home/Catalog/Product/Checkout): at `scrollY 0` sticky `top:0` `z-30`, opaque ground, square, `max-w-6xl`, nav centre offset 0px, `filter/backdrop-filter/transform none`; past the threshold `data-scrolled="true"`, bar `max-width 896px`, `border-radius 14px`, `margin-top 8px`, translucent `background 82%`, `backdrop-filter blur(12px)`, `<header>` bg + bottom border transparent; scroll-back fully resets; no horizontal overflow in either state at any width; 2.15 overlay still fixed inset-0 opaque full-viewport with scroll lock + focus-on-X while scrolled; contrast worst-case (pill over the mustard live banner) 5.68:1 nav / 11.16:1 wordmark — but the real-device *feel*, the +2px read, and the live reduced-motion read are Lazar's/Petar's. Owner: **Lazar** (+ **Petar**). | 2.17 | **after 2.17 deploys — before the first real drop (real phone, both locales)** |
+| 33 | **Safari / iOS `backdrop-filter` blur check (2.17).** On the same phone, in **Safari** (not just Chrome), scroll the Home page down. Pass = the scrolled bar is **genuinely blurred**, not merely translucent — the content behind it goes soft. Code confirmed the served CSS pill rule carries **both** `-webkit-backdrop-filter: blur(var(--header-blur))` and `backdrop-filter: blur(var(--header-blur))` (verified against the raw served CSS bytes), but the in-app Browser pane is Chromium, so **no WebKit engine was available** to confirm the blur actually renders on iOS Safari. Owner: **Lazar**. | 2.17 | **after 2.17 deploys — before the first real drop (iOS Safari)** |
+| 34 | **Lighthouse mobile Performance re-run on Home + Catalog (2.17).** After the deploy, run PageSpeed Insights (mobile) on `https://www.trajanovv.com/` and `/en/catalog` and record the Performance number; compare to the pre-2.17 baseline (mobile **94** on Catalog + Checkout, per 2.04). `backdrop-filter` on a sticky element repaints on scroll and is the one realistic way this phase could cost points — though the blur is on the small ~896px pill only, active only while scrolled, so the risk is low. Code could **not** produce a comparable number locally: a dev/localhost Lighthouse is not comparable to the production PageSpeed baseline (no CDN, different throttling), and the meaningful measurement is on the deployed build — the same "re-check on PageSpeed after deploy" pattern 2.04 used for the 94 mobile scores. **If it drops below 94, report it — do not absorb it silently** (`D-2.17-4`'s media-query fallback also removes the mobile blur if needed). Owner: **Lazar / Petar**. | 2.17 | **after 2.17 deploys — before the first real drop** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
