@@ -3420,3 +3420,112 @@ start at `D-2.01-6`.*
   The banner is the status line and must not appear to load; the cards arriving one after another *is*
   the drop reveal `brand.md` §6 sanctions.
 - **Links:** `src/components/home/HomeExperience.tsx` (live branch) · `brand.md` §6
+
+### D-2.17-1 · 2026-07-25 · `position: sticky; top: 0`, not `position: fixed`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.17 brief); executed by Claude Code.
+- **Decision:** The scroll-reactive header sticks with `position: sticky; top: 0`, not the reference's
+  `position: fixed`.
+- **Alternative rejected:** The reference block's `fixed`. `fixed` removes the header from flow, which
+  would require padding the top of `<main>` on every route by the header's height — a number that
+  would then have to be kept in sync by hand and would be wrong the moment the header's height changed.
+  `sticky` keeps the header in flow, so nothing below it moves and no page needs an offset.
+- **Downside accepted:** `sticky` stops working inside any ancestor with `overflow` other than
+  `visible`. `<body>` is `flex min-h-full flex-col` with no overflow today, so it works — but the 2.15
+  overlay sets `document.body.style.overflow = 'hidden'` while open, which un-sticks the header. That
+  is harmless (the overlay covers the whole viewport regardless) and was **confirmed in-browser**, not
+  assumed: with the page scrolled and the header in its pill state, opening the burger still produced a
+  `position: fixed`, inset-0, full-viewport (390×844) opaque overlay with the body scroll locked.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `src/app/globals.css` · `D-2.15-1`
+
+### D-2.17-2 · 2026-07-25 · The scrolled state is one `data-scrolled` attribute + a CSS block, not conditional Tailwind classes
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.17 brief); executed by Claude Code.
+- **Decision:** The scrolled state is a single `data-scrolled` attribute on `<header>` plus an unlayered
+  CSS block in `globals.css` — not a pile of conditional Tailwind classes.
+- **Alternative rejected:** The reference's approach, `cn('…', isScrolled && 'bg-background/50 max-w-4xl
+  rounded-2xl border backdrop-blur-lg lg:px-5')`. Rejected because it puts a raw radius (`rounded-2xl`),
+  a raw opacity (`/50`) and a raw blur scale (`backdrop-blur-lg`) into a component, which `brand.md` §8
+  forbids, and because it makes the transition list implicit. React sets **one attribute**; every value
+  lives in `globals.css` as a token.
+- **Downside accepted:** The styling is no longer visible in the component file — a reader of
+  `SiteHeader.tsx` sees `data-scrolled` and has to open `globals.css` to learn what it does. Mitigated
+  by a comment at the attribute naming the `.header-shell` / `.header-bar` block.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `src/app/globals.css`
+
+### D-2.17-3 · 2026-07-25 · At scroll-top the header renders identically to `main`
+- **Status:** Accepted (see the resting-height carve-out in `D-2.17-7`)
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.17 brief); executed by Claude Code.
+- **Decision:** The pill is a **scrolled-only** state: at `scrollY = 0` the header is `bg-ground`,
+  `border-b border-border`, `max-w-6xl`, square, opaque — i.e. exactly what 2.13 and 2.15 measured.
+- **Alternative rejected:** Making the pill the permanent resting style (visually closer to the
+  reference, which floats even at the top).
+- **Downside accepted:** The effect is invisible until the customer scrolls, so on a short page it never
+  appears at all. That is the correct trade — it protects the finished 2.13 desktop centreline result
+  and the 2.15 overlay geometry, both verified rect-by-rect. **Measured:** at `scrollY = 0` the header
+  computes `bg` `rgb(15,18,16)`, `border-bottom` `rgb(42,46,43)`, bar `max-width 1152px`,
+  `border-radius 0px`, no blur, nav centre offset 0px, on all four routes × both widths × both locales.
+  The one deviation from "byte-identical" is the resting **height** (69px → 71px), carved out in
+  `D-2.17-7`.
+- **Links:** `src/app/globals.css` · `D-2.17-7`
+
+### D-2.17-4 · 2026-07-25 · The behaviour applies at every width, phones included
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.17 brief); executed by Claude Code.
+- **Decision:** The contract-and-blur applies at every viewport width, phones included — not `lg:` only.
+- **Alternative rejected:** `lg:` only, leaving mobile with today's scroll-away header.
+- **Downside accepted:** A permanently sticky bar costs roughly 60px of a 390px-tall phone viewport for
+  the whole session, on a site whose loudest object is a countdown. Taken because the audience is
+  Instagram-native and mobile-first, the cart badge is the one thing they need persistently reachable,
+  and losing the header entirely below the fold is worse than losing 60px. **If Lazar dislikes it on a
+  real phone, the fix is one media query** (owed #32).
+- **Links:** `src/components/layout/SiteHeader.tsx` · `src/app/globals.css`
+
+### D-2.17-5 · 2026-07-25 · A third narrowly-scoped exception to `brand.md` §6 — scroll-driven and site-wide
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.17 brief); executed by Claude Code.
+- **Decision:** A third exception to `brand.md` §6, recorded honestly in §6. `D-2.10-1` (spotlight) and
+  `D-2.16-3` (hero reveal) are first-paint or hover effects; this one is **scroll-driven and site-wide**,
+  which is a genuine widening of the rule, not another carve-out. §6 now reads as a *presumption against
+  decoration*, not an absolute.
+- **Alternative rejected:** Leaving §6 as written and treating the header as outside its scope.
+- **Downside accepted:** "Motion belongs to the countdown and the drop reveal, nothing else" is now
+  three exceptions deep and is no longer literally true. Any fourth request is an owner-level decision.
+- **Links:** `brand.md` §6 · `D-2.10-1` · `D-2.16-3`
+
+### D-2.17-6 · 2026-07-25 · Nothing is added to or removed from the header's contents
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.17 brief); executed by Claude Code.
+- **Decision:** Same wordmark, same three nav links, same MK·EN switch, same cart, same credit, same
+  burger, same overlay, same order, same strings. **Zero message-catalog change — the catalogs stay at
+  243 keys.**
+- **Alternative rejected:** Taking the reference's `Login` / `Sign Up` / `Get Started` while in the file.
+  There are no accounts on this site and never will be at this scope.
+- **Downside accepted:** None.
+- **Links:** `src/components/layout/SiteHeader.tsx` · `src/messages/{mk,en}.json` (unchanged)
+
+### D-2.17-7 · 2026-07-25 · The resting header is 2px taller than `main`; operator chose to ship the brief's CSS verbatim
+- **Status:** Accepted
+- **Decided by:** Claude Code (surfaced the conflict); **ratified by Petar in-session** (chose "Ship the
+  brief's CSS verbatim" when asked).
+- **Decision:** Task 3's CSS block puts `border: 1px solid transparent` on `.header-bar` in **both**
+  scroll states (so the scrolled border is a colour transition, not a box-model jump). With
+  `box-sizing: border-box` and an auto height, that 1px top+bottom border makes the resting header
+  **2px taller** than `main` (measured: `<header>` 69px → 71px; `.header-bar` 68px → 70px), and pushes
+  every page's first content element down 2px (`<main>`'s first child `y` 69 → 71) — **site-wide,
+  including the Checkout header**. This is an unavoidable consequence of the both-states-border
+  technique: you cannot have both the border in both states (no inter-state jump) and a resting box
+  pixel-identical to `main`. It directly contradicts the letter of `D-2.17-3` and trips hard stop #4.
+  Petar was shown the measured numbers and chose to ship the brief's CSS **verbatim**, accepting the
+  +2px.
+- **Alternative rejected:** A layout-neutral pill edge — drawing the scrolled 1px edge with a technique
+  that does not change the box model (inset `box-shadow` or `outline`), so the resting header stays
+  pixel-identical to `main` **and** there is no inter-state jump. This best satisfies `D-2.17-3` and the
+  brief's own stated intent ("a colour transition, not a box-model change"), but deviates from the exact
+  `border` CSS the brief specifies and (for `box-shadow`) brushes against `brand.md` §5's
+  "shadow is for overlays only". Rejected by the operator in favour of shipping the specified CSS.
+- **Downside accepted:** The resting header is 2px taller than the 2.13/2.15 signed-off geometry on
+  every route, and all content sits 2px lower. It is invisible to the eye and consistent across routes,
+  but it is a real, measured deviation from `D-2.17-3` — flagged for Lazar's real-device sign-off
+  (owed #32). Not compensated with negative margin/padding (hard stop #4 forbids that).
+- **Links:** `src/app/globals.css` (`.header-bar`) · `D-2.17-3` · Phase 2.17 hard stop #4

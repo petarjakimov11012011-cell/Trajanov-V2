@@ -73,6 +73,7 @@ ledger at the end of this section is the proof, and it reproduces the handover's
 | `--color-mustard-tint-8` | `color-mix(in srgb, var(--color-mustard) 8%, transparent)` | Size-picker selected fill |
 | `--color-mustard-tint-6` | `color-mix(in srgb, var(--color-mustard) 6%, transparent)` | Cart cap-notice fill |
 | `--color-glow` | `color-mix(in srgb, var(--color-foreground) 100%, transparent)` | Product-card pointer spotlight — the off-white foreground, never pure white (`D-2.10-1`) |
+| `--color-ground-translucent` | `color-mix(in srgb, var(--color-ground) 82%, transparent)` | The scrolled header bar, behind `backdrop-filter` (`D-2.17-1…6`). 82% keeps the header text above AA over content — raise toward 100% if a contrast check fails, never lower it |
 
 ### Contrast ledger — WCAG 2.2 AA, all computed and passing
 
@@ -136,6 +137,8 @@ value that isn't a scale step is a bug.
 | `--radius-full` | `9999px` | Language pill, dots |
 | `--shadow-sm` | `0 1px 2px 0 rgb(0 0 0 / 0.4)` | Raised chips (rare) |
 | `--shadow-lg` | `0 16px 40px -12px rgb(0 0 0 / 0.7)` | Overlays: cart drawer, dialogs |
+| `--header-blur` | `12px` | `backdrop-filter` radius on the scrolled header bar (`D-2.17-1…6`) |
+| `--header-bar-max-scrolled` | `56rem` | Max width the header bar contracts to when scrolled (`max-w-6xl` 72rem → 56rem, `D-2.17-3`) |
 
 Dark, flat design — shadow is for overlays only, never decoration.
 
@@ -183,6 +186,18 @@ staggered blur-in entrance applied to the Home hero sections and the live-drop p
 entirely under `prefers-reduced-motion: reduce` (the `.reveal-group` class sets `animation: none`, so
 every hero child renders in its final state on the first frame); it is **not** to be reused on any
 other page (About, Catalog, Product, legal) without a new owner-level decision.
+
+**A third exception — the scroll-reactive header (`D-2.17-5`) — and this one is a different kind.** The
+first two are first-paint or hover effects on a single surface. This one is **scroll-driven and
+site-wide**: `SiteHeader` sticks to the top of every page in both locales and, past a small scroll
+offset, contracts into a translucent, blurred, rounded pill via a CSS transition on
+`background-color` / `border-color` / `max-width` / `border-radius` / `backdrop-filter`, retimed to
+`--motion-base`. Because it is a plain CSS transition, the global `prefers-reduced-motion: reduce`
+rule already flattens it to a snap. **This is a genuine widening of the rule, not another carve-out:**
+with three exceptions now on the books — one of them scroll-driven and on every route — "motion
+belongs to the countdown and the drop reveal, nothing else" is no longer literally true. Read §6 from
+here on as a **presumption against decoration**, not an absolute. Any fourth motion request is an
+owner-level decision.
 
 ---
 
