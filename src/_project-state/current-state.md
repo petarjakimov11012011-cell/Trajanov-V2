@@ -104,7 +104,29 @@ register UNCHANGED; no new fact** (a gradient makes no factual claim). **Owed-ve
 (#37), and **row #36's `D-2.19-6` ratify-or-strike item marked ratified**. Decisions `D-2.20-1…3` — all
 three orchestrator-made and appended verbatim; **Claude Code made no on-the-fly decision this phase**.
 **`file-map.md` needs no tree change**; **`00_stack-and-config.md` unchanged**. Branch
-`phase-2.20-wordmark-shine-white`; PR to `main`, **not self-merged** (`D-0-3`).
+`phase-2.20-wordmark-shine-white`; **PR [#32](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/32)
+MERGED to `main` (merge `e5c570c`, 2026-07-25) on Petar's explicit instruction (`D-0-3`: operator-authorised,
+not Code); branch deleted** (clean GitHub PR merge, remote + local refs pruned). **Production deploy VERIFIED**
+— the live `https://www.trajanovv.com/` CSS bundle (`/_next/static/chunks/2744txcsz25me.css`) carries
+`--color-shine:#fff` and the shipped stop
+`linear-gradient(100deg, var(--color-foreground) calc(var(--wordmark-x) - 24%), var(--color-shine)
+var(--wordmark-x), var(--color-foreground) calc(var(--wordmark-x) + 24%))`, with **zero** occurrences of the
+2.19 `color-mix(in srgb, var(--color-mustard) 65%, …)` stop — and, because there is no `color-mix` left in the
+block, Lightning CSS no longer emits the `@supports` fallback pair, so the gradient now ships **once** (expected,
+not a regression). `--color-glow` is unchanged on production (`color-mix(in srgb, var(--color-foreground) 100%,
+transparent)`), as are `--motion-shine:.9s`, `--motion-slow:.42s`, `--motion-reveal:.76s` and
+`--header-bar-max-scrolled:48rem`; the `@media (hover:hover) and (pointer:fine)` gate, the
+`animation:trajanov-wordmark-shine var(--motion-shine) linear 1` and the dedicated
+`@media (prefers-reduced-motion:reduce)` rule (`-webkit-text-fill-color:currentColor;background-image:none;
+animation:none`) all serve intact. Driven live in-browser on production at 1280 in **both locales** (`lang=en`
+on `/en`, `lang=mk` on `/`): hovering the wordmark produces an animation with `duration 0.9s`,
+`timing-function linear`, `iteration-count 1`, frames `-40%` @0 · `0%` @200 · `50%` @450 · `100%` @700 ·
+`136%` @880, the band centre computing **`rgb(255, 255, 255)`**, and `getBoundingClientRect()` **identical at
+every frame** (`89,23,135.039,24`); `<header>` still computes `transform/filter/backdrop-filter: none`, and the
+CSSOM carries **exactly two** `.wordmark-shine` rules with the reduced-motion one second. The **real-device
+feel + the subtlety call + the OLED bloom read + the touch-device inertness read + the live reduced-motion read
+stay owed #37** (Lazar + Petar). `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01
+critical path.
 
 **2.19 COMPLETE — the TRAJANOV wordmark now takes a single band of light across its letters when you
 hover or tab onto it, so the brand mark reads as the link home (this update, 2026-07-25).** An out-of-band
