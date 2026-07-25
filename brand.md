@@ -65,6 +65,7 @@ ledger at the end of this section is the proof, and it reproduces the handover's
 | `--color-border` | `#2A2E2B` | Hairlines, dividers — quiet |
 | `--color-border-strong` | `#686D67` | Hairlines that must be seen: fields, the cap notice |
 | `--color-focus-ring` | `#F2C55A` | Focus ring (light mustard), 2px at 2px offset over ground |
+| `--color-shine` | `#FFFFFF` | *Wordmark hover-shine band only* (`D-2.20-1`) |
 
 **Derived tints** (never hardcode — use `color-mix` against the token):
 
@@ -74,6 +75,14 @@ ledger at the end of this section is the proof, and it reproduces the handover's
 | `--color-mustard-tint-6` | `color-mix(in srgb, var(--color-mustard) 6%, transparent)` | Cart cap-notice fill |
 | `--color-glow` | `color-mix(in srgb, var(--color-foreground) 100%, transparent)` | Product-card pointer spotlight — the off-white foreground, never pure white (`D-2.10-1`) |
 | `--color-ground-translucent` | `color-mix(in srgb, var(--color-ground) 82%, transparent)` | The scrolled header bar, behind `backdrop-filter` (`D-2.17-1…6`). 82% keeps the header text above AA over content — raise toward 100% if a contrast check fails, never lower it |
+
+**`--color-shine` is a scoped exception to "never pure white" (`D-2.20-1`).** The rule that
+`--color-glow` records — *the off-white foreground, never pure white* (`D-2.10-1`) — still stands
+everywhere else, and **`--color-glow` is unchanged**: the product-card spotlight remains
+`--color-foreground`. `--color-shine` is `#FFFFFF` and is used in **one place only**, the band of the
+wordmark hover sweep, where an off-white band over an off-white wordmark would not read as light at
+all. Using it anywhere else needs a new owner-level decision. Downside accepted with the exception:
+pure white on a near-black ground can bloom on OLED phones, which is most of audience 1.
 
 ### Contrast ledger — WCAG 2.2 AA, all computed and passing
 
@@ -89,6 +98,7 @@ ledger at the end of this section is the proof, and it reproduces the handover's
 | sold-out on ground / surface | **5.3 / 5.0** | 4.5 |
 | border-strong on ground / surface | **3.6 / 3.3** | 3.0 |
 | focus-ring on ground | **11.6** | 3.0 |
+| shine (pure white) on ground | **18.8** | 4.5 |
 
 **Never use (all computed < AA, all avoided in code):** red on mustard **1.9** · off-white on
 mustard **1.7** · white on red **4.24**. On mustard and on red, labels are always the near-black
@@ -209,9 +219,12 @@ owner-level decision.
 
 **A fourth exception — the wordmark hover shine (`D-2.19-1`) — granted as the owner-level decision the
 paragraph above calls for.** Lazar requested it directly (2026-07-25). It is a **one-shot gradient sweep
-across the header wordmark**: a band of `--color-mustard`, mixed into the resting `--color-foreground`,
-travels once across the TRAJANOV glyphs on `:hover` **or** `:focus-visible`, timed on `--motion-shine`
-(900ms) at constant speed. It is **fine-pointer only** (gated on `@media (hover: hover) and
+across the header wordmark**: a band of `--color-shine` — **pure white** (`D-2.20-1`), over outer stops
+that stay `--color-foreground` — travels once across the TRAJANOV glyphs on `:hover` **or**
+`:focus-visible`, timed on `--motion-shine` (900ms) at **constant speed** (`linear`, ratified
+`D-2.20-3`). 2.19 first shipped the band as a mustard mix, which *darkened* the letters as it crossed
+them and tinted them brand yellow; 2.20 recoloured it so the sweep **brightens only and never dims**
+(`D-2.20-2`). It is **fine-pointer only** (gated on `@media (hover: hover) and
 (pointer: fine)`, so touch devices and the mobile menu overlay paint nothing), it **never loops** — no
 `infinite`, no mount animation, no tap scale — and under `prefers-reduced-motion: reduce` it is
 **removed entirely**, not flattened: a dedicated rule drops the animation *and* the gradient, so the

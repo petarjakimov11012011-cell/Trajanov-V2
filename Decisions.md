@@ -3683,3 +3683,44 @@ start at `D-2.01-6`.*
   **The brief said `--ease-out`; this is a deliberate departure and a one-word revert** — replace
   `linear` with `var(--ease-out)` in the `.wordmark-shine` block and nothing else changes.
 - **Links:** `src/app/globals.css` (`.wordmark-shine`) · `D-2.18-2` · `brand.md` §6
+
+### D-2.20-1 · 2026-07-25 · The band becomes pure white, via a new `--color-shine: #FFFFFF` token
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.20 brief); executed by Claude Code.
+- **Decision:** The wordmark shine band becomes pure white, via a new `--color-shine: #FFFFFF` token.
+- **Alternative rejected:** a near-white such as `#F8F6F2`, which would keep `brand.md` §3's "never pure
+  white" rule intact.
+- **Downside accepted:** **this is a deliberate, narrowly-scoped exception to §3's `--color-glow` rule —
+  "the off-white foreground, never pure white" (`D-2.10-1`)** — and pure white on a near-black ground can
+  bloom on OLED phones, which is most of audience 1. Rejected the near-white because at that small a step
+  from `#ECE8E0` the band would not read as white light at all, so it would not deliver what was asked
+  for. Owner's call — Lazar, 2026-07-25. **The exception is scoped to this one sweep. `--color-shine` is
+  not to be used anywhere else without a new decision, and `--color-glow` stays off-white for the
+  product-card spotlight.**
+- **Links:** `brand.md` §3 · `src/app/globals.css` (`:root`, `.wordmark-shine`) · `D-2.10-1` · `D-2.19-5`
+
+### D-2.20-2 · 2026-07-25 · The trough stays `--color-foreground`. The sweep brightens only; it never dims
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.20 brief); executed by Claude Code.
+- **Decision:** The gradient's two outer stops stay `var(--color-foreground)`. The sweep brightens only;
+  it never dims.
+- **Alternative rejected:** dipping the outer stops below `--color-foreground` so the band pops harder
+  against a darker surround — the technique the 21st.dev reference uses.
+- **Downside accepted:** the visible step is only 15.4:1 → 18.4:1, so the glint is **subtler than the
+  mustard version was**. Rejected the dip because it would visibly dim the wordmark on hover, and on the
+  scrolled translucent pill over the mustard live banner the mark is already at its worst contrast (2.19
+  measured **7.84:1** there mid-sweep). Making a navigation link *harder* to read on hover is the wrong
+  trade.
+- **Links:** `brand.md` §3 · `src/app/globals.css` (`.wordmark-shine`) · `D-2.20-1`
+
+### D-2.20-3 · 2026-07-25 · `D-2.19-6` is ratified. The easing stays `linear`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.20 brief); executed by Claude Code.
+- **Decision:** `D-2.19-6` is ratified. The `.wordmark-shine` easing stays `linear`.
+- **Alternative rejected:** reverting to the brief's `var(--ease-out)`.
+- **Downside accepted:** `linear` is a third motion timing in play alongside `--ease-out` and
+  `--ease-smooth`. Ratified because Code's reasoning was measured, not asserted: `--ease-out` is
+  front-loaded enough that the band clears the glyphs by t≈225ms of 900ms, making the sweep a ~150ms
+  flick followed by ~710ms of invisible drift. Constant speed is how light crosses a surface. **This
+  closes the "ratify or strike" item that was sitting in owed row #36.**
+- **Links:** `D-2.19-6` · `brand.md` §6 · `src/app/globals.css` (`.wordmark-shine`) · owed register #36
