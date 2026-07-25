@@ -122,8 +122,16 @@ UNCHANGED**; **no new fact** (a timing curve + a fade make no factual claim). **
 Decisions `D-2.18-1…5` (all five orchestrator-made, appended verbatim; no Claude-Code-only decision this phase — the CSS
 was shippable as written, unlike 2.17). **`file-map.md` needs no tree change** (only the new completion report was added;
 the tree lists the `completions/` directory, not each report). **`00_stack-and-config.md` unchanged** (no dependency, no
-config). Branch `phase-2.18-header-retime`; **PR open to `main`, NOT self-merged** (`D-0-3`). `NEXT:` line **unchanged** —
-out-of-band, does not touch the 2.06 → Y.01 critical path.
+config). Branch `phase-2.18-header-retime`; **PR [#30](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/30)
+MERGED to `main` (merge `8f19408`, 2026-07-25) on Petar's explicit instruction (`D-0-3`: operator-authorised, not Code);
+branch deleted** (clean GitHub PR merge; PR #30 shows the "Merged" badge). **Production deploy VERIFIED** — on the live
+`https://www.trajanovv.com/` the served CSS bundle carries the three new tokens (`--motion-slow:420ms`,
+`--ease-smooth:cubic-bezier(.65,0,.35,1)`, `--motion-reveal:760ms`), the retimed values (`--header-bar-max-scrolled:48rem`,
+`--motion-stagger:110ms`), the retimed `.header-shell`/`.header-bar` transitions on `var(--motion-slow) var(--ease-smooth)`,
+the new `.header-credit` drop-out rule (scrolled → `position:absolute;opacity:0;visibility:hidden;pointer-events:none`), and
+`.reveal-group>*{animation:trajanov-reveal var(--motion-reveal)…}` — the exact merged code is serving. The **real-device
+feel + the `D-2.18-5` (hero retime) confirm/strike + the live reduced-motion read + the PageSpeed re-run stay owed #35**
+(Lazar + Petar). `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.17 COMPLETE — the site header now sticks to the top and, once you scroll, contracts into a
 translucent blurred pill (this update, 2026-07-25).** An out-of-band **UI-only** phase (the 2.07–2.16
