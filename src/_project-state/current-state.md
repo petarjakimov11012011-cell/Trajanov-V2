@@ -129,10 +129,23 @@ no factual claim). **Owed-verification register +3** (#32 sticky-header sign-off
 produced locally (post-deploy PageSpeed is the valid measurement). Decisions `D-2.17-1…6` (all six
 orchestrator-made, appended verbatim) + `D-2.17-7` (Claude Code, operator-ratified — the +2px resting
 delta). **`file-map.md` needs no tree change** (no file added, moved, or deleted); **`00_stack-and-config.md`
-unchanged** (no dependency, no config). Branch `phase-2.17-scroll-header`; **PR open to `main` — NOT
-self-merged (`D-0-3`).** `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical
-path. (Note: `main` had moved by one **empty `github-actions[bot]` keep-alive commit** `bd15ed1`
-`[skip ci]` since PR #28; the branch is based on it — benign, not a concurrent phase.)
+unchanged** (no dependency, no config). Branch `phase-2.17-scroll-header`; **PR
+[#29](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/29) MERGED to `main` (merge
+`cecc054`, 2026-07-25) on Petar's explicit instruction (`D-0-3`: operator-authorised, not Code); branch
+deleted** (clean GitHub PR merge). **Production deploy VERIFIED** — on the live `https://www.trajanovv.com/`
+the deployed home HTML carries `class="header-shell bg-ground border-border sticky top-0 z-30 border-b"`
+on `<header>` and `header-bar` on the inner grid `<div>`, and the served CSS bundle
+(`/_next/static/chunks/…css`) contains all three tokens (`--header-blur:12px`,
+`--header-bar-max-scrolled:56rem`, and `--color-ground-translucent` as the 82% `color-mix` under an
+`@supports` guard), the base `.header-shell`/`.header-bar` transition rules, and the scrolled pill rule
+`.header-shell[data-scrolled=true] .header-bar{max-width:…;background-color:var(--color-ground-translucent);
+border-radius:var(--radius-lg);-webkit-backdrop-filter:blur(var(--header-blur));backdrop-filter:blur(var(--header-blur));margin-top:.5rem}`
+— with **both** the `-webkit-` and unprefixed `backdrop-filter`, and **no** header-specific
+`prefers-reduced-motion` rule (the global rule covers it). The exact merged code is serving. The
+**real-device feel + the +2px read + the iOS Safari blur + the Lighthouse re-run stay owed #32/#33/#34**
+(Lazar + Petar). `NEXT:` line **unchanged** — out-of-band, does not touch the 2.06 → Y.01 critical path.
+(Note: `main` had moved by one **empty `github-actions[bot]` keep-alive commit** `bd15ed1` `[skip ci]`
+since PR #28; the branch was based on it — benign, not a concurrent phase.)
 
 **2.16 COMPLETE — the Home hero now reveals with a short staggered blur-in on first paint (this update,
 2026-07-25).** An out-of-band **UI-only** phase (the 2.07–2.15 / Y.02 shape) — **no commerce, no schema, no
