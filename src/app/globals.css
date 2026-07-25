@@ -83,6 +83,11 @@
   --motion-drop: 480ms;
   /* Home hero reveal duration (brand.md §6, D-2.18-5), replacing the borrowed --motion-drop. */
   --motion-reveal: 760ms;
+  /* Wordmark hover shine (brand.md §6, D-2.19-1). Its own duration: the sweep is a travel across
+     the glyphs, not a property transition, and borrowing --motion-slow would couple it to the
+     header contract. Read via var() in the .wordmark-shine block, so it is NOT a utility
+     (the --glow-* / --header-* precedent — do not add it to @theme inline). */
+  --motion-shine: 900ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   /* Symmetric ease-in-out, HEADER ONLY (brand.md §6, D-2.18-2). Replaces --ease-out on the header;
      --ease-out stays the site default everywhere else. Read via var() in the header block. */
@@ -501,4 +506,119 @@
   transition:
     opacity var(--motion-slow) var(--ease-smooth),
     visibility 0s linear var(--motion-slow);
+}
+
+/*
+  Wordmark hover shine (Phase 2.19, brand.md §3/§6, D-2.19-1…5).
+  A one-shot band of light that travels across the TRAJANOV wordmark on hover or keyboard focus, so
+  the brand mark also reads as the control it is (the link home). FOURTH narrowly-scoped exception to
+  brand.md §6, after D-2.10-1 (card spotlight), D-2.16-3 (hero reveal) and D-2.17-5 (scroll header) —
+  owner-level, Lazar's own request (D-2.19-1). It is for THIS wordmark only. Do not reuse it on any
+  other link, button or heading without a new owner-level decision.
+
+  Pure CSS, no dependency (D-2.19-2). The 21st.dev reference this came from is a `motion.button` and
+  an `npm install framer-motion`; `motion` v12 — the same library under its current name — is already
+  installed, so that install would duplicate the animation runtime in a Hobby-hosted bundle, and
+  D-2.11-3 already settled that pointer effects here are CSS. Only the *technique* is reused: an
+  animated custom property driving a gradient. The element stays a next-intl <Link href="/"> — it is
+  navigation, not a button (D-2.19-3).
+
+  TECHNIQUE: background-clip: text, NOT a masked overlay layer. An overlay would have to re-emit the
+  wordmark's own text (content: attr()/a duplicate node) to have glyphs to mask, which duplicates a
+  translated string into CSS and into the a11y tree. background-clip:text needs neither, and its
+  -webkit- form is the oldest, most uniformly supported of the two in WebKit (mask-composite is the
+  part of the mask route Safari has historically been weakest on — see the D-2.10-3 note above).
+
+  Colours are tokens only (D-2.19-5): the glyph rests on --color-foreground and the travelling band is
+  a color-mix of --color-mustard into it, per the §3 derived-tints rule. No literal hex/rgb/hsl here.
+  The reference's shadcn primary-colour token does not exist in this codebase and would resolve to
+  nothing. Mustard is 9.0:1 on ground and foreground is 15.4:1, so every intermediate colour in the
+  sweep sits above AA by construction — the wordmark cannot go illegible mid-animation.
+
+  NOTHING here puts transform / filter / backdrop-filter / will-change / contain on <header> or on any
+  ancestor of the mobile overlay — any of those would make <header> a containing block for its
+  position:fixed descendant and break the 2.15 overlay (2.17 hard stop #2). The effect lives on the
+  <a> itself: only `background-image` and the custom property animate, and neither reflows, so the
+  wordmark's box is identical at rest, mid-sweep and after.
+*/
+
+/* Registering the property is what makes it interpolate — an unregistered custom property animates
+   discretely and the sweep would silently do nothing. */
+@property --wordmark-x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 100%;
+}
+
+@keyframes trajanov-wordmark-shine {
+  from {
+    --wordmark-x: -40%;
+  }
+  to {
+    --wordmark-x: 140%;
+  }
+}
+
+/* Fine pointers only. The wordmarkClass string is shared with the mobile overlay's wordmark
+   (SiteHeader.tsx ~288), and this guard is what keeps the effect inert there — and stops a :hover
+   state sticking on the glyphs after a tap on a touch screen. */
+@media (hover: hover) and (pointer: fine) {
+  /* :focus-visible as well as :hover, so a keyboard user tabbing onto the wordmark gets the same
+     affordance. This adds only background/animation — the element's own
+     focus-visible:ring-2 focus-visible:ring-focus-ring is a box-shadow, drawn outside the border box
+     and completely unaffected by background-clip: text. Both render, not one. */
+  .wordmark-shine:hover,
+  .wordmark-shine:focus-visible {
+    /* Also the graceful degradation: where @property is unsupported the at-rule above is dropped and
+       --wordmark-x would be an invalid var(), which would take background-image down with it and
+       leave transparent-filled text — i.e. an invisible wordmark. This declaration keeps the gradient
+       valid and static (band parked off the right edge), so the mark simply renders as a plain
+       --color-foreground wordmark with no sweep. */
+    --wordmark-x: 100%;
+    background-image: linear-gradient(
+      100deg,
+      var(--color-foreground) calc(var(--wordmark-x) - 24%),
+      color-mix(in srgb, var(--color-mustard) 65%, var(--color-foreground)) var(--wordmark-x),
+      var(--color-foreground) calc(var(--wordmark-x) + 24%)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* ONE sweep per hover. No `infinite`, no `alternate`, no repeat delay: this header is sticky on
+       every route, and a looping shine would be a permanently moving object in the corner of every
+       page — the exact thing §6 exists to prevent (D-2.19-4). Leaving and re-entering may run it
+       again; that is the point of a hover affordance.
+
+       `linear`, NOT var(--ease-out) — a measured deviation from the brief's Task 1, logged D-2.19-6.
+       This is a band of light TRAVELLING across the glyphs, not a property settling into a new value,
+       and --ease-out (cubic-bezier(0.16, 1, 0.3, 1)) is heavily front-loaded: measured in-browser, it
+       puts --wordmark-x past 100% — i.e. the band already off the right edge of the wordmark — by
+       t = 225ms of the 900ms, so the light crosses the letters in ~150ms and the remaining ~710ms is
+       an invisible drift off-screen. That reads as a flick, not a shine. `linear` spends 200ms leading
+       in, ~500ms actually crossing the glyphs, 200ms leading out. It is the same objection D-2.18-2
+       raised against --ease-out on the header contract; --ease-smooth is header-contract-only, so the
+       answer here is constant speed, which is how light actually moves across a surface. `linear` is a
+       keyword, not an inlined design value (same category as 2.18's authorised `visibility 0s linear`).
+       Revert = replace this one word with var(--ease-out). */
+    animation: trajanov-wordmark-shine var(--motion-shine) linear 1;
+  }
+}
+
+/*
+  Reduced motion: REMOVE the sweep, do not flatten it — and this rule is deliberately NOT redundant
+  with the global @media (prefers-reduced-motion: reduce) block at ~217. That global rule sets
+  `animation-duration: 0.001ms !important`, which is right for the header's property transitions
+  (a 420ms colour change becomes a snap) but wrong here: it would turn a 900ms travelling sweep into a
+  single-frame FLASH of light across the wordmark — precisely what prefers-reduced-motion exists to
+  prevent. So the gradient is neutralised too and the glyph is filled normally again, leaving a plain
+  --color-foreground wordmark on hover and on focus. DO NOT DELETE THIS AS DUPLICATE OF THE GLOBAL RULE.
+  Equal specificity to the block above, so it wins on source order — it must stay after it.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-shine:hover,
+  .wordmark-shine:focus-visible {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+  }
 }

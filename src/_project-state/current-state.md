@@ -6,11 +6,110 @@ NEXT: 2.06 operator half — the LIVE drop rehearsal on `www.trajanovv.com` (Laz
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-25** · By: **Claude Code (Phase 2.18 — header retime + credit drop-out)**
+Last updated: **2026-07-25** · By: **Claude Code (Phase 2.19 — wordmark hover shine)**
 
 ---
 
 ## Status
+
+**2.19 COMPLETE — the TRAJANOV wordmark now takes a single band of light across its letters when you
+hover or tab onto it, so the brand mark reads as the link home (this update, 2026-07-25).** An out-of-band
+**UI-only** phase in the 2.16/2.17/2.18 shape — **no new element, link, string, state, listener, dependency;
+no commerce, schema, or fact touched**, and **line 1 `NEXT:` is unchanged** (the 2.06 operator rehearsal
+remains next; this phase does not advance the critical path). The header is sticky and site-wide in both
+locales including Checkout (`D-2.17-1`), so this renders on every route. What shipped:
+- **`src/app/globals.css` — one new `:root` token + one new CSS block + one dedicated reduced-motion rule.**
+  `:root` gains **`--motion-shine: 900ms`** (`D-2.19-1`) — its own duration, because the sweep is a *travel*
+  across the glyphs rather than a property transition, and borrowing `--motion-slow` would couple it to the
+  header contract. Like `--glow-*` / `--header-*` it is read via `var()` and is **not** added to
+  `@theme inline`. **No existing token is repointed** — `--motion-fast/base/slow/drop/reveal`, `--ease-out`,
+  `--ease-smooth`, `--motion-stagger`, `--header-bar-max-scrolled`, `--header-blur` all keep their 2.18
+  values, and the `.header-shell`/`.header-bar`/`.header-credit` blocks are **byte-unchanged**. The new
+  `.wordmark-shine` block sits after `.header-credit` at the end of the file: a registered
+  `@property --wordmark-x` (`<percentage>`, `initial-value: 100%`) animated `-40% → 140%` by a
+  `@keyframes trajanov-wordmark-shine`, driving a `linear-gradient` that is clipped to the glyphs with
+  `background-clip: text` + `-webkit-text-fill-color: transparent` (`D-2.19-2`). It is gated on
+  **`@media (hover: hover) and (pointer: fine)`** and triggered by **`:hover` *and* `:focus-visible`**, with
+  `animation-iteration-count: 1` — **one sweep per trigger, no loop, no mount animation, no tap scale**
+  (`D-2.19-4`). Colours are tokens only: the glyph rests on `--color-foreground` and the band is
+  `color-mix(in srgb, var(--color-mustard) 65%, var(--color-foreground))` (`D-2.19-5`) — **grep-proven zero
+  literal hex / `rgb(` / `hsl(` and zero `--primary` in the block**.
+- **Easing — the one Claude-Code decision this phase (`D-2.19-6`), flagged for ratification.** The brief's
+  Task 1 said to use `var(--ease-out)`. Measured in-browser by seeking the real animation frame by frame,
+  `--ease-out` (`cubic-bezier(0.16, 1, 0.3, 1)`) drove `--wordmark-x` to **63.9% at t=112ms** and **108.6%
+  at t=225ms** — the band had already left the right edge of the glyphs a quarter of the way through, so the
+  visible sweep lasted **~150ms** and the remaining ~710ms was invisible drift. That is a flick, not a shine.
+  Shipped **`linear`** instead: 0% at 200ms, 50% at 450ms, 100% at 700ms — 200ms lead-in, ~500ms crossing the
+  letters, 200ms lead-out. Same objection `D-2.18-2` raised against `--ease-out` on the header contract.
+  `--motion-shine` stays 900ms; **one-word revert** if the orchestrator strikes it.
+- **Reduced motion — a DEDICATED rule that removes the sweep, deliberately not covered by the global one.**
+  The global `@media (prefers-reduced-motion: reduce)` block (~217) sets `animation-duration: 0.001ms
+  !important`, which is right for the header's property transitions but would turn a 900ms travelling sweep
+  into a **single-frame flash** — exactly what the preference exists to prevent. So a second rule sets
+  `animation: none` **and** `background-image: none` + `-webkit-text-fill-color: currentColor`, leaving a plain
+  `--color-foreground` wordmark on hover and focus. The CSS comment says why, so nobody deletes it as redundant.
+- **`src/components/layout/SiteHeader.tsx` — ONE changed line.** `wordmark-shine ` prepended to the
+  `wordmarkClass` constant (~157). `git diff main -- SiteHeader.tsx` is **one changed line**. The `<Link
+  href="/">` elements themselves, `renderCredit()`, the overlay, focus trap, scroll lock, scroll effect,
+  `data-scrolled`, `iconButtonClass`, `overlayRow` are all byte-unchanged; the wordmark stays a next-intl
+  `<Link>` and does **not** become a `<button>` (`D-2.19-3`).
+- **`brand.md` §6.** +1 token row (`--motion-shine` 900ms), a fourth-exception paragraph, and the closing
+  count corrected to **four** exceptions (next request is the fifth). `brand.md` and `globals.css` `:root`
+  agree on 900ms — checked, not assumed.
+
+**Gates:** `npm run build` (exit 0, "✓ Compiled successfully in 2.4s") / `npx tsc --noEmit` (exit 0) /
+`npm run lint` (clean, exit 0); `npm test` **116/116** (19 files, unchanged count) incl. `✓ 10 simultaneous
+orders against 3 units → exactly 3 succeed, 7 rejected with insufficient_stock, stock 0`. `git diff main --
+package.json package-lock.json src/messages/` **empty** (still **243** keys, no new dependency).
+
+**Rendered and measured** (dev server, both locales, 320/390/768/1024/1280, Home + Catalog + Checkout):
+at rest the wordmark is **byte-identical to pre-2.19** — `color rgb(236,232,224)`, `background-image: none`,
+`animation-name: none` (the gradient and the transparent fill apply **only** while hovered/focused, so the
+resting glyph's rendering is untouched). Hovered, one sweep runs and **stops** — after it finishes there is
+no animation object left and `--wordmark-x` sits back at its specified `100%`, measured, not eyeballed.
+`getBoundingClientRect()` is **`89,23,135.039,24` at rest, at every seeked frame mid-sweep, and after** —
+identical; nav centre X pinned at 640 and the credit's X at 236.039 throughout. Scrolled
+(`data-scrolled="true"`, bar `max-width 768px`, `border-radius 14px`, `blur(12px)`,
+`--color-ground-translucent`): the sweep still runs and is still visible in the pill. `<header>` computes
+**`transform: none`, `filter: none`, `backdrop-filter: none`, `will-change: auto`, `contain: none`** on every
+route and both scroll states (2.17 hard stop #2 holds). Tab to the wordmark **with the mouse parked
+elsewhere**: `:focus-visible` matches, the sweep fires **and** the focus ring renders
+(`rgb(242,197,90) 0 0 0 2px` = `--color-focus-ring`), mid-sweep too. **Contrast:** the sweep has only two
+stop colours, so every painted pixel is between them — rest/brightest `#ECE8E0` = **15.42:1** on
+`--color-ground`, dimmest (band centre) `#E6BF75` = **10.84:1**; worst realistic backdrop (the translucent
+pill over the mustard live banner, `#352D18`) **11.16:1 / 7.84:1**. All well above AA — the wordmark cannot
+go illegible mid-sweep, as `D-2.19-5` predicted by construction. Mobile overlay at 390 opens, traps focus,
+locks scroll, closes to the burger; its wordmark carries the class but renders plain off-white with no
+gradient and no animation. **No horizontal overflow** at 320/390/768/1024/1280 in either header state.
+Zero new console errors; the known **`ProductCard.tsx:59` MK price hydration mismatch is pre-existing and
+recorded unchanged, not fixed** (`ProductCard.tsx` byte-unchanged; a static className on a constant string
+cannot produce a hydration mismatch). Screenshots captured: **MK 1280 resting**, **MK 1280 mid-sweep**,
+**MK 1280 scrolled mid-sweep**, **EN 1280 mid-sweep**, **MK 390 overlay open**.
+
+**Two things the Browser pane could not do, folded into owed #36:** (a) it advertises
+`(hover: hover) and (pointer: fine)` at **every** viewport width and has no coarse-pointer emulation, so the
+`hover: hover` guard's inertness on a real touch device is proven only from the served CSS bytes + CSSOM, not
+observed; (b) it cannot toggle DevTools reduced-motion emulation (same limit 2.16/2.17/2.18 hit) — the
+reduced-motion outcome was proven by CSSOM (exactly one `.wordmark-shine` reduced-motion rule, after the hover
+rules) plus a simulation injecting those exact declarations, under which the hovered wordmark had **zero**
+animations and rendered plain `--color-foreground`. Both need a live read on a real phone.
+
+**Owed left to the live deploy (Lazar + Petar):** **#36** — wordmark shine sign-off on a real phone + desktop,
+both locales, including **ratify or strike `D-2.19-6`** (the `linear` easing deviation), the live
+reduced-motion read, and the touch-device inertness check.
+
+**Frozen (byte-unchanged):** `src/messages/{mk,en}.json` (still **243** keys) / `docs/i18n/string-inventory.md`
+/ `facts.md` / `HomeExperience.tsx` / `Countdown.tsx` / `ProductCard.tsx` / `SpotlightCard.tsx` /
+`SiteFooter.tsx` / `LanguageSwitch.tsx` / the overlay + focus trap + scroll lock in `SiteHeader.tsx` / cart /
+checkout / `src/lib/**` / `create_order` / `expire_reservations` / `supabase/**` / `src/config/**` /
+`package.json` + lockfile (**no new dependency**) / the `.header-shell`+`.header-bar`+`.header-credit` CSS
+blocks. **No new placeholder, no `[PLACEHOLDER: …]` marker; placeholder register UNCHANGED; no new fact** (a
+gradient makes no factual claim). **Owed-verification register +1** (#36). Decisions `D-2.19-1…6` — five
+orchestrator-made and appended verbatim, **one (`D-2.19-6`) made by Claude Code from measurement and flagged
+for ratification**. **`file-map.md` needs no tree change** (only the new completion report; the tree lists the
+`completions/` directory, not each report). **`00_stack-and-config.md` unchanged** (no dependency, no config).
+Branch `phase-2.19-wordmark-shine`; PR to `main`, **not self-merged** (`D-0-3`). `NEXT:` line **unchanged** —
+out-of-band, does not touch the 2.06 → Y.01 critical path.
 
 **2.18 COMPLETE — the scroll-reactive header now settles instead of snapping, drops its build credit
 out of the pill as it contracts, and contracts a little further; the Home hero reveal is retimed to read
@@ -2062,6 +2161,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 33 | **Safari / iOS `backdrop-filter` blur check (2.17).** On the same phone, in **Safari** (not just Chrome), scroll the Home page down. Pass = the scrolled bar is **genuinely blurred**, not merely translucent — the content behind it goes soft. Code confirmed the served CSS pill rule carries **both** `-webkit-backdrop-filter: blur(var(--header-blur))` and `backdrop-filter: blur(var(--header-blur))` (verified against the raw served CSS bytes), but the in-app Browser pane is Chromium, so **no WebKit engine was available** to confirm the blur actually renders on iOS Safari. Owner: **Lazar**. | 2.17 | **after 2.17 deploys — before the first real drop (iOS Safari)** |
 | 34 | **Lighthouse mobile Performance re-run on Home + Catalog (2.17).** After the deploy, run PageSpeed Insights (mobile) on `https://www.trajanovv.com/` and `/en/catalog` and record the Performance number; compare to the pre-2.17 baseline (mobile **94** on Catalog + Checkout, per 2.04). `backdrop-filter` on a sticky element repaints on scroll and is the one realistic way this phase could cost points — though the blur is on the small ~896px pill only, active only while scrolled, so the risk is low. Code could **not** produce a comparable number locally: a dev/localhost Lighthouse is not comparable to the production PageSpeed baseline (no CDN, different throttling), and the meaningful measurement is on the deployed build — the same "re-check on PageSpeed after deploy" pattern 2.04 used for the 94 mobile scores. **If it drops below 94, report it — do not absorb it silently** (`D-2.17-4`'s media-query fallback also removes the mobile blur if needed). Owner: **Lazar / Petar**. | 2.17 | **after 2.17 deploys — before the first real drop** |
 | 35 | **Retimed header + hero sign-off on the live deploy, both locales (2.18).** On `https://www.trajanovv.com` and `/en`, desktop and phone, scroll Home down and back up. Pass = **the bar settles rather than snaps** (now `--motion-slow` 420ms on the symmetric `--ease-smooth`, `D-2.18-1/2`); **the "Built by Vertex Consulting" credit fades cleanly out of the pill with nothing else shifting** (`D-2.18-3/4` — desktop `lg:` only; on a phone the credit already lives in the burger overlay, untouched); and **the Home hero reads as deliberate rather than hurried** (`--motion-reveal` 760ms, stagger 110ms). Three things fold into this row: **(a) confirm or strike `D-2.18-5` — the hero retime was folded in without an explicit yes** (it is one token pair, isolated in Task 5, trivially revertible); (b) the **live reduced-motion read** — with "Reduce Motion" on, the header should snap and the hero render final-state on frame 1 (Code confirmed no new reduced-motion rule and the global rule covers, but the in-app Browser pane can't toggle the DevTools emulation); (c) a **post-deploy PageSpeed (mobile) re-run** on `/` + `/en/catalog` vs the pre-2.17 baseline (**94**) — a longer transition should not cost anything, report it if it does. Code measured the header + hero end-to-end in the pane (both locales, 320/390/768/1024/1280, Home/Catalog/Checkout): at `scrollY 0` credit `position: static`/visible, bar `max-width 1152px`, transitions `0.42s` on `cubic-bezier(0.65,0,0.35,1)`; scrolled bar `max-width 768px` (48rem), credit `absolute`/`opacity 0`/`visibility hidden`/`pointer-events none`, `<header>` `filter/transform none`; nav centred (offset ≤ 0.01px), no wrap/overflow, 48rem pill fits MK + EN at 1024 + 1280; Vertex link unreachable scrolled / reachable at top; ended hero 1.09s, countdown 1.31s, both < 1.5s; mobile overlay + its own credit unaffected while scrolled — but the real-device *feel*, the `D-2.18-5` call, the live reduced-motion read, and the PageSpeed number are Lazar's/Petar's. Owner: **Lazar** (+ **Petar**). | 2.18 | **after 2.18 deploys — before the first real drop (real phone, both locales)** |
+| 36 | **Wordmark hover shine sign-off on the live deploy (2.19).** On `https://www.trajanovv.com` and `/en`, **on a desktop with a mouse** and **on a real phone**. Desktop pass = hovering the TRAJANOV wordmark in the top-left runs **one** band of light across the letters (~0.9s) and then **stops** — no shimmer, no loop, nothing moving when the pointer is elsewhere; it works both at the top of the page and inside the scrolled pill; tabbing onto the wordmark does the same **and** still shows the mustard focus ring. Three things fold into this row: **(a) ratify or strike `D-2.19-6`** — the brief specified `var(--ease-out)` and Code shipped **`linear`** instead, because measurement showed `--ease-out` puts the band past the right edge of the glyphs by t=225ms of the 900ms, making the visible sweep a ~150ms flick followed by ~710ms of invisible drift; `linear` gives 200ms in, ~500ms across the letters, 200ms out. It is a **one-word revert** (`linear` → `var(--ease-out)` in the `.wordmark-shine` block) if Lazar prefers the brief's version. **(b) The touch-device read** — on a phone, tap the wordmark and confirm **nothing shines and no hover state sticks** afterwards; the effect is gated on `@media (hover: hover) and (pointer: fine)`, and Code verified that guard in the served CSS + CSSOM, but the in-app Browser pane reports a fine pointer at **every** viewport width and has no coarse-pointer emulation, so the inertness was never actually observed. **(c) The live reduced-motion read** — with "Reduce Motion" enabled (iOS Settings → Accessibility → Motion; Android → Remove animations), hovering/focusing the wordmark should produce **no sweep, no flash, no single-frame flicker** — just a plain off-white wordmark; Code proved this by CSSOM (exactly one dedicated `.wordmark-shine` reduced-motion rule, ordered after the hover rules, setting `animation: none` + `background-image: none` + `-webkit-text-fill-color: currentColor`) and by injecting those exact declarations as a simulation (hovered wordmark → **zero** animations, plain `--color-foreground`), but the pane cannot toggle the real DevTools emulation. Code measured the rest end-to-end in the pane (both locales, 320/390/768/1024/1280, Home/Catalog/Checkout): resting wordmark byte-identical to pre-2.19 (`color rgb(236,232,224)`, no background-image, no animation); one sweep per hover that finishes and does not restart; `getBoundingClientRect()` **identical** at rest / every mid-sweep frame / after (`89,23,135.039,24`), nav centre 640 and credit X 236.039 unchanged throughout; `<header>` still `transform/filter/backdrop-filter: none`; sweep visible in the scrolled pill; keyboard focus fires the sweep **and** renders the `#F2C55A` ring; contrast 15.42:1 rest / 10.84:1 at the band centre on ground, 11.16:1 / 7.84:1 over the pill on the mustard banner; overlay wordmark unanimated; no horizontal overflow; zero new console errors — but the real-device *feel*, the `D-2.19-6` call, the touch read, and the live reduced-motion read are Lazar's/Petar's. Owner: **Lazar** (+ **Petar**). | 2.19 | **after 2.19 deploys — before the first real drop (real phone + a desktop mouse, both locales)** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

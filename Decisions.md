@@ -3601,3 +3601,85 @@ start at `D-2.01-6`.*
   to him after 2.16 and never separately answered. It is one token pair, isolated in Task 5, and
   trivially revertible — called out at the top of the completion report so he can strike it in review.
 - **Links:** `brand.md` §5/§6 · `src/app/globals.css` (`:root`, `.reveal-group`) · `D-2.16-3`
+
+### D-2.19-1 · 2026-07-25 · Add the wordmark hover shine at all (the fourth motion exception)
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.19 brief); executed by Claude Code.
+- **Decision:** Add a hover/focus-gated light sweep across the TRAJANOV header wordmark.
+- **Alternative rejected:** hold to `brand.md` §6's presumption against decoration and ship nothing.
+- **Downside accepted:** §6's carve-out list grows to four, and the "presumption against decoration" gets
+  weaker every time it is granted. Owner's call — Lazar requested it directly, 2026-07-25.
+- **Links:** `brand.md` §6 · `src/app/globals.css` (`:root`, `.wordmark-shine`)
+
+### D-2.19-2 · 2026-07-25 · Pure CSS. No `framer-motion`, no new dependency, no JS animation
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.19 brief); executed by Claude Code.
+- **Decision:** The effect is pure CSS — no `framer-motion`, no new dependency, no JS animation.
+- **Alternative rejected:** the supplied 21st.dev `ShinyButton` component as written — a `motion.button`
+  plus `npm install framer-motion`.
+- **Downside accepted:** no spring physics; the sweep is an eased linear travel, marginally less springy
+  than the reference. Reason: `motion` v12 is already installed and `framer-motion` is that same
+  library's former name, so the install would duplicate the runtime in a Hobby-hosted bundle; and
+  `D-2.11-3` already settled that pointer effects on this site are CSS.
+- **Links:** `src/app/globals.css` (`.wordmark-shine`) · `D-2.11-3` · `D-2.10-1`
+
+### D-2.19-3 · 2026-07-25 · The wordmark stays a `next-intl` `<Link href="/">`. It does not become a `<button>`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.19 brief); executed by Claude Code.
+- **Decision:** The wordmark stays a `next-intl` `<Link href="/">`; it does not become a `<button>`.
+- **Alternative rejected:** swapping in the reference's `<motion.button>`.
+- **Downside accepted:** the supplied file is not copy-pasted at all — only its *technique* (a gradient
+  sweep driven by an animated `--x` custom property) is reused. Reason: a `<button>` is not a navigation
+  control. Converting it would break the href, the link role in the a11y tree, middle-click and
+  open-in-new-tab, and the crawlable path back to `/` — to gain an effect we can have without any of that.
+- **Links:** `src/components/layout/SiteHeader.tsx` (`wordmarkClass`, ~157)
+
+### D-2.19-4 · 2026-07-25 · Hover- and focus-gated. One sweep per hover. No loop, no mount animation, no tap scale
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.19 brief); executed by Claude Code.
+- **Decision:** The sweep is gated on `:hover` and `:focus-visible` and runs exactly once per trigger
+  (`animation-iteration-count: 1`). No loop, no mount animation, no tap scale.
+- **Alternative rejected:** the reference's `repeat: Infinity, repeatDelay: 1` plus the `scale 0.8 → 1`
+  entrance and `whileTap: 0.95`.
+- **Downside accepted:** touch users never see the effect (correct — there is no hover on touch). Reason:
+  this is a sticky header on every route; a permanently shimmering wordmark is a permanently moving
+  object in the corner of every page, which is the exact thing §6 exists to prevent. Lazar asked for hover.
+- **Links:** `src/app/globals.css` (`.wordmark-shine`) · `D-2.17-5`
+
+### D-2.19-5 · 2026-07-25 · The sweep colour is `--color-mustard`, over a wordmark that rests on `--color-foreground`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase 2.19 brief); executed by Claude Code.
+- **Decision:** The travelling highlight is `--color-mustard` (mixed into the resting glyph colour with
+  `color-mix`), over a wordmark that rests on `--color-foreground`.
+- **Alternative rejected:** `hsl(var(--primary))` as the reference uses.
+- **Downside accepted:** mustard is the brand accent and §3 warns it stops meaning anything if overused —
+  this adds one more mustard moment to the header, alongside the focus ring and the Vertex credit link.
+  Reason: `--primary` is a **shadcn token that does not exist in this codebase** and would resolve to
+  nothing; and an off-white shine over an off-white wordmark is invisible. Mustard is 9.0:1 on ground and
+  foreground is 15.4:1, so **every intermediate colour in the sweep is above AA by construction** — the
+  wordmark cannot go illegible mid-animation.
+- **Links:** `brand.md` §3 · `src/app/globals.css` (`.wordmark-shine`)
+
+### D-2.19-6 · 2026-07-25 · The sweep travels at constant speed (`linear`), not on `var(--ease-out)`
+- **Status:** Accepted
+- **Decided by:** Claude Code (on-the-fly, from in-browser measurement — a deviation from the brief's
+  Task 1, which said to use `--ease-out`). **Flagged for the orchestrator to ratify or strike.**
+- **Decision:** The `.wordmark-shine` animation runs `linear` rather than `var(--ease-out)`. Duration
+  stays the brief-specified `--motion-shine` (900ms) and the token itself is unchanged.
+- **Alternative rejected:** `var(--ease-out)` as the brief's Task 1 instructs. Rejected on measurement,
+  not taste: `--ease-out` is `cubic-bezier(0.16, 1, 0.3, 1)`, which is heavily front-loaded. Seeking the
+  real animation frame by frame in the browser, it drove `--wordmark-x` to **63.9% at t=112ms** and
+  **108.6% at t=225ms** — i.e. the highlight band had already left the right-hand edge of the glyphs a
+  quarter of the way into the 900ms. The visible sweep lasted **~150ms** and the remaining ~710ms was the
+  band drifting off-screen where nobody can see it. That reads as a flick, or a flash, not a shine — and
+  a flash is the exact failure mode `D-2.19-4` and the reduced-motion rule exist to avoid. On `linear` the
+  same measurement gives 0% at 200ms, 50% at 450ms, 100% at 700ms: 200ms lead-in, ~500ms actually crossing
+  the letters, 200ms lead-out. This is the same objection `D-2.18-2` raised against `--ease-out` on the
+  header contract, applied to a travel rather than a settle.
+- **Downside accepted:** the sweep is the one motion on the site that uses neither `--ease-out` nor
+  `--ease-smooth`, so §6's "default easing for all of the above" no longer covers every animation
+  literally. `linear` is a CSS keyword, not an inlined design value (the same category as 2.18's
+  brief-authorised `visibility 0s linear`), so no token was invented and none was repointed.
+  **The brief said `--ease-out`; this is a deliberate departure and a one-word revert** — replace
+  `linear` with `var(--ease-out)` in the `.wordmark-shine` block and nothing else changes.
+- **Links:** `src/app/globals.css` (`.wordmark-shine`) · `D-2.18-2` · `brand.md` §6

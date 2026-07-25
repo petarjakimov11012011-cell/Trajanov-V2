@@ -155,7 +155,7 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
   // The wordmark markup appears twice — in the header bar and in the overlay's top bar (D-2.15-3). Same
   // classes both times.
   const wordmarkClass =
-    'font-display text-foreground text-price rounded-[var(--radius-sm)] font-extrabold uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring';
+    'wordmark-shine font-display text-foreground text-price rounded-[var(--radius-sm)] font-extrabold uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring';
 
   // The burger and the overlay's X share size / interaction classes (44px WCAG target, matching the cart).
   const iconButtonClass =
