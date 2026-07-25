@@ -166,6 +166,7 @@ may use it.
 | `--motion-slow` | `420ms` | The scroll-reactive header contract (`D-2.18-1`) — its own duration, **not** a change to `--motion-base` (which also times the FAQ + the block at ~358) |
 | `--motion-drop` | `480ms` | The drop reveal — the one moment worth animating |
 | `--motion-reveal` | `760ms` | Home hero reveal duration, replacing the borrowed `--motion-drop` (`D-2.18-5`) |
+| `--motion-shine` | `900ms` | Wordmark hover shine (`D-2.19-1`) — its own duration; the sweep is a travel across the glyphs, not a property transition |
 | `--ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` | Default easing for all of the above |
 | `--ease-smooth` | `cubic-bezier(0.65, 0, 0.35, 1)` | Symmetric ease-in-out. **Header only** (`D-2.18-2`) — `--ease-out` stays the site default everywhere else |
 | `--motion-stagger` | `110ms` | Gap between siblings in the Home hero reveal |
@@ -205,6 +206,24 @@ with three exceptions now on the books — one of them scroll-driven and on ever
 belongs to the countdown and the drop reveal, nothing else" is no longer literally true. Read §6 from
 here on as a **presumption against decoration**, not an absolute. Any fourth motion request is an
 owner-level decision.
+
+**A fourth exception — the wordmark hover shine (`D-2.19-1`) — granted as the owner-level decision the
+paragraph above calls for.** Lazar requested it directly (2026-07-25). It is a **one-shot gradient sweep
+across the header wordmark**: a band of `--color-mustard`, mixed into the resting `--color-foreground`,
+travels once across the TRAJANOV glyphs on `:hover` **or** `:focus-visible`, timed on `--motion-shine`
+(900ms) at constant speed. It is **fine-pointer only** (gated on `@media (hover: hover) and
+(pointer: fine)`, so touch devices and the mobile menu overlay paint nothing), it **never loops** — no
+`infinite`, no mount animation, no tap scale — and under `prefers-reduced-motion: reduce` it is
+**removed entirely**, not flattened: a dedicated rule drops the animation *and* the gradient, so the
+mark renders as a plain `--color-foreground` wordmark. (The global reduced-motion rule alone would
+compress the 900ms travel into a single-frame flash, which is worse than the effect it replaces.)
+Nothing about it reflows — the wordmark's box is identical at rest, mid-sweep and after.
+**It is not to be reused on any other link, button or heading without a new owner-level decision.**
+
+**There are now four exceptions on the books** — the product-card spotlight (`D-2.10-1`), the Home hero
+reveal (`D-2.16-3`), the scroll-reactive header (`D-2.17-5`) and this wordmark shine (`D-2.19-1`). The
+presumption against decoration still stands, and it gets weaker every time it is granted. Any **fifth**
+motion request is an owner-level decision.
 
 ---
 
