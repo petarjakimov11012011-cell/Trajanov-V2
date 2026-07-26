@@ -5,6 +5,7 @@ import {notFound} from 'next/navigation';
 import {ArrowLeft} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
+import {getProductImage} from '@/lib/product-images';
 import {Placeholder} from '@/components/system/Placeholder';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {ShippingNotice} from '@/components/system/ShippingNotice';
@@ -73,6 +74,9 @@ export default async function ProductPage({
   const realName = locale === 'mk' ? product.nameMk : product.nameEn;
   const title = realName ?? `${t('Placeholder.productName')} ${pad2(product.index)}`;
 
+  // Looked up by SLUG, never by position (D-Y.03-1). Null for Product 03 and for anything unphotographed.
+  const photo = getProductImage(product.slug);
+
   // Buy state from the SERVER's drop state + stock (the 6 handover states — no new ones):
   //  sold out → sold-out · pre-drop → disabled/"coming soon" · live → default · ended (with stock) →
   //  sold-out (non-interactive; the drop is over — the closest of the available states).
@@ -112,8 +116,22 @@ export default async function ProductPage({
 
       {/* Buy path above the fold */}
       <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+        {/* FIRST slot takes the interim lifestyle frame when one exists (D-Y.03-1/7). The SECOND stays
+            a visible placeholder on purpose: the back / print-detail shot is genuinely still owed
+            (register #2), and the page should say so rather than imply the set is complete. Product 03
+            has no frame at all, so it keeps two placeholders. */}
         <div className="grid grid-cols-2 gap-3">
-          <PhotoSlot label={t('Placeholder.productPhoto')} muted={soldOut} />
+          <PhotoSlot
+            label={t('Placeholder.productPhoto')}
+            muted={soldOut}
+            image={
+              photo && {
+                src: photo.src,
+                alt: t(photo.altKey),
+                objectPosition: photo.objectPosition,
+              }
+            }
+          />
           <PhotoSlot label={t('Placeholder.productPhoto')} muted={soldOut} />
         </div>
 

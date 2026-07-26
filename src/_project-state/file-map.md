@@ -6,11 +6,25 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-23** · By: **Claude Code (Phase 2.11 — Home FAQ section, Code)**
+Last updated: **2026-07-26** · By: **Claude Code (Phase Y.03 — interim catalog photography, Code)**
 
 ---
 
 ## Status
+
+**Interim catalog photography landed (Phase Y.03).** The **first images ever committed to this repo**:
+`public/images/lifestyle/{mustard-ochre-01,off-white-01}.webp` (209 KB / 154 KB, 1333×2000), rendering on
+the Catalog card and the **first** product-page slot for **Products 01 and 02 only**. New
+`src/lib/product-images.ts` binds a photograph to a product **by slug, never by index** (`D-Y.03-1`);
+`src/components/system/PhotoSlot.tsx` gained an optional `image` prop backed by `next/image` while its
+**no-image branch stays behaviourally unchanged**. New `docs/i18n/mk-review-y03.md` (**unsigned**) and
+`completions/Part-2-Phase-Y03-BLOCKED.md` (the preserved refusal of the superseded brief). **Product 03
+(baby blue) is byte-unchanged** — no frame exists and a stand-in is what placeholder #8 forbids
+(`D-Y.03-2`). Placeholder **#2 narrowed but still OPEN**, **#8 untouched**: the neutral front / back /
+print-detail set is still OWED and this phase did not move the pre-drop gate (`D-Y.03-3`). `facts.md` §8
+frame count corrected 4→3 (`D-Y.03-8`) and a new **§8.1** records five permissions by fact/date/channel
+only, **no PII** (`D-0-1`); Known Issue #6 **resolved**, #4 gained a line item. **No `next.config.ts`
+`images` block, no remote host, no new dependency** (`D-Y.03-5`). Below is the 2.04b/2.04/2.03 history.
 
 **SEO/GEO polish landed (Phase 2.04b).** New: `src/app/llms.txt/route.ts` (the `/llms.txt` route),
 `src/lib/seo/routes.ts` (shared indexable-route list + `absoluteUrl`, read by the sitemap AND llms.txt),
@@ -240,8 +254,10 @@ Trajanov-V2/
 │
 ├── public/
 │   └── images/
-│       ├── products/               # .gitkeep — REAL photos only — D-0-6
-│       └── lifestyle/              # .gitkeep — the bar shoot — pending permissions
+│       ├── products/               # .gitkeep — REAL neutral photos only — D-0-6 — STILL EMPTY
+│       └── lifestyle/              # the bar shoot — permissions GIVEN (facts.md §8.1, Y.03)
+│           ├── mustard-ochre-01.webp   # Product 01 interim — 1333×2000, 209 KB — D-Y.03-1/4
+│           └── off-white-01.webp       # Product 02 interim — 1333×2000, 154 KB — D-Y.03-1/4
 │
 ├── supabase/                       # LOCAL ONLY — no hosted project until 1.07 (D-1.03-5)
 │   ├── config.toml                 # `supabase init`; trimmed stack for 8 GB host (D-1.03-10)
@@ -303,7 +319,13 @@ Root additions (1.03): `vitest.config.ts` (serial file execution — one shared 
   waiting to happen.
 - **`SUPABASE_SERVICE_ROLE_KEY` is server-only.** Never behind `NEXT_PUBLIC_`.
 - **`src/components/ui/` is shadcn-generated.** Don't hand-edit; re-generate.
-- **`public/images/products/` holds real photographs only** (`D-0-6`).
+- **`public/images/products/` holds real photographs only** (`D-0-6`) — and is **reserved for the neutral
+  front / back / print-detail set**, which does not exist yet. Interim **lifestyle** frames live in
+  `public/images/lifestyle/` and must not be moved here (`D-Y.03-4`); putting them here would make this
+  file map lie about what we hold. When the neutral set lands it **replaces** them (`D-Y.03-7`).
+- **A photograph is bound to a product by SLUG, never by index or position** (`src/lib/product-images.ts`,
+  `D-Y.03-1`). Re-ordering `src/config/products.ts` must not be able to move a shirt's photo onto another
+  colourway — on cash-on-delivery that ships a colour the customer did not choose.
 - **Never hardcode a colour, size, or spacing value.** `brand.md` → tokens → Tailwind config.
 - **Never hardcode a factual claim.** `facts.md` or `[PLACEHOLDER: …]` + register entry.
 - **Never hardcode a user-facing string.** `src/messages/`.
@@ -349,4 +371,5 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-23 | 2.09 (Code) | **Size buttons in garment order S·M·L·XL (out-of-band UI).** Added `src/lib/drop/size-order.ts` (`CANONICAL_SIZE_ORDER` + `compareSizeLabels` — pure, NOT server-only, unit-testable) and `tests/drop/size-order.test.ts` (8 cases, written first + run RED via a temporary alphabetical stub → GREEN). Modified `src/lib/drop/state.ts` (`toProductView` sort: `localeCompare` → `compareSizeLabels`; comment rewritten — the ONE place size order was decided in `src/`), `Decisions.md` (`D-2.09-1…4`), `current-state.md` (status block + owed register #22; `NEXT:` unchanged), `file-map.md`. Added `completions/Part-2-Phase-09-Completion.md`, `briefs/Part-2-Phase-09-Code.md`. **`.claude/launch.json`** gained a second dev config (`trajanov-dev-2909`, port 3011) — local tooling, gitignored dir (not committed). **No `src/lib/orders/`, `create_order`, `expire_reservations`, `supabase/migrations/`, cart, checkout, `src/config/` (incl. `products.ts`), `SITE_URL`, header/footer, `src/lib/seo/`, `sitemap.ts`, `llms.txt`, `manifest.ts`, message files, `facts.md`, `brand.md`, or new dependency touched.** `D-2.09-*`. | Claude Code |
 | 2026-07-23 | 2.10 (Code) | **Product-card pointer spotlight (out-of-band UI).** Added `src/components/product/SpotlightCard.tsx` (thin `'use client'` wrapper; own-element `onPointerMove`, rAF-throttled writes to `--glow-x/--glow-y`, fine-pointer+mouse guard, cancel-on-unmount; no doc/window listener, no `dangerouslySetInnerHTML`). Modified `src/app/globals.css` (four tokens in `:root` after `--color-mustard-tint-6`; `--color-glow` also in `@theme inline`; a scoped `.spotlight-card` block gated in `@media (hover: hover) and (pointer: fine)` — surface-wash `::after` + 1px masked edge-light `::before`, reveal on hover + `:focus-visible`), `brand.md` (§3 `--color-glow`; §5 Spotlight table `--glow-size`/`--glow-opacity-surface`/`--glow-opacity-edge` + §5/§6 carve-out sentences), `src/components/product/ProductCard.tsx` (interactive branch only: `inner` wrapped in `<SpotlightCard>` inside the `<Link>`; **still a server component**; sold-out branch byte-unchanged), `Decisions.md` (`D-2.10-1…3`), `current-state.md` (status block + owed register #23; `NEXT:` unchanged), `file-map.md`, `00_stack-and-config.md`. Added `completions/Part-2-Phase-10-Completion.md`, `briefs/Part-2-Phase-10-Code.md`. **No `src/lib/orders/`, `create_order`, `expire_reservations`, `supabase/migrations/`, cart, checkout, `src/config/`, `SITE_URL`, `src/messages/`, `facts.md`, `src/lib/seo/`, `sitemap.ts`, `llms.txt`, `manifest.ts`, or new dependency touched.** The effect's CSS + tokens + component are hex/`rgb()`/`hsl()`-free (only doc prose references hex, to explain). `D-2.10-*`. | Claude Code |
 | 2026-07-23 | 2.11 (Code) | **Home FAQ section (out-of-band UI).** Added `src/components/home/HomeFaq.tsx` (server component — native `<details name="home-faq">`/`<summary>` disclosures, 8 questions in 3 static group labels, lucide `Plus`→× icon, `<h2>` heading, localised `/contact` link, no email/phone; renders the FAQPage JSON-LD inline, `D-2.11-7`), `src/lib/faq.ts` (single source — 3 groups × ordered q/a KEYS, no strings), `src/lib/seo/faq-jsonld.ts` (pure `faqJsonLd(t)` → `FAQPage` node), `tests/seo/faq-jsonld.test.ts` (23 assertions), `docs/i18n/mk-review-2.11.md` (unsigned), `completions/Part-2-Phase-11-Completion.md`, `briefs/Part-2-Phase-11-Code.md`. Modified `src/app/[locale]/page.tsx` (mount `<HomeFaq />` after `<HomeExperience>`, before `<DevPreviewSwitch>`), `src/app/globals.css` (appended `.faq-item` disclosure block — tokens only, no new token), `src/messages/{mk,en}.json` (new `Faq` namespace, 22 keys each), `docs/i18n/string-inventory.md` (regen **219 → 241**), `Decisions.md` (`D-2.11-1…7`), `current-state.md` (status block + owed register #24/#25/#26; `NEXT:` unchanged), `file-map.md`. **No `src/components/home/HomeExperience.tsx`/`Countdown`/`DropBanner`, `src/lib/orders/`, `create_order`, `expire_reservations`, `supabase/`, cart, checkout, `src/config/`, `src/lib/drop/`, `SITE_URL`, `facts.md`, `src/lib/seo/{site,product}-jsonld.ts`, `sitemap.ts`, `llms.txt`, `manifest.ts`, or new dependency touched; no new placeholder, no new token.** `D-2.11-*`. | Claude Code |
+| 2026-07-26 | Y.03 (Code) | **Interim catalog photography (out-of-band, Products 01 + 02 only).** New: `public/images/lifestyle/mustard-ochre-01.webp` + `off-white-01.webp` (the first images ever committed to this repo — 209 KB / 154 KB, 1333×2000, WebP; **no ~33 MB original is in this branch's history**), `src/lib/product-images.ts` (slug→image map, 2 entries, baby-blue absent → `null`), `docs/i18n/mk-review-y03.md` (**unsigned**), `completions/Part-2-Phase-Y03-BLOCKED.md` (the preserved refusal of the superseded brief), `completions/Part-2-Phase-Y03.md`. Modified: `src/components/system/PhotoSlot.tsx` (optional `image` prop → `next/image` `fill`/`object-cover`; **the no-image branch is behaviourally unchanged** — same hatch, label, `aspect-[4/5]`, `muted`), `src/components/product/ProductCard.tsx` + `src/app/[locale]/catalog/[slug]/page.tsx` (look the photo up by slug; the product page's **second** slot stays a placeholder), `src/messages/{mk,en}.json` (`Product.photoAltOchre` + `Product.photoAltOffWhite`), `docs/i18n/string-inventory.md` (243→245), `facts.md` (§8 frame count 4→3, new §8.1 permissions, changelog), `Decisions.md` (`D-Y.03-1…11`), `current-state.md` (Known Issue #6 resolved, #4 line item, placeholder #2 narrowed, owed #38–40), this file, `00_stack-and-config.md`. **Product 03 (baby blue) byte-unchanged — proven by an HTML diff of the rendered `<main>` (identical, 6843 bytes both sides).** **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, checkout, `src/config/`, `src/types/database.ts`, `next.config.ts`, `SITE_URL`, or npm dependency touched.** `D-Y.03-1…11`. | Claude Code |
 | 2026-07-24 | 2.12 (Code) | **Home hero sub-line → brand line (out-of-band copy-only).** Replaced **only** the value of `Home.sub` in `src/messages/{mk,en}.json` (MK „Пронајди сродна, во свет продадени души." / EN „Find a kindred soul, in a world full of sold souls.") — **byte-exact operator copy, Code edited neither language** (`D-2.12-2`). Renders at three sites in `HomeExperience.tsx` (no-view/`ended`/`countdown`) × two locales; absent in `live`. New line makes no factual claim → **`facts.md` byte-unchanged, no entry added**; the three facts the old line carried still render elsewhere both locales (`Faq.a8`/`About.body3`/`Meta.homeDescription`; `Faq.a2`/`Cart.codNote`/`Checkout.codSummary`/`Common.shippingNotice`; `Product.shippingBody`/`Faq.a4`). `Meta.homeDescription` untouched (`D-2.12-3`). Regenerated `docs/i18n/string-inventory.md` (still **241**, one row). Added `docs/i18n/mk-review-2.12.md` (unsigned, one string), `completions/Part-2-Phase-12-Completion.md`. Modified `Decisions.md` (`D-2.12-1/2/3`), `current-state.md` (status block + owed register #27; **`NEXT:` unchanged**), `file-map.md` (this row + tree: `mk-review-2.11.md`/`2.12.md`). **No component (`HomeExperience.tsx`/`HomeFaq.tsx`/`page.tsx`/`globals.css`), `src/lib/`, `supabase/`, cart, checkout, `src/config/`, `SITE_URL`, `brand.md`, `src/lib/seo/`, other message key, or new dependency touched; no new key (241), no new placeholder, no new token.** `D-2.12-*`. | Claude Code |

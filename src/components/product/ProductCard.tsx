@@ -3,6 +3,7 @@ import {Link} from '@/i18n/navigation';
 import {cn} from '@/lib/utils';
 import {formatMkd} from '@/lib/format';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
+import {getProductImage} from '@/lib/product-images';
 import {Placeholder} from '@/components/system/Placeholder';
 import {StockBadge} from '@/components/drop/StockBadge';
 import {SpotlightCard} from '@/components/product/SpotlightCard';
@@ -21,6 +22,10 @@ export function ProductCard({product}: {product: ProductView}) {
   const realName = locale === 'mk' ? product.nameMk : product.nameEn;
   const title = realName ?? `${t('Placeholder.productName')} ${pad2(product.index)}`;
 
+  // Interim lifestyle frame for the two photographed colourways (D-Y.03-1/7); null for every other
+  // product, which keeps the hatched placeholder. Looked up by SLUG — never by index or card position.
+  const photo = getProductImage(product.slug);
+
   const inner = (
     <div
       className={cn(
@@ -29,7 +34,17 @@ export function ProductCard({product}: {product: ProductView}) {
       )}
     >
       <div className="relative">
-        <PhotoSlot label={t('Placeholder.productPhoto')} muted={soldOut} />
+        <PhotoSlot
+          label={t('Placeholder.productPhoto')}
+          muted={soldOut}
+          image={
+            photo && {
+              src: photo.src,
+              alt: t(photo.altKey),
+              objectPosition: photo.objectPosition,
+            }
+          }
+        />
 
         {product.stock === 'low' && (
           <div className="absolute left-2 top-2">
