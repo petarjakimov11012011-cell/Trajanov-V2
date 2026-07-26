@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-26 |
 | **Branch** | `phase-y.03-catalog-photography` |
-| **PR** | *(opened at the end of this phase — see §12)* |
+| **PR** | [#33](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/33) |
 | **Brief** | The superseding Y.03 Code brief supplied in chat 2026-07-26 (supersedes the version this branch's `Part-2-Phase-Y03-BLOCKED.md` refused) |
 
 ---
