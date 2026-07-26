@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-27 |
 | **Branch** | `phase-y.05-home-hero-overlay` |
-| **PR** | (opened with this report; operator merges — `D-0-3`) |
+| **PR** | [#35](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/35) — open; operator merges (`D-0-3`) |
 | **Brief** | Part 2 · Phase Y.05 · Code (supplied in-session; not committed to `briefs/`) |
 
 ---
