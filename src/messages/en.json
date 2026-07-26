@@ -177,7 +177,9 @@
     "shipping": "Shipping",
     "shippingBody": "North Macedonia only. Cash on delivery.",
     "chooseSize": "Choose a size",
-    "oneUnitLimit": "Max 2 items per order."
+    "oneUnitLimit": "Max 2 items per order.",
+    "photoAltOchre": "Ochre t-shirt with red print, worn.",
+    "photoAltOffWhite": "Off-white t-shirt with red print, worn."
   },
   "Cart": {
     "title": "Cart",
