@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-26 |
 | **Branch** | `phase-y.04-home-hero` |
-| **PR** | *(filled at PR open — see the PR link in `current-state.md` line 1)* |
+| **PR** | [#34](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/34) |
 | **Brief** | `briefs/Part-2-Phase-Y04-Code.md` |
 
 ---
