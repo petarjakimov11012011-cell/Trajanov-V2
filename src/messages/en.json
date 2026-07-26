@@ -181,7 +181,8 @@
     "chooseSize": "Choose a size",
     "oneUnitLimit": "Max 2 items per order.",
     "photoAltOchre": "Ochre t-shirt with red print, worn.",
-    "photoAltOffWhite": "Off-white t-shirt with red print, worn."
+    "photoAltOffWhite": "Off-white t-shirt with red print, worn.",
+    "photoAltComposite": "Ochre and off-white t-shirts with red print, worn."
   },
   "Cart": {
     "title": "Cart",
