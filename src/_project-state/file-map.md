@@ -6,11 +6,21 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-26** · By: **Claude Code (Phase Y.03 — interim catalog photography, Code)**
+Last updated: **2026-07-26** · By: **Claude Code (Phase Y.04 — Home hero photography)**
 
 ---
 
 ## Status
+
+**Home hero photography landed (Phase Y.04).** The Home page's countdown, ended, and no-view branches
+now render the two Y.03 lifestyle frames + two CTAs (**Каталог** → `/katalog`, **Контакт** → `/kontakt`,
+EN parallel) inside `src/components/home/HomeExperience.tsx` — **the only component touched**; the
+`live` branch is byte-unchanged. **No new file under `src/` or `public/`** — the frames are the existing
+`public/images/lifestyle/*.webp`, bound by named constants in `HomeExperience.tsx` itself (not via
+`src/lib/product-images.ts`, which stays a Catalog/Product concern). New: `docs/i18n/mk-review-y04.md`
+(**unsigned**), the Y.04 brief + completion report. Modified: `src/messages/{mk,en}.json` (+2 keys →
+247), `docs/i18n/string-inventory.md`, `Decisions.md` (`D-Y.04-1…5`; `D-1.05-4` → Superseded), the state
+files. Below is the Y.03 history.
 
 **Interim catalog photography landed (Phase Y.03).** The **first images ever committed to this repo**:
 `public/images/lifestyle/{mustard-ochre-01,off-white-01}.webp` (209 KB / 154 KB, 1333×2000), rendering on
@@ -142,11 +152,13 @@ Trajanov-V2/
 │   ├── design-handovers/
 │   │   └── Part-1-Phase-02-Handover.md  # current UI spec — read before UI work
 │   ├── i18n/
-│   │   ├── string-inventory.md      # GENERATED (npm run i18n:inventory) — every key/MK/EN/where (2.01, regen 2.03 → 213)
+│   │   ├── string-inventory.md      # GENERATED (npm run i18n:inventory) — every key/MK/EN/where (2.01, regen Y.04 → 247)
 │   │   ├── mk-review-2.02.md        # native-MK review record: 150 strings + 8 URLs + 6 slugs, verdicts + both sign-offs (2.02)
 │   │   ├── mk-review-2.03.md        # native-MK review pack for the 63 new legal strings — signed 2.05 (2.03)
 │   │   ├── mk-review-2.11.md        # native-MK review pack for the 22 new Home-FAQ strings — unsigned (2.11)
-│   │   └── mk-review-2.12.md        # native-MK review pack for the new Home hero sub-line (one string) — unsigned (2.12)
+│   │   ├── mk-review-2.12.md        # native-MK review pack for the new Home hero sub-line (one string) — unsigned (2.12)
+│   │   ├── mk-review-y03.md         # native-MK review pack for the 2 photo alt strings — unsigned (Y.03; tree line added Y.04)
+│   │   └── mk-review-y04.md         # native-MK review pack for the 2 hero CTA strings — unsigned (Y.04)
 │   ├── legal/
 │   │   └── facts-audit-2.03.md      # every rendered claim traced; 2 findings; zero UNSOURCED (2.03)
 │   └── ops/                          # operator runbooks (2.06)
@@ -373,3 +385,4 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-23 | 2.11 (Code) | **Home FAQ section (out-of-band UI).** Added `src/components/home/HomeFaq.tsx` (server component — native `<details name="home-faq">`/`<summary>` disclosures, 8 questions in 3 static group labels, lucide `Plus`→× icon, `<h2>` heading, localised `/contact` link, no email/phone; renders the FAQPage JSON-LD inline, `D-2.11-7`), `src/lib/faq.ts` (single source — 3 groups × ordered q/a KEYS, no strings), `src/lib/seo/faq-jsonld.ts` (pure `faqJsonLd(t)` → `FAQPage` node), `tests/seo/faq-jsonld.test.ts` (23 assertions), `docs/i18n/mk-review-2.11.md` (unsigned), `completions/Part-2-Phase-11-Completion.md`, `briefs/Part-2-Phase-11-Code.md`. Modified `src/app/[locale]/page.tsx` (mount `<HomeFaq />` after `<HomeExperience>`, before `<DevPreviewSwitch>`), `src/app/globals.css` (appended `.faq-item` disclosure block — tokens only, no new token), `src/messages/{mk,en}.json` (new `Faq` namespace, 22 keys each), `docs/i18n/string-inventory.md` (regen **219 → 241**), `Decisions.md` (`D-2.11-1…7`), `current-state.md` (status block + owed register #24/#25/#26; `NEXT:` unchanged), `file-map.md`. **No `src/components/home/HomeExperience.tsx`/`Countdown`/`DropBanner`, `src/lib/orders/`, `create_order`, `expire_reservations`, `supabase/`, cart, checkout, `src/config/`, `src/lib/drop/`, `SITE_URL`, `facts.md`, `src/lib/seo/{site,product}-jsonld.ts`, `sitemap.ts`, `llms.txt`, `manifest.ts`, or new dependency touched; no new placeholder, no new token.** `D-2.11-*`. | Claude Code |
 | 2026-07-26 | Y.03 (Code) | **Interim catalog photography (out-of-band, Products 01 + 02 only).** New: `public/images/lifestyle/mustard-ochre-01.webp` + `off-white-01.webp` (the first images ever committed to this repo — 209 KB / 154 KB, 1333×2000, WebP; **no ~33 MB original is in this branch's history**), `src/lib/product-images.ts` (slug→image map, 2 entries, baby-blue absent → `null`), `docs/i18n/mk-review-y03.md` (**unsigned**), `completions/Part-2-Phase-Y03-BLOCKED.md` (the preserved refusal of the superseded brief), `completions/Part-2-Phase-Y03.md`. Modified: `src/components/system/PhotoSlot.tsx` (optional `image` prop → `next/image` `fill`/`object-cover`; **the no-image branch is behaviourally unchanged** — same hatch, label, `aspect-[4/5]`, `muted`), `src/components/product/ProductCard.tsx` + `src/app/[locale]/catalog/[slug]/page.tsx` (look the photo up by slug; the product page's **second** slot stays a placeholder), `src/messages/{mk,en}.json` (`Product.photoAltOchre` + `Product.photoAltOffWhite`), `docs/i18n/string-inventory.md` (243→245), `facts.md` (§8 frame count 4→3, new §8.1 permissions, changelog), `Decisions.md` (`D-Y.03-1…11`), `current-state.md` (Known Issue #6 resolved, #4 line item, placeholder #2 narrowed, owed #38–40), this file, `00_stack-and-config.md`. **Product 03 (baby blue) byte-unchanged — proven by an HTML diff of the rendered `<main>` (identical, 6843 bytes both sides).** **No `supabase/migrations/`, `create_order`, `expire_reservations`, cart, checkout, `src/config/`, `src/types/database.ts`, `next.config.ts`, `SITE_URL`, or npm dependency touched.** `D-Y.03-1…11`. | Claude Code |
 | 2026-07-24 | 2.12 (Code) | **Home hero sub-line → brand line (out-of-band copy-only).** Replaced **only** the value of `Home.sub` in `src/messages/{mk,en}.json` (MK „Пронајди сродна, во свет продадени души." / EN „Find a kindred soul, in a world full of sold souls.") — **byte-exact operator copy, Code edited neither language** (`D-2.12-2`). Renders at three sites in `HomeExperience.tsx` (no-view/`ended`/`countdown`) × two locales; absent in `live`. New line makes no factual claim → **`facts.md` byte-unchanged, no entry added**; the three facts the old line carried still render elsewhere both locales (`Faq.a8`/`About.body3`/`Meta.homeDescription`; `Faq.a2`/`Cart.codNote`/`Checkout.codSummary`/`Common.shippingNotice`; `Product.shippingBody`/`Faq.a4`). `Meta.homeDescription` untouched (`D-2.12-3`). Regenerated `docs/i18n/string-inventory.md` (still **241**, one row). Added `docs/i18n/mk-review-2.12.md` (unsigned, one string), `completions/Part-2-Phase-12-Completion.md`. Modified `Decisions.md` (`D-2.12-1/2/3`), `current-state.md` (status block + owed register #27; **`NEXT:` unchanged**), `file-map.md` (this row + tree: `mk-review-2.11.md`/`2.12.md`). **No component (`HomeExperience.tsx`/`HomeFaq.tsx`/`page.tsx`/`globals.css`), `src/lib/`, `supabase/`, cart, checkout, `src/config/`, `SITE_URL`, `brand.md`, `src/lib/seo/`, other message key, or new dependency touched; no new key (241), no new placeholder, no new token.** `D-2.12-*`. | Claude Code |
+| 2026-07-26 | Y.04 (Code) | **Home hero photography.** New: `docs/i18n/mk-review-y04.md` (**unsigned**, 2 CTA strings), `completions/Part-2-Phase-Y04-Completion.md`, `briefs/Part-2-Phase-Y04-Code.md`. Modified: `src/components/home/HomeExperience.tsx` (photo block + 2 CTAs in the countdown/ended/no-view branches; **`live` branch byte-unchanged**, rendered `<main>` at `?preview=live` byte-identical to `main`'s both locales; `browseWhileWait` link retired `D-Y.04-2`), `src/messages/{mk,en}.json` (**+2 keys**: `Home.ctaCatalog`/`ctaContact`), `docs/i18n/string-inventory.md` (regen **245→247**), `Decisions.md` (`D-Y.04-1…5` + `D-1.05-4` Status → Superseded), `current-state.md` (line 1, owed #41–43, placeholder note, Known Issue #4 line item), this file (incl. the stale-missing `mk-review-y03.md` tree line). **Zero files under `public/` — no new asset (`D-0-6`); no `supabase/`, `create_order`, `expire_reservations`, cart, checkout, `src/config/`, `src/lib/drop/`, `globals.css`, `PhotoSlot.tsx`, `product-images.ts`, `HomeFaq`, header/footer, or npm dependency touched.** `D-Y.04-*`. | Claude Code |
