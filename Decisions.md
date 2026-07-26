@@ -3724,3 +3724,155 @@ start at `D-2.01-6`.*
   flick followed by ~710ms of invisible drift. Constant speed is how light crosses a surface. **This
   closes the "ratify or strike" item that was sitting in owed row #36.**
 - **Links:** `D-2.19-6` · `brand.md` §6 · `src/app/globals.css` (`.wordmark-shine`) · owed register #36
+
+### D-Y.03-1 · 2026-07-26 · Photographs map to products by colourway, verified against the file, never by supplied order or index
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.03 brief); executed by Claude Code.
+- **Decision:** A photograph goes on a product only if it **shows that product's colourway**, confirmed by
+  opening the file and looking at it before wiring. The lookup in `src/lib/product-images.ts` is keyed by
+  product **slug** — never by array index, sort order, or the order the files were supplied.
+- **Alternative rejected:** the positional mapping originally requested, which would have shifted every
+  shirt by one product.
+- **Downside accepted:** overrides the order the operator gave, so the operator's instruction and the
+  shipped mapping differ. If Code's colour read were wrong the mapping would be wrong, so each file was
+  confirmed by eye first: `mustard-ochre-01.webp` is the saturated ochre tee (~`(213,163,58)`),
+  `off-white-01.webp` is the near-white tee (~`(199,188,181)`). Both confirmed 2026-07-26.
+- **Links:** `src/lib/product-images.ts` · `facts.md` §7 · `src/config/products.ts`
+
+### D-Y.03-2 · 2026-07-26 · Product 03 (baby blue) ships with no photograph
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.03 brief); executed by Claude Code.
+- **Decision:** Product 03 gets **no photograph**. Its card and product page are byte-unchanged by this
+  phase — proven by an HTML diff of the rendered `<main>` for `/katalog/test-baby-blue` before and after
+  (identical, 6843 bytes both sides).
+- **Alternative rejected:** using the third frame — a screenshot that measures warm grey — as a stand-in.
+- **Downside accepted:** the catalog looks uneven — two cards with photographs, one hatched box — until
+  Vladimir shoots baby blue. Taken because a stand-in is exactly what placeholder register #8 forbids in
+  its own words ("no stand-in, no generated image, no other shirt's photo") and what `D-0-6` prohibits.
+- **Links:** placeholder register #8 · `D-0-6` · `D-Y.02-1` · `src/lib/product-images.ts`
+
+### D-Y.03-3 · 2026-07-26 · Placeholder rows #2 and #8 stay open; #2 is narrowed only
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.03 brief); executed by Claude Code.
+- **Decision:** Row **#2** is **narrowed** to one sense and no further — the neutral-background front /
+  back / print-detail set is still owed for every colourway, and an interim lifestyle frame now renders
+  for Products 01 and 02. Row **#8** is **byte-unchanged**. Nothing is struck or cleared.
+- **Alternative rejected:** clearing #2 now that a real photograph renders.
+- **Downside accepted:** the register looks unchanged after a phase that shipped visible work, which can
+  read as no progress. That is the point — the pre-drop gate still blocks on photography and Vladimir
+  still owes the neutral set.
+- **Links:** placeholder register #2, #8 · `facts.md` §8
+
+### D-Y.03-4 · 2026-07-26 · The files live in `public/images/lifestyle/`, not `public/images/products/`
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.03 brief); executed by Claude Code.
+- **Decision:** Both WebP files are committed to `public/images/lifestyle/`.
+- **Alternative rejected:** `public/images/products/`, which `file-map.md` reserves for the real neutral set.
+- **Downside accepted:** an extra directory now, and a later move when the real set lands. Taken because
+  putting lifestyle frames in `products/` would make the file map lie about what we hold.
+- **Links:** `file-map.md` · `public/images/lifestyle/` · `D-0-6`
+
+### D-Y.03-5 · 2026-07-26 · `next/image`, local files, no `images` config, no new dependency
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.03 brief); executed by Claude Code.
+- **Decision:** The first images on the site render through `next/image` with `fill` + `object-cover` in
+  the existing `aspect-[4/5]` box, `priority` off, `sizes="(min-width: 1024px) 280px, 50vw"`. Local files
+  only. `next.config.ts` gets **no** `images` block. No new npm dependency — `next/image` is built in.
+- **Alternative rejected:** a plain `<img>` (no optimisation, CLS risk), or a remote image host (a new
+  surface to secure, and it breaks the portability rule).
+- **Downside accepted:** the site now has an image-optimisation code path it did not have before, and
+  Lighthouse mobile Performance on Catalog — already only **94** — must be re-measured on the live domain
+  (owed #39). Verified in-pane that the browser picks the 640px candidate at 390px, not the 3840px one.
+- **Links:** `src/components/system/PhotoSlot.tsx` · `next.config.ts` · owed register #39 · `00_stack-and-config.md`
+
+### D-Y.03-6 · 2026-07-26 · The bar backdrop is acceptable as brand imagery despite visible alcohol and a 12+ audience
+- **Status:** Accepted (widened by `D-Y.03-10`)
+- **Decided by:** Vladimir, his own call on his own brand, relayed by Lazar 2026-07-26.
+- **Decision:** The „Вторник" bar interior — a wall of spirits, the venue's signage and trade dress in
+  frame — is acceptable as brand imagery on the Catalog and Product pages.
+- **Alternative rejected:** reshooting the lifestyle set somewhere neutral.
+- **Downside accepted:** a venue with alcohol is now the front door of a brand whose youngest customers
+  are 12. Owner's call, recorded rather than absorbed.
+- **Links:** `facts.md` §8.1 · Known Issue #6 · `D-Y.03-10`
+
+### D-Y.03-7 · 2026-07-26 · Override `facts.md` §8's "cannot carry Catalog or Product" for these two frames, as an interim
+- **Status:** Accepted
+- **Decided by:** **Lazar**, 2026-07-26. (See the downside — `facts.md` §8 assigns this call to Vladimir.)
+- **Decision:** The two frames may carry the Catalog card and the **first** Product slot for Products 01
+  and 02, as a logged interim. `facts.md` §8's "It cannot carry Catalog or Product" sentence is **not
+  retracted** — it still states the real defect and now carries the override beside it.
+- **Alternative rejected:** waiting for the neutral set, which is owed anyway and would clear #2/#8
+  properly — the orchestrator's own recommendation, made twice, and the basis of the earlier refusal.
+- **Downside accepted:** warm tungsten light shifts the garment colour, so on a cash-on-delivery order
+  what the customer sees is **not exactly** what arrives at the door — the precise risk `facts.md` §8 was
+  written to guard. Mitigated by the second product-page slot staying a visible placeholder and by #2
+  remaining open. These frames are **replaced** when the neutral set lands, not kept alongside it.
+  **Second downside, recorded not smoothed over:** `facts.md` §8 assigns the photography calls to
+  **Vladimir**, and this override was made by **Lazar**. The Y.03 brief's own preamble faulted its
+  superseded version for routing these calls through Lazar; on this decision it does the same thing. The
+  mismatch is written into `facts.md` §8 and raised in the completion report rather than papered over.
+- **Links:** `facts.md` §8 · `facts.md` §8.1 · placeholder register #2 · `Part-2-Phase-Y03-BLOCKED.md` §3(c)
+
+### D-Y.03-8 · 2026-07-26 · `facts.md` §8's frame count corrected from four to three
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.03 brief); executed by Claude Code.
+- **Decision:** The §8 lifestyle row now reads **3 frames**, not 4. Vladimir holds three; a fourth does
+  not exist yet.
+- **Alternative rejected:** leaving the record as-is.
+- **Downside accepted:** a fact marked VERIFIED since the scaffold commit was wrong, which weakens the
+  claim that a VERIFIED mark means checked. Recorded as a dated correction with its own decision ID
+  rather than silently edited, so the error stays visible.
+- **Links:** `facts.md` §8 · `facts.md` changelog · `Part-2-Phase-Y03-BLOCKED.md` §4
+
+### D-Y.03-9 · 2026-07-26 · Guardian consent for Vladimir's own image is recorded as a FIFTH permission, not folded into his own
+- **Status:** Accepted
+- **Decided by:** Petar (orchestrator), in session 2026-07-26, after Code raised it; parents' consent
+  obtained by the operators.
+- **Decision:** `facts.md` §8.1 records **five** permissions, not the four the brief listed. The fifth is
+  **guardian consent from Vladimir's parents** for commercial use of his own image. His face is fully
+  identifiable in `mustard-ochre-01.webp`, and that permission is what makes the frame publishable.
+- **Alternative rejected:** the brief's instruction to treat Vladimir's own instruction to publish as
+  covering his image, and to explicitly **not** treat guardian consent as a blocker.
+- **Downside accepted:** this contradicts a direct instruction in the brief and cost a round-trip before
+  any code was written. Taken because the brief applies the correct test to the other model — "she **is
+  21** — an adult, so her own consent is sufficient" — and then abandons that same test for someone it
+  identifies as a minor in the next paragraph. A minor's self-consent is not valid consent for commercial
+  use of their likeness; recording it as satisfied would have put a false clearance into `facts.md`, the
+  only legal source. The permission covers **this publication only** and does not close Known Issue #4.
+- **Links:** `facts.md` §8.1 · Known Issue #4 · `facts.md` §1 · `D-Z.01-3`
+
+### D-Y.03-10 · 2026-07-26 · The backdrop call is written to cover a person in frame holding a drink, not only a backdrop
+- **Status:** Accepted (widens `D-Y.03-6`)
+- **Decided by:** Petar (orchestrator), in session 2026-07-26, after Code raised it.
+- **Decision:** `D-Y.03-6` and `facts.md` §8.1 permission #4 are worded to state explicitly that the
+  authorisation covers **a person in frame holding a spirits tumbler**, which `off-white-01.webp` shows,
+  and not merely alcohol in the background.
+- **Alternative rejected:** leaving `D-Y.03-6` at the brief's wording ("a wall of spirits **behind** two
+  young models") and letting the glass be read into the word "backdrop".
+- **Downside accepted:** it widens, on the record, what the owner is documented as having approved for a
+  brand whose audience starts at 12 — and the person holding the glass is a minor. The contents of the
+  glass are **not determinable** from the photograph and no claim is made about them. Taken because the
+  brief never mentions the glass, so `D-Y.03-6` as drafted would have recorded approval for something
+  narrower than what actually ships; a decision that understates what it authorises is not a decision.
+- **Links:** `D-Y.03-6` · `facts.md` §8.1 · `public/images/lifestyle/off-white-01.webp`
+
+### D-Y.03-11 · 2026-07-26 · Verification reseeded the LOCAL scratch database; the hosted database was never touched
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot, to satisfy the brief's non-negotiable browser-verification gate.
+- **Decision:** The local dev database served a **stale scratch dataset** (`test-tee-black`,
+  `test-tee-two`) from a currently-live leftover drop `test-open-drop`, so the catalog never rendered the
+  committed products at all. To verify, Code ran `npm run sync:drop` against **local only** (guarded: the
+  resolved host was asserted to be `127.0.0.1` and `SUPABASE_DB_URL` was confirmed unexported), then
+  temporarily moved the two scratch drops' windows into the past so `pickActiveDrop` selected the
+  committed `test-drop` — matching production. Stock for `test-off-white` was briefly set to 0 to prove
+  sold-out styling reaches a photograph. **All three mutations were restored** from a saved backup and
+  re-queried after.
+- **Alternative rejected:** verifying against the stale data (which would have proved nothing — none of
+  those slugs have a photograph), or repointing dev at the **hosted** database (zero mutations, but it
+  reads production and needs production credentials for a render check).
+- **Downside accepted:** a literal reading of the brief's "**No sync**" was deviated from. That line sits
+  under "do not touch … **the hosted database**", and nothing hosted was read or written — but the
+  deviation is logged rather than left implicit. Second downside: the local scratch drops
+  `test-open-drop` / `test-upcoming-drop` are not in `src/config/drops.ts`, so this divergence will bite
+  the next phase that verifies the catalog locally too.
+- **Links:** `scripts/sync-drop.ts` · `src/lib/drop/state.ts` (`pickActiveDrop`) · `src/config/drops.ts`

@@ -216,12 +216,33 @@ fabric are OWED before it can enter a live drop** — that assignment is `Y.01`.
 
 | Asset | Status |
 |---|---|
-| Lifestyle shots — bar location, 2 models, mustard + off-white tees, 4 frames | **VERIFIED, on hand** |
+| Lifestyle shots — bar location, 2 models, mustard + off-white tees, **3 frames** | **VERIFIED, on hand** |
 | Product shots — front / back / print detail, neutral background | **DOES NOT EXIST — OWED** (Vladimir) |
+
+**Frame count corrected 2026-07-26 (`D-Y.03-8`): three frames, not four.** This row read "4 frames"
+from the scaffold onwards. Vladimir holds **three**; a fourth does not exist yet. Only two of the
+three are wired to anything — there is **no baby-blue frame**, which is why Product 03 still ships
+with a photo placeholder (placeholder register #8).
 
 The lifestyle set is good and carries the Home hero and the About page. **It cannot carry Catalog
 or Product** — no clean front, no back, no print detail, and the mustard reads differently under
 the bar's warm lighting than it does in daylight.
+
+**Overridden as a logged interim for two frames only, 2026-07-26 (`D-Y.03-7`, Lazar's call).** The
+mustard and off-white frames now render on the **Catalog card and the first Product slot** for
+Products 01 and 02. The sentence above still states the real defect and is **not retracted**: warm
+tungsten light shifts the garment colour, so on a cash-on-delivery order what the customer sees is
+not exactly what arrives at the door. Mitigations: the second product-page slot stays a visible
+placeholder, and placeholder register #2 stays **OPEN**. These frames are **replaced** when the
+neutral set lands, not kept alongside it.
+
+> **The neutral product set remains OWED and these frames do not satisfy it.** A styled lifestyle
+> frame in a bar is not front / back / print-detail on a neutral background. The register must still
+> reach zero before the first real drop opens; this interim did not move that gate.
+
+**Note on the authority for `D-Y.03-7`.** This section assigns the photography calls to **Vladimir**
+(see the location note below). The §8 override was made by **Lazar**. That mismatch is recorded here
+rather than smoothed over, and is raised in the Y.03 completion report.
 
 **Product photography gates Phases 1.06 and 2.05.** Per drop: front, back, print close-up, one
 on-body — neutral wall or flat, daylight, no flash. A phone is fine.
@@ -237,6 +258,39 @@ decide whether a bar backdrop is right for the brand's front door; (b) the venue
 trade dress are visible and identifiable, so **confirm the venue is happy to appear** and confirm
 Vladimir has the models' permission to use their images commercially. Both are owner-level calls
 for Vladimir, on the parallel track, before those images go live.
+
+### 8.1 Permissions — all five GIVEN, recorded 2026-07-26
+
+The imperative in the location note above is **satisfied**. This resolves Known Issue **#6**, which
+had blocked all future lifestyle imagery.
+
+**PII rule — this repo is public (`D-0-1`).** What follows records the **fact, date and channel** of
+each permission and nothing more. No message text, no screenshots, no sender handles, no phone
+numbers, and **no name for the model** are committed here or anywhere in this repo. The evidence is
+**held by Lazar and Petar, outside the repo**; it is referenced as held, never attached.
+
+| # | Permission | Status | Date | Channel |
+|---|---|---|---|---|
+| 1 | **Venue** — „Вторник", Strumica: signage and trade dress may appear | **GIVEN** | 2026-07-26 | Direct message from the venue, relayed by Lazar |
+| 2 | **Adult model** — commercial use of her image | **GIVEN** | 2026-07-26 | Her own message, given directly, relayed by Lazar |
+| 3 | **Second person in frame — this is Vladimir himself** | **GIVEN** | 2026-07-26 | His own instruction to publish these pictures |
+| 4 | **Backdrop call** — visible alcohol, audience starts at 12 | **MADE, in favour** | 2026-07-26 | Vladimir's own decision on his own brand, relayed by Lazar |
+| 5 | **Guardian consent for Vladimir's own image** — commercial use | **GIVEN** | 2026-07-26 | His parents, confirmed by the orchestrator (Petar) in session |
+
+**Why #2 needs no guardian consent and #5 does.** The adult model **is 21**, so her own consent is
+sufficient. Vladimir is a **minor** (§1; Known Issue #4), so his own instruction does *not* by itself
+cover commercial use of his likeness — his face is fully identifiable in the mustard frame. Permission
+**#5 is the one that makes that frame publishable**, and it is the reason this is recorded as five
+permissions rather than the four originally listed.
+
+**#4 covers a person in frame holding a drink, not only a backdrop.** The off-white frame shows a
+person at the bar holding a spirits tumbler; the contents are not determinable from the photograph.
+That is a step beyond "a wall of spirits behind the models", so it is written down explicitly here
+rather than left to be read into the word "backdrop" (`D-Y.03-6`).
+
+**Still open, deliberately not a blocker for Y.03:** Vladimir's own photograph is a line item for the
+parental conversation already open under Known Issue **#4** (legal responsibility, cutover blocker,
+owner Vladimir + parents). Permission #5 covers **this publication**; it does not close #4.
 
 ---
 
@@ -301,4 +355,5 @@ site header only. It does **not** go in the Organization or WebSite JSON-LD, `sa
 | 2026-07-18 | **§ 7 Price + sizes → VERIFIED (Phase 1.08 Code brief, Task 1, `D-1.08-1`).** Price **1199 MKD** for this drop and currency **MKD** marked VERIFIED (provenance: owner via Lazar, 2026-07-18); the old "~$65 / ~3,700 MKD INDICATIVE ONLY" ceiling is **SUPERSEDED** — a real price now exists. Sizes **S/M/L/XL** VERIFIED, with the **off-white** shirt **XL-only**. Fabric/composition/care and per-size measurements stay **UNVERIFIED — OWED**. Edit made by Code on explicit orchestrator instruction (the gate runs against a real-priced rehearsal drop, `D-1.08-1`) and surfaced in the completion report — not a silent add. | Claude Code (per 1.08 brief) |
 | 2026-07-19 | **§ 1 Responsible party amended (Phase 2.03 Code, `D-2.03-1`).** The row now records that the party **displayed** on Terms + Privacy is **Vladimir Trajanov, alone** (Lazar's call), while keeping the underlying VERIFIED intake fact (Vladimir Trajanov and his parents) visible in the same cell — neither overwritten nor deleted. The §1 open flag (confirm legal responsibility with the parents before cutover) is **unchanged and still open**. Full walk of every rendered claim recorded in `docs/legal/facts-audit-2.03.md`; no other claim needed a `facts.md` change. Edit made by Code on explicit orchestrator instruction and surfaced in the completion report — not a silent add. | Claude Code (per 2.03 brief) |
 | 2026-07-22 | **§ 7 Product 03 — baby blue added (Phase Y.02 Code, Task 1, `D-Y.02-1`).** A **third colourway, baby blue**, working name "Product 03": **price 1999 MKD VERIFIED** (owner, 2026-07-22) and **sizes S/M/L/XL VERIFIED** (owner); the colourway itself is **owner-stated, NOT photographed** (explicitly not "VERIFIED (photos)" like the other two); **photos + fabric/care UNVERIFIED — OWED** (Vladimir); the real customer-facing name is OWED. Recorded as a new `### Product 03` sub-block in § 7. Owner-authorised out-of-order insert (Lazar, 2026-07-22). Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.02 brief) |
+| 2026-07-26 | **§ 8 Photography — permissions recorded, frame count corrected, Catalog/Product line overridden as an interim (Phase Y.03 Code).** New **§ 8.1** records **five** permissions as GIVEN by fact/date/channel only — venue („Вторник"), the adult model (**21**, her own consent), Vladimir's own instruction, the backdrop call (Vladimir, in favour, and written to cover **a person in frame holding a drink**, not only a backdrop), and **guardian consent for Vladimir's own image** (his parents, confirmed by the orchestrator in session). **No message text, screenshot, handle, phone number, or the model's name is committed** (`D-0-1`); evidence is held by Lazar and Petar outside the repo. **Frame count corrected 4 → 3** (`D-Y.03-8`) — a fourth does not exist. The **"It cannot carry Catalog or Product"** sentence is **NOT retracted**; it is overridden for **two frames only** as a logged interim (`D-Y.03-7`, **Lazar's** call — a mismatch with this section's assignment of these calls to Vladimir, recorded rather than smoothed over). The **neutral product set remains OWED**; placeholder register #2 stays OPEN and #8 is untouched. Resolves Known Issue #6; adds a line item to the still-open Known Issue #4. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.03 brief) |
 | 2026-07-23 | **§ 11 Site build credit added (Phase 2.08 Code).** New section recording the site as built by **Vertex Consulting** (VERIFIED, operator/Lazar, 2026-07-23) and its URL `https://www.vertexconsulting.mk/en` (VERIFIED — click-test owed before ship). Scoped hard: a build credit in the site header only, **not** a partner/sponsor/stockist, and barred from JSON-LD/`sameAs`/OG/`llms.txt`/sitemap/footer/legal pages. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per 2.08 brief) |
