@@ -3973,3 +3973,193 @@ start at `D-2.01-6`.*
   `src/config/drops.ts` and keeps biting every phase that verifies locally; this phase worked around
   it rather than fixing it.
 - **Links:** `D-Y.03-11` · `src/lib/drop/state.ts` (`pickActiveDrop`)
+
+### D-Y.05-1 · 2026-07-27 · `Home.headline` is retired from render, not deleted
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.05 brief); executed by Claude Code.
+- **Decision:** The rendered `<h1>{t('headline')}</h1>` is removed from all three non-`live` Home
+  branches. The key stays in `mk.json` and `en.json` and is flagged `_(not found in source)_` in the
+  regenerated `string-inventory.md` — the `D-Y.04-2` treatment, applied to a second key.
+- **Alternative rejected:** deleting the key, which would drop the inventory to 246 and make the
+  change hard to reverse.
+- **Downside accepted:** the catalogs now carry two dead keys (`browseWhileWait`, `headline`), not one.
+- **Links:** `D-Y.04-2` · `docs/i18n/string-inventory.md` · `src/messages/{mk,en}.json`
+
+### D-Y.05-2 · 2026-07-27 · The Home H1 becomes visually hidden in the three non-live branches
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.05 brief); executed by Claude Code.
+- **Decision:** Each of the `no-view`, `ended` and `countdown` branches renders
+  `<h1 className="sr-only">{t('title')}</h1>` — identical to what the `live` branch has done since 2.04.
+- **Alternative rejected:** no H1 at all, which breaks 2.04's "one H1 per page, no heading skips" gate
+  and costs the Accessibility 100.
+- **Downside accepted:** the page's visible top-level heading is now a photograph; the H1 exists for
+  machines and screen readers only.
+- **Links:** Phase 2.04 a11y gates · `src/components/home/HomeExperience.tsx`
+
+### D-Y.05-3 · 2026-07-27 · Two hero sources, art-directed by breakpoint
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.05 brief); executed by Claude Code.
+- **Decision:** Below `640px` the hero renders `mustard-ochre-01.webp` in `aspect-[4/5]`
+  (`objectPosition` keeping Y.04's tuned `center 60%`); from `640px` it renders the new
+  `trio-composite-01.webp` (1672×941, three-panel composite of the same three §8.1-permitted frames,
+  serif TRAJANOV burned in) in `aspect-[16/9]`. Both bound by explicit named constants (`D-Y.03-1`).
+- **Alternative rejected:** the composite at all breakpoints — `object-cover` on a 16:9 source in a
+  phone-shaped box crops to roughly the middle third and slices the burned-in wordmark into
+  unreadable fragments.
+- **Downside accepted:** two hero images to maintain, and phone visitors never see the composite.
+- **Links:** `D-Y.03-1` · `facts.md` §8.1 · `public/images/lifestyle/trio-composite-01.webp`
+
+### D-Y.05-4 · 2026-07-27 · Exactly one image preload, and it stays the mobile one
+- **Status:** Accepted (execution deviates from the brief's prop recipe — see D-Y.05-11)
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.05 brief); executed by Claude Code.
+- **Decision:** The mustard frame keeps `priority` (the LCP element for phone visitors). The composite
+  must emit **no** `rel="preload" as="image"` link, so a phone never preloads a desktop-only asset.
+- **Alternative rejected:** `priority` on both, which emits two preload links and makes phone visitors
+  preload a desktop-only asset — the thing Y.04's 98 depended on not happening.
+- **Downside accepted:** desktop LCP loses its preload hint (measured cost on this branch: desktop
+  Lighthouse 99, LCP 0.9s — the composite is still the desktop LCP element).
+- **Links:** `D-Y.04` preload record · `D-Y.05-11` · `src/components/home/HomeExperience.tsx`
+
+### D-Y.05-5 · 2026-07-27 · Full-bleed means the width of the page column, not the viewport
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.05 brief); executed by Claude Code.
+- **Decision:** The hero cancels the column padding (`-mx-4 sm:-mx-6`) and stops at the existing
+  `max-w-6xl` (1152px). Measured hero box at 1280: exactly 1152×648.
+- **Alternative rejected:** true `100vw` bleed via `left-1/2 -translate-x-1/2 w-screen`, which would
+  upscale a 1672px source on a wide display and break alignment with the header and footer.
+- **Downside accepted:** on a large monitor the hero is a wide band, not edge-to-edge glass.
+- **Links:** `D-Y.04-3` (the bleed shape) · `src/components/home/HomeExperience.tsx`
+
+### D-Y.05-6 · 2026-07-27 · The scrim only darkens; measured, then deepened 55% → 80% reach
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.05 brief); recipe finalised
+  by measurement, Claude Code.
+- **Decision:** The overlay scrim is built from `--color-ground` only, via `color-mix` — a flat 40%
+  wash plus a bottom gradient at 92%. No new colour token, no white, no lightening blend (`D-2.10-1`
+  stands). The brief's starting recipe ran the gradient to 55% of the hero's height; measured, the
+  countdown digits' top rows sit ~60% up the box at 320/768/1024 and their brightest underlying
+  pixel composited to **2.14:1** (< the 3:1 floor), so the gradient reach was deepened to **80%** —
+  the sanctioned correction direction ("deepen the scrim; never lighten the photograph, never
+  brighten the text"). After deepening, every digit's worst pixel measures ≥3.34:1, tagline ≥7.82:1,
+  CTA labels ≥9.26:1 across 320/390/768/1024/1280, both locales, all overlay states.
+- **Alternative rejected:** a lighter text colour over an undimmed photo.
+- **Downside accepted:** the photograph reads darker than the file does on its own — and the 80%
+  reach dims more of it than the brief's 55% sketch anticipated.
+- **Links:** `D-2.10-1` · brand.md §3 · `src/components/home/HomeExperience.tsx` (`SCRIM_*`)
+
+### D-Y.05-7 · 2026-07-27 · The countdown stays the largest type on the page, inside the overlay
+- **Status:** Accepted (execution partially deviates — see D-Y.05-9/10)
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.05 brief); executed by Claude Code.
+- **Decision:** The countdown renders inside the overlay, above the tagline; nothing in the overlay
+  may be set larger. Verified rendered: digits 88px from `768px` up, 36px below — against 16px
+  tagline/buttons and 12px labels, the largest type at every width.
+- **Alternative rejected:** moving the countdown above the image to keep Y.04's measured contrast —
+  that leaves the hero looking nothing like what was asked for.
+- **Downside accepted:** countdown legibility now depends on the scrim, so it was measured rather
+  than assumed (see D-Y.05-6 for the measured ratios).
+- **Links:** brand.md §2/§4 · `D-Y.05-6` · `src/components/drop/Countdown.tsx`
+
+### D-Y.05-8 · 2026-07-27 · The overlay tagline renders in `--color-foreground`, not the muted token
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Context:** Y.04's tagline was `text-muted-foreground` on the plain page ground (7.9:1, brand.md
+  §3). In the overlay it sits on a photograph behind a scrim; muted (#ABA79E) over the measured
+  worst-case composite would hold only ~1.7–4.6:1 depending on scrim depth, and the only sanctioned
+  correction (deepen, D-Y.05-6) would have to darken the photograph much further to buy the same
+  margin a brighter token gives for free.
+- **Decision:** Inside the overlay the tagline is `text-foreground`. This is the initial design
+  choice for a new surface, decided before measurement — not a post-measurement brightening, which
+  D-Y.05-6 forbids.
+- **Alternative rejected:** keeping `text-muted-foreground` and deepening the scrim until it passes —
+  costs the photograph far more darkening for a token whose whole purpose (quiet secondary text) the
+  hero tagline no longer serves.
+- **Downside accepted:** the tagline is one step louder in the hierarchy than Y.04 shipped it; the
+  quiet-secondary look is lost on the hero.
+- **Links:** brand.md §3 · `D-Y.05-6` · `src/components/home/HomeExperience.tsx`
+
+### D-Y.05-9 · 2026-07-27 · The countdown's token size is restored at the call site — tailwind-merge has been silently stripping it since 1.04
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot, after measurement.
+- **Context:** The brief's gate "computed font-size pasted for the digits" surfaced this: the digit
+  and colon spans inside `Countdown.tsx` pass `text-countdown` **before** a text-colour class into
+  `cn()`, and `tailwind-merge` (3.6.0, locked since the 1.01 scaffold) cannot tell a custom
+  font-size utility from a colour utility — both pattern-match `text-*` — so it drops
+  `text-countdown` as a "conflicting colour". The digits have computed to **16px** since the
+  countdown was built in 1.04 — on `main` and on production today. `DropCountdownEyebrow` loses its
+  `text-eyebrow` the same way (renders 16px). Every prior "the countdown is the loudest object"
+  verification was made against the stripped size; no earlier gate ever demanded the computed value.
+- **Decision:** In `HomeExperience.tsx` (the one file in this phase's scope) the `Countdown` wrapper
+  gets the size utility via its existing `className` prop, so the stripped spans inherit the token
+  size. `Countdown.tsx` itself and `src/lib/utils.ts` are untouched.
+- **Alternative rejected:** fixing the root cause — reordering classes in `Countdown.tsx` or
+  configuring `extendTailwindMerge` with the brand's custom font-size group in `src/lib/utils.ts` —
+  both outside this phase's file scope, and the utils change has site-wide blast radius that needs
+  its own phase and its own verification.
+- **Downside accepted:** the root cause remains. Any `cn('text-<custom-size> … text-<colour>')`
+  elsewhere still strips the size (`DropCountdownEyebrow` on this same hero still renders 16px, and
+  `/styleguide`'s countdown demos stay small). A follow-up phase should fix `cn()` properly.
+- **Links:** `src/lib/utils.ts` · `src/components/drop/Countdown.tsx` · tailwind-merge 3.6.0 ·
+  `D-Y.05-10`
+
+### D-Y.05-10 · 2026-07-27 · Below `768px` the countdown renders at `--text-h1` — the countdown token physically cannot fit a phone
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot, after measurement; deviates from D-Y.05-7's "renders at
+  `--text-countdown`" below `md:`.
+- **Context:** With the token size restored (D-Y.05-9), the countdown row measured **402px wide at a
+  390px viewport** — `--text-countdown` is `clamp(2.75rem, 13vw, 5.5rem)`, and four `min-w-[2ch]`
+  cells at 13vw plus three colons and six gaps add to more than 100vw. The token was born unfittable
+  on phones; the 16px strip is why it never visibly clipped. Between 640–735px the capped 5.5rem row
+  (669px) still exceeds the overlay's width.
+- **Decision:** The wrapper carries `text-h1 md:text-countdown`. From `768px` up the row (669px) fits
+  every hero and the brief's token applies; below, `--text-h1` (36–50px digits) — still by far the
+  largest type in the hero — fits with margin (row 306px at 390, 274px at 320; no clipping, no
+  horizontal overflow, verified at all five widths).
+- **Alternative rejected:** shipping the token at all widths and letting `overflow-hidden` clip the
+  digits (~6px per side at 390, worse at 320 — unreadable edges on the one element the site exists
+  to show); or shrinking the Countdown's internal gaps (out-of-scope file).
+- **Downside accepted:** on phones the countdown renders at the H1 token, not the countdown token —
+  a second token now sizes the same component depending on width, and D-Y.05-7's letter holds only
+  from `md:` up.
+- **Links:** `D-Y.05-9` · brand.md §4 · `src/components/home/HomeExperience.tsx`
+
+### D-Y.05-11 · 2026-07-27 · The composite ships default-lazy — on Next 16 both `loading="eager"` and `fetchPriority="high"` emit a second preload link
+- **Status:** Accepted; deviates from the brief's Task 4 prop recipe to satisfy the same brief's DoD
+- **Decided by:** Claude Code, on the spot, after measurement.
+- **Context:** The brief's recipe for the composite (`loading="eager"` + `fetchPriority="high"`, no
+  `priority`) assumes only `priority` emits a preload. Measured on Next 16.2.10: `fetchPriority="high"`
+  emits a `rel="preload" as="image"` link, and so does `loading="eager"` alone — either way `<head>`
+  carries **two** preloads, which is exactly what D-Y.05-4 exists to prevent and what the DoD's
+  "exactly one preload, mustard" forbids.
+- **Decision:** The composite `<Image>` carries no `priority`, no `loading`, no `fetchPriority` —
+  next/image's default (lazy). Measured consequences: exactly one preload (mustard) in `<head>` both
+  locales; a phone (where the composite's box is `display:none`) never downloads the 185KB
+  desktop-only asset at all; desktop discovers it in the initial HTML, in-viewport, and fetches it
+  right after layout — desktop Lighthouse 99 with the composite as the LCP element at 0.9s.
+- **Alternative rejected:** keeping the brief's literal props (two preloads, DoD fail, and phones
+  preload a desktop asset); or hand-rolling `getImageProps` + `<picture>` art direction, which
+  departs from the repo's established next/image pattern for marginal desktop gain.
+- **Downside accepted:** desktop's composite fetch starts at layout time instead of parse time — a
+  ~0.1s LCP cost on the measured desktop run.
+- **Links:** `D-Y.05-4` · Next 16.2.10 `next/image` preload behaviour ·
+  `src/components/home/HomeExperience.tsx`
+
+### D-Y.05-12 · 2026-07-27 · Verification maneuvers: local scratch drops ended for Lighthouse, and a temporary uncommitted `view = null` for the no-view render
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — the D-Y.04-5 / D-Y.03-11 pattern, repeated and extended.
+- **Decision:** (a) For Lighthouse on `next start`, the two local scratch drops' windows were moved
+  into the past (local Docker DB only; exact prior values recorded first: `test-open-drop`
+  2026-07-21T17:24:31.984Z → 2026-07-29T17:24:31.984Z, `test-upcoming-drop` 2026-07-29T17:24:31.984Z
+  → 2026-08-05T17:24:31.984Z), `/` then served the ended-state hero as production does, and **both
+  rows were restored byte-exact and re-queried after**. Hosted untouched. (b) For the no-view state —
+  unreachable via `?preview=` (it needs zero drop rows) — `page.tsx` got a one-line local
+  `const view = null` override, the state was rendered and measured at all five widths in both
+  locales, and the file was reverted via `git checkout` (diff-proven clean) before commit.
+- **Alternative rejected:** (a) measuring `/` in the live state (a page this phase doesn't touch);
+  (b) deleting the drops rows to force no-view through the real query path — `products`/`variants`/
+  `order_items` hang off `drops` without cascade, so an honest restore would mean dump-and-reload of
+  six tables for a branch this phase doesn't change (`getActiveDropView`'s null path is untouched
+  code).
+- **Downside accepted:** the same one D-Y.04-5 logged — the scratch DB keeps diverging from
+  `src/config/drops.ts` and biting every phase; and the no-view evidence proves the component branch,
+  not the DB-to-null path (that path is untouched by this phase).
+- **Links:** `D-Y.04-5` · `D-Y.03-11` · `src/app/[locale]/page.tsx` · `src/lib/drop/state.ts`

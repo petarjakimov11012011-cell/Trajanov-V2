@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 247 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 248 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -120,7 +120,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Home.ctaCatalog` | Каталог | Catalog | `src/components/home/HomeExperience.tsx` |
 | `Home.ctaContact` | Контакт | Contact | `src/components/home/HomeExperience.tsx` |
 | `Home.eyebrow` | Следно спуштање | Next drop | _(not found in source)_ |
-| `Home.headline` | Кога тајмерот ќе стигне нула, спуштањето е во живо. | When the timer hits zero, the drop is live. | `src/components/home/HomeExperience.tsx` |
+| `Home.headline` | Кога тајмерот ќе стигне нула, спуштањето е во живо. | When the timer hits zero, the drop is live. | _(not found in source)_ |
 | `Home.opening` | Се отвора… | Opening… | `src/components/home/HomeExperience.tsx` |
 | `Home.sub` | Пронајди сродна, во свет продадени души. | Find a kindred soul, in a world full of sold souls. | `src/components/home/HomeExperience.tsx` |
 | `Home.tagline` | Наскоро. | Coming soon. | _(not found in source)_ |
@@ -204,8 +204,9 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Product.composition` | Состав и нега | Composition & care | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Product.details` | Детали | Details | _(not found in source)_ |
 | `Product.oneUnitLimit` | Најмногу 2 парчиња по нарачка. | Max 2 items per order. | `src/components/product/AddToCartPanel.tsx` |
+| `Product.photoAltComposite` | Окер и крем-бели маици со црвен принт, носени. | Ochre and off-white t-shirts with red print, worn. | `src/components/home/HomeExperience.tsx` |
 | `Product.photoAltOchre` | Окер маица со црвен принт, носена. | Ochre t-shirt with red print, worn. | `src/components/home/HomeExperience.tsx`<br>`src/lib/product-images.ts` |
-| `Product.photoAltOffWhite` | Крем-бела маица со црвен принт, носена. | Off-white t-shirt with red print, worn. | `src/components/home/HomeExperience.tsx`<br>`src/lib/product-images.ts` |
+| `Product.photoAltOffWhite` | Крем-бела маица со црвен принт, носена. | Off-white t-shirt with red print, worn. | `src/lib/product-images.ts` |
 | `Product.shipping` | Испорака | Shipping | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Product.shippingBody` | Само во Северна Македонија. Плаќање со готовина при преземање. | North Macedonia only. Cash on delivery. | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Product.size` | Величина | Size | `src/components/product/AddToCartPanel.tsx` |
