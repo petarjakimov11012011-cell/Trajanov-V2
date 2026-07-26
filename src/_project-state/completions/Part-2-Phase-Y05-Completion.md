@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-27 |
 | **Branch** | `phase-y.05-home-hero-overlay` |
-| **PR** | [#35](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/35) — open; operator merges (`D-0-3`) |
+| **PR** | [#35](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/35) — **MERGED** to `main` (merge `aa916cc`, 2026-07-27) on Petar's explicit instruction (`D-0-3`: operator-authorised, not Code); branch deleted. Production deploy verified ~36s after merge (record in `current-state.md` line 1) |
 | **Brief** | Part 2 · Phase Y.05 · Code (supplied in-session; not committed to `briefs/`) |
 
 ---
