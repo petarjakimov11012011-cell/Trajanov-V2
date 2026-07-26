@@ -872,7 +872,7 @@ decisions start at `D-1.05-8`.*
 - **Links:** `Trajanov-V2-Plan.md` §4 · `facts.md` §5 · Phase 1.07
 
 ### D-1.05-4 · 2026-07-15 · No photo hero on Home, and no photo slot either
-- **Status:** Accepted
+- **Status:** Superseded by D-Y.04-1
 - **Context:** The phase plan lists "Hero" under 1.05. The only photography that exists is the
   lifestyle set from the bar shoot, and it is blocked twice over (`facts.md` §8): model and venue
   permission are unconfirmed, and whether an alcohol backdrop is right for a brand whose audience
@@ -3876,3 +3876,100 @@ start at `D-2.01-6`.*
   `test-open-drop` / `test-upcoming-drop` are not in `src/config/drops.ts`, so this divergence will bite
   the next phase that verifies the catalog locally too.
 - **Links:** `scripts/sync-drop.ts` · `src/lib/drop/state.ts` (`pickActiveDrop`) · `src/config/drops.ts`
+
+### D-Y.04-1 · 2026-07-26 · Home gets a photographic hero; `D-1.05-4` superseded
+- **Status:** Accepted
+- **Decided by:** Lazar, 2026-07-26 (orchestrator decision, pre-made in the Phase Y.04 brief); executed
+  by Claude Code.
+- **Context:** `D-1.05-4` kept Home type-led with no photo and no photo slot, because model and venue
+  permission were unconfirmed and the alcohol-backdrop call was unmade. All five permissions were
+  recorded GIVEN on 2026-07-26 (`facts.md` §8.1) and Known Issue #6 is resolved. `D-1.05-4` named this
+  exact condition as the trigger for the change.
+- **Decision:** Home renders `mustard-ochre-01.webp` (and `off-white-01.webp` at `≥640px`) in the
+  countdown, ended, and no-view states. Live state unchanged.
+- **Alternative rejected:** an AI-generated hero composite supplied on 2026-07-26, whose embedded C2PA
+  credential recorded `c2pa.created` by `gpt-image 2.0` with
+  `digitalSourceType: trainedAlgorithmicMedia` and no ingredient assertion — refused under `D-0-6` and
+  `facts.md` §8 ("the pixels must start as the actual shirt"), and because §8.1's permissions were
+  given for photographs of real people, one of them a minor, not for a synthetic likeness.
+- **Downside accepted:** the mustard frame now appears on both the Home hero and the Product 01 Catalog
+  card, so one photograph carries two surfaces. Warm tungsten light still shifts the garment colour
+  (`D-Y.03-7`). Both are properly fixed by the neutral set, still owed, still placeholder #2.
+- **Links:** `facts.md` §8 · §8.1 · `D-1.05-4` · `D-0-6` · `D-Y.03-7` ·
+  `src/components/home/HomeExperience.tsx`
+
+### D-Y.04-2 · 2026-07-26 · The countdown branch's "browse while you wait" text link is retired; the key stays
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Context:** The brief's top-to-bottom order for the countdown branch enumerates every element that
+  ships — eyebrow, h1 + sub, Countdown, photograph, the two buttons, aboutLink — and the existing
+  `browseWhileWait` text link (`/catalog`) is not in it. The new primary **Каталог** button targets the
+  same route, directly beneath the photograph.
+- **Decision:** The `browseWhileWait` `<Link>` no longer renders. The `Home.browseWhileWait` key stays
+  in both catalogs (the brief pins `string-inventory.md` at 245 → **247**, i.e. two keys added, none
+  removed).
+- **Alternative rejected:** keeping both — a text link and a primary button to the same route four
+  elements apart is a duplicate call to action competing with itself, and contradicts the brief's
+  exhaustive ordering. Also rejected: deleting the key, which would break the briefed 247 count.
+- **Downside accepted:** `Home.browseWhileWait` is now a dead key, honestly flagged
+  "_(not found in source)_" in the regenerated `string-inventory.md`. A reviewed MK string no longer
+  renders anywhere; a future phase either re-uses or removes it.
+- **Links:** brief Task 2 ordering · `docs/i18n/string-inventory.md` · `src/messages/{mk,en}.json`
+
+### D-Y.04-3 · 2026-07-26 · Mobile full-bleed is implemented as `-mx-4` against the page column, square-cornered at the bleed
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Context:** The brief specifies "full-bleed width" for the single mobile frame. The Home column is
+  `max-w-6xl px-4 sm:px-6`, so a `w-full` child stops 16px short of each viewport edge.
+- **Decision:** Below `sm:` the frame carries `-mx-4`, cancelling the column's `px-4` exactly, so the
+  photograph runs edge to edge with **no rounding** (corners that touch the viewport edge are square);
+  from `sm:` it returns inside the column with the PhotoSlot `radius-lg`. Both boxes carry the
+  PhotoSlot `bg-surface-2` so a still-loading photograph reads as a quiet surface, never a hole.
+- **Alternative rejected:** keeping the frame inside the column padding (not full-bleed — reads as a
+  card, not a hero), and viewport-width tricks (`50vw` negative margins), which desync from the real
+  column padding and can leak a scrollbar-width horizontal overflow.
+- **Downside accepted:** the `-mx-4` is coupled to the page column's `px-4` — if the column padding
+  ever changes below `sm:`, the bleed drifts and must follow (recorded in a comment at the site).
+  Verified: `document.documentElement.scrollWidth === 390` at 390px — no horizontal overflow.
+- **Links:** `src/components/home/HomeExperience.tsx` (`HeroPhotos`) ·
+  `src/components/system/PhotoSlot.tsx`
+
+### D-Y.04-4 · 2026-07-26 · The secondary button is composed from existing pieces; no new variant system
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Context:** The brief mandates "the existing button styling" for both buttons, but the codebase has
+  no secondary *button-link* variant: the only filled button-links are the mustard Cart-checkout recipe
+  (`CartView`) and the checkout submit; the only bordered interactive treatment is the cart stepper's
+  `border-border-strong` / `hover:border-foreground`.
+- **Decision:** Both buttons share the exact base recipe from `CartView`'s checkout Link (font,
+  radius-md, px-5 py-3, motion-fast transition, focus ring); the primary takes its
+  `bg-mustard hover:bg-mustard-hover text-on-mustard` fill verbatim, the secondary takes the cart
+  stepper's `border border-border-strong text-foreground hover:border-foreground` on `bg-transparent`.
+  Every class already exists in the codebase; heights compute to 48px / 50px (≥44px tap targets).
+- **Alternative rejected:** reusing `BuyButton`'s only bordered look — the sold-out state — which is a
+  *disabled* affordance in the grey `soldout` token, semantically wrong for a live action; or inventing
+  a new variant, which the brief forbids.
+- **Downside accepted:** the secondary recipe now exists only inline in `HomeExperience`; if a shared
+  Button component ever lands, it should absorb both.
+- **Links:** `src/components/cart/CartView.tsx` · `src/components/product/BuyButton.tsx` ·
+  `src/components/home/HomeExperience.tsx` (`HeroCtas`)
+
+### D-Y.04-5 · 2026-07-26 · Lighthouse was measured on the ended-state hero by ending the LOCAL scratch drops; hosted never touched; restored after
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot, to make the brief's "Lighthouse mobile on `/` ≥ 94" gate
+  measure the page this phase actually changed.
+- **Context:** The local scratch database still carries the `D-Y.03-11` leftover drops
+  (`test-open-drop`, currently live), so a local production build serves the **live grid** on `/` —
+  a page this phase does not touch — while real production serves the **ended** hero. The `?preview=`
+  override is dev-only and refused under `next start`.
+- **Decision:** The two scratch drops' windows were moved into the past (local Docker DB only, exact
+  prior values recorded first), `/` then served the ended-state photographic hero, Lighthouse ran
+  against `next start` — **mobile Performance 98** — and **both rows were restored byte-exact and
+  re-queried after**. The same maneuver, guardrails and restore-proof as `D-Y.03-11`.
+- **Alternative rejected:** measuring `/` in the live state (measures a page the phase didn't change —
+  a number that proves nothing about the hero), or pointing dev at the hosted database (production
+  credentials for a local render check, zero-mutation but needless exposure).
+- **Downside accepted:** the same one `D-Y.03-11` logged — the scratch DB diverges from
+  `src/config/drops.ts` and keeps biting every phase that verifies locally; this phase worked around
+  it rather than fixing it.
+- **Links:** `D-Y.03-11` · `src/lib/drop/state.ts` (`pickActiveDrop`)
