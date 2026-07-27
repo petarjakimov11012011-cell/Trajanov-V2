@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-27 |
 | **Branch** | `phase-2.22-showcase-controls` |
-| **PR** | [#37](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/37) — open to `main`; **operator merges, `D-0-3`** |
+| **PR** | [#37](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/37) — **MERGED** to `main` (merge `a32ee5f`, 2026-07-27, on Petar's explicit instruction, `D-0-3`); production deploy verified on `https://www.trajanovv.com`, both locales |
 | **Brief** | Part 2 · Phase 2.22 · Code (delivered in-session) |
 
 ---

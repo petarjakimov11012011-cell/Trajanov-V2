@@ -12,8 +12,20 @@ Last updated: **2026-07-27** · By: **Claude Code (Phase 2.22 — Showcase contr
 
 ## Status
 
-**Phase 2.22 — Showcase controls: chromeless — CODE COMPLETE (2026-07-27, branch
-`phase-2.22-showcase-controls`; PR [#37](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/37) open to `main` — operator merges, `D-0-3`).** Out-of-band
+**Phase 2.22 — Showcase controls: chromeless — COMPLETE (2026-07-27, branch
+`phase-2.22-showcase-controls`; PR [#37](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/37) **MERGED** to `main`, merge `a32ee5f`, 2026-07-27, on
+Petar's explicit instruction — `D-0-3`: operator-authorised, not Code; branch deleted, remote +
+local refs pruned).** **Production deploy VERIFIED on `https://www.trajanovv.com` (2026-07-27,
+~1 min after merge):** `/` and `/en` both serve the chromeless controls — all three icon buttons
+carry the new class string (**no** `border-border-strong`, **no** `font-display`,
+`text-muted-foreground` + `p-3` + `rounded-[var(--radius-md)]` + the full `focus-visible:` ring
+set present), the `-ml-3 flex items-center` wrapper appears **exactly once** per page, the
+per-locale accessible names are correct (MK „Претходно парче" / „Следно парче" / „Паузирај"; EN
+"Previous piece" / "Next piece" / "Pause" — **no EN string in the MK build**), the "View the
+piece" `ctaSecondary` link **still** carries its border (untouched, as scoped), and **exactly
+one** `rel="preload" as="image"` in `<head>` per locale (the mustard-hero invariant intact).
+Owed **#51** (real-phone feel) + **#52** (Lazar's look sign-off) are now actionable on the live
+deploy. Out-of-band
 UI-only phase; does **not** advance the critical path (the `NEXT:` line is unchanged — Y.01 and
 the 2.06 operator half remain next). The three carousel controls under the Home showcase (prev /
 next / pause) are now **chromeless**: the `iconButton` constant in `HomeShowcase.tsx` drops
