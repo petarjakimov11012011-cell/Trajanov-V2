@@ -6,11 +6,25 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-27** · By: **Claude Code (Phase Y.05 — Home hero: full-bleed photograph with overlaid CTAs)**
+Last updated: **2026-07-27** · By: **Claude Code (Phase 2.21 — Home showcase: the pieces under the hero)**
 
 ---
 
 ## Status
+
+**Home showcase landed (Phase 2.21).** The pieces themselves now render on the home page between the
+hero and the FAQ (countdown/ended/no-view; **nothing in `live`** — rendered `<main>` at
+`?preview=live` sha256-identical to `main`'s, both locales). New:
+`src/components/home/HomeShowcase.tsx` (client carousel — stacked `inert` slides, 6s autoplay with
+the WCAG 2.2 pause set, swipe, labelled progress bar), `src/lib/showcase.ts` (pure slide source —
+photo-required, live-empty; `wrapIndex`), `tests/home/showcase.test.ts` (new `tests/home/` dir, 13
+pure assertions, no DB), `docs/i18n/mk-review-2.21.md` (**unsigned**, 7 strings), the 2.21
+completion report. Modified: `src/app/[locale]/page.tsx` (mount between `<HomeExperience>` and
+`<HomeFaq>`), `src/app/globals.css` (scoped `.showcase-*` block after `.faq-item`),
+`src/messages/{mk,en}.json` (**+7 `Showcase` keys** → 255), `docs/i18n/string-inventory.md`
+(`Home.browseWhileWait` resolves again), `Decisions.md` (`D-2.21-1…7`), the state files.
+**`HomeExperience.tsx` byte-unchanged; no `public/`, `product-images.ts`, `HomeFaq`/`faq.ts`,
+`src/config/`, `supabase/`, `next.config.ts`, or dependency change.** Below is the Y.05/Y.04 history.
 
 **Home hero overlay landed (Phase Y.05).** The Home hero is now **one photograph with the words on
 it**: the drop state, the countdown, the tagline and the two CTAs sit **on** the image over a
@@ -230,7 +244,7 @@ Trajanov-V2/
 │   │   ├── layout/                 # SiteHeader, SiteFooter, LanguageSwitch
 │   │   ├── legal/                  # LegalPage + LegalSection — shared shell for the 3 legal pages (2.03, D-2.03-3)
 │   │   ├── seo/                    # JsonLd — renders a JSON-LD <script> (2.04)
-│   │   ├── home/                   # HomeExperience (props-driven from server drop state, 1.04); HomeFaq — server-rendered FAQ section under the hero (2.11)
+│   │   ├── home/                   # HomeExperience (props-driven from server drop state, 1.04); HomeFaq — server-rendered FAQ section under the hero (2.11); HomeShowcase — client carousel of the photographed pieces between hero and FAQ, hidden in `live` (2.21)
 │   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice, DevPreviewSwitch (1.04), ShippingNotice (MK-only shipping, 2.01)
 │   │
 │   ├── lib/
@@ -240,6 +254,7 @@ Trajanov-V2/
 │   │   ├── site.ts                  # SITE_URL origin constant — hreflang/canonical base (2.05: https://www.trajanovv.com)
 │   │   ├── metadata.ts              # localeAlternates() (2.01) + pageMetadata()/ogImageUrl() — OG+Twitter+noindex (2.04)
 │   │   ├── faq.ts                   # single source for the Home FAQ — 3 groups × ordered q/a KEYS (keys only, no strings); read by HomeFaq + faq-jsonld (2.11, D-2.11-5)
+│   │   ├── showcase.ts              # single source for the Home showcase — which products get a slide (photo REQUIRED, `live` → none) + wrapIndex; pure, vitest-importable (2.21)
 │   │   ├── seo/                     # structured-data builders (2.04)
 │   │   │   ├── site-jsonld.ts       # Organization + WebSite @graph — no address/logo/SearchAction/partner
 │   │   │   ├── product-jsonld.ts    # Product node, gated on a real name; availability from drop state
@@ -326,6 +341,8 @@ Trajanov-V2/
 │   │   └── cron.test.ts            # both pg_cron jobs scheduled + active from db reset
 │   ├── drop/
 │   │   └── size-order.test.ts      # PURE unit test — canonical size comparator (S·M·L·XL), 8 cases, RED→GREEN (2.09)
+│   ├── home/
+│   │   └── showcase.test.ts        # PURE unit test — showcaseSlides (null/live → [], photo-required, order preserved, baby-blue never) + wrapIndex (2.21)
 │   ├── rls/anon-access.test.ts     # anon wall: orders unreadable, variants readable, no writes/rpc
 │   └── orders/
 │       ├── create-order.test.ts    # happy path, drop window (D-1.03-7), full error vocabulary
@@ -404,3 +421,4 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-24 | 2.12 (Code) | **Home hero sub-line → brand line (out-of-band copy-only).** Replaced **only** the value of `Home.sub` in `src/messages/{mk,en}.json` (MK „Пронајди сродна, во свет продадени души." / EN „Find a kindred soul, in a world full of sold souls.") — **byte-exact operator copy, Code edited neither language** (`D-2.12-2`). Renders at three sites in `HomeExperience.tsx` (no-view/`ended`/`countdown`) × two locales; absent in `live`. New line makes no factual claim → **`facts.md` byte-unchanged, no entry added**; the three facts the old line carried still render elsewhere both locales (`Faq.a8`/`About.body3`/`Meta.homeDescription`; `Faq.a2`/`Cart.codNote`/`Checkout.codSummary`/`Common.shippingNotice`; `Product.shippingBody`/`Faq.a4`). `Meta.homeDescription` untouched (`D-2.12-3`). Regenerated `docs/i18n/string-inventory.md` (still **241**, one row). Added `docs/i18n/mk-review-2.12.md` (unsigned, one string), `completions/Part-2-Phase-12-Completion.md`. Modified `Decisions.md` (`D-2.12-1/2/3`), `current-state.md` (status block + owed register #27; **`NEXT:` unchanged**), `file-map.md` (this row + tree: `mk-review-2.11.md`/`2.12.md`). **No component (`HomeExperience.tsx`/`HomeFaq.tsx`/`page.tsx`/`globals.css`), `src/lib/`, `supabase/`, cart, checkout, `src/config/`, `SITE_URL`, `brand.md`, `src/lib/seo/`, other message key, or new dependency touched; no new key (241), no new placeholder, no new token.** `D-2.12-*`. | Claude Code |
 | 2026-07-26 | Y.04 (Code) | **Home hero photography.** New: `docs/i18n/mk-review-y04.md` (**unsigned**, 2 CTA strings), `completions/Part-2-Phase-Y04-Completion.md`, `briefs/Part-2-Phase-Y04-Code.md`. Modified: `src/components/home/HomeExperience.tsx` (photo block + 2 CTAs in the countdown/ended/no-view branches; **`live` branch byte-unchanged**, rendered `<main>` at `?preview=live` byte-identical to `main`'s both locales; `browseWhileWait` link retired `D-Y.04-2`), `src/messages/{mk,en}.json` (**+2 keys**: `Home.ctaCatalog`/`ctaContact`), `docs/i18n/string-inventory.md` (regen **245→247**), `Decisions.md` (`D-Y.04-1…5` + `D-1.05-4` Status → Superseded), `current-state.md` (line 1, owed #41–43, placeholder note, Known Issue #4 line item), this file (incl. the stale-missing `mk-review-y03.md` tree line). **Zero files under `public/` — no new asset (`D-0-6`); no `supabase/`, `create_order`, `expire_reservations`, cart, checkout, `src/config/`, `src/lib/drop/`, `globals.css`, `PhotoSlot.tsx`, `product-images.ts`, `HomeFaq`, header/footer, or npm dependency touched.** `D-Y.04-*`. | Claude Code |
 | 2026-07-27 | Y.05 (Code) | **Home hero: full-bleed photograph with overlaid CTAs.** New: `public/images/lifestyle/trio-composite-01.webp` (1672×941, 16:9, 184,756 B WebP — three-panel composite of the same three §8.1-permitted frames, serif TRAJANOV burned in; renders ≥640px), `docs/i18n/mk-review-y05.md` (**unsigned**, 1 string), `completions/Part-2-Phase-Y05-Completion.md`. Modified: `src/components/home/HomeExperience.tsx` (the ONLY component — `HeroPhotos` → `Hero` with image/scrim/content layers; `HERO_FRAME_OFF_WHITE` deleted, `HERO_FRAME_COMPOSITE` added; rendered `Home.headline` retired `D-Y.05-1`; `sr-only` H1 in the three non-live branches `D-Y.05-2`; countdown size restored at call site over the pre-existing tailwind-merge strip `D-Y.05-9/10`; **`live` branch byte-unchanged**, rendered `<main>` at `?preview=live` sha-identical to `main`'s both locales), `src/messages/{mk,en}.json` (**+1 key**: `Product.photoAltComposite`), `docs/i18n/string-inventory.md` (regen **247→248**; `Home.headline` flagged retired), `Decisions.md` (`D-Y.05-1…12`), `current-state.md` (line 1, owed #44–47, placeholder note, registers), this file. **No `supabase/`, `create_order`, `expire_reservations`, cart, checkout, `src/config/`, `src/lib/drop/`, `src/lib/product-images.ts`, `globals.css`, `facts.md`, `brand.md`, or npm dependency touched** (diff-proven). `D-Y.05-*`. | Claude Code |
+| 2026-07-27 | 2.21 (Code) | **Home showcase — the pieces under the hero.** New: `src/components/home/HomeShowcase.tsx` (client carousel — stacked slides with `aria-hidden`+`inert`, 6s autoplay + WCAG 2.2 SC 2.2.2 pause set incl. a JS reduced-motion stop, swipe, labelled progress bar; images carry NO `priority`/`loading`/`fetchPriority`), `src/lib/showcase.ts` (pure slide source — photo REQUIRED, `live` → `[]`; `wrapIndex`), `tests/home/showcase.test.ts` (new `tests/home/` dir — 13 pure assertions, no DB), `docs/i18n/mk-review-2.21.md` (**unsigned**, 7 strings), `completions/Part-2-Phase-21-Completion.md`. Modified: `src/app/[locale]/page.tsx` (mount between `<HomeExperience>` and `<HomeFaq>`), `src/app/globals.css` (scoped `.showcase-*` block after `.faq-item` — tokens only; `--showcase-autoplay` is set INLINE by the component, not a `:root` token, `D-2.21-6`), `src/messages/{mk,en}.json` (**+7 `Showcase` keys**), `docs/i18n/string-inventory.md` (regen **248→255**; `Home.browseWhileWait` resolves to `HomeShowcase.tsx` again), `Decisions.md` (`D-2.21-1…7`), `current-state.md` (line 1, status, Built, owed #48–50, placeholder #4 Page column), this file. **`HomeExperience.tsx` byte-unchanged (diff-proven); live `<main>` sha256-identical to `main`'s both locales; no `public/`, `HomeFaq.tsx`/`faq.ts`, `product-images.ts`, `PhotoSlot.tsx`, `ProductCard.tsx`, `src/config/`, `supabase/`, `src/lib/drop/`, `next.config.ts`, `facts.md`, `brand.md`, or npm dependency touched.** `D-2.21-*`. | Claude Code |

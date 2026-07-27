@@ -34,6 +34,15 @@
     "ctaCatalog": "Каталог",
     "ctaContact": "Контакт"
   },
+  "Showcase": {
+    "regionLabel": "Парчиња",
+    "prev": "Претходно парче",
+    "next": "Следно парче",
+    "pause": "Паузирај",
+    "play": "Пушти",
+    "slideLabel": "{index} од {total}",
+    "view": "Види го парчето"
+  },
   "Faq": {
     "h2": "Често поставувани прашања",
     "groupOrdering": "Нарачка",

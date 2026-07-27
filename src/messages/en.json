@@ -34,6 +34,15 @@
     "ctaCatalog": "Catalog",
     "ctaContact": "Contact"
   },
+  "Showcase": {
+    "regionLabel": "Pieces",
+    "prev": "Previous piece",
+    "next": "Next piece",
+    "pause": "Pause",
+    "play": "Play",
+    "slideLabel": "{index} of {total}",
+    "view": "View the piece"
+  },
   "Faq": {
     "h2": "Frequently Asked Questions",
     "groupOrdering": "Ordering",

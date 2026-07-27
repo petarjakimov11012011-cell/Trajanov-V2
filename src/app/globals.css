@@ -386,6 +386,74 @@
 }
 
 /*
+  Home showcase (Phase 2.21, brand.md §3/§5/§6, D-2.21-1…n).
+  One large photograph at a time between the hero and the FAQ, with prev/next arrows, a pause
+  control and a labelled progress bar (HomeShowcase.tsx). The FIFTH logged, narrowly-scoped
+  exception to §6's presumption against decoration — after D-2.10-1, D-2.16-3, D-2.17-5 and
+  D-2.19-1 — and the FIRST that loops: an owner-requested 6s autoplay with a real pause mechanism
+  (WCAG 2.2 SC 2.2.2). Every colour, duration and easing below is an existing token.
+
+  The slides are STACKED (grid-area 1/1), all in the DOM: the stack's height is the tallest
+  slide's height, so a slide change can never shift layout. Inactive slides carry aria-hidden +
+  inert in the markup; pointer-events: none here is the belt to that suspender. The cross-fade is
+  a plain opacity transition on --motion-slow over --ease-smooth (the brief's pairing for this
+  section), so the GLOBAL prefers-reduced-motion rule (~line 227) already flattens it to a snap —
+  deliberately no second rule. Autoplay under reduced motion is stopped in JS in HomeShowcase.tsx:
+  this file cannot stop a setTimeout, so do not delete that check as a "duplicate" of the global
+  rule.
+
+  --showcase-autoplay is set INLINE on the section by HomeShowcase.tsx from the same constant that
+  arms the JS slide timer — one source, so the fill and the timer cannot drift. It is a component
+  wiring value, not a brand token (the --glow-* / --header-* precedent), which is why it is not in
+  :root and not in brand.md §6. The fill runs `linear` on purpose: it tracks a constant-speed
+  timer (the D-2.20-3 rationale); an eased fill would misreport the time remaining.
+*/
+.showcase-stack {
+  display: grid;
+}
+
+.showcase-slide {
+  grid-area: 1 / 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-slow) var(--ease-smooth);
+}
+
+.showcase-slide[data-active="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The progress fill: transform-only (never width — a layout property would reflow every frame).
+   Resting state is empty; `is-held` marks the active slide's bar while paused so the current
+   position stays readable; `is-running` tracks the live autoplay timer. */
+.showcase-progress-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background-color: var(--color-mustard);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.showcase-progress-fill.is-held {
+  transform: scaleX(1);
+}
+
+.showcase-progress-fill.is-running {
+  animation: trajanov-showcase-progress var(--showcase-autoplay) linear forwards;
+}
+
+@keyframes trajanov-showcase-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/*
   Home hero reveal (Phase 2.16, brand.md §6, D-2.16-1…5).
   A first-paint-only staggered entrance for the Home hero. Deliberate, narrowly-scoped exception to
   "motion belongs to the countdown and the drop reveal, nothing else" — the second one, after the
