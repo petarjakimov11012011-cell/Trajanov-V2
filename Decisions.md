@@ -4301,3 +4301,91 @@ start at `D-2.01-6`.*
   the no-view/touch/reduced-motion evidence proves the component branches via simulation, not real
   hardware — the real-device read is owed row #49.
 - **Links:** `D-Y.05-12` · `D-Y.04-5` · `src/app/[locale]/page.tsx` · completion report §5
+
+### D-2.22-1 · 2026-07-27 · Chromeless means the visible box goes, the hit area stays
+- **Status:** Accepted
+- **Decided by:** Orchestrator (owner-requested), pre-made in the Phase 2.22 brief (decision 1);
+  logged here by Code as the brief instructs.
+- **Context:** The three carousel controls under the Home showcase (prev, next, pause) sat in
+  bordered rounded boxes (`border border-border-strong`, 50×50 rendered). Next to a full-bleed
+  photograph they read as form furniture. Lazar asked for the boxes gone.
+- **Decision:** The `iconButton` constant drops the border and the hover-border move; `p-3` and
+  the 24px icon stay, so the padded box becomes **48×48** (the missing 2px is exactly the removed
+  1px border per side). 48 clears the 44px tap-target floor this project has held since the 2.04
+  gate (WCAG 2.2 SC 2.5.8). The padding is the tap target, not decoration.
+- **Alternative rejected:** shrink the button to the glyph.
+- **Downside accepted:** none material — the button occupies the same footprint it did; it just
+  stops drawing an outline.
+- **Links:** Phase 2.22 brief (decision 1) · `src/components/home/HomeShowcase.tsx` (`iconButton`) ·
+  `D-2.22-2` · `D-2.22-3`
+
+### D-2.22-2 · 2026-07-27 · The icons rest at muted-foreground and go to foreground on hover and on focus
+- **Status:** Accepted
+- **Decided by:** Orchestrator (owner-requested), pre-made in the Phase 2.22 brief (decision 2);
+  logged here by Code as the brief instructs.
+- **Context:** With the box gone the glyph is the whole control, and it needs a visible hover/focus
+  response without inventing motion. The progress labels in the same row already run
+  muted-foreground → foreground on hover.
+- **Decision:** `text-muted-foreground` at rest, `hover:text-foreground` +
+  `focus-visible:text-foreground` lit. Measured this phase against `--color-ground` `#0F1210`:
+  **7.85:1** at rest, **15.42:1** lit — both far above the 3:1 floor WCAG 2.2 SC 1.4.11 sets for
+  meaningful non-text graphics, and matching the brand.md §3 ledger (7.9 / 15.4). The lucide icons
+  draw with `stroke="currentColor"`, so no colour class touches the icon elements themselves.
+- **Alternative rejected:** keep the icons at full `foreground` at rest.
+- **Downside accepted:** with no box and no colour headroom left, hover would have needed a
+  transform or an opacity trick — a new brand.md §6 motion exception for a hover state, not worth
+  it.
+- **Links:** Phase 2.22 brief (decision 2) · brand.md §3 ledger · `D-2.22-1`
+
+### D-2.22-3 · 2026-07-27 · The radius stays because the focus ring is the only chrome left
+- **Status:** Accepted
+- **Decided by:** Orchestrator (owner-requested), pre-made in the Phase 2.22 brief (decision 3);
+  logged here by Code as the brief instructs.
+- **Decision:** `rounded-[var(--radius-md)]` is kept on the chromeless buttons. With the border
+  gone, the `focus-visible:` ring is the only chrome these buttons ever draw, and the radius is
+  what shapes it.
+- **Alternative rejected:** strip the radius along with the border, since nothing visible rounds
+  at rest.
+- **Downside accepted:** a token'd radius rides along on an element that visibly uses it only
+  while focused.
+- **Links:** Phase 2.22 brief (decision 3) · `D-2.22-1` · brand.md §5 (`--radius-md`)
+
+### D-2.22-4 · 2026-07-27 · The three-button group is pulled left by its own padding (`-ml-3`)
+- **Status:** Accepted
+- **Decided by:** Orchestrator (owner-requested), pre-made in the Phase 2.22 brief (decision 4);
+  logged here by Code as the brief instructs.
+- **Context:** Once the box is invisible, the first glyph would sit 12px inside the column edge
+  and the whole row would read as indented against the photograph above it.
+- **Decision:** The three buttons are wrapped in one `-ml-3 flex items-center` element — a flex
+  item where three used to be, so the outer control row's class string and the mobile wrap
+  behaviour are untouched. No `gap` between the three: each button's own `p-3` already puts 24px
+  between glyphs. The negative margin puts the glyph back on the column edge.
+- **Alternative rejected:** leave the group indented.
+- **Downside accepted:** the button's invisible hit area now starts 4px from the viewport edge at
+  320px — measured this phase: rect left = 4, ring outer edge exactly 0, zero horizontal overflow.
+- **Links:** Phase 2.22 brief (decision 4) · `src/components/home/HomeShowcase.tsx` · `D-2.22-1`
+
+### D-2.22-5 · 2026-07-27 · Verification maneuvers: the scratch-drop window shift repeated (twice), and the D-2.21-7 simulations re-run
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — the `D-Y.05-12` / `D-2.21-7` pattern, repeated.
+- **Decision:** (a) The active local drop (`test-open-drop`, no photographed products) again
+  renders an empty showcase in every preview, so both scratch drops' windows were shifted into the
+  past (exact prior values recorded first — the same values `D-2.21-7` recorded:
+  `test-open-drop` 2026-07-21T17:24:31.984Z → 2026-07-29T17:24:31.984Z; `test-upcoming-drop`
+  2026-07-29T17:24:31.984Z → 2026-08-05T17:24:31.984Z), making `test-drop` the active ended drop.
+  This happened **twice** (the second time for one final 320px focus-ring render after the first
+  restore); after each shift **both rows were restored byte-exact and `npm test` re-ran 129/129**.
+  Hosted untouched. (b) The headless pane still reports `document.visibilityState === "hidden"`
+  permanently, so autoplay/pause behaviours were proven the `D-2.21-7` way: visibility-getter
+  override + dispatched `visibilitychange` (autoplay advances when "visible", stops when
+  "hidden"), real-pointer hover pause, JS-focus focus-within pause, and reduced motion by patching
+  `matchMedia` + client-side remount (pause button not rendered, no advance in 8s, arrows and
+  progress buttons still change slides). (c) The pane additionally stopped compositing screenshots
+  at wide viewports mid-scroll this session, so wide-viewport renders were captured with tall
+  viewports (e.g. 1280×2100) at scroll 0 — measurement JS was unaffected.
+- **Alternative rejected:** verifying against the photo-less live scratch drop (proves an empty
+  section, not the controls); skipping the behaviours the pane cannot reach natively.
+- **Downside accepted:** the same ones `D-2.21-7` logged — the scratch DB keeps diverging from
+  `src/config/drops.ts` and biting every phase, and the behaviour evidence is simulation, not real
+  hardware; the real-device read is owed row #51.
+- **Links:** `D-2.21-7` · `D-Y.05-12` · Phase 2.22 completion report §5
