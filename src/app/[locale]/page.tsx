@@ -3,6 +3,7 @@ import type {Locale} from 'next-intl';
 import {getTranslations} from 'next-intl/server';
 import {HomeExperience} from '@/components/home/HomeExperience';
 import {HomeFaq} from '@/components/home/HomeFaq';
+import {HomeShowcase} from '@/components/home/HomeShowcase';
 import {DevPreviewSwitch} from '@/components/system/DevPreviewSwitch';
 import {getActiveDropView, parsePreviewState} from '@/lib/drop/state';
 import {pageMetadata} from '@/lib/metadata';
@@ -38,6 +39,10 @@ export default async function HomePage({
   return (
     <>
       <HomeExperience view={view} />
+      {/* Same server-computed `view` as the hero — no second query. It self-hides during a live
+          drop (and with no drop / no photographed product): src/lib/showcase.ts returns no slides,
+          so the buyable grid stays the whole page in the hour that matters (Phase 2.21). */}
+      <HomeShowcase view={view} />
       {/* Static content — renders identically in all three drop states and in preview; takes no props
           from `view` (Phase 2.11). Sits under the hero, above the dev-only preview switch. */}
       <HomeFaq />

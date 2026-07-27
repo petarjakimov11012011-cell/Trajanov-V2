@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 248 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 255 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -64,7 +64,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Checkout.summary` | Преглед на нарачката | Order summary | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.title` | Нарачка | Checkout | `src/app/[locale]/checkout/page.tsx` |
 | `Checkout.verifying` | се проверува | verifying | `src/components/checkout/CheckoutForm.tsx` |
-| `Common.currency` | ден | MKD | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/product/ProductCard.tsx` |
+| `Common.currency` | ден | MKD | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Common.languageEn` | EN | EN | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.languageMk` | МК | МК | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.lastUpdated` | Последно ажурирано | Last updated | `src/app/[locale]/privacy/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/app/[locale]/terms/page.tsx` |
@@ -116,7 +116,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Footer.rights` | © 2026 Трајанов. Сите права задржани. | © 2026 Trajanov. All rights reserved. | `src/components/layout/SiteFooter.tsx` |
 | `Footer.social` | СЛЕДИ | FOLLOW | `src/components/layout/SiteFooter.tsx` |
 | `Home.aboutLink` | Прво место на конкурс за дизајн | First place in a design competition | `src/components/home/HomeExperience.tsx` |
-| `Home.browseWhileWait` | Разгледај додека чекаш | Browse while you wait | _(not found in source)_ |
+| `Home.browseWhileWait` | Разгледај додека чекаш | Browse while you wait | `src/components/home/HomeShowcase.tsx` |
 | `Home.ctaCatalog` | Каталог | Catalog | `src/components/home/HomeExperience.tsx` |
 | `Home.ctaContact` | Контакт | Contact | `src/components/home/HomeExperience.tsx` |
 | `Home.eyebrow` | Следно спуштање | Next drop | _(not found in source)_ |
@@ -175,8 +175,8 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Placeholder.composition` | [PLACEHOLDER: состав и нега — од етикетата] | [PLACEHOLDER: composition & care — from the label] | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Placeholder.courier` | [PLACEHOLDER: курир и цена на испорака — Владимир] | [PLACEHOLDER: courier and delivery cost — Vladimir] | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Placeholder.notice` | Преглед на дизајн-системот. Податоците за производите (назив, цена, величини, состав, фотографии) се примероци — вистинските ги внесува Владимир во подоцнежна фаза. | Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase. | `src/components/system/PreviewNotice.tsx` |
-| `Placeholder.price` | [PLACEHOLDER: цена MKD] | [PLACEHOLDER: price MKD] | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/checkout/CheckoutForm.tsx`<br>`src/components/product/ProductCard.tsx` |
-| `Placeholder.productName` | Производ | Product | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/product/ProductCard.tsx` |
+| `Placeholder.price` | [PLACEHOLDER: цена MKD] | [PLACEHOLDER: price MKD] | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/checkout/CheckoutForm.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
+| `Placeholder.productName` | Производ | Product | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Placeholder.productPhoto` | [PLACEHOLDER: фотографија — Владимир] | [PLACEHOLDER: product photo — Vladimir] | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Placeholder.returnsWindow` | [PLACEHOLDER: рок за враќање и замена — Владимир] | [PLACEHOLDER: returns and exchange window — Vladimir] | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Placeholder.sizesSample` | величини — примерок, се чекаат од Владимир | sizes — sample, pending Vladimir | `src/components/product/AddToCartPanel.tsx` |
@@ -226,6 +226,13 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `ShippingReturns.returnsBody` | Точниот рок сè уште го немаме потврдено. | We don't have the exact window confirmed yet. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.returnsHeading` | Рок за враќање и замена | Returns and exchange window | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.whereHeading` | Каде испорачуваме | Where we ship | `src/app/[locale]/shipping-returns/page.tsx` |
+| `Showcase.next` | Следно парче | Next piece | `src/components/home/HomeShowcase.tsx` |
+| `Showcase.pause` | Паузирај | Pause | `src/components/home/HomeShowcase.tsx` |
+| `Showcase.play` | Пушти | Play | `src/components/home/HomeShowcase.tsx` |
+| `Showcase.prev` | Претходно парче | Previous piece | `src/components/home/HomeShowcase.tsx` |
+| `Showcase.regionLabel` | Парчиња | Pieces | `src/components/home/HomeShowcase.tsx` |
+| `Showcase.slideLabel` | {index} од {total} | {index} of {total} | `src/components/home/HomeShowcase.tsx` |
+| `Showcase.view` | Види го парчето | View the piece | `src/components/home/HomeShowcase.tsx` |
 | `Stock.inStock` | На залиха | In stock | `src/components/drop/StockBadge.tsx` |
 | `Stock.low` | Уште {count} | {count} left | `src/components/drop/StockBadge.tsx` |
 | `Stock.soldOut` | Распродадено | Sold out | `src/components/drop/StockBadge.tsx`<br>`src/components/product/ProductCard.tsx` |
