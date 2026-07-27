@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-27 |
 | **Branch** | `phase-2.21-home-showcase` |
-| **PR** | *(opened at close of phase — number in the PR link below)* |
+| **PR** | [#36](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/36) |
 | **Brief** | `briefs/` — Part 2 · Phase 2.21 · Code (delivered in-session) |
 
 ---
