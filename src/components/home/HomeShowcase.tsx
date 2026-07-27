@@ -27,10 +27,13 @@ const AUTOPLAY_MS = 6000;
 const ctaSecondary =
   'font-display inline-flex items-center justify-center rounded-[var(--radius-md)] border border-border-strong bg-transparent px-5 py-3 font-bold text-foreground transition-colors duration-[var(--motion-fast)] hover:border-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ground';
 
-// The same shell at icon-button proportions: 48px square (p-3 + a 24px icon) clears the 44px
-// tap-target floor (WCAG 2.2 — 2.5.8, the 2.04 gate).
+// Chromeless by design (D-2.22-1): no border, no background — the icon is the whole control. The
+// `p-3` padding IS the tap target (48px square with the 24px icon — the 44px floor, WCAG 2.2
+// 2.5.8, the 2.04 gate), not decoration; do not remove it. The focus ring is the only chrome
+// these buttons ever draw, and the radius is what shapes it — do not remove the `focus-visible:`
+// classes or the radius.
 const iconButton =
-  'font-display inline-flex items-center justify-center rounded-[var(--radius-md)] border border-border-strong bg-transparent p-3 text-foreground transition-colors duration-[var(--motion-fast)] hover:border-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ground';
+  'inline-flex items-center justify-center rounded-[var(--radius-md)] bg-transparent p-3 text-muted-foreground transition-colors duration-[var(--motion-fast)] hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ground';
 
 // Home showcase (Phase 2.21) — the pieces, one large photograph at a time, between the hero and the
 // FAQ. Layout and interaction follow the reference; every fact on a slide is one we hold: the
@@ -216,39 +219,44 @@ export function HomeShowcase({view}: {view: DropView | null}) {
             autoplay, no pause button — a control that cannot do anything is worse than no control. */}
         {total > 1 && (
           <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
-            <button
-              type="button"
-              aria-label={t('Showcase.prev')}
-              className={iconButton}
-              onClick={() => goTo(active - 1)}
-            >
-              <ArrowLeft aria-hidden className="h-6 w-6" />
-            </button>
-            <button
-              type="button"
-              aria-label={t('Showcase.next')}
-              className={iconButton}
-              onClick={() => goTo(active + 1)}
-            >
-              <ArrowRight aria-hidden className="h-6 w-6" />
-            </button>
-            {/* No pause control under reduced motion: autoplay does not exist there, so the button
-                could do nothing (the same principle as the one-slide case). Arrows and the progress
-                buttons still change slides. */}
-            {!reducedMotion && (
+            {/* -ml-3 pulls the group left by its own padding so the first GLYPH (not the invisible
+                hit area) sits on the column edge, level with the photograph above (D-2.22-4). No
+                gap: each button's own p-3 already puts 24px between glyphs. */}
+            <div className="-ml-3 flex items-center">
               <button
                 type="button"
-                aria-label={manualPause ? t('Showcase.play') : t('Showcase.pause')}
+                aria-label={t('Showcase.prev')}
                 className={iconButton}
-                onClick={() => setManualPause((p) => !p)}
+                onClick={() => goTo(active - 1)}
               >
-                {manualPause ? (
-                  <Play aria-hidden className="h-6 w-6" />
-                ) : (
-                  <Pause aria-hidden className="h-6 w-6" />
-                )}
+                <ArrowLeft aria-hidden className="h-6 w-6" />
               </button>
-            )}
+              <button
+                type="button"
+                aria-label={t('Showcase.next')}
+                className={iconButton}
+                onClick={() => goTo(active + 1)}
+              >
+                <ArrowRight aria-hidden className="h-6 w-6" />
+              </button>
+              {/* No pause control under reduced motion: autoplay does not exist there, so the
+                  button could do nothing (the same principle as the one-slide case). Arrows and
+                  the progress buttons still change slides. */}
+              {!reducedMotion && (
+                <button
+                  type="button"
+                  aria-label={manualPause ? t('Showcase.play') : t('Showcase.pause')}
+                  className={iconButton}
+                  onClick={() => setManualPause((p) => !p)}
+                >
+                  {manualPause ? (
+                    <Play aria-hidden className="h-6 w-6" />
+                  ) : (
+                    <Pause aria-hidden className="h-6 w-6" />
+                  )}
+                </button>
+              )}
+            </div>
 
             {/* Labelled progress bar doubling as pagination: one button per slide, the product
                 title as its visible label, a fill that tracks the autoplay timer. The fill is
