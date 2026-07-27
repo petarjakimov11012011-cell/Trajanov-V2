@@ -6,11 +6,56 @@ NEXT: **Y.01** (drop content load) + the placeholder register to **zero** before
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-27** · By: **Claude Code (Phase 2.21 — Home showcase: the pieces under the hero)**
+Last updated: **2026-07-27** · By: **Claude Code (Phase 2.22 — Showcase controls: chromeless)**
 
 ---
 
 ## Status
+
+**Phase 2.22 — Showcase controls: chromeless — CODE COMPLETE (2026-07-27, branch
+`phase-2.22-showcase-controls`; PR open to `main` — operator merges, `D-0-3`).** Out-of-band
+UI-only phase; does **not** advance the critical path (the `NEXT:` line is unchanged — Y.01 and
+the 2.06 operator half remain next). The three carousel controls under the Home showcase (prev /
+next / pause) are now **chromeless**: the `iconButton` constant in `HomeShowcase.tsx` drops
+`border border-border-strong` + `hover:border-foreground` + `font-display`; the icons rest at
+`text-muted-foreground` and go to `text-foreground` on hover **and** `:focus-visible`
+(`D-2.22-2`); `p-3` + the 24px icon stay, so the buttons measure **48×48** at every width
+(320/390/768/1024/1280 — the missing 2px vs 2.21's 50×50 is exactly the removed border;
+`D-2.22-1`), above the 44px floor. `rounded-[var(--radius-md)]` stays because the focus ring is
+now the only chrome and the radius shapes it (`D-2.22-3`). The three buttons sit in one new
+`-ml-3 flex items-center` wrapper so the first **glyph** (not the invisible hit area) lands on the
+column edge under the photograph (`D-2.22-4`); the outer control row and the progress container
+class strings are byte-identical, so the mobile wrap (progress bar onto its own row below `sm:`)
+is unchanged. **Measured, not assumed:** border widths 0px ×4 and fully transparent background at
+rest **and** on real-pointer hover; rest colour `rgb(171,167,158)` = **7.85:1** on ground, hover +
+focus `rgb(236,232,224)` = **15.42:1** (3:1 floor, WCAG 2.2 SC 1.4.11); real-Tab walk gives every
+one of the three the `#F2C55A` ring (2px at 2px offset, box-shadow-verified) with **zero**
+clipping ancestors and the ring outer edge landing exactly at x=0 at 320px (hit area starts at
+x=4, `D-2.22-4`'s accepted downside — no overflow); focus still **cannot** land inside an
+inactive slide (`inert` re-tab-walked); prev/next/pause all work, the pause name still flips
+„Паузирај"⇄„Пушти", autoplay still pauses on hover / focus-within / hidden tab and is absent
+entirely under reduced motion with arrows + progress still working (all re-proven via the
+`D-2.21-7` simulations, logged `D-2.22-5`); **zero horizontal overflow at 320px both locales**;
+section height **pixel-identical across slide changes** at all five widths (863.20 / 950.70 /
+1422.59 / 854 / 934 px — exactly −2px vs 2.21's record below `sm:` where the button row is its own
+flex line, **identical** at ≥768 where the 50px progress items govern the row); `/?preview=live` +
+`/en?preview=live` render a `<main>` **sha256-identical to `main`'s** (18,281 B MK
+`493e28ed…385b14` / 15,976 B EN `6087cb79…343fd8`, same dev server, same DB, deterministic across
+repeated fetches); rendered at 390 + 1280, both locales, countdown + ended states, **zero console
+errors** (the known pre-existing MK-price hydration mismatch in the pane's mk-ICU-less Chromium
+fired as usual — SSR curl-proven correct „1.199 ден" / „1,199 MKD", not new, root fix still owed).
+Gates: build / `tsc --noEmit` / lint clean; `npm test` **129/129** incl.
+`✓ 10 simultaneous orders against 3 units → exactly 3 succeed, 7 rejected with insufficient_stock, stock 0`
+(re-run after each byte-exact scratch-drop restore, `D-2.22-5`); **zero** hex / `rgb(` / `hsl(` /
+raw-ms / raw-easing literals in the diff; diff touches **only** `HomeShowcase.tsx`, `Decisions.md`,
+`current-state.md`, and the completion report — `ctaSecondary`, the "View the piece" link, the
+progress buttons, `HomeExperience.tsx`, `globals.css`, `showcase.ts`, both message catalogs,
+`src/config/`, `supabase/`, `next.config.ts`, `package.json` + lockfile all **byte-unchanged**
+(diff-stat-proven empty). No new string (inventory still **255**, no new `docs/i18n/` file), no
+new token, no new CSS rule, no new dependency, no new motion exception
+(`transition-colors duration-[var(--motion-fast)]` is already §6's "hover, focus" assignment).
+Decisions `D-2.22-1…5`. New owed **#51** (the chromeless controls on a real phone) + **#52**
+(Lazar's look sign-off). Placeholder register **unchanged** — no row added, cleared, or touched.
 
 **Phase 2.21 — Home showcase: the pieces under the hero — CODE COMPLETE (2026-07-27, branch
 `phase-2.21-home-showcase`; PR [#36](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/36) **MERGED** to `main`, merge `9b8511d`,
@@ -2404,6 +2449,8 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 48 | **Native MK review of the seven new `Showcase` strings (2.21).** All seven are short control labels (`regionLabel`/`prev`/`next`/`pause`/`play`/`slideLabel`/`view`); pack committed **unsigned** at `docs/i18n/mk-review-2.21.md`. Lazar + Petar read them **in context on the live site** (most are `aria-label`s — devtools or VoiceOver) and sign both boxes. Check specifically: the word **„парче/парчиња"** for the garment (incl. the definite form in „Види го парчето"), and the imperative forms **„Паузирај" / „Пушти"** on the play/pause control. Owner: **Lazar + Petar**. | 2.21 | **before the first real drop (both sign-off boxes filled)** |
 | 49 | **The showcase on a real phone, from an Instagram link, both locales (2.21).** Open `https://www.trajanovv.com` and `/en` on a phone after the deploy. Swipe the section left and right; press the pause button; scroll past it and back. **Pass:** swipe changes the slide, the pause button is reachable and obvious, nothing overlaps or shifts the hero or the FAQ, and the page still scrolls vertically without fighting the carousel. The swipe/pause/reduced-motion behaviours were verified via synthetic events in the headless pane (`D-2.21-7`), **not on real hardware** — this row is the real-device read. Owner: **Lazar**. | 2.21 | **after the 2.21 deploy — before the first real drop** |
 | 50 | **Sign-off that the front door still leads with the hero (2.21).** Lazar looks at the deployed home page and answers two things: (a) does the showcase sit **under** the hero rather than competing with it, and (b) is the neutral slot name („Производ 01" / "Product 01") acceptable on the front door until Y.01 fills in real names. **Pass: a yes, or a named change.** Owner: **Lazar**. | 2.21 | **after the 2.21 deploy — before the first real drop** |
+| 51 | **The three chromeless controls on a real phone, `https://www.trajanovv.com` (2.22).** The boxes around prev / next / pause are gone; the buttons keep their full 48×48 hit area (the padding is the tap target) but draw only the glyph. On an actual handset, both locales: tap each of the three several times. **Pass: each is easy to hit first time with a thumb despite having no visible box; nothing looks mis-aligned under the photograph.** The 48×48 rects, the 320px edge fit (hit area starts 4px from the viewport edge, `D-2.22-4`) and all behaviours were measured in the headless pane (`D-2.22-5`), **not on real hardware** — this row is the real-device read. Owner: **Lazar**. | 2.22 | **after the 2.22 deploy — before the first real drop** |
+| 52 | **Lazar's look sign-off on the chromeless row (2.22).** The change is his ask — the bordered boxes read as form furniture next to the full-bleed photograph. He looks at the deployed row (390-ish phone + desktop, both locales, countdown + ended): icons rest muted and light up on hover/focus (`D-2.22-2`), first glyph on the column edge (`D-2.22-4`), progress bar unchanged. **Pass: he confirms this is the "cleaner" he asked for, or names what to change.** Owner: **Lazar**. | 2.22 | **after the 2.22 deploy — before the first real drop** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
