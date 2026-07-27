@@ -4163,3 +4163,141 @@ start at `D-2.01-6`.*
   `src/config/drops.ts` and biting every phase; and the no-view evidence proves the component branch,
   not the DB-to-null path (that path is untouched by this phase).
 - **Links:** `D-Y.04-5` · `D-Y.03-11` · `src/app/[locale]/page.tsx` · `src/lib/drop/state.ts`
+
+### D-2.21-1 · 2026-07-27 · The Home showcase autoplay — the FIFTH motion exception, and the first that loops
+- **Status:** Accepted
+- **Decided by:** Orchestrator (owner-requested), pre-made in the Phase 2.21 brief (decisions 6–7);
+  logged here by Code as the brief instructs.
+- **Context:** `brand.md` §6 holds a presumption against decoration, with four logged exceptions
+  (`D-2.10-1`, `D-2.16-3`, `D-2.17-5`, `D-2.19-1`) — all first-paint, hover, or scroll-driven; none
+  loops. The Home showcase (one large photograph at a time, between the hero and the FAQ)
+  auto-advances every 6s.
+- **Decision:** Autoplay ships — 6s per slide, with a real pause mechanism per WCAG 2.2 SC 2.2.2:
+  it stops on hover, on focus-within, when the tab is hidden, on a visible pause button, and
+  entirely under `prefers-reduced-motion` (a JS `matchMedia` check — the global CSS rule cannot
+  stop a `setTimeout`). The cross-fade rides `--motion-slow` over `--ease-smooth` per the brief —
+  noting that `brand.md` §6 letters both as header-scoped; the brief's pairing is treated as the
+  orchestrator widening that scope for this one section. `brand.md` is out of this phase's scope,
+  so §6's text is NOT updated — flagged in the completion report §3 for the orchestrator.
+- **Alternative rejected:** a static showcase with manual controls only (no autoplay) — rejected by
+  the owner-requested brief; or a new dedicated motion token pair, which needs a `brand.md` edit
+  this phase is forbidden to make.
+- **Downside accepted:** a permanently animating element on the front door, and a §6 whose
+  "header only" scoping for `--motion-slow`/`--ease-smooth` is now inaccurate until a future phase
+  updates it.
+- **Links:** Phase 2.21 brief (decisions 6–7) · brand.md §6 · `src/app/globals.css` `.showcase-*` ·
+  `src/components/home/HomeShowcase.tsx`
+
+### D-2.21-2 · 2026-07-27 · A null price falls back to the ProductCard placeholder, not to slide exclusion
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Context:** The brief's `ShowcaseSlide` carries `priceMkd` and the slide template calls
+  `formatMkd(priceMkd, …)`, but `ProductView.priceMkd` is `number | null` (null = OWED,
+  `facts.md` §7). All three committed products have real VERIFIED prices today, so the branch is
+  currently unreachable — but the type demands an answer.
+- **Decision:** `ShowcaseSlide.priceMkd` stays `number | null`, and the slide renders the existing
+  `<Placeholder>{t('Placeholder.price')}</Placeholder>` fallback when null — exactly what
+  `ProductCard` does. No non-null assertion, no invented number.
+- **Alternative rejected:** excluding unpriced products from the showcase (hides a photographed
+  product over a fact the placeholder register already tracks as a visible marker); or typing the
+  field non-null and asserting (a crash path the DB can reach).
+- **Downside accepted:** if a price is ever nulled in the DB, a bracketed `[PLACEHOLDER: цена MKD]`
+  renders on the front door until caught — mitigated by it being exactly the visible, logged
+  placeholder mechanism the project mandates.
+- **Links:** `src/lib/showcase.ts` · `src/components/home/HomeShowcase.tsx` ·
+  `src/components/product/ProductCard.tsx` · placeholder register #1 (cleared) rationale
+
+### D-2.21-3 · 2026-07-27 · No pause button under prefers-reduced-motion
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Context:** Under `prefers-reduced-motion: reduce` the JS gate disables autoplay entirely
+  (brief decision 6). The pause/play toggle then controls nothing.
+- **Decision:** The pause button does not render under reduced motion — the same principle the
+  brief applies to the one-slide case ("a control that cannot do anything is worse than no
+  control"). Arrows and the progress buttons still render and still change slides (verified).
+- **Alternative rejected:** rendering the toggle disabled or as a no-op — an interactive element
+  that announces itself and does nothing is an a11y defect, not a courtesy.
+- **Downside accepted:** reduced-motion users see one fewer control than others, and if a future
+  change ever re-enabled autoplay under reduced motion by mistake there would be no visible pause
+  control (mitigated: the JS gate and this button share the same `reducedMotion` state, so they
+  cannot diverge).
+- **Links:** `src/components/home/HomeShowcase.tsx` · WCAG 2.2 SC 2.2.2 · Phase 2.21 brief decision 6
+
+### D-2.21-4 · 2026-07-27 · The progress bar wraps onto its own row below `sm:`
+- **Status:** Accepted
+- **Decided by:** Claude Code, after measurement.
+- **Context:** The brief's controls row is the reference's desktop shape: arrows + pause + the
+  labelled progress bar inline. Measured at 320px, the three 50px buttons + gaps leave each
+  progress button ~45px — the visible label truncates to two letters („Пр…"), which is not a
+  label.
+- **Decision:** The progress container carries `basis-full` below `sm:` (wrapping onto its own
+  full-width row — labels measure 138px at 320px and render legibly) and `sm:basis-auto sm:flex-1`
+  from `sm:` up (the reference's inline row).
+- **Alternative rejected:** truncated inline labels at all widths (unreadable at 320/390); or
+  hiding the labels below `sm:` (an unlabelled progress bar is what the brief's "labelled" rules
+  out).
+- **Downside accepted:** the controls block is one row (~62px) taller on phones.
+- **Links:** `src/components/home/HomeShowcase.tsx` · measured at 320/390 in the pane
+
+### D-2.21-5 · 2026-07-27 · The empty progress track is `--color-border-strong`, not `--color-border`
+- **Status:** Accepted
+- **Decided by:** Claude Code, after measurement.
+- **Context:** The track under each progress label first shipped on `--color-border` and measured
+  **1.37:1** on ground — below the 3:1 non-text floor (WCAG 2.2 1.4.11) held since 2.04.
+- **Decision:** The track uses `--color-border-strong` — measured **3.56:1**, the same value the
+  section's bordered buttons already carry, and exactly what brand.md §3 names it for ("hairlines
+  that must be seen").
+- **Alternative rejected:** keeping `--color-border` and arguing the track is decorative (the
+  empty track is the only visual bar on inactive items — it identifies the control).
+- **Downside accepted:** the resting track is more prominent than the reference design's
+  hairline.
+- **Links:** brand.md §3 · `src/components/home/HomeShowcase.tsx` · measured ratios in the
+  completion report
+
+### D-2.21-6 · 2026-07-27 · `--showcase-autoplay` is set inline from the component's constant, not added to `:root` or brand.md
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Context:** The progress fill must track the 6s autoplay timer, and the scoped CSS block may
+  not contain a raw millisecond value. A `:root` token would need a `brand.md` §6 row — and
+  `brand.md` is out of this phase's scope ("no new token is needed — if you think one is, stop and
+  say so").
+- **Decision:** One constant, `AUTOPLAY_MS = 6000`, lives in `HomeShowcase.tsx`; it arms the JS
+  timer AND is written onto the section as the `--showcase-autoplay` custom property, which the
+  `.showcase-progress-fill` rule reads. One source — the fill and the timer cannot drift. The fill
+  runs `linear` (it tracks a constant-speed timer — the `D-2.20-3` rationale) and restarts from
+  zero when the timer re-arms (a resumed-mid-bar fill would misreport the time remaining).
+- **Alternative rejected:** a `--motion-showcase` token in `:root` + brand.md §6 (out of scope
+  this phase — flagged in the report if the orchestrator wants it promoted); or hardcoding a
+  duration in the CSS block (two sources that drift, and a banned raw value).
+- **Downside accepted:** a motion duration lives in a component file rather than the token sheet —
+  a future re-time must know to edit `AUTOPLAY_MS`, not `globals.css`.
+- **Links:** `src/components/home/HomeShowcase.tsx` · `src/app/globals.css` `.showcase-*` ·
+  `D-2.20-3`
+
+### D-2.21-7 · 2026-07-27 · Verification maneuvers: scratch-drop windows shifted and restored, a temporary `view = null`, and headless-pane simulations
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — the `D-Y.05-12` / `D-Y.04-5` pattern, repeated and
+  extended.
+- **Decision:** (a) The active local drop (`test-open-drop`, no photographed products) would have
+  rendered an empty showcase in every preview, so both scratch drops' windows were shifted into
+  the past (exact prior values recorded first: `test-open-drop` 2026-07-21T17:24:31.984Z →
+  2026-07-29T17:24:31.984Z; `test-upcoming-drop` 2026-07-29T17:24:31.984Z →
+  2026-08-05T17:24:31.984Z), making `test-drop` (the three real catalog products) the active ended
+  drop; **both rows were restored byte-exact after, and `npm test` re-ran 129/129** — the mid-
+  maneuver run correctly failed 10 order-flow tests, proving the restore mattered. Hosted
+  untouched. (b) The no-view state used a one-line local `view = null` override, rendered both
+  locales, then reverted (diff-proven clean). (c) The headless pane reports
+  `document.visibilityState === "hidden"` permanently and cannot emulate reduced motion or touch,
+  so: visibility pause/resume was proven by overriding the getter and dispatching
+  `visibilitychange` (both directions); reduced motion by patching `matchMedia` and remounting via
+  client-side navigation (no autoplay in 8s, no pause button, arrows/progress still work); swipe
+  by synthetic `TouchEvent`s (left/right advance, vertical flick and sub-threshold drag ignored);
+  hover-pause was observed live (the pane's parked cursor paused autoplay exactly as designed).
+- **Alternative rejected:** verifying against the photo-less scratch drop (proves an empty
+  section, not the feature); skipping the behaviours the pane cannot reach natively (they are the
+  phase's WCAG gates).
+- **Downside accepted:** the same ones `D-Y.05-12` logged — the scratch DB keeps diverging from
+  `src/config/drops.ts` and biting every phase (it cost one mid-phase red test run this time); and
+  the no-view/touch/reduced-motion evidence proves the component branches via simulation, not real
+  hardware — the real-device read is owed row #49.
+- **Links:** `D-Y.05-12` · `D-Y.04-5` · `src/app/[locale]/page.tsx` · completion report §5
