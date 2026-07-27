@@ -13,7 +13,7 @@ Last updated: **2026-07-27** · By: **Claude Code (Phase 2.22 — Showcase contr
 ## Status
 
 **Phase 2.22 — Showcase controls: chromeless — CODE COMPLETE (2026-07-27, branch
-`phase-2.22-showcase-controls`; PR open to `main` — operator merges, `D-0-3`).** Out-of-band
+`phase-2.22-showcase-controls`; PR [#37](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/37) open to `main` — operator merges, `D-0-3`).** Out-of-band
 UI-only phase; does **not** advance the critical path (the `NEXT:` line is unchanged — Y.01 and
 the 2.06 operator half remain next). The three carousel controls under the Home showcase (prev /
 next / pause) are now **chromeless**: the `iconButton` constant in `HomeShowcase.tsx` drops

@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-27 |
 | **Branch** | `phase-2.22-showcase-controls` |
-| **PR** | (opened to `main` this session — number in the PR link below; **operator merges, `D-0-3`**) |
+| **PR** | [#37](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/37) — open to `main`; **operator merges, `D-0-3`** |
 | **Brief** | Part 2 · Phase 2.22 · Code (delivered in-session) |
 
 ---
