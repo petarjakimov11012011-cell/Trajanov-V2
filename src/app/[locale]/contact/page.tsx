@@ -1,7 +1,9 @@
 import type {Metadata} from 'next';
 import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations} from 'next-intl/server';
+import {Phone, Mail, AtSign} from 'lucide-react';
 import {pageMetadata} from '@/lib/metadata';
+import {ContactForm} from '@/components/contact/ContactForm';
 import {
   EMAIL,
   EMAIL_MAILTO,
@@ -26,10 +28,18 @@ export async function generateMetadata({
   });
 }
 
-// Contact is a static page — same as About, no drop state, no DB read (D-1.05, Task 4). No form (the
-// phone is the channel), no address (there is none — facts.md §1). Phone + Instagram are imported from
-// src/lib/social.ts, never retyped. Tap targets meet WCAG 2.2 AA 2.5.8: phone and Instagram are the
-// two things a person came here to press, so they are ≥44px tall on mobile (min-h-11 = 2.75rem).
+// Contact — Phase 2.23. STILL a static page (setRequestLocale, no force-dynamic, no DB read): the
+// message form is a client island inside it. Two columns at lg:+ — form left, rail right, ~60/40 —
+// stacked below, form first. The form ships on the owner's reversal of Plan §4 "No contact form"
+// (D-2.23-1); delivery is by email only, no database table (brief Decision 2). The rail carries
+// exactly three rows — Phone, Email, Instagram — all from src/lib/social.ts, never retyped; no
+// address exists (facts.md §1) and Instagram is the only social account (facts.md §6). Rows are
+// ≥44px tall (WCAG 2.2 SC 2.5.8). AtSign stands in for Instagram — Lucide has no Instagram glyph in
+// this version, and an honest substitute beats a hand-drawn brand mark (D-2.07-2).
+
+const railValueClass =
+  'font-display text-foreground group-hover:text-mustard font-semibold underline-offset-4 transition-colors duration-[var(--motion-fast)] group-hover:underline';
+const railIconClass = 'text-muted-foreground mt-1 h-5 w-5 shrink-0';
 
 export default async function ContactPage({
   params,
@@ -39,9 +49,11 @@ export default async function ContactPage({
   const {locale} = await params;
   setRequestLocale(locale);
   const t = await getTranslations('Contact');
+  // Cloudflare Turnstile sitekey is public by design (NEXT_PUBLIC_) — same source as checkout.
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-16 sm:px-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6">
       <header className="flex flex-col gap-4">
         <p className="text-eyebrow text-muted-foreground uppercase tracking-[0.14em]">
           {t('eyebrow')}
@@ -49,51 +61,61 @@ export default async function ContactPage({
         <h1 className="font-display text-h1 text-foreground font-extrabold text-balance">
           {t('h1')}
         </h1>
-        <p className="text-muted-foreground text-body">{t('context')}</p>
+        <p className="text-muted-foreground text-body">{t('intro')}</p>
       </header>
 
-      <section className="flex flex-col gap-6">
-        <a
-          href={PHONE_TEL}
-          className="group flex min-h-11 flex-col gap-1 py-2"
-        >
-          <span className="text-eyebrow text-muted-foreground uppercase tracking-[0.14em]">
-            {t('phoneLabel')}
-          </span>
-          <span className="font-display text-h2 text-foreground group-hover:text-mustard underline-offset-4 transition-colors duration-[var(--motion-fast)] group-hover:underline">
-            {PHONE_DISPLAY}
-          </span>
-        </a>
+      <div className="grid items-start gap-12 lg:grid-cols-[3fr_2fr] lg:gap-16">
+        <ContactForm siteKey={siteKey} />
 
-        <a
-          href={INSTAGRAM_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="group flex min-h-11 flex-col gap-1 py-2"
-        >
-          <span className="text-eyebrow text-muted-foreground uppercase tracking-[0.14em]">
-            {t('instagramLabel')}
-          </span>
-          <span className="font-display text-h2 text-foreground group-hover:text-mustard underline-offset-4 transition-colors duration-[var(--motion-fast)] group-hover:underline">
-            {INSTAGRAM_HANDLE}
-          </span>
-          <span className="text-small text-muted-foreground">
-            {t('instagramNote')}
-          </span>
-        </a>
+        <aside className="flex flex-col gap-2">
+          <h2 className="text-eyebrow text-muted-foreground uppercase tracking-[0.14em]">
+            {t('railHeading')}
+          </h2>
 
-        <a
-          href={EMAIL_MAILTO}
-          className="group flex min-h-11 flex-col gap-1 py-2"
-        >
-          <span className="text-eyebrow text-muted-foreground uppercase tracking-[0.14em]">
-            {t('emailLabel')}
-          </span>
-          <span className="font-display text-h2 text-foreground group-hover:text-mustard underline-offset-4 transition-colors duration-[var(--motion-fast)] group-hover:underline">
-            {EMAIL}
-          </span>
-        </a>
-      </section>
+          <ul className="flex flex-col">
+            <li>
+              <a href={PHONE_TEL} className="group flex min-h-11 items-start gap-3 py-3">
+                <Phone aria-hidden strokeWidth={1.75} className={railIconClass} />
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-small text-muted-foreground">{t('phoneLabel')}</span>
+                  <span className={railValueClass}>{PHONE_DISPLAY}</span>
+                  <span className="text-small text-muted-foreground">{t('phoneNote')}</span>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href={EMAIL_MAILTO} className="group flex min-h-11 items-start gap-3 py-3">
+                <Mail aria-hidden strokeWidth={1.75} className={railIconClass} />
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-small text-muted-foreground">{t('emailLabel')}</span>
+                  <span className={railValueClass}>{EMAIL}</span>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex min-h-11 items-start gap-3 py-3"
+              >
+                <AtSign aria-hidden strokeWidth={1.75} className={railIconClass} />
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-small text-muted-foreground">{t('instagramLabel')}</span>
+                  <span className={railValueClass}>{INSTAGRAM_HANDLE}</span>
+                  <span className="text-small text-muted-foreground">{t('instagramNote')}</span>
+                </span>
+              </a>
+            </li>
+          </ul>
+
+          {/* Strumica · NMK-only shipping · COD — the existing context line, at the foot of the rail
+              (brief Task 1), not in the header. */}
+          <p className="text-small text-muted-foreground border-border mt-4 border-t pt-4">
+            {t('context')}
+          </p>
+        </aside>
+      </div>
     </div>
   );
 }
