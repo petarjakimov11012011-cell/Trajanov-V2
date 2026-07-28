@@ -4588,3 +4588,128 @@ start at `D-2.01-6`.*
   already long enough to be unwieldy, and this is a deviation from the brief's literal Task 5 — which
   is why it is logged here rather than done silently.
 - **Links:** `CLAUDE.md` (state duties) · `src/_project-state/current-state.md` · Phase 2.24 brief Task 5
+
+---
+
+### D-2.25-1 · 2026-07-29 · The brand type scale is registered with tailwind-merge, so `cn()` stops deleting font sizes
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — the root fix that `D-Y.05-9/10` deferred out of that
+  phase's file scope, and that three shipped source comments name by file and function.
+- **Context — this was a live rendering bug, not a tidiness item.** `tailwind-merge` cannot read our
+  CSS. Its default `text-color` class group matches any `text-<word>` it does not already know as a
+  font size, so **every one of the seven brand size tokens was filed as a COLOUR**: `text-countdown`
+  and `text-foreground` shared one conflict group, and inside `cn()` the later class silently deleted
+  the earlier one. Proven empirically against the installed `tailwind-merge@3.6.0` before any file was
+  edited — `twMerge('text-countdown text-foreground')` returns `'text-foreground'`, and
+  `twMerge('font-display text-small … text-muted-foreground hover:text-foreground')` returns the string
+  with `text-small` **gone**. Measured in a live browser on `main`: the `/styleguide` countdown digits
+  computed to **16px**, the header nav to **16px**, the language switch to **16px**. The countdown has
+  rendered at the body default since Phase 1.04, on `main` and in production.
+- **Decision:** `src/lib/utils.ts` builds `cn()` from `extendTailwindMerge`, registering
+  `countdown, h1, h2, body, small, price, eyebrow` under the **`font-size`** class group. A size and a
+  colour are different CSS properties and now stop colliding; two sizes (`text-h1 text-h2`) still
+  resolve last-wins, which is correct. Verified after the change on the same pages: `/styleguide`
+  countdown **16px → 88px**, nav **16px → 13px**, language switch **16px → 13px**.
+- **Alternative rejected:** keep spreading the per-call-site workaround — write every class string that
+  contains a brand size as a plain concatenation instead of `cn()`. That is what 2.15, 2.21 and Y.05
+  each did in turn, and it is why three files carry hand-written notes explaining the same bug. It
+  scales as a permanent tax on every future component, it silently fails the moment somebody uses
+  `cn()` without reading the note, and it had already let the loudest object on the site render at
+  16px for twenty-one phases without anyone noticing.
+- **Also rejected:** passing the whole Tailwind theme to `extendTailwindMerge` via its `theme` option.
+  It would cover future tokens automatically, but it means restating the colour, spacing, radius and
+  motion scales in TypeScript as a second source of truth for values `brand.md` already owns — the
+  exact duplication `CLAUDE.md`'s "tokens come from `brand.md` and nowhere else" exists to prevent.
+- **Downside accepted:** the seven-name list in `src/lib/utils.ts` is a **manual mirror** of the
+  `--text-*` tokens in `globals.css` `@theme inline`. Adding an eighth type token to the brand scale
+  without adding it here reintroduces the identical silent-strip bug for that token alone, with no
+  build error and no test failure to catch it. The list carries a KEEP IN SYNC comment saying so; that
+  is a comment, not an enforcement mechanism.
+- **Second downside accepted:** the fix **changes rendered output on pages nobody asked to change**.
+  Every `cn()` string where a brand size preceded a colour had been rendering at the inherited 16px and
+  now snaps to its token — the drop eyebrow (16px → 12px), the showcase caption (16px → 13px), and the
+  checkout and contact form error lines (16px → 13px). All four are what the author wrote and what
+  `brand.md` §4 prescribes, so they are treated as restorations, not regressions. **The form error
+  lines dropping to 13px is flagged for `/impeccable harden`** rather than pre-empted here.
+- **Links:** `src/lib/utils.ts` · `src/app/globals.css` (`@theme inline`) · `brand.md` §4 ·
+  `D-Y.05-9` · `D-Y.05-10` · `D-2.25-2` · `D-2.25-3` · `CLAUDE.md` (tokens)
+
+---
+
+### D-2.25-2 · 2026-07-29 · The countdown's size moves onto the component root and the digit spans inherit it
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — a regression that `D-2.25-1` would otherwise have caused.
+- **Context.** `D-Y.05-9/10` worked around the strip by putting `text-h1 md:text-countdown` on a
+  wrapper at the Home call site and letting the digit spans inherit it, because their own
+  `text-countdown` was being deleted. `D-2.25-1` stops deleting it — which means the spans' own
+  `text-countdown` would come back and **override the wrapper**, reinstating the exact clip Y.05
+  measured: at 390px, four 2ch cells at 13vw plus colons and gaps measure ~402px, wider than the
+  viewport. The token was born unfittable on a phone; the 16px bug is the only reason nobody ever saw
+  it clip. Fixing the merge without moving the size would have shipped a horizontal overflow on the
+  Home hero for every phone visitor.
+- **Decision:** the size is declared **once, on the `Countdown` root** —
+  `font-display text-h1 md:text-countdown …` — and the digit and colon spans declare no size at all
+  and inherit. The root is the only place that knows the row is responsive. The Home call site's
+  wrapper `className` is therefore deleted as redundant. Measured after the change: **390px → 36px
+  digits, row 306px wide, `documentElement.scrollWidth` 390 (no overflow); 768px → 88px digits, row
+  669px (fits); 1280px → 88px.**
+- **Alternative rejected:** leave `text-countdown` on the spans and keep the responsive step at the
+  call site. Rejected because a caller would then have to know that the component's own spans will
+  overrule whatever size it passes — the failure mode is invisible in the JSX and only shows up as a
+  clipped row on a phone.
+- **Also rejected:** widen the token, or make `--text-countdown` itself fit 390px. That edits
+  `brand.md` §4 to route around a layout problem in one component, and `brand.md` is owner territory.
+- **Downside accepted:** the countdown is now **smaller than its own brand token below `md:`**, so the
+  "largest type on the site" claim in `brand.md` §4 holds only from 768px up. `/styleguide` also
+  changes: its `<Countdown offsetMs={40_000} />` passes no `className`, so it inherited the bug and
+  rendered at 16px — it now renders at the real token, which is a **visible change to the design-system
+  reference page** that Lazar has not seen. Register row added.
+- **Links:** `src/components/drop/Countdown.tsx` · `src/components/home/HomeExperience.tsx` ·
+  `src/app/[locale]/styleguide/page.tsx` · `D-Y.05-9` · `D-Y.05-10` · `D-2.25-1` · `brand.md` §4
+
+---
+
+### D-2.25-3 · 2026-07-29 · The three "do not use `cn()`" workarounds are retired in the same commit that removes their reason
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Decision:** `HomeExperience.tsx`, `HomeShowcase.tsx` and `SiteHeader.tsx` each carried a comment
+  instructing future authors to avoid `cn()` for class strings containing a brand size. All three are
+  rewritten to describe what is now true and to name `D-2.25-1`; `SiteHeader`'s `overlayRow` returns
+  from hand-concatenated strings to `cn()`. The overlay rows were re-measured open, at 390px: **24px
+  `text-h2`, 44px row height, 2px left border, `rgb(171,167,158)`** — identical to before, and the
+  emitted class string is unchanged.
+- **Alternative rejected:** fix `cn()` and leave the comments. A comment that tells the next author to
+  work around a bug that no longer exists is worse than no comment: it would have propagated the
+  workaround into new components indefinitely, which is exactly how this bug survived twenty-one
+  phases.
+- **Downside accepted:** this widens the diff into three files that the P0 item did not name, and
+  `SiteHeader.overlayRow` is a behavioural no-op whose only justification is consistency — a reviewer
+  must read it as such rather than looking for a rendered change.
+- **Links:** `src/components/home/HomeExperience.tsx` · `src/components/home/HomeShowcase.tsx` ·
+  `src/components/layout/SiteHeader.tsx` · `D-2.25-1`
+
+---
+
+### D-2.25-4 · 2026-07-29 · `text-sm` → `text-small` only; the other off-scale sizes are reported, not codemodded
+- **Status:** Accepted
+- **Decided by:** **Petar**, asked and answered before any file was edited (the P0 brief said
+  `text-sm→text-small`; the codebase also carries `text-xs`, `text-base`, `text-lg` and `text-3xl`,
+  none of which `brand.md` §4 sanctions).
+- **Decision:** codemod **`text-sm` → `text-small` only** — 18 call sites across 9 files, `0.875rem`
+  → `0.8125rem`. Zero stock `text-sm` remains in any rendered route (verified against the served HTML
+  of `/`, `/?preview=live`, `/?preview=ended`, `/catalog`, `/cart`, `/checkout`, `/contact`, `/about`,
+  `/styleguide`). The remaining off-scale sizes — `text-xs` ×6, `text-base` ×4, `text-lg` ×2,
+  `text-3xl` ×1 — are carried to `/impeccable polish` and the closing `/impeccable audit` as an
+  inventory item, with the owner deciding there.
+- **Alternative rejected:** migrate the whole file tree onto `brand.md` §4 in this pass
+  (`text-xs`→`text-eyebrow`, `text-base`→`text-body`, `text-lg`/`text-3xl` onto the nearest token).
+  It is where the codebase should end up and `CLAUDE.md` forbids hardcoded sizes, but `text-lg` and
+  `text-3xl` have **no clean brand equivalent**, so the migration cannot be finished mechanically —
+  and doing the easy two-thirds of it inside a P0 bug fix would change more pixels than the item
+  promised, on pages the fix has no reason to touch.
+- **Downside accepted:** the codebase **stays inconsistent on purpose** until `/polish` closes it, and
+  `DropBanner.tsx:28` now reads `text-small … sm:text-base` — one brand token and one stock token in a
+  single responsive pair, which is the least defensible line in the diff. It is left that way rather
+  than quietly widened past the agreed scope.
+- **Links:** `brand.md` §4 · `CLAUDE.md` (tokens) · `src/components/drop/DropBanner.tsx` ·
+  `D-2.25-1` · Phase 2.25 completion report
