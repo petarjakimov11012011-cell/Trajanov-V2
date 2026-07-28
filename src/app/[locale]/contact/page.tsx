@@ -1,8 +1,9 @@
 import type {Metadata} from 'next';
 import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations} from 'next-intl/server';
-import {Phone, Mail, AtSign} from 'lucide-react';
+import {Phone, Mail} from 'lucide-react';
 import {pageMetadata} from '@/lib/metadata';
+import {InstagramIcon} from '@/components/system/InstagramIcon';
 import {ContactForm} from '@/components/contact/ContactForm';
 import {
   EMAIL,
@@ -34,8 +35,9 @@ export async function generateMetadata({
 // (D-2.23-1); delivery is by email only, no database table (brief Decision 2). The rail carries
 // exactly three rows — Phone, Email, Instagram — all from src/lib/social.ts, never retyped; no
 // address exists (facts.md §1) and Instagram is the only social account (facts.md §6). Rows are
-// ≥44px tall (WCAG 2.2 SC 2.5.8). AtSign stands in for Instagram — Lucide has no Instagram glyph in
-// this version, and an honest substitute beats a hand-drawn brand mark (D-2.07-2).
+// ≥44px tall (WCAG 2.2 SC 2.5.8). The Instagram row carries a local outline glyph
+// (src/components/system/InstagramIcon.tsx) — this Lucide ships no brand icons, so the mark is drawn
+// on the same 24px grid as Mail/Phone and inherits the same colour token (D-2.24-1).
 
 const railValueClass =
   'font-display text-foreground group-hover:text-mustard font-semibold underline-offset-4 transition-colors duration-[var(--motion-fast)] group-hover:underline';
@@ -99,7 +101,7 @@ export default async function ContactPage({
                 rel="noopener noreferrer"
                 className="group flex min-h-11 items-start gap-3 py-3"
               >
-                <AtSign aria-hidden strokeWidth={1.75} className={railIconClass} />
+                <InstagramIcon aria-hidden strokeWidth={1.75} className={railIconClass} />
                 <span className="flex flex-col gap-0.5">
                   <span className="text-small text-muted-foreground">{t('instagramLabel')}</span>
                   <span className={railValueClass}>{INSTAGRAM_HANDLE}</span>

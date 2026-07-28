@@ -1,6 +1,7 @@
 import {useTranslations} from 'next-intl';
-import {Mail, Phone, AtSign} from 'lucide-react';
+import {Mail, Phone} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
+import {InstagramIcon} from '@/components/system/InstagramIcon';
 import {
   EMAIL,
   EMAIL_MAILTO,
@@ -76,10 +77,8 @@ export function SiteFooter() {
                   rel="noopener noreferrer"
                   className={itemClass}
                 >
-                  {/* Lucide dropped its brand icons (no Instagram glyph in this version). AtSign
-                      marks the social handle honestly rather than shipping a fabricated brand mark
-                      (D-2.07-2). */}
-                  <AtSign
+                  {/* Local Instagram glyph — this Lucide ships no brand icons (D-2.24-1). */}
+                  <InstagramIcon
                     aria-hidden
                     strokeWidth={1.75}
                     className="text-muted-foreground h-4 w-4 shrink-0"

@@ -2639,7 +2639,7 @@ start at `D-2.01-6`.*
   `D-2.03-1` (real Privacy) · `D-2.05-3` (published email) · `D-Y.02-1` (out-of-band precedent) · `D-2.07-2/3`
 
 ### D-2.07-2 · 2026-07-23 · Instagram row uses the Lucide `AtSign` icon — this Lucide has no brand Instagram glyph
-- **Status:** Accepted
+- **Status:** Superseded by D-2.24-1
 - **Decided by:** Claude Code (executor), while building 2.07.
 - **Context:** The brief asks for an "instagram icon (Lucide)". `lucide-react 1.24.0` has **dropped its brand
   icons** — there is no `Instagram` export (the build failed on the import). `facts.md` §6 forbids
@@ -4497,3 +4497,94 @@ start at `D-2.01-6`.*
 - **Downside accepted:** keyboard evidence is per-element simulation, not a hand on a keyboard; the
   real-device read goes on the owed register (row #55).
 - **Links:** `D-2.21-7` · `D-2.22-5` · Phase 2.23 completion report §5
+
+---
+
+### D-2.24-1 · 2026-07-28 · A local outline Instagram glyph replaces the `@` mark on both social rows
+- **Status:** Accepted
+- **Decided by:** **Lazar (owner)** — he asked for a real Instagram logo on 2026-07-28. The glyph's
+  *form* (outline recreation vs. Meta's official asset) is Claude Code's call, on the spot.
+- **Context:** `D-2.07-2` put the Lucide `AtSign` (`@`) mark on the site's two Instagram links —
+  the footer `СЛЕДИ`/FOLLOW column and the Contact rail — because `lucide-react@^1.24.0` **dropped
+  its brand icons** (no `Instagram` export; the import fails the build). At a glance both rows read
+  as "an email address," not "our Instagram." `D-2.07-2` listed exactly this fix as its rejected
+  alternative **(a) vendor a custom Instagram SVG**. That alternative is now the owner's
+  instruction — a visual-brand call, his to make, and the one register #17 was holding open.
+- **Decision:** Ship `src/components/system/InstagramIcon.tsx` — a local, server-safe presentational
+  component with the same call shape as a Lucide icon (`className`, `strokeWidth`, `aria-hidden`
+  spread through `SVGProps<SVGSVGElement>`), so both call sites change **by name only**. Three
+  children on the same 24px grid as the rest of the icon set: the rounded-square camera body, the
+  lens circle, the flash dot. `stroke="currentColor"` + `fill="none"`, so it inherits the parent's
+  colour token exactly as `Mail`/`Phone` do; **no colour value is written in the file**. The icon
+  stays `aria-hidden` on both surfaces — the visible `@trajanovv2026` handle remains the link's
+  accessible name. **`lucide-react` is not moved, and no dependency is added** — the whole point of
+  a local component is that the pin stays pinned.
+- **Alternatives considered:** **(a) Meta's official solid / gradient Instagram mark** — rejected on
+  three counts: the site's icon set is a 1.75-weight line set on a 24px grid and a filled brand asset
+  would be the only solid icon on the page; a gradient or solid asset **cannot inherit a colour
+  token**, so it would break the one rule that keeps `Mail`/`Phone`/Instagram the same colour; and an
+  outline recreation puts materially less brand trade dress into a **public repo** (`D-0-1`) than
+  shipping the official asset would. **(b) Keep `AtSign`** — rejected: it is what the owner asked to
+  change. **(c) Downgrade `lucide-react` to a version that still ships brand icons** — rejected for
+  the same reason `D-2.07-2` rejected it: a dependency change to obtain a deprecated glyph.
+- **Downside accepted:** What ships is a **recreated Instagram-style outline mark, not Meta's
+  official brand asset** — it is a lookalike drawn to the house grid, and Meta's brand guidelines
+  ask for the official asset unaltered. It is used for one purpose only: linking to **the brand's own
+  Instagram account** (`facts.md` §6 — the only social account we have). The `D-2.07-2` concern about
+  trade dress in a public repo is reduced, not eliminated. Whether the mark reads as Instagram on a
+  real screen is Lazar's eyeball call — new register row **#58**.
+- **Links:** `src/components/system/InstagramIcon.tsx` · `src/components/layout/SiteFooter.tsx` ·
+  `src/app/[locale]/contact/page.tsx` · `D-2.07-2` (superseded) · `D-0-1` · `facts.md` §6 ·
+  `src/lib/social.ts` (unchanged) · register #17 (narrowed) / #58 (new)
+
+---
+
+### D-2.24-2 · 2026-07-28 · Row-height parity was proven against `main` by a temporary checkout — which clobbered uncommitted work
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — the `D-2.21-7` / `D-2.23-7` verification-maneuver lineage.
+- **Decision:** "The row height is unchanged" is a claim about **two** builds, so both were measured.
+  With the branch measured, `git checkout main -- src/components/layout/SiteFooter.tsx
+  'src/app/[locale]/contact/page.tsx'` put `main`'s two call sites in the working tree, the dev
+  server reloaded, and the same probe ran again. Baseline (`AtSign`, children `circle,path`) and
+  branch (`InstagramIcon`, children `rect,path,line`) agree **exactly**: footer social row 33.59px at
+  both 375 and 1280; rail Instagram row 110.5px at 375 and 91px at 1280; icon boxes 16×16 / 20×20;
+  computed `stroke: rgb(171, 167, 158)` on all three icons in both builds.
+- **Two things went wrong and are on the record rather than quietly fixed.** (a) **The restore step
+  `git checkout HEAD -- …` silently reverted the phase's own edits** — nothing had been committed
+  yet, so `HEAD` was still `main`. The two call sites were re-applied by hand and the final
+  `git diff main` re-read line by line to confirm `aria-hidden`, `strokeWidth={1.75}` and both
+  classNames survive as **unchanged context lines** (the strongest available proof they are
+  byte-identical). The correct order is commit first, then measure the baseline. (b) The pane's
+  next-intl `NEXT_LOCALE` cookie made `/kontakt` 307 to `/en/contact` after an EN visit, which
+  briefly produced an EN measurement labelled MK; caught by asserting `document.documentElement.lang`
+  in every probe, and fixed by setting the cookie back to `mk`. **Pre-existing middleware behaviour,
+  not a defect of this phase** — but any future phase measuring both locales in one pane will hit it.
+- **Alternative rejected:** asserting parity from the source alone ("both are 24-viewBox SVGs at the
+  same `h-4 w-4`, so nothing can move") — true by inspection and still an unmeasured claim, which is
+  exactly the class of claim this project's DoD asks to be measured.
+- **Downside accepted:** the maneuver cost a re-apply of two files and one discarded measurement; the
+  evidence is a same-machine, same-dev-server comparison, not a production one — the live read is
+  register row **#58**.
+- **Links:** `D-2.21-7` · `D-2.23-7` · Phase 2.24 completion report §3/§5
+
+---
+
+### D-2.24-3 · 2026-07-28 · A Status-block entry was added to `current-state.md`, which the brief did not enumerate
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Context:** The brief's Task 5 lists exactly four `current-state.md` edits — narrow owed #17, add
+  the new owed row, update `Last updated`/`By`, rewrite line 1 unchanged — and does **not** mention
+  the Status block. Taken literally, the file would carry a `Last updated: … (Phase 2.24)` stamp with
+  **no record anywhere in it that a Phase 2.24 exists**, and the next orchestrator reading the file
+  before writing the next brief would not know the `@` had been replaced.
+- **Decision:** Add one compact Status entry above the 2.23 block, in the file's established shape
+  (what shipped, what was measured, gates, owed rows, decisions), explicitly stamped **out-of-band /
+  `NEXT:` byte-unchanged** so it cannot be mistaken for critical-path movement.
+- **Alternative rejected:** execute Task 5 to the letter and leave the Status block untouched —
+  rejected because `CLAUDE.md`'s state duty is "update `current-state.md`", the file bills itself as
+  "the single source of truth for project status," and every prior phase records itself there. A
+  brief's edit list being non-exhaustive is not a licence to leave the truth file wrong.
+- **Downside accepted:** an out-of-band one-commit fix now occupies a paragraph in a Status section
+  already long enough to be unwieldy, and this is a deviation from the brief's literal Task 5 — which
+  is why it is logged here rather than done silently.
+- **Links:** `CLAUDE.md` (state duties) · `src/_project-state/current-state.md` · Phase 2.24 brief Task 5

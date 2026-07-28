@@ -6,11 +6,45 @@ NEXT: **Y.01** (drop content load) + the placeholder register to **zero** before
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-28** · By: **Claude Code (Phase 2.23 — Contact page: message form + contact rail)**
+Last updated: **2026-07-28** · By: **Claude Code (Phase 2.24 — Instagram glyph replaces the `@` icon)**
 
 ---
 
 ## Status
+
+**Phase 2.24 — Instagram glyph replaces the `@` icon — CODE COMPLETE (2026-07-28, branch
+`phase-2.24-instagram-icon`; PR [#39](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/39)
+open to `main`, **not merged** — an operator merges, `D-0-3`).**
+**Out-of-band, one commit, zero critical-path movement — `NEXT:` on line 1 is byte-unchanged.** The
+site's **two** Instagram links (the footer `СЛЕДИ`/FOLLOW column on every page, and the Contact
+right-hand rail) showed a generic `@` and read as "an email address" at a glance; they now carry a
+real Instagram mark. New `src/components/system/InstagramIcon.tsx` — a **local**, server-safe outline
+glyph on the same 24px grid as the Lucide set, with the same call shape as a Lucide icon, so both
+call sites changed **by name only** (`aria-hidden`, `strokeWidth={1.75}` and both classNames
+byte-identical). `stroke="currentColor"` + `fill="none"` mean it inherits the parent's colour token
+exactly as `Mail`/`Phone` do — **zero hex/`rgb(`/`hsl(`/named colour in the file** (grep-proven).
+**`lucide-react` stays pinned at `^1.24.0` and no dependency was added** — that is the whole point of
+a local component. **Zero user-facing text added: `src/messages/` is untouched, so this phase creates
+no MK review debt.** `D-2.07-2` **superseded by `D-2.24-1`** (Status line only — append-only
+respected); the reversal is **Lazar's owner-level visual call**, made 2026-07-28, and is exactly the
+alternative `D-2.07-2` had rejected. **Verified in-browser at 375px + 1280px, both locales, on `/`
+(footer) and `/kontakt` + `/en/contact` (rail):** the glyph renders (children `rect,path,line` vs.
+`main`'s `circle,path`), computed `stroke: rgb(171, 167, 158)` and `fill: none` — **identical to the
+`Mail` and `Phone` icons beside it** on all four renders; box sizes unchanged (footer 16×16, rail
+20×20); **row heights pixel-identical to `main`, measured on both sides** via a temporary
+`git checkout main -- <the two call sites>` (`D-2.24-2`) — footer social row **33.59px** at 375 and
+1280; rail Instagram row **110.5px** at 375, **91px** at 1280; **zero console errors** on all four
+renders; both links still resolve to
+`https://instagram.com/trajanovv2026` with `target="_blank"` + `rel="noopener noreferrer"`; the
+accessible name of each link is still the handle text **alone** (icon `aria-hidden`, no `aria-label`,
+no `<title>`). Gates: build / `tsc --noEmit` / lint clean; `npm test` **154/154 — unchanged from
+`main`**, incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed` (no commerce code
+touched). Forbidden-area diff (`package.json` + lockfile, `src/messages/`, `src/config/`,
+`supabase/`, `facts.md`, `brand.md`, `src/lib/social.ts`) **empty**. **Downside on the record:** the
+mark is a **recreated Instagram-style outline, not Meta's official brand asset**, used only to link
+to the brand's own account (`facts.md` §6). Owed **#17 NARROWED** (icon half resolved; the 2.07
+footer-redesign sign-off half stays open), new owed **#58** (Lazar eyeballs the glyph on the live
+site). Placeholder register **unchanged**. Decisions `D-2.24-1/2/3`.
 
 **Phase 2.23 — Contact page: message form + contact rail — COMPLETE (2026-07-28, branch
 `phase-2.23-contact-form`; PR [#38](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/38)
@@ -2539,7 +2573,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 14 | **Register the IndexNow key in Bing Webmaster Tools** (`D-2.04b-6`). Key `78dec4b97e3fbb0f22d1c8df38050f74`, served at `${SITE_URL}/78dec4b97e3fbb0f22d1c8df38050f74.txt`. **Public by design, NOT a secret (`D-0-1`).** Ops-only, and only meaningful **after the real domain is live** (2.05) — the key file must resolve on the final host before Bing accepts it, and `pingIndexNow()` stays un-wired until a post-2.05 hook. **Now actionable — the domain is live and `SITE_URL` is flipped (2.05); the key file resolves on `https://www.trajanovv.com`.** Owner: **Lazar (ops)**. | 2.04b | **post-2.05 (domain live — now actionable)** |
 | 15 | **Live Turnstile captcha renders + solves on the real-domain checkout.** The site key rotated to `0x4AAAAAAD6pSIvEa1p8GkZX` (new Managed widget, hostnames `trajanovv.com` + `www`, `D-2.05-4`); the server-side `verifyTurnstile` **does not assert hostname** (it checks `success` only), so no code gate depends on the host. But a real browser render + solve on `https://www.trajanovv.com/checkout` needs an **open drop** — deferred to the 2.06 rehearsal. **2.06 Code (2026-07-22): the runbook is ready** — `docs/ops/drop-rehearsal-runbook.md` step 2b (open drop via `docs/ops/rehearsal-sql/01-open-rehearsal-drop.sql`, solve the real Turnstile on `/naracka`, place one order). Still owed until Lazar + Vladimir run it. Owner: **Lazar / 2.06 rehearsal**. | 2.05 | **2.06 rehearsal (runbook ready; operator runs it)** |
 | 16 | **A real order email delivers from `info@trajanovv.com` end to end.** `ORDER_FROM_ADDRESS` is now `info@trajanovv.com` and the domain is Resend-verified (`D-2.05-3`); unit tests (mocked Resend) assert the new from-address. That a live order's notification actually **arrives** in Vladimir's inbox `from: info@trajanovv.com` needs a real order → the 2.06 rehearsal. **2.06 Code (2026-07-22): the runbook is ready** — `docs/ops/drop-rehearsal-runbook.md` step 2d (confirm the email in Vladimir's inbox: subject "Нова нарачка TRJ-0001 — Trajanov", ordered line, customer block, COD copy) + step 0 pre-flight (test that `info@` routes to his inbox). Still owed until the operator runs it. Owner: **Lazar / 2.06 rehearsal**. | 2.05 | **2.06 rehearsal (runbook ready; operator runs it)** |
-| 17 | **Footer redesign — Lazar design sign-off (2.07).** The footer was rebuilt to the two-zone design (contact/social columns + © row) **outside a Design phase**; the Instagram row uses the Lucide **`AtSign`** (`@`) icon because this `lucide-react` ships **no** brand Instagram glyph (`D-2.07-2`). Code verified structure, contrast (every pair passes WCAG 2.2 AA), tap targets (≥24px), MK+EN strings, and mobile stacking — but the **visual-brand call** (the redesign itself + the `@`-for-Instagram icon) is Lazar's/Design's. Eyeball the `https://www.trajanovv.com` footer (any page), **MK + EN, 375px + desktop**. If a real Instagram glyph is wanted, drop an SVG in and swap the `AtSign` import — one commit. Owner: **Lazar / Design**. | 2.07 | **after 2.07 deploy — sign off anytime before the first real drop** |
+| 17 | **Footer redesign — Lazar design sign-off (2.07). NARROWED by 2.24 — still OPEN.** The footer was rebuilt to the two-zone design (contact/social columns + © row) **outside a Design phase**. Code verified structure, contrast (every pair passes WCAG 2.2 AA), tap targets (≥24px), MK+EN strings, and mobile stacking — but the **visual-brand call on the redesign itself** is Lazar's/Design's and is the half that stays open. Eyeball the `https://www.trajanovv.com` footer (any page), **MK + EN, 375px + desktop**. ~~*Second half — the `@`-mark standing in for Instagram (`D-2.07-2`) — **RESOLVED by Phase 2.24** (2026-07-28): Lazar instructed a real Instagram logo, a local outline glyph now ships on both social rows (`D-2.24-1`, superseding `D-2.07-2`). That the new mark reads correctly on a real screen is a fresh eyeball, tracked separately as row **#58** — do not re-open it here.*~~ Owner: **Lazar / Design**. | 2.07 | **after 2.07 deploy — sign off anytime before the first real drop** |
 | 18 | **New MK footer strings — native review (2.07).** Three MK strings post-date the 2.02 native review and ship exactly as the 1.05 brief proposed them: `Footer.contact` „КОНТАКТ", `Footer.social` „СЛЕДИ", `Footer.rights` „© 2026 Трајанов. Сите права задржани." A native speaker (Lazar/Petar) confirms spelling / agreement / tone — same process as `docs/i18n/mk-review-2.03.md`. Owner: **Lazar / Petar**. | 2.07 | **before the first real drop (MK review pass)** |
 | 19 | **New MK `Credit` strings — native review (2.08).** Two strings post-date the 2.02/2.03 reviews and render on **every** page: `Credit.builtBy` „Изработено од Vertex Consulting" (rich-text; only the company name is linked, and it stays untranslated) and `Credit.opensInNewTab` „се отвора во нов прозорец" (the visually-hidden new-tab announcement). Two native speakers read both **in context, in the browser**, and sign the review pack — same process as `docs/i18n/mk-review-2.03.md`. Owner: **Lazar + Petar**. | 2.08 | **before the first real drop (MK review pass)** |
 | 20 | **Click-test `https://www.vertexconsulting.mk/en`** (`facts.md` § 11, marked VERIFIED — **must be click-tested before it ships**). The credit link opens a **working** page in a **new tab** from the **live** header, on a **phone and on desktop**, in **both locales**. Same rule as the Instagram URL in `facts.md` § 6 — a link to a page that does not resolve is a **broken fact on every page of the site**. Code confirmed the anchor is correct (`target="_blank" rel="noopener noreferrer"`, hidden new-tab text, mustard link) but **cannot confirm the destination resolves**. Owner: **Lazar**. | 2.08 | **before the first real drop (live click-test, both platforms + locales)** |
@@ -2580,6 +2614,7 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 55 | **The Contact page on a real phone (2.23).** Open `/kontakt` on an actual handset, both locales. **Pass: fields are tappable, the on-screen keyboard does not cover the submit button, nothing overflows, and every focusable control shows the ring on an external-keyboard Tab walk.** The pane proved geometry (44px+ targets, zero overflow 320–1280) and per-element `:focus-visible`, but not real hardware and not a real Tab traversal (`D-2.23-7`). Owner: **Lazar**. | 2.23 | **after the 2.23 deploy — before the first real drop** |
 | 56 | **Native MK review of the 2.23 strings — 21 rows (2.23).** `docs/i18n/mk-review-2.23.md`, committed unsigned: 15 new `Contact` strings, 2 new + **2 rewritten** `Privacy` strings (the rewrites were previously stamped in the 2.03 pack — they carry legal weight), and both rewritten `Meta` descriptions. Check specifically: „контакт-форма(та)", the imperative „Испрати"/„Се испраќа…", and „Побарај нè директно" in UPPERCASE. Owner: **Lazar + Petar**. | 2.23 | **before the first real drop (both sign-off boxes filled)** |
 | 57 | **Lazar's sign-off that a contact form is what he wants living on the site (2.23).** The form ships on the owner's reversal of Plan §4 (`D-2.23-1`) relayed through the brief — Lazar looks at the live page and confirms, or it is reverted before the first real drop. The accepted downside stands on the record: a second inbox that must actually be read. Owner: **Lazar**. | 2.23 | **after the 2.23 deploy — before the first real drop** |
+| 58 | **The Instagram glyph on a real screen (2.24).** Lazar eyeballs the new mark on `https://www.trajanovv.com` after deploy — **both surfaces (the footer `СЛЕДИ`/FOLLOW column on any page, and the `/kontakt` + `/en/contact` right-hand rail), MK + EN, 375px + desktop**. **Pass: it reads as *Instagram* at its rendered size (16px in the footer, 20px in the rail), it sits right beside `Mail`/`Phone` as one icon set — same colour, same line weight, same optical size — and the row height has not moved.** What ships is a **recreated outline mark drawn to the house 24px grid, not Meta's official brand asset** (`D-2.24-1`, superseding `D-2.07-2`); Code measured geometry, colour and row height in the pane, but "does it read as Instagram" is an eyeball, not a measurement. Owner: **Lazar**. | 2.24 | **after the 2.24 deploy — before the first real drop** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,
