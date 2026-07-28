@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-28 |
 | **Branch** | `phase-2.23-contact-form` |
-| **PR** | [#38](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/38) — open to `main`, **not merged; an operator merges (`D-0-3`)** |
+| **PR** | [#38](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/38) — **MERGED** to `main` (merge `cbd0d48`, 2026-07-28, on Petar's explicit instruction, `D-0-3`); branch deleted, refs pruned; production deploy verified on `https://www.trajanovv.com`, both locales (see §12) |
 | **Brief** | `briefs/Part-2-Phase-23-Code.md` (delivered in-session) |
 
 ---
@@ -252,3 +252,34 @@ Nothing blocked. Carryover for the orchestrator:
 - `file-map.md`: tree + changelog row (also restored the missing `mk-review-2.21.md` tree line).
 - `00_stack-and-config.md`: **no entry needed** — no dependency or config change.
 - `Decisions.md`: `D-2.23-1…7`, append-only, no prior entry edited.
+
+## 12. Merge + production verification (added post-merge, 2026-07-28)
+
+**PR #38 merged to `main` as `cbd0d48`** on Petar's explicit instruction — `D-0-3`: an operator, not
+Code, authorised the merge. Branch deleted; remote + local refs pruned.
+
+**This merge is not a no-op for the running site.** It changes `src/`, so the merge-triggered
+redeploy is the moment the site starts accepting messages from strangers — and the moment the
+Privacy page stops contradicting itself. Verified on `https://www.trajanovv.com` ~45s after merge:
+
+| Check | Result |
+|---|---|
+| `/kontakt` · `/en/contact` | **200** both |
+| Form fields | `contact-name`, `contact-email`, `contact-subject`, `contact-message` — all four, both locales |
+| Headings | **exactly one `<h1>`** per page, both locales |
+| Rail values | `tel:+38978820520` · `mailto:info@trajanovv.com` · `instagram.com/trajanovv2026` — both locales, matching `social.ts` |
+| Consent link | MK `href="/privatnost"` · EN `href="/en/privacy"` — locale-correct |
+| Turnstile | the **real 2.05 site key** served; **zero** dummy-key occurrences |
+| English in the MK build | **zero** occurrences of "Get in touch" / "Required fields" / "Reach us directly" / "Send us a message" / "By sending" / "fastest way" |
+| `/privatnost` old claims | **zero** „Не собираме е-пошта" · **zero** „Нема формулар" |
+| `/en/privacy` old claims | **zero** "don't collect your email" · **zero** "No form, no portal" |
+| New Privacy section | renders both locales („Што собираме кога ни пишуваш" / "What we collect when you write to us") |
+| Meta descriptions | both corrected strings serve per-locale (contact + privacy) |
+
+**Still owed and NOT verifiable from here — #53–57**, now actionable on the live deploy: a real
+message delivering end to end with **Reply** addressing the sender (needs the production Resend
+keys, which exist only in Vercel), the Turnstile widget rendering + solving on the real domain, the
+page on a real handset, the 21-row MK review, and Lazar's sign-off that the form should exist.
+
+**Unchanged by the merge:** `llms.txt`'s Contact note still lists only Instagram + phone — accurate
+but now incomplete (report §3.1). Not a false statement; recommended for a future phase.

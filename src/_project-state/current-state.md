@@ -12,9 +12,25 @@ Last updated: **2026-07-28** · By: **Claude Code (Phase 2.23 — Contact page: 
 
 ## Status
 
-**Phase 2.23 — Contact page: message form + contact rail — CODE COMPLETE (2026-07-28, branch
+**Phase 2.23 — Contact page: message form + contact rail — COMPLETE (2026-07-28, branch
 `phase-2.23-contact-form`; PR [#38](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/38)
-open to `main` — operator merges, not Code, `D-0-3`).** Out-of-band
+**MERGED** to `main`, merge `cbd0d48`, 2026-07-28, on Petar's explicit instruction — `D-0-3`:
+operator-authorised, not Code; branch deleted, remote + local refs pruned).** **This merge is NOT a
+no-op for the running site** — it changes `src/`, and the merge-triggered redeploy is the moment the
+site starts accepting messages from strangers. **Production deploy VERIFIED on
+`https://www.trajanovv.com` (2026-07-28, ~45s after merge):** `/kontakt` and `/en/contact` both
+serve **200** and carry all four fields (`contact-name`/`-email`/`-subject`/`-message`), **exactly
+one `<h1>`** each, the three rail hrefs (`tel:+38978820520`, `mailto:info@trajanovv.com`,
+`instagram.com/trajanovv2026`), the locale-correct consent link (MK `/privatnost`, EN
+`/en/privacy`), and the **real 2.05 Turnstile site key with zero dummy-key occurrences**; the MK
+build carries **zero** occurrences of "Get in touch" / "Required fields" / "Reach us directly" /
+"Send us a message" / "By sending" / "fastest way" (no English leak). **The legal correction is live
+and provable:** `/privatnost` serves **zero** „Не собираме е-пошта" and **zero** „Нема формулар",
+`/en/privacy` serves **zero** "don't collect your email" and **zero** "No form, no portal", and both
+render the new section („Што собираме кога ни пишуваш" / "What we collect when you write to us");
+both corrected meta descriptions serve per-locale. **Owed #53–57 are now actionable on the live
+deploy.** Out-of-band phase; does **not** advance the critical path (the `NEXT:` line is unchanged —
+Y.01 and the 2.06 operator half remain next). Out-of-band
 phase; does **not** advance the critical path (the `NEXT:` line is unchanged — Y.01 and the 2.06
 operator half remain next). The Contact page is now a real two-column page: **message form left,
 contact rail right** (~60/40 at `lg:`+, measured 624/416px = 1.50 at 1024 and 1280; stacked
