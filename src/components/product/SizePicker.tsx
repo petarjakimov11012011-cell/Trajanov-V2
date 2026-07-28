@@ -47,7 +47,7 @@ export function SizePicker({
             aria-pressed={isSelected}
             onClick={() => choose(size)}
             className={cn(
-              'font-display inline-flex h-11 min-w-[3rem] items-center justify-center rounded-[var(--radius-md)] px-3 text-sm font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ground',
+              'font-display inline-flex h-11 min-w-[3rem] items-center justify-center rounded-[var(--radius-md)] px-3 text-small font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ground',
               !size.available &&
                 'border-border text-muted-foreground cursor-not-allowed border line-through',
               size.available &&

@@ -30,11 +30,14 @@ function Cell({
 }) {
   return (
     <div className="flex flex-col items-center gap-2">
-      {/* Fixed 2ch width + tabular figures = zero layout shift on any digit change. */}
+      {/* Fixed 2ch width + tabular figures = zero layout shift on any digit change.
+          The SIZE is deliberately absent here and inherited from the component root (D-2.25-2): the
+          root is the one place that knows the row must step down below `md:`, and a `text-countdown`
+          re-declared on the span would override that step and clip the row on a phone. */}
       <span
         suppressHydrationWarning
         className={cn(
-          'text-countdown tabular block min-w-[2ch] text-center font-extrabold transition-colors duration-[var(--motion-fast)]',
+          'tabular block min-w-[2ch] text-center font-extrabold transition-colors duration-[var(--motion-fast)]',
           accent ? 'text-accent' : 'text-foreground',
           !known && 'opacity-30',
         )}
@@ -53,7 +56,8 @@ function Colon({accent}: {accent: boolean}) {
     <span
       aria-hidden
       className={cn(
-        'text-countdown font-extrabold leading-none',
+        // Size inherited from the root, like the digit cells above (D-2.25-2).
+        'font-extrabold leading-none',
         // nudge the colon onto the digits' optical centre
         'translate-y-[0.12em] self-start',
         accent ? 'text-accent' : 'text-border-strong',
@@ -116,6 +120,13 @@ export function Countdown({
   const underHour = known && totalSec > 0 && totalSec < 3600;
   const underMin = known && totalSec > 0 && totalSec < 60;
 
+  // The countdown's SIZE lives on the root below and the digit/colon spans inherit it (D-2.25-2),
+  // because the size is responsive and a span is not the place that knows it. `text-countdown` alone
+  // cannot fit a phone: at 390px, four 2ch cells at 13vw plus colons and gaps measure ~402px — wider
+  // than the viewport (measured, D-Y.05-9/10). The token was born unfittable, and nobody ever saw it
+  // clip only because the size was being stripped before it could render. So the row steps down to
+  // `text-h1` below `md:` and takes the full token from `md:` up, where it does fit. A caller may
+  // still override via `className` — `cn()` now resolves two competing font sizes correctly.
   return (
     <div
       role="timer"
@@ -124,7 +135,10 @@ export function Countdown({
           ? `${days} ${t('days')} ${hours} ${t('hours')} ${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`
           : undefined
       }
-      className={cn('font-display inline-flex flex-col items-center', className)}
+      className={cn(
+        'font-display text-h1 md:text-countdown inline-flex flex-col items-center',
+        className,
+      )}
     >
       <div
         className={cn(

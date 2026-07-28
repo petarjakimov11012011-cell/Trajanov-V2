@@ -25,10 +25,10 @@ export function DropLiveBanner({
         <span className="bg-on-mustard absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" />
         <span className="bg-on-mustard relative inline-flex h-2.5 w-2.5 rounded-full" />
       </span>
-      <span className="font-display text-sm font-bold uppercase tracking-[0.08em] sm:text-base">
+      <span className="font-display text-small font-bold uppercase tracking-[0.08em] sm:text-base">
         {t('live')}
       </span>
-      <span className="tabular ml-auto text-sm font-semibold">
+      <span className="tabular ml-auto text-small font-semibold">
         {t('remaining', {count: remaining})}
       </span>
     </div>
@@ -41,7 +41,7 @@ export function DropEndedBanner({className}: {className?: string}) {
   return (
     <div
       className={cn(
-        'bg-surface text-muted-foreground border-border flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-[var(--radius-md)] border px-4 py-3 text-sm',
+        'bg-surface text-muted-foreground border-border flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-[var(--radius-md)] border px-4 py-3 text-small',
         className,
       )}
       role="status"

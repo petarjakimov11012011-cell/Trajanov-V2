@@ -85,7 +85,7 @@ export function CartView() {
               <h3 className="font-display text-foreground font-semibold">
                 {tp('productName')} {pad2(l.productIndex)}
               </h3>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-small">
                 {t('size')}: {l.size}
               </p>
               <div className="mt-1">
@@ -128,15 +128,15 @@ export function CartView() {
       {/* summary */}
       <div className="bg-surface flex flex-col gap-4 rounded-[var(--radius-lg)] p-5 lg:sticky lg:top-20">
         {atCap && (
-          <p className="border-border-strong bg-mustard-tint-6 text-foreground rounded-[var(--radius-md)] border px-3 py-2 text-sm">
+          <p className="border-border-strong bg-mustard-tint-6 text-foreground rounded-[var(--radius-md)] border px-3 py-2 text-small">
             {t('capNotice')}
           </p>
         )}
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-small">
           <span className="text-muted-foreground">{t('subtotal')}</span>
           <Placeholder>{tp('price')}</Placeholder>
         </div>
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-small">
           <span className="text-muted-foreground">{t('shipping')}</span>
           <span className="text-muted-foreground">{t('shippingValue')}</span>
         </div>

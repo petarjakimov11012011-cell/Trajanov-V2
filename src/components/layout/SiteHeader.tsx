@@ -162,15 +162,17 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
     'text-foreground inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] transition-colors duration-[var(--motion-fast)] hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring';
 
   // The overlay's stacked rows: large, left-aligned, a LEFT vertical accent on the active one (D-2.15-4).
-  // A plain template string, NOT cn(): tailwind-merge treats the custom `text-h2` utility as a text-colour
-  // and would drop it when a `text-foreground` / `text-muted-foreground` follows through the merge, shrinking
-  // the row to the 16px default. The rest of the codebase writes `text-h2 text-foreground` as a plain string
-  // for exactly this reason (font-size + colour are different CSS properties and never truly conflict).
+  // This used to be hand-concatenated rather than cn(), because tailwind-merge filed the custom `text-h2`
+  // utility as a text-colour and dropped it whenever `text-foreground` / `text-muted-foreground` followed —
+  // shrinking the row to the 16px default. src/lib/utils.ts now registers the brand sizes under `font-size`
+  // (D-2.25-1), so a size and a colour no longer collide and cn() is safe here again.
   const overlayRow = (active: boolean) =>
-    'font-display text-h2 flex min-h-11 items-center gap-3 border-l-2 pl-4 font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ' +
-    (active
-      ? 'text-foreground border-mustard'
-      : 'text-muted-foreground border-transparent hover:text-foreground');
+    cn(
+      'font-display text-h2 flex min-h-11 items-center gap-3 border-l-2 pl-4 font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+      active
+        ? 'text-foreground border-mustard'
+        : 'text-muted-foreground border-transparent hover:text-foreground',
+    );
 
   // The build credit — subordinate, muted; only "Vertex Consulting" is the link (facts.md §11). Rendered
   // in the header bar (desktop) and again, centred, near the bottom of the overlay. A fresh node each call.

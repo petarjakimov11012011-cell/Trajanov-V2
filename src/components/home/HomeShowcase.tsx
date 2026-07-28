@@ -183,8 +183,9 @@ export function HomeShowcase({view}: {view: DropView | null}) {
                   </div>
 
                   <div className="flex flex-col items-start gap-4">
-                    {/* Class strings on the text column are PLAIN strings, not cn(): tailwind-merge
-                        strips a custom text-size utility that precedes a text-colour one (D-Y.05-9). */}
+                    {/* Plain strings, no cn() needed — nothing here is conditional. (The former
+                        reason, that cn() stripped a brand text-size sitting before a text-colour,
+                        was fixed at the root in src/lib/utils.ts — D-2.25-1.) */}
                     <span className="text-muted-foreground text-eyebrow tabular uppercase tracking-[0.14em]">
                       {pad2(i + 1)} / {pad2(total)}
                     </span>

@@ -128,7 +128,7 @@ export function CheckoutForm({siteKey}: {siteKey: string}) {
       {/* summary + turnstile + place order */}
       <div className="bg-surface flex flex-col gap-4 rounded-[var(--radius-lg)] p-5 lg:sticky lg:top-20">
         <h2 className="font-display text-foreground font-bold">{t('summary')}</h2>
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-small">
           <span className="text-muted-foreground">{t('summary')}</span>
           <Placeholder>{tp('price')}</Placeholder>
         </div>
@@ -145,12 +145,12 @@ export function CheckoutForm({siteKey}: {siteKey: string}) {
           {submitting ? (
             <>
               <span className="border-mustard h-5 w-5 animate-spin rounded-full border-2 border-t-transparent" aria-hidden />
-              <span className="text-muted-foreground text-sm">{t('verifying')}…</span>
+              <span className="text-muted-foreground text-small">{t('verifying')}…</span>
             </>
           ) : (
             <>
               <ShieldCheck className="text-mustard h-5 w-5" strokeWidth={1.75} aria-hidden />
-              <span className="text-muted-foreground text-sm">{to('protected')}</span>
+              <span className="text-muted-foreground text-small">{to('protected')}</span>
             </>
           )}
         </div>

@@ -21,7 +21,7 @@ export function StockBadge({
     return (
       <span
         className={cn(
-          'text-muted-foreground inline-flex items-center gap-1.5 text-sm',
+          'text-muted-foreground inline-flex items-center gap-1.5 text-small',
           className,
         )}
       >

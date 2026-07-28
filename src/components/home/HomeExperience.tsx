@@ -222,20 +222,11 @@ export function HomeExperience({view}: {view: DropView | null}) {
             <DropCountdownEyebrow />
             {/* The countdown renders INSIDE the overlay (D-Y.05-7) — the largest type on the page;
                 nothing else in the overlay may be set larger. Behaviour props (target / serverNowMs
-                / onComplete) unchanged from Y.04. The size classes on the wrapper are a MEASURED
-                fix, not styling drift (D-Y.05-9/10): Countdown's own digit/colon spans write
-                `text-countdown` before a text-colour class inside cn(), and tailwind-merge cannot
-                tell a custom font-size utility from a colour, so it strips the size — the digits
-                have computed to 16px since 1.04, on `main` and production too (pre-existing;
-                surfaced by this phase's "largest type in the hero" gate). The spans inherit the
-                size from this wrapper instead. It is `text-h1` below `md:` because the countdown
-                token PHYSICALLY cannot fit a phone: at 390px, four 2ch cells at 13vw + colons +
-                gaps measure 402px — wider than the viewport (the token was born unfittable; the
-                16px bug is why nobody ever saw it clip). From `md:` the row fits and the token
-                applies. Root fix (extendTailwindMerge in src/lib/utils.ts) is out of this phase's
-                file scope. */}
+                / onComplete) unchanged from Y.04. The `text-h1 md:text-countdown` size that used to
+                sit here as a wrapper workaround has moved INTO the component (D-2.25-2), which is
+                the one place that owns the measured `md:` step; the root fix that made the
+                workaround unnecessary is `extendTailwindMerge` in src/lib/utils.ts (D-2.25-1). */}
             <Countdown
-              className="text-h1 md:text-countdown"
               target={view.startsAtMs}
               serverNowMs={view.serverNowMs}
               onComplete={() => {

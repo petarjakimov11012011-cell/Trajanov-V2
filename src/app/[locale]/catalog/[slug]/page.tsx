@@ -107,7 +107,7 @@ export default async function ProductPage({
       {jsonLd && <JsonLd data={jsonLd} />}
       <Link
         href="/catalog"
-        className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-sm transition-colors duration-[var(--motion-fast)]"
+        className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-small transition-colors duration-[var(--motion-fast)]"
       >
         <ArrowLeft className="h-4 w-4" /> {t('Product.back')}
       </Link>
@@ -184,7 +184,7 @@ export default async function ProductPage({
           <h2 className="font-display text-foreground font-bold">
             {t('Product.shipping')}
           </h2>
-          <p className="text-muted-foreground text-sm">{t('Product.shippingBody')}</p>
+          <p className="text-muted-foreground text-small">{t('Product.shippingBody')}</p>
         </section>
       </div>
     </div>
