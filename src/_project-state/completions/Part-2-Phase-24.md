@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-28 |
 | **Branch** | `phase-2.24-instagram-icon` |
-| **PR** | #39 |
+| **PR** | [#39](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/39) — **MERGED** to `main` (merge `43a5384`, 2026-07-28) on Petar's explicit instruction, `D-0-3`: operator-authorised, not Code. Branch deleted, remote + local refs pruned. |
 | **Brief** | Part 2 · Phase 24 · Code (delivered in-session; **no `briefs/Part-2-Phase-24-Code.md` file exists on disk** — see § 3) |
 
 ---
@@ -189,6 +189,22 @@ branch on every cell above.
 | Accessible name unchanged; icon announces nothing | ☑ icon `aria-hidden`, no `<title>`, no `aria-label` added. **Footer name is the handle alone; the rail's is label+handle+note — pre-existing, unchanged (§ 3, item 3).** |
 | `D-2.24-1` appended; `D-2.07-2` **Status line only** changed | ☑ one-line diff on `D-2.07-2` (`Accepted` → `Superseded by D-2.24-1`) |
 | `current-state.md` line 1 byte-identical | ☑ `diff` against `main`'s line 1 → **no output** |
+
+### Production deploy — VERIFIED (2026-07-28, ~1 min after merge)
+
+This merge changes `src/`, so the redeploy is **not** a no-op for the running site.
+
+| Check | Result |
+|---|---|
+| `/`, `/en`, `/kontakt`, `/en/contact` | **200** on all four |
+| New glyph geometry served (`rx="5" ry="5"`, `M16 11.37A4 4 0 1 1 12.63 8`, `x1="17.5" x2="17.51"`) | ☑ 1 icon per Home footer, 2 per Contact page (footer + rail) |
+| Lucide `AtSign` signature (`cx="12" cy="12" r="4"`, its `M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8` path) | ☑ **zero occurrences on all four URLs** |
+| Colour parity, live, 375 + 1280 × MK + EN | ☑ `stroke: rgb(171, 167, 158)` on Instagram, `Mail` **and** `Phone` — all three identical |
+| Box sizes | ☑ 16×16 (footer) / 20×20 (rail) |
+| Row heights vs. the pre-merge baseline | ☑ footer **33.59px**; rail **110.5px @375 / 91px @1280** — pixel-identical |
+| `target="_blank"` + `rel="noopener noreferrer"`, href `https://instagram.com/trajanovv2026` | ☑ both surfaces, both locales |
+| `aria-label` / `<title>` on the icon | ☑ **zero on all four URLs** — it still announces nothing |
+| Console errors / horizontal overflow | ☑ zero / none |
 
 ### Owed to Lazar
 

@@ -12,9 +12,25 @@ Last updated: **2026-07-28** · By: **Claude Code (Phase 2.24 — Instagram glyp
 
 ## Status
 
-**Phase 2.24 — Instagram glyph replaces the `@` icon — CODE COMPLETE (2026-07-28, branch
+**Phase 2.24 — Instagram glyph replaces the `@` icon — COMPLETE (2026-07-28, branch
 `phase-2.24-instagram-icon`; PR [#39](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/39)
-open to `main`, **not merged** — an operator merges, `D-0-3`).**
+**MERGED** to `main`, merge `43a5384`, 2026-07-28, on Petar's explicit instruction — `D-0-3`:
+operator-authorised, not Code; branch deleted, remote + local refs pruned).** **This merge is NOT a
+no-op for the running site** — it changes `src/`, and the merge-triggered redeploy is the moment the
+`@` stops standing in for Instagram on the public site. **Production deploy VERIFIED on
+`https://www.trajanovv.com` (2026-07-28, ~1 min after merge):** `/`, `/en`, `/kontakt` and
+`/en/contact` all serve **200** and carry the new glyph's exact geometry (`rx="5" ry="5"`, the lens
+path `M16 11.37A4 4 0 1 1 12.63 8`, the flash `x1="17.5" x2="17.51"`) — **one icon on each Home
+footer, two on each Contact page** (footer + rail); the Lucide `AtSign` signature (`cx="12" cy="12"
+r="4"` and its `M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8` path) returns **zero occurrences on all
+four URLs**. Measured live in-browser at **375px + 1280px × MK + EN**: computed
+`stroke: rgb(171, 167, 158)` on the Instagram, `Mail` **and** `Phone` icons — **all three identical**;
+boxes **16×16** (footer) / **20×20** (rail); footer social row **33.59px** and rail Instagram row
+**110.5px @375 / 91px @1280** — **pixel-identical to the pre-merge `main` baseline**; zero horizontal
+overflow; **zero console errors**; both links resolve to `https://instagram.com/trajanovv2026` with
+`target="_blank"` + `rel="noopener noreferrer"`; **zero `aria-label` and zero `<title>`** on any of
+the four URLs, so the icon still announces nothing. **Still owed and NOT verifiable from here: #58**
+(Lazar's eyeball — does the mark read as *Instagram* to a human at 16px and 20px on a real screen).
 **Out-of-band, one commit, zero critical-path movement — `NEXT:` on line 1 is byte-unchanged.** The
 site's **two** Instagram links (the footer `СЛЕДИ`/FOLLOW column on every page, and the Contact
 right-hand rail) showed a generic `@` and read as "an email address" at a glance; they now carry a
