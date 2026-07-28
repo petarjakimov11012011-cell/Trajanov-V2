@@ -88,7 +88,7 @@ reviewer — the ones above are a starting proposal, not gospel.
 | **Cart** | Hold, review, proceed | Max 2 units per order enforced here **and** server-side. |
 | **Checkout** | One screen. Name, phone, address, city, notes. | No account. No card. No upsells. Confirm-on-delivery expectation stated plainly. |
 | **About** | The story | Sourced entirely from `facts.md` § 3. It is a genuinely good story and needs no embellishment. |
-| **Contact** | Reach him | Phone + email (email pending). Instagram. **No contact form** — the phone is the channel and adding a form means building a second inbox nobody reads. |
+| **Contact** | Reach him | Phone + email + Instagram, plus a **message form** (name, email, optional subject, message → delivered by email only, no database table). *Amended 2026-07-28 per `D-2.23-1` — the owner reversed the kickoff call "No contact form — the phone is the channel and adding a form means building a second inbox nobody reads"; the accepted downside is a second inbox that must actually be read.* |
 | **Legal** | Terms, Privacy, Shipping & Returns | Hand-written for a Macedonian COD micro-brand. Responsible party per `facts.md` § 1. |
 
 **Not building:** accounts, login, wishlist, product reviews, blog, newsletter, discount codes,

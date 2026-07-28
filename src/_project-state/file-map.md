@@ -181,14 +181,16 @@ Trajanov-V2/
 │   ├── design-handovers/
 │   │   └── Part-1-Phase-02-Handover.md  # current UI spec — read before UI work
 │   ├── i18n/
-│   │   ├── string-inventory.md      # GENERATED (npm run i18n:inventory) — every key/MK/EN/where (2.01, regen Y.05 → 248)
+│   │   ├── string-inventory.md      # GENERATED (npm run i18n:inventory) — every key/MK/EN/where (2.01, regen 2.23 → 272)
 │   │   ├── mk-review-2.02.md        # native-MK review record: 150 strings + 8 URLs + 6 slugs, verdicts + both sign-offs (2.02)
 │   │   ├── mk-review-2.03.md        # native-MK review pack for the 63 new legal strings — signed 2.05 (2.03)
 │   │   ├── mk-review-2.11.md        # native-MK review pack for the 22 new Home-FAQ strings — unsigned (2.11)
 │   │   ├── mk-review-2.12.md        # native-MK review pack for the new Home hero sub-line (one string) — unsigned (2.12)
 │   │   ├── mk-review-y03.md         # native-MK review pack for the 2 photo alt strings — unsigned (Y.03; tree line added Y.04)
 │   │   ├── mk-review-y04.md         # native-MK review pack for the 2 hero CTA strings — unsigned (Y.04)
-│   │   └── mk-review-y05.md         # native-MK review pack for the composite alt string — unsigned (Y.05)
+│   │   ├── mk-review-y05.md         # native-MK review pack for the composite alt string — unsigned (Y.05)
+│   │   ├── mk-review-2.21.md        # native-MK review pack for the 7 showcase strings — unsigned (2.21; tree line added 2.23)
+│   │   └── mk-review-2.23.md        # native-MK review pack — 21 rows incl. 2 REWRITTEN 2.03-stamped Privacy strings — unsigned (2.23)
 │   ├── legal/
 │   │   └── facts-audit-2.03.md      # every rendered claim traced; 2 findings; zero UNSOURCED (2.03)
 │   └── ops/                          # operator runbooks (2.06)
@@ -218,7 +220,7 @@ Trajanov-V2/
 │   │       ├── layout.tsx           # <html>, Rubik+Inter fonts, header/footer, provider
 │   │       ├── page.tsx             # home → HomeExperience (countdown / LIVE) + Home→About link (1.05)
 │   │       ├── about/page.tsx       # STATIC — press story, facts.md §3/§4; setRequestLocale (1.05)
-│   │       ├── contact/page.tsx     # STATIC — phone/IG + email placeholder, no form/address (1.05)
+│   │       ├── contact/page.tsx     # STATIC — 2.23: message form (client island) + 3-row rail from social.ts; no address (facts §1)
 │   │       ├── terms/page.tsx         # STATIC — Terms of sale; Vladimir alone (D-2.03-1); no statute (2.03)
 │   │       ├── privacy/page.tsx       # STATIC — Privacy; fields match orders schema; no cookie banner (2.03)
 │   │       ├── shipping-returns/page.tsx  # STATIC — reuses ShippingNotice; 2 visible placeholders (2.03)
@@ -241,6 +243,7 @@ Trajanov-V2/
 │   │   ├── product/                # ProductCard, BuyButton, SizePicker, AddToCartPanel (add-to-cart, 1.06), SpotlightCard (pointer glow, 2.10)
 │   │   ├── cart/                   # CartView, cart-store (sessionStorage useSyncExternalStore, 1.06)
 │   │   ├── checkout/               # CheckoutField, CheckoutForm, Turnstile (real widget, 1.04)
+│   │   ├── contact/                # ContactForm — CheckoutForm-patterned message form (2.23)
 │   │   ├── layout/                 # SiteHeader, SiteFooter, LanguageSwitch
 │   │   ├── legal/                  # LegalPage + LegalSection — shared shell for the 3 legal pages (2.03, D-2.03-3)
 │   │   ├── seo/                    # JsonLd — renders a JSON-LD <script> (2.04)
@@ -277,8 +280,12 @@ Trajanov-V2/
 │   │   │   └── ip.ts                # server-only rate-limit RPC call (1.04)
 │   │   ├── turnstile/
 │   │   │   └── verify.ts            # server-only Cloudflare Siteverify (1.04)
-│   │   └── email/                  # Resend side channel — order notification (Z.01)
-│   │       └── order-notification.ts # MK composer + best-effort sender; never throws, bounded (Z.01)
+│   │   ├── contact/                # contact-form pipeline (2.23)
+│   │   │   ├── process-contact.ts   # PURE: validate (caps, email shape, header-injection reject) + turnstile→validate→send; vitest-importable
+│   │   │   └── actions.ts           # "use server" sendContact — thin wrapper; exports the action ONLY (D-2.23-4)
+│   │   └── email/                  # Resend senders (Z.01, 2.23)
+│   │       ├── order-notification.ts # MK composer + best-effort sender; never throws, bounded (Z.01)
+│   │       └── contact-message.ts   # contact sender — replyTo visitor, „[Контакт]" prefix; result NOT advisory (2.23)
 │   │
 │   ├── config/                     # typed drop config (1.04, D-0-4)
 │   │   ├── schema.ts                # DropConfig/ProductConfig types + validators + constants
@@ -331,7 +338,10 @@ Trajanov-V2/
 │   ├── cart/
 │   │   └── cart.test.ts            # PURE cart reducer: choice recorded, 2-unit cap, toOrderItems boundary (1.06)
 │   ├── email/
-│   │   └── order-notification.test.ts # Z.01 sender — Resend MOCKED, no DB: sends once/right fields, throw+missing-env degrade, no PII in logs
+│   │   ├── order-notification.test.ts # Z.01 sender — Resend MOCKED, no DB: sends once/right fields, throw+missing-env degrade, no PII in logs
+│   │   └── contact-message.test.ts  # 2.23 sender — Resend MOCKED: compose/prefix, replyTo, success + send_error/timeout/unconfigured/exception, no PII
+│   ├── contact/
+│   │   └── process-contact.test.ts  # 2.23 pipeline — PURE: caps, email shape, header-injection reject, turnstile fail-closed, no sent:true unconfirmed
 │   ├── concurrency/
 │   │   ├── oversell.test.ts        # 10 orders / 3 units → exactly 3 succeed, 7 insufficient_stock
 │   │   └── expiry.test.ts          # stock returned exactly once, incl. 2 concurrent sweeps
@@ -422,3 +432,4 @@ On every phase that adds, moves, or deletes a file:
 | 2026-07-26 | Y.04 (Code) | **Home hero photography.** New: `docs/i18n/mk-review-y04.md` (**unsigned**, 2 CTA strings), `completions/Part-2-Phase-Y04-Completion.md`, `briefs/Part-2-Phase-Y04-Code.md`. Modified: `src/components/home/HomeExperience.tsx` (photo block + 2 CTAs in the countdown/ended/no-view branches; **`live` branch byte-unchanged**, rendered `<main>` at `?preview=live` byte-identical to `main`'s both locales; `browseWhileWait` link retired `D-Y.04-2`), `src/messages/{mk,en}.json` (**+2 keys**: `Home.ctaCatalog`/`ctaContact`), `docs/i18n/string-inventory.md` (regen **245→247**), `Decisions.md` (`D-Y.04-1…5` + `D-1.05-4` Status → Superseded), `current-state.md` (line 1, owed #41–43, placeholder note, Known Issue #4 line item), this file (incl. the stale-missing `mk-review-y03.md` tree line). **Zero files under `public/` — no new asset (`D-0-6`); no `supabase/`, `create_order`, `expire_reservations`, cart, checkout, `src/config/`, `src/lib/drop/`, `globals.css`, `PhotoSlot.tsx`, `product-images.ts`, `HomeFaq`, header/footer, or npm dependency touched.** `D-Y.04-*`. | Claude Code |
 | 2026-07-27 | Y.05 (Code) | **Home hero: full-bleed photograph with overlaid CTAs.** New: `public/images/lifestyle/trio-composite-01.webp` (1672×941, 16:9, 184,756 B WebP — three-panel composite of the same three §8.1-permitted frames, serif TRAJANOV burned in; renders ≥640px), `docs/i18n/mk-review-y05.md` (**unsigned**, 1 string), `completions/Part-2-Phase-Y05-Completion.md`. Modified: `src/components/home/HomeExperience.tsx` (the ONLY component — `HeroPhotos` → `Hero` with image/scrim/content layers; `HERO_FRAME_OFF_WHITE` deleted, `HERO_FRAME_COMPOSITE` added; rendered `Home.headline` retired `D-Y.05-1`; `sr-only` H1 in the three non-live branches `D-Y.05-2`; countdown size restored at call site over the pre-existing tailwind-merge strip `D-Y.05-9/10`; **`live` branch byte-unchanged**, rendered `<main>` at `?preview=live` sha-identical to `main`'s both locales), `src/messages/{mk,en}.json` (**+1 key**: `Product.photoAltComposite`), `docs/i18n/string-inventory.md` (regen **247→248**; `Home.headline` flagged retired), `Decisions.md` (`D-Y.05-1…12`), `current-state.md` (line 1, owed #44–47, placeholder note, registers), this file. **No `supabase/`, `create_order`, `expire_reservations`, cart, checkout, `src/config/`, `src/lib/drop/`, `src/lib/product-images.ts`, `globals.css`, `facts.md`, `brand.md`, or npm dependency touched** (diff-proven). `D-Y.05-*`. | Claude Code |
 | 2026-07-27 | 2.21 (Code) | **Home showcase — the pieces under the hero.** New: `src/components/home/HomeShowcase.tsx` (client carousel — stacked slides with `aria-hidden`+`inert`, 6s autoplay + WCAG 2.2 SC 2.2.2 pause set incl. a JS reduced-motion stop, swipe, labelled progress bar; images carry NO `priority`/`loading`/`fetchPriority`), `src/lib/showcase.ts` (pure slide source — photo REQUIRED, `live` → `[]`; `wrapIndex`), `tests/home/showcase.test.ts` (new `tests/home/` dir — 13 pure assertions, no DB), `docs/i18n/mk-review-2.21.md` (**unsigned**, 7 strings), `completions/Part-2-Phase-21-Completion.md`. Modified: `src/app/[locale]/page.tsx` (mount between `<HomeExperience>` and `<HomeFaq>`), `src/app/globals.css` (scoped `.showcase-*` block after `.faq-item` — tokens only; `--showcase-autoplay` is set INLINE by the component, not a `:root` token, `D-2.21-6`), `src/messages/{mk,en}.json` (**+7 `Showcase` keys**), `docs/i18n/string-inventory.md` (regen **248→255**; `Home.browseWhileWait` resolves to `HomeShowcase.tsx` again), `Decisions.md` (`D-2.21-1…7`), `current-state.md` (line 1, status, Built, owed #48–50, placeholder #4 Page column), this file. **`HomeExperience.tsx` byte-unchanged (diff-proven); live `<main>` sha256-identical to `main`'s both locales; no `public/`, `HomeFaq.tsx`/`faq.ts`, `product-images.ts`, `PhotoSlot.tsx`, `ProductCard.tsx`, `src/config/`, `supabase/`, `src/lib/drop/`, `next.config.ts`, `facts.md`, `brand.md`, or npm dependency touched.** `D-2.21-*`. | Claude Code |
+| 2026-07-28 | 2.23 (Code) | **Contact page: message form + contact rail.** New: `src/components/contact/ContactForm.tsx` (client form — CheckoutField ×4, fresh Turnstile token at submit, caps mirrored from `CONTACT_CAPS`, consent line → locale-aware Privacy `Link`, success ONLY on a confirmed send, catches a rejected action `D-2.23-5`), `src/lib/contact/process-contact.ts` (PURE pipeline: Turnstile → validate → send; caps 100/200/150/4000, exported `EMAIL_SHAPE`, header-injection rejection), `src/lib/contact/actions.ts` ("use server" thin wrapper — exports the action ONLY, `D-2.23-4`), `src/lib/email/contact-message.ts` (second Resend sender — from `ORDER_FROM_ADDRESS`, to `ORDER_NOTIFICATION_EMAIL`, `replyTo` visitor, „[Контакт]" prefix, 8s ceiling, result NOT advisory), `tests/contact/process-contact.test.ts` (new `tests/contact/` dir), `tests/email/contact-message.test.ts`, `docs/i18n/mk-review-2.23.md` (**unsigned**, 21 rows), `completions/Part-2-Phase-23-Completion.md`, `briefs/Part-2-Phase-23-Code.md`. Modified: `src/app/[locale]/contact/page.tsx` (rebuilt — two-column static page, 3-row rail from `social.ts`, `max-w-2xl`→`max-w-6xl`), `src/app/[locale]/privacy/page.tsx` (new `LegalSection` between collect and why), `src/messages/{mk,en}.json` (**+17 keys**: 15 `Contact` + 2 `Privacy`; **4 rewrites**: `Privacy.collectBody`/`deleteBody` + `Meta.contactDescription`/`privacyDescription` `D-2.23-3`), `Trajanov-V2-Plan.md` (§4 Contact row amended, `D-2.23-1`), `docs/i18n/string-inventory.md` (regen **255→272**), `Decisions.md` (`D-2.23-1…7`), `current-state.md` (status, Built, Components, Resend row, owed #53–57; **`NEXT:` unchanged**), this file. **No `supabase/`, migration, `create_order`, `expire_reservations`, cart, checkout order path, `src/config/`, `SiteFooter`/`SiteHeader`/`HomeExperience`/`HomeShowcase`/`CheckoutForm`/`CheckoutField`/`Turnstile`, `product-images.ts`, `next.config.ts`, `facts.md`, `brand.md`, `site.ts`, or npm dependency touched (diff-proven).** `D-2.23-*`. | Claude Code |

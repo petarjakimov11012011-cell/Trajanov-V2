@@ -23,12 +23,16 @@ export async function generateMetadata({
   });
 }
 
-// Privacy — a STATIC editorial page (D-2.03, Task 4). The list of collected fields matches the actual
-// `orders` table columns in supabase/migrations/20260715021215_schema.sql: customer_name, phone, city,
-// address, notes — and NO email (there is no email field; D-Z.01-1). "Raw IP never stored, one-way
-// hash" matches src/lib/rate-limit/hash.ts (D-1.04-7/14). No cookie banner and no consent UI: the site
-// sets no analytics/advertising cookies (Decision 4). Responsible party: Vladimir Trajanov, Strumica,
-// alone (D-2.03-1). Deletion is by phone (src/lib/social.ts) — no invented form, email, or portal.
+// Privacy — a STATIC editorial page (D-2.03, Task 4). The ORDER list of collected fields matches the
+// actual `orders` table columns in supabase/migrations/20260715021215_schema.sql: customer_name,
+// phone, city, address, notes — the order path still has no email field (D-Z.01-1). Since 2.23 the
+// CONTACT FORM additionally collects name, email, optional subject and message — delivered as one
+// email to Vladimir, never stored in the site's database (brief 2.23 Decision 2) — described in its
+// own section below so the order sections stay accurate about orders (brief 2.23 Decision 7). "Raw IP
+// never stored, one-way hash" matches src/lib/rate-limit/hash.ts (D-1.04-7/14). No cookie banner and
+// no consent UI: the site sets no analytics/advertising cookies (Decision 4). Responsible party:
+// Vladimir Trajanov, Strumica, alone (D-2.03-1). Deletion: by phone, or for contact-form messages by
+// replying in the email thread.
 export default async function PrivacyPage({
   params,
 }: {
@@ -55,6 +59,12 @@ export default async function PrivacyPage({
     >
       <LegalSection heading={t('collectHeading')}>
         <p>{t('collectBody')}</p>
+      </LegalSection>
+
+      {/* The contact form's data path (2.23) — its own self-contained section (what, why, where it
+          goes, not stored), so the order sections below keep describing orders only. */}
+      <LegalSection heading={t('contactFormHeading')}>
+        <p>{t('contactFormBody')}</p>
       </LegalSection>
 
       <LegalSection heading={t('whyHeading')}>

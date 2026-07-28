@@ -4389,3 +4389,111 @@ start at `D-2.01-6`.*
   `src/config/drops.ts` and biting every phase, and the behaviour evidence is simulation, not real
   hardware; the real-device read is owed row #51.
 - **Links:** `D-2.21-7` · `D-Y.05-12` · Phase 2.22 completion report §5
+---
+### D-2.23-1 · 2026-07-28 · The contact form ships — reversing Plan §4 "No contact form"
+- **Status:** Accepted
+- **Decided by:** The owner, via Lazar (2026-07-28), baked into the Phase 2.23 brief (decision 1);
+  logged by Claude Code as instructed.
+- **Decision:** The Contact page carries a real message form (Name / Email / Subject-optional /
+  Message → Turnstile → validate → one email to `ORDER_NOTIFICATION_EMAIL` with `replyTo` = the
+  visitor). This reverses `Trajanov-V2-Plan.md` §4's Contact row ("No contact form — the phone is
+  the channel"); the row is amended in place with this ID, the old sentence quoted, not deleted.
+- **Alternative rejected:** keep the phone + email links only (the kickoff call).
+- **Downside accepted:** a second inbox that must actually be read, a new PII surface on a site run
+  by a minor, free-to-send spam exposure (bounded by Turnstile + hard length caps, deliberately NOT
+  the order rate limiter — brief decision 4), and a mandatory rewrite of two native-reviewed
+  Privacy strings (see the 2.23 review pack).
+- **Links:** Phase 2.23 brief (decisions 1–4) · `Trajanov-V2-Plan.md` §4 · owed row (Lazar's
+  sign-off that the form is what he wants living on the site)
+---
+### D-2.23-2 · 2026-07-28 · The form reuses five already-reviewed strings instead of minting Contact twins
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Decision:** The required-field error (`Checkout.errorRequired`), the submitting line
+  (`Checkout.verifying`), the bot-protection label (`Order.protected`), the failed-check message
+  (`Order.turnstileFailed`) and the generic error (`Order.genericError`) are REUSED in the contact
+  form. Only genuinely new copy got new keys (15 `Contact.*`).
+- **Alternative rejected:** duplicate them as `Contact.*` keys with identical text.
+- **Downside accepted:** cross-namespace coupling — rewording a Checkout/Order string for
+  checkout-specific reasons silently rewords the contact form too. Accepted because the duplicated
+  alternative drifts the two copies apart the first time one is reviewed alone, which is worse.
+- **Links:** `src/components/contact/ContactForm.tsx` · `docs/i18n/mk-review-2.23.md` §3 count check
+---
+### D-2.23-3 · 2026-07-28 · Both Meta descriptions rewritten — the brief's Decision 7 named only the two Privacy bodies
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Decision:** `Meta.privacyDescription` (MK+EN) said „без е-пошта" / "no email" — a THIRD live
+  statement that becomes false the moment the form ships, exactly the class of contradiction the
+  brief's report-§3 instruction exists to catch. It is rewritten („…кога нарачуваш или ни
+  пишуваш…"). `Meta.contactDescription` is also rewritten to mention the message form it now
+  describes. Both are in the 2.23 MK review pack.
+- **Alternative rejected:** leave the meta descriptions untouched and only report the finding
+  (ships a false public statement for at least one more phase).
+- **Downside accepted:** two strings changed beyond the brief's literal list, and two more rows for
+  the reviewers.
+- **Links:** Phase 2.23 brief (hard stop 1, report §3) · `docs/i18n/mk-review-2.23.md` §3
+---
+### D-2.23-4 · 2026-07-28 · The action is a thin wrapper over a pure pipeline module — and exports nothing but the action
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — the `process-order.ts` convention, plus a defect found
+  in verification.
+- **Decision:** Validation + orchestration live in `src/lib/contact/process-contact.ts` (pure,
+  injected deps, 25 unit assertions); `src/lib/contact/actions.ts` ("use server") only wires
+  `verifyTurnstile` + `sendContactMessage`. The first cut also re-exported the two types from
+  actions.ts — Next's server-actions loader compiles EVERY export of a "use server" module into an
+  action reference, so the type-only export (erased by TypeScript) crashed the module at runtime
+  with `ReferenceError: ContactInput is not defined` (a 500 on every submit; tsc/build both green).
+  The re-export is removed; types are imported from `process-contact.ts`.
+- **Alternative rejected:** validation inline in the "use server" file (unit tests would then drag
+  in `server-only` imports); keeping the type re-export (crashes at runtime).
+- **Downside accepted:** one more file, and client/type imports must point at the sibling module,
+  not the action file.
+- **Links:** `src/lib/orders/process-order.ts` (the convention) · `tests/contact/process-contact.test.ts`
+---
+### D-2.23-5 · 2026-07-28 · The form catches a rejected action call — a deliberate divergence from CheckoutForm
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot, after verification caught the stuck state live.
+- **Decision:** `ContactForm` wraps the `sendContact` await in try/catch; a rejection (network
+  drop, server crash — including the D-2.23-4 500 before its fix) renders the send-failed state
+  pointing at the phone and the email. Without it the button is stranded on „Се испраќа…" forever.
+  CheckoutForm, which this form is modelled on, does NOT catch action rejections.
+- **Alternative rejected:** mirror CheckoutForm exactly (the brief's "same submit shape" read
+  literally).
+- **Downside accepted:** the same latent stuck-submit defect remains in CheckoutForm itself —
+  out of scope here (`CheckoutForm.tsx` is on the byte-unchanged list), surfaced in the completion
+  report §3 instead of quietly fixed.
+- **Links:** `src/components/contact/ContactForm.tsx` · Phase 2.23 completion report §3
+---
+### D-2.23-6 · 2026-07-28 · Length caps are validated at submit, not typed-input-limited — CheckoutField ships unchanged
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Decision:** `CheckoutField` has no `maxLength` passthrough and the brief forbids modifying it.
+  The client mirrors the server's caps (imported from `CONTACT_CAPS` — one source, no drift) in its
+  submit-time validation and renders `Contact.errorTooLong` per field; the server remains the
+  authority and rejects over-cap input outright.
+- **Alternative rejected:** a local wrapper re-implementing the field to add `maxLength` (the
+  brief's fallback) — a second field implementation to keep in sync forever, bought only to move
+  the same feedback a few seconds earlier.
+- **Downside accepted:** a visitor pasting a 5,000-character message learns it is too long at
+  submit, not while typing.
+- **Links:** Phase 2.23 brief (Task 3, scope note) · `src/lib/contact/process-contact.ts`
+---
+### D-2.23-7 · 2026-07-28 · Verification maneuvers: temporary axe route, transition-freeze reads, programmatic focus-visible
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — the `D-2.21-7`/`D-2.22-5` lineage.
+- **Decision:** (a) axe-core ran IN-BROWSER on `/kontakt` + `/en/contact` (zero violations of any
+  impact) by serving `node_modules/axe-core/axe.min.js` as `public/__axe-temp.js` for the duration
+  of the check — file deleted before anything was staged, `git status` clean. (b) The permanently
+  hidden preview pane freezes CSS transitions at their start value, so computed-style colour reads
+  (error border, status text) were taken with the element's transition disabled for the read and
+  restored after — the frozen read had shown the pre-error border colour and was discarded as a
+  measurement artifact, not a defect. (c) The pane does not traverse focus on synthesized Tab, so
+  the keyboard walk was proven as: every control tabbable + visible + zero clipping ancestors, the
+  global `:focus-visible { outline: 2px solid var(--color-focus-ring) }` rule present, programmatic
+  focus confirmed matching `:focus-visible` per element class (field → 2px mustard border, button →
+  the ground-offset `#F2C55A` box-shadow ring, rail link → the 2px `#F2C55A` outline at 2px offset).
+- **Alternative rejected:** skipping axe (the brief requires zero serious/critical), or claiming a
+  real Tab walk the pane cannot perform.
+- **Downside accepted:** keyboard evidence is per-element simulation, not a hand on a keyboard; the
+  real-device read goes on the owed register (row #55).
+- **Links:** `D-2.21-7` · `D-2.22-5` · Phase 2.23 completion report §5

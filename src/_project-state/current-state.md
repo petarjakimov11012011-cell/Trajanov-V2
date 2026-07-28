@@ -6,11 +6,90 @@ NEXT: **Y.01** (drop content load) + the placeholder register to **zero** before
 every brief. Nobody's memory outranks it. Line 1 is always the `NEXT:` line — Code updates it when
 closing every phase.
 
-Last updated: **2026-07-27** · By: **Claude Code (Phase 2.22 — Showcase controls: chromeless)**
+Last updated: **2026-07-28** · By: **Claude Code (Phase 2.23 — Contact page: message form + contact rail)**
 
 ---
 
 ## Status
+
+**Phase 2.23 — Contact page: message form + contact rail — CODE COMPLETE (2026-07-28, branch
+`phase-2.23-contact-form`; PR [#38](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/38)
+open to `main` — operator merges, not Code, `D-0-3`).** Out-of-band
+phase; does **not** advance the critical path (the `NEXT:` line is unchanged — Y.01 and the 2.06
+operator half remain next). The Contact page is now a real two-column page: **message form left,
+contact rail right** (~60/40 at `lg:`+, measured 624/416px = 1.50 at 1024 and 1280; stacked
+form-first at 320/390/768), still **static** (`● SSG` both locales — the form is a client island,
+no DB read, no `force-dynamic`). **The form ships on the owner's reversal of Plan §4 „No contact
+form" (`D-2.23-1`)** — the Plan's Contact row is amended in place, old sentence quoted, not
+deleted. Delivery is **email only, no database table** (brief decision 2 — „Auto-expose new
+tables" is still ON, `D-1.07-14`): `ContactForm` (modelled on CheckoutForm — same fresh-token-at-
+submit `D-1.04-8`, same `CheckoutField`s, same error/success discipline) → `sendContact` ("use
+server", thin) → `processContact` (pure, injected deps, the `process-order.ts` convention) runs
+**Turnstile → validate → send, failing closed at every step**: server-side length caps
+**100/200/150/4000** (rejection, not truncation — client mirrors them via the same imported
+`CONTACT_CAPS`), pragmatic email shape (same exported regex both sides), and **header-injection
+rejection** (`\r`/`\n` + all control chars refused in name/email/subject — those three reach email
+headers; the message body may contain newlines). The sender (`src/lib/email/contact-message.ts`,
+mirroring `order-notification.ts`: env at call time, never throws, 8s ceiling, no `server-only`)
+sends **from `ORDER_FROM_ADDRESS` (imported, never retyped) to `ORDER_NOTIFICATION_EMAIL` with
+`replyTo` = the visitor**, subject prefixed **„[Контакт]"** so contact mail sorts away from
+„Нова нарачка" order mail — and **unlike the order sender its result is NOT advisory**: the email
+IS the record, so the UI renders success **only** on a Resend-confirmed send; every failure branch
+(unconfigured/send_error/timeout/exception, all unit-tested with Resend mocked) renders the
+failure state pointing at the phone and the email (verified live in both locales against the
+unconfigured branch — no Resend key exists locally, so no real email could send). **The order rate
+limiter is deliberately NOT reused** (brief decision 4 — contact attempts must never eat a
+customer's drop-day order slots); Turnstile is the bot gate, the caps bound the damage. The rail
+carries **exactly three rows — Phone, Email, Instagram** — all from `src/lib/social.ts`, with the
+`AtSign`-for-Instagram substitution (`D-2.07-2`), rows ≥44px (measured 91/70/111px at 320), the
+existing `context` line at the rail foot, and the consent line under the button linking the
+**locale-aware** Privacy route (MK `/privatnost` / EN `/en/privacy`, via the i18n `Link` — brief
+decision 9, never a hand-typed href).
+**The Privacy page is corrected in the same PR (brief decision 7, hard stop 1):**
+`Privacy.collectBody` rewritten (order-scoped, true again), a **new self-contained section**
+(`contactFormHeading`/`contactFormBody` — what the form collects, used only to reply, **not stored
+in the site's database**) rendered via the existing `LegalSection` between the order-collect and
+Why sections, and `Privacy.deleteBody` rewritten (delete by phone **or** a reply in the email
+thread) — verified live: the false claims („Не собираме е-пошта", „Нема формулар") have **zero
+occurrences** in either locale's rendered page. **A THIRD false-once-this-ships statement was
+found and fixed (`D-2.23-3`):** `Meta.privacyDescription` said „без е-пошта"/"no email" — both
+Meta descriptions (privacy + contact) rewritten in both catalogs and added to the review pack.
+**Two defects found by verification, fixed in-phase:** (a) a type-only re-export from the
+"use server" module crashed every submit with a 500 (`ReferenceError` at runtime; tsc/build green
+— Next compiles every export of an actions file into an action reference, `D-2.23-4`); (b) the
+form now catches a rejected action call instead of stranding the button on „Се испраќа…"
+(`D-2.23-5` — CheckoutForm carries the same latent defect, surfaced in report §3, NOT quietly
+fixed there). **17 new strings MK+EN** (15 `Contact` + 2 `Privacy`; identical key sets, parity
+suite green; humanizer run — nothing fired), inventory **255→272**;
+`docs/i18n/mk-review-2.23.md` committed **unsigned** covering **21 rows** incl. the two rewritten
+native-stamped Privacy strings and both Meta rewrites (owed **#56**). **Contrast measured, not
+assumed** (transition-freeze artifact of the hidden pane worked around by disabling the transition
+for the read, `D-2.23-7`): labels + consent + rail sub-lines **7.85:1**, error text **7.49:1**,
+error border **6.32:1** vs field fill / **7.49:1** vs ground, default field border **3.01:1** vs
+fill / **3.57:1** vs ground (≥3 floor, the shipped 1.06 treatment), submit label on mustard
+**9.26:1**, rail values + consent link **15.42:1**, Turnstile-box text **7.31:1**; no placeholder
+text is rendered anywhere on the page. **axe: ZERO violations of any impact on `/kontakt` and
+`/en/contact`** (real in-browser run via a temporary `public/__axe-temp.js`, deleted before
+staging, `D-2.23-7`); **exactly one `<h1>`**, rail heading the only `<h2>`; every control tabbable
+with zero clipping ancestors, fields → 2px mustard focus border, button → the `#F2C55A`
+ground-offset ring, links → the global 2px `#F2C55A` outline (programmatic `:focus-visible`
+verification — the pane cannot traverse focus on synthesized Tab, `D-2.23-7`); **zero horizontal
+overflow at 320/390/768/1024/1280, both locales; zero console errors** (the known MK-price
+hydration warning does not fire on this route). Empty-required submit shows per-field errors and
+provably makes **zero network calls**; a Turnstile-unresolved submit is refused with the retry
+message, also zero calls. Gates: build / `tsc --noEmit` / lint clean; `npm test` **154/154**
+(129 + 25 new: validation incl. every cap edge + header-injection + fail-closed order, sender
+success/send_error/timeout/unconfigured/exception with **no PII in any log line**) incl.
+`✓ 10 simultaneous orders against 3 units → exactly 3 succeed`; **zero** hex / `rgb(` / `hsl(` /
+raw-ms / raw-easing literals in the diff; out-of-scope list byte-unchanged (diff-proven —
+`SiteFooter`/`SiteHeader`/`HomeExperience`/`HomeShowcase`/`CheckoutForm`/`CheckoutField`/
+`Turnstile`/`src/config/`/`supabase/`/orders/drop/cart paths/`package.json`+lockfile/`facts.md`/
+`brand.md`/`site.ts` all untouched); **no new dependency, no new table, no migration**. Decisions
+`D-2.23-1…7`. New owed **#53** (a real message delivers end-to-end on production, Reply goes back
+to the sender) **#54** (Turnstile renders + solves on the real-domain `/kontakt`) **#55** (the
+page on a real phone — tappable fields, keyboard doesn't cover submit) **#56** (MK review signed —
+21 rows) **#57** (Lazar's sign-off that a contact form is what he wants on the site). Placeholder
+register **unchanged** — no row added, cleared, or touched.
 
 **Phase 2.22 — Showcase controls: chromeless — COMPLETE (2026-07-27, branch
 `phase-2.22-showcase-controls`; PR [#37](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/37) **MERGED** to `main`, merge `a32ee5f`, 2026-07-27, on
@@ -1875,6 +1954,22 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 
 ## Built
 
+### Contact form + rail (2.23) — a way to write to Vladimir
+- `/kontakt` · `/en/contact` rebuilt: two columns at `lg:`+ (form 60 / rail 40), stacked form-first
+  below; still static SSG — the form is a client island.
+- `src/components/contact/ContactForm.tsx` — CheckoutForm-patterned client form (CheckoutField ×4,
+  fresh Turnstile token at submit, per-field errors, caps mirrored from `CONTACT_CAPS`, consent
+  line → locale-aware Privacy link). Success renders ONLY on a Resend-confirmed send.
+- `src/lib/contact/process-contact.ts` — pure pipeline (Turnstile → validate → send), injected
+  deps, unit-tested: caps 100/200/150/4000, email shape, `\r`/`\n` + control-char rejection in
+  name/email/subject (header-injection), newlines allowed in the body.
+- `src/lib/contact/actions.ts` — "use server" thin wrapper; exports the action only (`D-2.23-4`).
+- `src/lib/email/contact-message.ts` — second Resend sender: from `ORDER_FROM_ADDRESS`, to
+  `ORDER_NOTIFICATION_EMAIL`, `replyTo` = visitor, subject prefix „[Контакт]", plain text, 8s
+  ceiling, never throws — result NOT advisory (the email is the record; no DB table by design).
+- Privacy corrected in the same PR: `collectBody`/`deleteBody` rewritten, new contact-form section
+  rendered, both `Meta` descriptions fixed (`D-2.23-3`); Plan §4 Contact row amended (`D-2.23-1`).
+
 ### Home showcase (2.21) — the pieces, under the hero
 
 - **`src/lib/showcase.ts`** — pure, no React, no I/O; the single source for which products get a
@@ -2385,8 +2480,9 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 - `drop/` — Countdown, DropBanner (live/ended/countdown-eyebrow), StockBadge.
 - `product/` — ProductCard, BuyButton (6 states), SizePicker.
 - `cart/` — CartView (steppers, cap, empty). `checkout/` — CheckoutField, TurnstilePlaceholder,
-  CheckoutForm. `layout/` — SiteHeader, SiteFooter, LanguageSwitch. `system/` — Placeholder,
-  PhotoSlot, PreviewNotice. `home/` — HomeExperience. (`components/ui/` still shadcn-reserved, empty.)
+  CheckoutForm. `contact/` — ContactForm (2.23). `layout/` — SiteHeader, SiteFooter,
+  LanguageSwitch. `system/` — Placeholder, PhotoSlot, PreviewNotice. `home/` — HomeExperience.
+  (`components/ui/` still shadcn-reserved, empty.)
 
 ### Integrations wired
 - **next-intl** — MK default (`/`), EN (`/en/`), `localePrefix: as-needed`; message catalogs
@@ -2396,7 +2492,7 @@ Note: shadcn's default style is Base UI-based (`base-nova`), not Radix — see `
 | Integration | Status |
 |---|---|
 | Supabase | **HOSTED + MIGRATIONS PUSHED + PARITY PROVEN** (1.07 Code) — Frankfurt `eu-central-1`, ref `kmuocwmevyyuhcvwoebf`, **Postgres 17.6**. 8/8 migrations; local == remote. **46/46 tests pass against hosted**, incl. the 10-vs-3 oversell gate; pg_cron = **2 active jobs**; RLS verified with the real anon key; DB left **clean, TRJ-0001**. `test-drop` published (ended, null-priced). **Owed #4 CLOSED.** Legacy keys (`D-1.07-1`) confirmed in use. Admin access via the **session pooler** (`D-1.07-11`, IPv6). ⚠ **"Auto-expose new tables" is still ON** — future tables land anon-writable (`D-1.07-14`); ⚠ **`db reset --linked` is broken here** (`D-1.07-15`). |
-| Resend | **BUILT (Z.01).** SDK `resend 6.17.2`; server-side best-effort order-notification sender in `src/lib/email/order-notification.ts`, fired after `create_order()` succeeds (`D-Z.01-5`), never affecting the order (Plan §8). From `onboarding@resend.dev` (`D-Z.01-2`); recipient in `ORDER_NOTIFICATION_EMAIL`, not published on Contact (`D-Z.01-3`). Unit-tested with **Resend mocked**. ✅ **Real inbox delivery VERIFIED — 1.08 operator (2026-07-18, `D-1.08-4`):** prereqs live (Resend account under Vladimir's email + `RESEND_API_KEY`/`ORDER_NOTIFICATION_EMAIL` in Vercel, redeployed); a real order (`TRJ-0001`) delivered the MK notification to Vladimir's inbox from `onboarding@resend.dev` with the correct order number / line / customer block / COD copy. Register #7 cleared. Branded from-address on `trajanov.com` still owed (#8 → 2.05, `D-Z.01-2`). |
+| Resend | **BUILT (Z.01).** SDK `resend 6.17.2`; server-side best-effort order-notification sender in `src/lib/email/order-notification.ts`, fired after `create_order()` succeeds (`D-Z.01-5`), never affecting the order (Plan §8). From `onboarding@resend.dev` (`D-Z.01-2`); recipient in `ORDER_NOTIFICATION_EMAIL`, not published on Contact (`D-Z.01-3`). Unit-tested with **Resend mocked**. ✅ **Real inbox delivery VERIFIED — 1.08 operator (2026-07-18, `D-1.08-4`):** prereqs live (Resend account under Vladimir's email + `RESEND_API_KEY`/`ORDER_NOTIFICATION_EMAIL` in Vercel, redeployed); a real order (`TRJ-0001`) delivered the MK notification to Vladimir's inbox from `onboarding@resend.dev` with the correct order number / line / customer block / COD copy. Register #7 cleared. Branded from-address on `trajanov.com` still owed (#8 → 2.05, `D-Z.01-2`). **2.23:** a second sender, `src/lib/email/contact-message.ts` — the contact form's messages to the same inbox, from `ORDER_FROM_ADDRESS`, `replyTo` = the visitor, subject prefix „[Контакт]"; **result NOT advisory** (the email is the record — no DB table, brief decision 2). Real end-to-end delivery owed (#53). |
 | Turnstile | **REAL KEYS LIVE IN PRODUCTION** (1.07 Code) — "Trajanov store", **Managed** (`D-1.07-2`), hostnames `trajanov-v2.vercel.app` + `localhost` only (`D-1.07-6`). Deployed `/checkout` serves `0x4AAAAAAD23OFW7Ka1hTR1F`; **no dummy key anywhere in the deployed build** (`D-1.04-8` superseded). Widget **solves on the production hostname**; real token + real secret → Siteverify **`success: true`**. **Owed #5 CLEARED — 1.08 Code (2026-07-18):** the real secret also *rejects* a missing token (`missing-input-response`) and an invalid token (`invalid-input-response`), wrong-secret control → `invalid-input-secret`; `orders=0`, no stock change. Server-side enforcement proven both directions (`D-1.07-7`, `D-1.08-3`). |
 | Cloudflare DNS | Not configured (2.05) |
 | Cloudflare Analytics | Not configured (2.05) |
@@ -2463,6 +2559,11 @@ or before any phase that builds on unverified work, the next phase is a verifica
 | 50 | **Sign-off that the front door still leads with the hero (2.21).** Lazar looks at the deployed home page and answers two things: (a) does the showcase sit **under** the hero rather than competing with it, and (b) is the neutral slot name („Производ 01" / "Product 01") acceptable on the front door until Y.01 fills in real names. **Pass: a yes, or a named change.** Owner: **Lazar**. | 2.21 | **after the 2.21 deploy — before the first real drop** |
 | 51 | **The three chromeless controls on a real phone, `https://www.trajanovv.com` (2.22).** The boxes around prev / next / pause are gone; the buttons keep their full 48×48 hit area (the padding is the tap target) but draw only the glyph. On an actual handset, both locales: tap each of the three several times. **Pass: each is easy to hit first time with a thumb despite having no visible box; nothing looks mis-aligned under the photograph.** The 48×48 rects, the 320px edge fit (hit area starts 4px from the viewport edge, `D-2.22-4`) and all behaviours were measured in the headless pane (`D-2.22-5`), **not on real hardware** — this row is the real-device read. Owner: **Lazar**. | 2.22 | **after the 2.22 deploy — before the first real drop** |
 | 52 | **Lazar's look sign-off on the chromeless row (2.22).** The change is his ask — the bordered boxes read as form furniture next to the full-bleed photograph. He looks at the deployed row (390-ish phone + desktop, both locales, countdown + ended): icons rest muted and light up on hover/focus (`D-2.22-2`), first glyph on the column edge (`D-2.22-4`), progress bar unchanged. **Pass: he confirms this is the "cleaner" he asked for, or names what to change.** Owner: **Lazar**. | 2.22 | **after the 2.22 deploy — before the first real drop** |
+| 53 | **A real contact message delivers end to end on production (2.23).** Send one from `https://www.trajanovv.com/kontakt`. **Pass: it lands in Vladimir's inbox, from `info@trajanovv.com`, subject prefixed „[Контакт]", and pressing Reply addresses the sender's own email.** Code proved every branch with Resend **mocked** and the live failure state against the locally-unconfigured sender — a real delivery needs the production keys, which exist only in Vercel. Owner: **Lazar**. | 2.23 | **after the 2.23 deploy — before the first real drop** |
+| 54 | **Turnstile renders and solves on the real-domain Contact page (2.23).** Load `https://www.trajanovv.com/kontakt`, submit a message. **Pass: the widget appears/resolves and a submit without it is refused.** Locally the documented dummy pass key solved and a sabotaged widget was refused with the retry message (zero server calls) — the real-key render on the real hostname is the owed half, same shape as checkout's row #15. Owner: **Lazar**. | 2.23 | **after the 2.23 deploy — before the first real drop** |
+| 55 | **The Contact page on a real phone (2.23).** Open `/kontakt` on an actual handset, both locales. **Pass: fields are tappable, the on-screen keyboard does not cover the submit button, nothing overflows, and every focusable control shows the ring on an external-keyboard Tab walk.** The pane proved geometry (44px+ targets, zero overflow 320–1280) and per-element `:focus-visible`, but not real hardware and not a real Tab traversal (`D-2.23-7`). Owner: **Lazar**. | 2.23 | **after the 2.23 deploy — before the first real drop** |
+| 56 | **Native MK review of the 2.23 strings — 21 rows (2.23).** `docs/i18n/mk-review-2.23.md`, committed unsigned: 15 new `Contact` strings, 2 new + **2 rewritten** `Privacy` strings (the rewrites were previously stamped in the 2.03 pack — they carry legal weight), and both rewritten `Meta` descriptions. Check specifically: „контакт-форма(та)", the imperative „Испрати"/„Се испраќа…", and „Побарај нè директно" in UPPERCASE. Owner: **Lazar + Petar**. | 2.23 | **before the first real drop (both sign-off boxes filled)** |
+| 57 | **Lazar's sign-off that a contact form is what he wants living on the site (2.23).** The form ships on the owner's reversal of Plan §4 (`D-2.23-1`) relayed through the brief — Lazar looks at the live page and confirms, or it is reverted before the first real drop. The accepted downside stands on the record: a second inbox that must actually be read. Owner: **Lazar**. | 2.23 | **after the 2.23 deploy — before the first real drop** |
 
 *Code verified directly (not owed) in 1.06 — carried forward; the 1.07 Cowork half is ops-only and
 verified no code directly: `npm run build`, `npx tsc --noEmit`, `npm run lint`,

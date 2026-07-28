@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 255 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 272 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -54,8 +54,8 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Checkout.codSummary` | Плаќаш со готовина при преземање. Нема онлајн плаќање. | You pay cash on delivery. No online payment. | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.contact` | Твои податоци | Your details | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.errorPhone` | Внеси валиден телефонски број. | Enter a valid phone number. | `src/components/checkout/CheckoutForm.tsx` |
-| `Checkout.errorRequired` | Ова поле е задолжително. | This field is required. | `src/components/checkout/CheckoutForm.tsx` |
-| `Checkout.name` | Име и презиме | Full name | `src/components/checkout/CheckoutForm.tsx` |
+| `Checkout.errorRequired` | Ова поле е задолжително. | This field is required. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
+| `Checkout.name` | Име и презиме | Full name | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Checkout.note` | Белешка (по избор) | Note (optional) | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.notePlaceholder` | Скала, спрат, ориентир… | Entrance, floor, landmark… | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.phone` | Телефон | Phone | `src/components/checkout/CheckoutForm.tsx` |
@@ -63,7 +63,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Checkout.reserveNote` | Нарачката резервира залиха 48 часа. | Your order reserves stock for 48 hours. | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.summary` | Преглед на нарачката | Order summary | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.title` | Нарачка | Checkout | `src/app/[locale]/checkout/page.tsx` |
-| `Checkout.verifying` | се проверува | verifying | `src/components/checkout/CheckoutForm.tsx` |
+| `Checkout.verifying` | се проверува | verifying | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Common.currency` | ден | MKD | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Common.languageEn` | EN | EN | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.languageMk` | МК | МК | `src/components/layout/LanguageSwitch.tsx` |
@@ -71,13 +71,28 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Common.shippingNotice` | Испорака само во Северна Македонија. Не доставуваме надвор од земјата. Плаќање со готовина при преземање. | We ship inside North Macedonia only. We can't deliver outside the country. Cash on delivery. | `src/components/system/ShippingNotice.tsx` |
 | `Common.skipToContent` | Прескокни до содржината | Skip to content | `src/app/[locale]/layout.tsx` |
 | `Common.switchLanguage` | Промени јазик | Change language | `src/components/layout/LanguageSwitch.tsx` |
+| `Contact.consent` | Со испраќањето се согласуваш податоците да ги користиме само за одговор. Повеќе во <link>политиката за приватност</link>. | By sending, you agree we use your details only to reply. More in the <link>privacy policy</link>. | `src/components/contact/ContactForm.tsx` |
 | `Contact.context` | Струмица, Северна Македонија · Испорака само низ Северна Македонија · Готовина при преземање. | Strumica, North Macedonia · Ships within North Macedonia only · Cash on delivery. | `src/app/[locale]/contact/page.tsx` |
 | `Contact.emailLabel` | Е-пошта | Email | `src/app/[locale]/contact/page.tsx` |
+| `Contact.errorEmail` | Внеси валидна е-пошта. | Enter a valid email address. | `src/components/contact/ContactForm.tsx` |
+| `Contact.errorTooLong` | Предолго — најмногу {max} знаци. | Too long — max {max} characters. | `src/components/contact/ContactForm.tsx` |
 | `Contact.eyebrow` | Контакт | Contact | `src/app/[locale]/contact/page.tsx` |
+| `Contact.formEmail` | Е-пошта | Email | `src/components/contact/ContactForm.tsx` |
+| `Contact.formMessage` | Порака | Message | `src/components/contact/ContactForm.tsx` |
+| `Contact.formName` | Име | Name | `src/components/contact/ContactForm.tsx` |
+| `Contact.formSubject` | Наслов (по избор) | Subject (optional) | `src/components/contact/ContactForm.tsx` |
 | `Contact.h1` | Стапи во контакт. | Get in touch. | `src/app/[locale]/contact/page.tsx` |
 | `Contact.instagramLabel` | Инстаграм | Instagram | `src/app/[locale]/contact/page.tsx` |
 | `Contact.instagramNote` | Тука се објавуваат спуштањата. Ова е главниот канал. | Drops are announced here. This is the main channel. | `src/app/[locale]/contact/page.tsx` |
+| `Contact.intro` | Прати ни порака и ќе ти одговориме по е-пошта. | Send us a message and we'll reply by email. | `src/app/[locale]/contact/page.tsx` |
 | `Contact.phoneLabel` | Телефон | Phone | `src/app/[locale]/contact/page.tsx` |
+| `Contact.phoneNote` | Најбрзиот начин да добиеш одговор. | The fastest way to get an answer. | `src/app/[locale]/contact/page.tsx` |
+| `Contact.railHeading` | Побарај нè директно | Reach us directly | `src/app/[locale]/contact/page.tsx` |
+| `Contact.requiredNote` | Задолжителните полиња се означени со *. | Required fields are marked with *. | `src/components/contact/ContactForm.tsx` |
+| `Contact.send` | Испрати | Send | `src/components/contact/ContactForm.tsx` |
+| `Contact.sendFailed` | Пораката не се испрати. Јави се на {phone} или пиши на {email}. | The message didn't send. Call {phone} or write to {email}. | `src/components/contact/ContactForm.tsx` |
+| `Contact.sending` | Се испраќа… | Sending… | `src/components/contact/ContactForm.tsx` |
+| `Contact.success` | Пораката е испратена. Ќе ти одговориме на е-пошта. | Message sent. We'll reply to your email. | `src/components/contact/ContactForm.tsx` |
 | `Credit.builtBy` | Изработено од <link>Vertex Consulting</link> | Built by <link>Vertex Consulting</link> | `src/components/layout/SiteHeader.tsx` |
 | `Credit.opensInNewTab` | се отвора во нов прозорец | opens in a new tab | `src/components/layout/SiteHeader.tsx` |
 | `Drop.days` | ДЕНА | DAYS | `src/components/drop/Countdown.tsx` |
@@ -133,11 +148,11 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Meta.catalogTitle` | Каталог — Trajanov | Catalog — Trajanov | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/app/[locale]/catalog/page.tsx` |
 | `Meta.checkoutDescription` | Внеси ги податоците за достава. Плаќање со готовина при преземање, испорака само во Северна Македонија. | Enter your delivery details. Cash on delivery, shipping within North Macedonia only. | `src/app/[locale]/checkout/page.tsx` |
 | `Meta.checkoutTitle` | Нарачка — Trajanov | Checkout — Trajanov | `src/app/[locale]/checkout/page.tsx` |
-| `Meta.contactDescription` | Стапи во контакт: телефон и Инстаграм. Струмица, Северна Македонија. | Get in touch: phone and Instagram. Strumica, North Macedonia. | `src/app/[locale]/contact/page.tsx` |
+| `Meta.contactDescription` | Стапи во контакт: прати порака или побарај нè по телефон и на Инстаграм. Струмица, Северна Македонија. | Get in touch: send a message, or reach us by phone and Instagram. Strumica, North Macedonia. | `src/app/[locale]/contact/page.tsx` |
 | `Meta.contactTitle` | Контакт — Trajanov | Contact — Trajanov | `src/app/[locale]/contact/page.tsx` |
 | `Meta.homeDescription` | Оверсајз унисекс маици од Струмица. Спуштања од 3 до 5 парчиња, вистински ограничени залихи, готовина при преземање. | Oversized unisex t-shirts from Strumica. Drops of 3 to 5 pieces, real limited stock, cash on delivery. | `src/app/[locale]/page.tsx` |
 | `Meta.homeTitle` | Trajanov — следно спуштање | Trajanov — next drop | `src/app/[locale]/page.tsx` |
-| `Meta.privacyDescription` | Што собираме кога нарачуваш и зошто. Само име, телефон, град и адреса — без е-пошта, без рекламни колачиња. | What we collect when you order, and why. Just name, phone, city and address — no email, no advertising cookies. | `src/app/[locale]/privacy/page.tsx` |
+| `Meta.privacyDescription` | Што собираме кога нарачуваш или ни пишуваш, и зошто. Без рекламни колачиња. | What we collect when you order or write to us, and why. No advertising cookies. | `src/app/[locale]/privacy/page.tsx` |
 | `Meta.privacyTitle` | Приватност — Trajanov | Privacy — Trajanov | `src/app/[locale]/privacy/page.tsx` |
 | `Meta.productDescription` | Оверсајз унисекс маица. Испорака само во Северна Македонија, готовина при преземање. | Oversized unisex t-shirt. Shipping within North Macedonia only, cash on delivery. | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Meta.shippingDescription` | Испорака само во Северна Македонија, плаќање готовина при преземање. Ако нешто не е во ред, јави се. | Shipping within North Macedonia only, cash on delivery. If something is wrong, call us. | `src/app/[locale]/shipping-returns/page.tsx` |
@@ -163,15 +178,15 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Order.capViolated` | Најмногу 2 парчиња по нарачка. | Max 2 items per order. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.duplicatePhone` | Веќе имаш активна нарачка со овој број за ова спуштање. | You already have a live order with this number for this drop. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.emptyCart` | Кошничката е празна. | Your cart is empty. | `src/components/checkout/CheckoutForm.tsx` |
-| `Order.genericError` | Нешто тргна наопаку. Пробај повторно. | Something went wrong. Try again. | `src/components/checkout/CheckoutForm.tsx` |
+| `Order.genericError` | Нешто тргна наопаку. Пробај повторно. | Something went wrong. Try again. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Order.noDrop` | Нема активно спуштање во моментов. | No active drop right now. | _(not found in source)_ |
 | `Order.notOpen` | Спуштањето не е отворено во моментов. | The drop isn't open right now. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.priceMissing` | Грешка кај нас: нема поставена цена. Не наплативме ништо. Пробај подоцна. | Our mistake: no price is set. You weren't charged. Try later. | `src/components/checkout/CheckoutForm.tsx` |
-| `Order.protected` | Заштита од роботи. | Bot protection. | `src/components/checkout/CheckoutForm.tsx` |
+| `Order.protected` | Заштита од роботи. | Bot protection. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Order.rateLimited` | Премногу обиди од оваа мрежа. Почекај малку и пробај пак. | Too many attempts from this network. Wait a moment and try again. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.soldOut` | Некој беше побрз. Последното парче штотуку замина. | Someone got there first. The last one just went. | `src/components/checkout/CheckoutForm.tsx` |
-| `Order.success` | Нарачка {orderNumber} е примена и резервирана 48 часа. Плаќаш со готовина при преземање — ќе те побараме телефонски за да ја потврдиме. | Order {orderNumber} received and reserved for 48 hours. You pay cash on delivery — we'll call you to confirm. | `src/components/checkout/CheckoutForm.tsx` |
-| `Order.turnstileFailed` | Проверката не помина. Пробај повторно. | That check didn't pass. Try again. | `src/components/checkout/CheckoutForm.tsx` |
+| `Order.success` | Нарачка {orderNumber} е примена и резервирана 48 часа. Плаќаш со готовина при преземање — ќе те побараме телефонски за да ја потврдиме. | Order {orderNumber} received and reserved for 48 hours. You pay cash on delivery — we'll call you to confirm. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
+| `Order.turnstileFailed` | Проверката не помина. Пробај повторно. | That check didn't pass. Try again. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Placeholder.composition` | [PLACEHOLDER: состав и нега — од етикетата] | [PLACEHOLDER: composition & care — from the label] | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Placeholder.courier` | [PLACEHOLDER: курир и цена на испорака — Владимир] | [PLACEHOLDER: courier and delivery cost — Vladimir] | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Placeholder.notice` | Преглед на дизајн-системот. Податоците за производите (назив, цена, величини, состав, фотографии) се примероци — вистинските ги внесува Владимир во подоцнежна фаза. | Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase. | `src/components/system/PreviewNotice.tsx` |
@@ -184,9 +199,11 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Privacy.abuseHeading` | Заштита од злоупотреба | Anti-abuse | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.browserBody` | Кошничката живее во sessionStorage и исчезнува кога ќе го затвориш јазичето. Нема рекламни колачиња, нема пиксели за следење, нема аналитички колачиња, нема пиксели од социјални мрежи. | The cart lives in sessionStorage and disappears when you close the tab. No advertising cookies, no tracking pixels, no analytics cookies, no social pixels. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.browserHeading` | Во твојот прелистувач | In your browser | `src/app/[locale]/privacy/page.tsx` |
-| `Privacy.collectBody` | Име, телефонски број, град, адреса и белешката ако ја пополниш. Тоа е сè. Не собираме е-пошта — нема поле за е-пошта. | Name, phone number, city, address, and your note if you leave one. That's everything. We don't collect your email — there is no email field. | `src/app/[locale]/privacy/page.tsx` |
+| `Privacy.collectBody` | Име, телефонски број, град, адреса и белешката ако ја пополниш. Тоа е сè што собира нарачката — при нарачка нема поле за е-пошта. | Name, phone number, city, address, and your note if you leave one. That's everything an order collects — ordering has no email field. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.collectHeading` | Што собираме кога нарачуваш | What we collect when you order | `src/app/[locale]/privacy/page.tsx` |
-| `Privacy.deleteBody` | Јави се телефонски и ќе ги избришеме. Нема формулар и нема портал — само телефонскиот број. | Call us and we'll delete them. No form, no portal — just the phone number. | `src/app/[locale]/privacy/page.tsx` |
+| `Privacy.contactFormBody` | Ако ја користиш контакт-формата: име, е-пошта, наслов ако внесеш и самата порака. Сето тоа му стигнува на Владимир како е-пошта за да ти одговори — тоа е единствената употреба. Не се чува во базата на сајтот. | If you use the contact form: your name, email address, the subject if you add one, and the message itself. It reaches Vladimir as an email so he can reply — that's the only use. It isn't stored in the site's database. | `src/app/[locale]/privacy/page.tsx` |
+| `Privacy.contactFormHeading` | Што собираме кога ни пишуваш | What we collect when you write to us | `src/app/[locale]/privacy/page.tsx` |
+| `Privacy.deleteBody` | Јави се телефонски и ќе ги избришеме. За порака пратена преку контакт-формата, доволен е и одговор во е-поштата. | Call us and we'll delete them. For a message sent through the contact form, a reply in the email thread works too. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.deleteHeading` | Како да ги избришеш податоците | How to delete your data | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.eyebrow` | Правно | Legal | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.h1` | Приватност | Privacy | `src/app/[locale]/privacy/page.tsx` |
