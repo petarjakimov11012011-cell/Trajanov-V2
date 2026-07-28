@@ -2,8 +2,9 @@ import type {Metadata} from 'next';
 import {Rubik, Inter} from 'next/font/google';
 import {notFound} from 'next/navigation';
 import {NextIntlClientProvider, hasLocale} from 'next-intl';
-import {getTranslations} from 'next-intl/server';
+import {getMessages, getTranslations} from 'next-intl/server';
 import {routing} from '@/i18n/routing';
+import {pickClientMessages} from '@/i18n/client-namespaces';
 import {SITE_URL} from '@/lib/site';
 import {ogImageUrl} from '@/lib/metadata';
 import {siteJsonLd} from '@/lib/seo/site-jsonld';
@@ -82,6 +83,13 @@ export default async function LocaleLayout({
 
   const tc = await getTranslations({locale, namespace: 'Common'});
 
+  // Scope what the provider serializes into the page (D-2.25-7). Without this the client gets the
+  // whole catalog on every route — measured at 16,308 bytes of MK messages in the HTML of `/`,
+  // `/kontakt`, `/uslovi` and `/katalog` alike, Terms and Privacy bodies included. Server Components
+  // and generateMetadata keep reading the FULL catalog from the request config; only the browser's
+  // copy is narrowed. The list and the test that keeps it honest live in @/i18n/client-namespaces.
+  const clientMessages = pickClientMessages(await getMessages({locale}));
+
   return (
     <html
       lang={locale}
@@ -99,7 +107,7 @@ export default async function LocaleLayout({
         {/* Site-wide Organization + WebSite structured data (Task 4) — no address, no logo, no
             SearchAction, no partner claim; sameAs is the one verified Instagram account. */}
         <JsonLd data={siteJsonLd()} />
-        <NextIntlClientProvider>
+        <NextIntlClientProvider locale={locale} messages={clientMessages}>
           <SiteHeader />
           <main id="main-content" className="flex flex-1 flex-col">
             {children}

@@ -1,12 +1,13 @@
-'use client';
-
-import {useEffect, useState, type ReactNode} from 'react';
+import {type ReactNode} from 'react';
 import Image from 'next/image';
 import {useTranslations} from 'next-intl';
-// Locale-aware router + Link (D-2.01). useRouter here is used only for router.refresh() at T-0, but it
-// comes from the i18n navigation surface so no user-facing routing bypasses the localised helpers.
-import {Link, useRouter} from '@/i18n/navigation';
-import {Countdown} from '@/components/drop/Countdown';
+// Locale-aware Link (D-2.01) — no user-facing routing bypasses the localised helpers.
+import {Link} from '@/i18n/navigation';
+import {
+  CountdownOpening,
+  CountdownTicker,
+  OpeningSwitch,
+} from '@/components/home/CountdownOpening';
 import {
   DropCountdownEyebrow,
   DropLiveBanner,
@@ -150,22 +151,16 @@ function HeroCtas() {
 // The home experience, driven by SERVER-computed drop state (D-1.04-9). The browser no longer decides
 // whether a drop is open — it renders whatever the server said and, at T-0, asks the server again
 // rather than unlocking anything itself (Task 4).
+//
+// This is a SERVER component (D-2.25-8). It used to be `'use client'` for one useState, one useEffect
+// and one router.refresh() — all three of which exist only to survive T-0 — and that pulled the
+// photograph, the scrim, the tagline, both CTAs, the three drop banners and the whole live-drop
+// product grid into the client bundle along with them. Those three things now live in
+// CountdownOpening.tsx and reach into this tree through slots, so the countdown branch is the only
+// one that ships any of this at all, and even there everything visual is server-rendered content
+// handed down as children.
 export function HomeExperience({view}: {view: DropView | null}) {
   const t = useTranslations('Home');
-  const router = useRouter();
-  // Set the moment the client countdown reaches zero: we ask the server to re-validate and show a brief
-  // "opening" state until it confirms the drop is live — never a broken buy button (Task 4).
-  const [opening, setOpening] = useState(false);
-
-  const state = view?.state;
-
-  // While opening and the server still says "countdown" (clock skew, or it opens exactly at T-0), keep
-  // asking. Stops as soon as the server flips the drop to live or ended.
-  useEffect(() => {
-    if (!opening || state !== 'countdown') return;
-    const id = setInterval(() => router.refresh(), 3000);
-    return () => clearInterval(id);
-  }, [opening, state, router]);
 
   // The three non-`live` branches carry a visually-hidden <h1> (D-Y.05-2) — the photograph is the
   // page's visible top, but the page keeps exactly one H1 for the 2.04 "one H1, no heading skips"
@@ -218,43 +213,50 @@ export function HomeExperience({view}: {view: DropView | null}) {
       ) : (
         <section className="reveal-group flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center">
           <h1 className="sr-only">{t('title')}</h1>
-          <Hero>
-            <DropCountdownEyebrow />
-            {/* The countdown renders INSIDE the overlay (D-Y.05-7) — the largest type on the page;
-                nothing else in the overlay may be set larger. Behaviour props (target / serverNowMs
-                / onComplete) unchanged from Y.04. The `text-h1 md:text-countdown` size that used to
-                sit here as a wrapper workaround has moved INTO the component (D-2.25-2), which is
-                the one place that owns the measured `md:` step; the root fix that made the
-                workaround unnecessary is `extendTailwindMerge` in src/lib/utils.ts (D-2.25-1). */}
-            <Countdown
-              target={view.startsAtMs}
-              serverNowMs={view.serverNowMs}
-              onComplete={() => {
-                setOpening(true);
-                router.refresh();
-              }}
+          {/* Only the T-0 flag is client-side (D-2.25-8). The provider wraps both the hero and the
+              about link because both change at T-0; everything between the tags is server-rendered
+              and passed through as children. */}
+          <CountdownOpening state={view.state}>
+            <Hero>
+              <DropCountdownEyebrow />
+              {/* The countdown renders INSIDE the overlay (D-Y.05-7) — the largest type on the page;
+                  nothing else in the overlay may be set larger. Behaviour (target / serverNowMs /
+                  the T-0 handover) unchanged from Y.04. The `text-h1 md:text-countdown` size that
+                  used to sit here as a wrapper workaround has moved INTO the component (D-2.25-2),
+                  which is the one place that owns the measured `md:` step; the root fix that made
+                  the workaround unnecessary is `extendTailwindMerge` in src/lib/utils.ts
+                  (D-2.25-1). */}
+              <CountdownTicker
+                target={view.startsAtMs}
+                serverNowMs={view.serverNowMs}
+              />
+              <OpeningSwitch
+                idle={
+                  <>
+                    <p className="text-foreground max-w-md text-balance">{t('sub')}</p>
+                    <HeroCtas />
+                  </>
+                }
+                // The T-0 "opening" status sits where the tagline would be — current behaviour kept:
+                // while re-validating, the tagline and the CTAs stay out of the way.
+                opening={
+                  <p className="text-mustard font-display font-semibold" role="status">
+                    {t('opening')}
+                  </p>
+                }
+              />
+            </Hero>
+            <OpeningSwitch
+              idle={
+                <Link
+                  href="/about"
+                  className="text-muted-foreground hover:text-foreground text-small underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:underline"
+                >
+                  {t('aboutLink')} →
+                </Link>
+              }
             />
-            {opening ? (
-              // The T-0 "opening" status sits where the tagline would be — current behaviour kept:
-              // while re-validating, the tagline and the CTAs stay out of the way.
-              <p className="text-mustard font-display font-semibold" role="status">
-                {t('opening')}
-              </p>
-            ) : (
-              <>
-                <p className="text-foreground max-w-md text-balance">{t('sub')}</p>
-                <HeroCtas />
-              </>
-            )}
-          </Hero>
-          {!opening && (
-            <Link
-              href="/about"
-              className="text-muted-foreground hover:text-foreground text-small underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:underline"
-            >
-              {t('aboutLink')} →
-            </Link>
-          )}
+          </CountdownOpening>
         </section>
       )}
 

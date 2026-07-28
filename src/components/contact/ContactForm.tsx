@@ -9,10 +9,15 @@ import {CheckoutField} from '@/components/checkout/CheckoutField';
 import {Turnstile, type TurnstileHandle} from '@/components/checkout/Turnstile';
 import {sendContact} from '@/lib/contact/actions';
 import {CONTACT_CAPS, EMAIL_SHAPE, type ContactResult} from '@/lib/contact/process-contact';
+import {firstInvalidField, focusFormField} from '@/lib/forms/first-invalid';
 import {EMAIL, PHONE_DISPLAY} from '@/lib/social';
 
 type Field = 'name' | 'email' | 'subject' | 'message';
 type Errors = Partial<Record<Field, string>>;
+
+// DOM order of the fields — the checkout contract, mirrored (D-2.25-5). validate() fills the map in
+// its own order (required loop, then the email shape, then the caps), so the focus order is declared.
+const FIELD_ORDER = ['name', 'email', 'subject', 'message'] as const;
 
 // The contact form (Phase 2.23) — modelled on CheckoutForm: same submit shape, same FRESH Turnstile
 // token minted at submit (D-1.04-8), same error/success rendering discipline. Client validation here
@@ -53,7 +58,13 @@ export function ContactForm({siteKey}: {siteKey: string}) {
     const form = e.currentTarget;
     const next = validate(form);
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
+    if (Object.keys(next).length > 0) {
+      // Nothing was sent, so focus does not stay on the button — it goes to the first invalid field in
+      // DOM order, exactly as checkout does (D-2.25-5).
+      const first = firstInvalidField(next, FIELD_ORDER);
+      if (first) focusFormField(form, first);
+      return;
+    }
 
     const data = new FormData(form);
     setSubmitting(true);
