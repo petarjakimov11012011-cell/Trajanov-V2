@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-07-28 |
 | **Branch** | `phase-2.23-contact-form` |
-| **PR** | opened to `main` — **not merged; an operator merges (`D-0-3`)** |
+| **PR** | [#38](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/38) — open to `main`, **not merged; an operator merges (`D-0-3`)** |
 | **Brief** | `briefs/Part-2-Phase-23-Code.md` (delivered in-session) |
 
 ---

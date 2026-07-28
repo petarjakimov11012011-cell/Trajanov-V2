@@ -13,7 +13,8 @@ Last updated: **2026-07-28** · By: **Claude Code (Phase 2.23 — Contact page: 
 ## Status
 
 **Phase 2.23 — Contact page: message form + contact rail — CODE COMPLETE (2026-07-28, branch
-`phase-2.23-contact-form`; PR open to `main` — operator merges, not Code, `D-0-3`).** Out-of-band
+`phase-2.23-contact-form`; PR [#38](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/38)
+open to `main` — operator merges, not Code, `D-0-3`).** Out-of-band
 phase; does **not** advance the critical path (the `NEXT:` line is unchanged — Y.01 and the 2.06
 operator half remain next). The Contact page is now a real two-column page: **message form left,
 contact rail right** (~60/40 at `lg:`+, measured 624/416px = 1.50 at 1024 and 1280; stacked
