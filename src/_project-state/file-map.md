@@ -6,11 +6,19 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-29** · By: **Claude Code (Phase 2.25 P1 — harden · optimize · adapt · animate)**
+Last updated: **2026-07-29** · By: **Claude Code (Phase 2.25 owner items — showcase named per state + live hero)**
 
 ---
 
 ## Status
+
+**Phase 2.25 owner items landed — one new file (same branch, after P1).** New:
+`docs/i18n/mk-review-2.25.md` (**unsigned** — the two showcase section-name strings,
+`Showcase.headingLast`/`headingLive`, owed register #64). Modified only (no moves, no deletes):
+`src/components/home/{HomeShowcase,HomeExperience}.tsx`, `src/lib/showcase.ts`,
+`src/app/[locale]/page.tsx` (comment), `src/messages/{mk,en}.json` (+2 keys → 274),
+`tests/home/showcase.test.ts`, `docs/i18n/string-inventory.md` (regenerated), `Decisions.md`
+(`D-2.25-22…25`), the state files.
 
 **Phase 2.25 P1 landed — five new files (branch `phase-2.25-impeccable-pass`, NOT yet merged; P2
 `/polish` + the closing `/audit` are still owed on the same branch).** New:

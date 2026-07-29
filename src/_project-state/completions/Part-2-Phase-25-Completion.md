@@ -358,3 +358,74 @@ forced the cart row rewrite (`D-2.25-12`).
 - [ ] **The closing `/impeccable audit`** over the whole branch.
 - [ ] **PR + one Vercel preview**, once both of the above land. **Not opened by this session, on
       Petar's instruction.**
+
+---
+
+## 10. Addendum — Petar's owner items (2026-07-29, after P1, before P2)
+
+**Instruction, verbatim intent:** (1) countdown/ended keep the products slider from the pre-branch
+homepage, named **"Last drop"**; (2) the branch catalog keeps the pre-branch product photos;
+(3) live keeps the slider too, named **"This drop"**; (4) the hero photograph stays even when a
+drop is live.
+
+### What shipped
+
+- **The showcase `<h2>` is visible and named per drop state** (`D-2.25-22`): „Ова спуштање"/"This
+  drop" while `live`, „Последно спуштање"/"Last drop" otherwise. FAQ's section-heading recipe
+  (`font-display text-h2 font-bold`), left-aligned; outline stays h1 → h2 → h3. Two new `Showcase`
+  keys MK+EN (inventory 272 → **274**); `Home.browseWhileWait` retired from render again (key
+  kept, auto-re-flagged "(not found in source)"). MK review pack `docs/i18n/mk-review-2.25.md`
+  committed **unsigned** → owed **#64**.
+- **`showcaseSlides()` no longer excludes `live`** (`D-2.25-23`, reversing 2.21 orchestrator
+  decision 5 on the owner's call). The no-photograph rule (2.21 decision 2) is untouched. On the
+  live page the showcase renders **below the buyable grid** — the grid keeps the top of the page.
+  `tests/home/showcase.test.ts` re-pins live-yields-slides.
+- **The live branch renders the same `Hero` as every other state** (`D-2.25-24`): `DropLiveBanner`
+  rides inside it as the state element (`max-w-md`, mirroring the ended banner), tagline beneath,
+  **no CTAs** (the grid below is the action). The hero sits outside the reveal-group so the T-0
+  refresh shows the photograph instantly while the cards animate.
+- **Item (2) was verified, not changed:** the branch never touched the catalog —
+  `src/app/[locale]/catalog/page.tsx` is byte-unchanged vs `main`; probes + screenshot confirm
+  Производ 01 → mustard, 02 → off-white, 03 → the logged placeholder, exactly Petar's reference.
+
+### Verification (the D-2.24-2 discipline)
+
+Against the committed sample drop (`test-drop`) — made active by shifting the two rehearsal drops'
+windows −2 months and **restoring byte-exact after** (`D-2.25-25`; post-restore inspect matches the
+pre-shift snapshot to the millisecond; `test-drop` itself never touched):
+
+- All three `?preview=` states × MK+EN: heading text correct in all six; `documentElement.lang`
+  asserted in every probe.
+- **Exactly one `rel="preload" as="image"` (the mustard frame) in every state — live included.**
+  Live used to ship **zero**; `D-Y.05-4`'s "exactly one" now holds uniformly. Live LCP becomes the
+  photograph; PSI on production is the binding number (existing #42/#45 lineage).
+- Exactly one `<h1>` per page; SSR serves „1.199 ден" (MK grouping) — the pane's „1,199" is the
+  long-recorded headless-Chromium ICU artifact, not new.
+- **Zero horizontal overflow at 320 and 375** in all three states; 375px live screenshot: full-bleed
+  hero, banner wrapping to two lines cleanly, grid below.
+- Gates re-run after the changes: `npm run build` clean · `npx tsc --noEmit` clean · `npm run lint`
+  **0 errors** (143 warnings, all the documented untracked-`.claude` baseline) · `npm test`
+  **166/166** incl. `✓ 10 simultaneous orders against 3 units → exactly 3 succeed`.
+
+### Things the orchestrator should read
+
+1. **The countdown-label caveat (`D-2.25-22`).** During a countdown, `view.products` are the
+   products of the drop being counted down TO (`pickActiveDrop` prefers upcoming). Today that is
+   the same record as the last drop, so „Последно спуштање" is accurate. **The day a genuinely new
+   drop is loaded with a future window, the countdown will tease the NEW pieces under a heading
+   that says "Last drop."** One `t()` call to change; owed row **#65** carries the reminder.
+2. **The 2.21 duplication concern now lives on the live page** (`D-2.25-23`): the same products
+   render twice (buyable cards, then non-buyable slides). The owner weighed it; order (grid first)
+   and the heading are the mitigation. Any past "live `<main>` is sha256-identical to `main`"
+   claims are historical records, not current invariants.
+3. **The live page's buy grid moves ~one viewport down on phones** (`D-2.25-24`) — the exact cost
+   2.21 refused, accepted by the owner for front-door continuity.
+
+### Registers
+
+Owed **+2**: **#64** (MK review of the two strings) · **#65** (live front door on a real screen,
+Lazar). Placeholder register **unchanged**. Decisions **`D-2.25-22…25`**. Files:
+`src/components/home/{HomeShowcase,HomeExperience}.tsx`, `src/lib/showcase.ts`,
+`src/app/[locale]/page.tsx` (comment only), `src/messages/{mk,en}.json`,
+`tests/home/showcase.test.ts`, `docs/i18n/{string-inventory,mk-review-2.25}.md`, `Decisions.md`,
+the state files. **No dependency, config, `supabase/`, or stock/order logic touched.**

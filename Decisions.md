@@ -5174,3 +5174,102 @@ start at `D-2.01-6`.*
   probes being subtracted.
 - **Links:** `src/app/[locale]/catalog/[slug]/page.tsx` · `D-2.25-10` · `D-2.24-2` · owed register #62
 
+
+### D-2.25-22 · 2026-07-29 · The showcase gets a visible name that changes with the drop state
+- **Status:** Accepted. **Supersedes the 2.21 brief's decision 8** (the visually-hidden,
+  "title-less" heading) — that was a brief-level call, not a `D-` entry, so no Status line changes.
+- **Decided by:** Petar (owner), 2026-07-29, in this session's instruction: "name it 'Last drop'"
+  (countdown/ended) and "'This drop'" (live). The rendering treatment is Code's.
+- **Decision:** The Home showcase's `<h2>` is now **visible** and named per server-computed drop
+  state: **„Ова спуштање" / "This drop"** while `live`, **„Последно спуштање" / "Last drop"**
+  otherwise. Two new `Showcase` keys (`headingLast`, `headingLive`), MK+EN; the treatment is the
+  FAQ's established section-heading recipe (`font-display text-h2 font-bold`), left-aligned on the
+  section's own axis. `Home.browseWhileWait` is retired from render again (key kept, the `D-Y.04-2`
+  treatment; inventory re-flags it "(not found in source)").
+- **Alternative rejected:** (a) keeping the sr-only heading and adding no visible name — rejected
+  because it is the owner's explicit instruction; (b) an eyebrow-styled label instead of a real
+  heading — rejected because the house section-heading recipe (FAQ h2) already exists and a
+  12px label naming a full-viewport section reads as lost, and the craft floor bans
+  eyebrow-over-heading structures.
+- **Downside accepted:** two new MK strings post-date every native review (owed row **#64**,
+  `docs/i18n/mk-review-2.25.md`, unsigned). And a semantic caveat the owner should reread once a
+  SECOND drop exists: during a **countdown**, `view.products` are the products of the drop being
+  counted down TO (`pickActiveDrop` prefers upcoming over most-recent). Today that drop is the same
+  record as the last one, so „Последно спуштање" is accurate — but the moment a NEW drop is loaded
+  with a future window, the countdown state will tease the NEW drop's pieces under a heading that
+  says "Last drop". Flagged in the completion report; the label-per-state map is one `t()` call to
+  change.
+- **Links:** `src/components/home/HomeShowcase.tsx` · `src/messages/{mk,en}.json` ·
+  `docs/i18n/mk-review-2.25.md` · owed register #64/#65 · `D-2.25-23`
+
+### D-2.25-23 · 2026-07-29 · The live state renders showcase slides — the 2.21 live-hide is reversed
+- **Status:** Accepted. **Reverses the 2.21 brief's orchestrator decision 5** ("the `live` state
+  returns NO slides"); brief-level call, no `D-` Status line to flip.
+- **Decided by:** Petar (owner), 2026-07-29: "when a drop is live keep the products slider …
+  name as 'This drop'."
+- **Decision:** `showcaseSlides()` no longer special-cases `live` — every state with photographed
+  products yields slides; the only exclusions left are no-drop and no-photograph (2.21 decision 2,
+  untouched). On the live page the showcase renders **below the buyable grid** (unchanged sibling
+  order in `page.tsx`), so the grid keeps the top of the page in the hour that matters.
+  `tests/home/showcase.test.ts` re-pins the new behaviour.
+- **Alternative rejected:** keeping the live-hide and rendering the slider only in the two waiting
+  states. That was 2.21's own reasoning ("a second, non-buyable gallery of the same shirts competes
+  with the only thing that matters that hour") — rejected because the owner weighed exactly that
+  and chose continuity of the section across all states.
+- **Downside accepted:** the 2.21 concern is real and now lives on the page: during a live drop the
+  same 2 products render twice (buyable cards, then non-buyable slides). Mitigated by order (grid
+  first) and by the heading naming the relationship („Ова спуштање"). Also the live `<main>` is no
+  longer byte-comparable to `main`'s live page — the sha256-identity claims in past phase records
+  are historical, not current invariants.
+- **Links:** `src/lib/showcase.ts` · `tests/home/showcase.test.ts` · `src/app/[locale]/page.tsx` ·
+  `D-2.25-22` · `D-2.25-24`
+
+### D-2.25-24 · 2026-07-29 · The hero photograph stays during live; the live banner rides inside it
+- **Status:** Accepted.
+- **Decided by:** Petar (owner), 2026-07-29: "keep the hero photo even when a drop is live." The
+  composition inside the hero is Code's.
+- **Decision:** The `live` branch of `HomeExperience` now renders the same `Hero` (mustard frame
+  below `sm:`, trio composite from `sm:`, ground-only scrim) as every other state. The
+  `DropLiveBanner` moves **inside** the hero as this state's drop-state element (the Y.05 content
+  model: state element + words on the photograph), constrained `max-w-md` to mirror the ended
+  banner; the tagline stays beneath it; **no CTAs** — the buyable grid directly below is the
+  action. The hero is deliberately NOT inside a reveal-group in this branch: at T-0 the photograph
+  appears instantly and only the cards animate.
+- **Alternative rejected:** (a) status quo — banner + grid only (the 2.04-era live page); rejected
+  by the owner's instruction. (b) Keeping the banner above the grid and shipping the hero with no
+  drop-state element — rejected because every other state anchors its state element on the
+  photograph, and a bare photo above a banner reads as two disconnected headers.
+- **Downside accepted:** on a phone the buyable grid moves roughly one viewport down during the
+  buy hour — the exact cost 2.21 refused; the owner accepted it for continuity of the front door.
+  The `live` state also gains the mustard LCP preload it previously lacked (it used to ship zero
+  image preloads): **`D-Y.05-4`'s "exactly one preload" now holds uniformly in all four states**,
+  and live LCP becomes the photograph rather than the banner. PSI on production post-merge will
+  tell (existing rows #42/#45 lineage).
+- **Links:** `src/components/home/HomeExperience.tsx` · `D-Y.05-4` · `D-Y.05-6` · `D-2.25-23`
+
+### D-2.25-25 · 2026-07-29 · Verification maneuvers: stale prod server killed, scratch-drop windows shifted −2 months and restored, `pg` scratchpad-only
+- **Status:** Accepted (the `D-2.21-7` / `D-2.22-5` / `D-2.23-7` lineage).
+- **Decided by:** Code, on the spot.
+- **Decision:** (1) The leftover `npm run start` on :3000 (PID 69677, serving the 04:29 build,
+  previews refused in prod mode) was killed per the P1 handoff's "use it or stop it"; `next dev`
+  took the port. (2) To make the committed sample drop (`test-drop`, the only one with
+  photographed products) the active drop, the two rehearsal drops' windows were shifted **−2
+  months** (`test-open-drop` 07-21→05-21 / 07-29→05-29; `test-upcoming-drop` 07-29→05-29 /
+  08-05→06-05; exact prior values recorded FIRST in the maneuver script and this session's log) and
+  **restored byte-exact after** — the post-restore inspect matches the pre-shift snapshot
+  timestamp-for-timestamp. `test-drop` itself was never touched. (3) Because the service-role key
+  has UPDATE revoked on `drops` (writes are SQL-editor-only by design), the shift ran over
+  `SUPABASE_DB_URL` with `pg` installed **into the session scratchpad only** — the project's
+  `package.json`/lockfile are untouched. (4) Headless-pane artifacts recorded for the next session:
+  the pane can report a 0×0 viewport until a `resize_window` + navigation lands (numeric probes
+  meaningless until `clientWidth` is real), lazy images never intersect so they need
+  `loading='eager'` forced before a screenshot, and the pane's Chromium still lacks mk ICU
+  (client-rendered prices group „1,199" while SSR correctly serves „1.199" — the known recorded
+  issue, not new).
+- **Alternative rejected:** verifying against the rehearsal drop that happened to be live
+  (`test-tee-*` products) — rejected because those slugs have no photographs, so the showcase
+  renders nothing and items 1/3 would have shipped sight-unseen against the products that matter.
+- **Downside accepted:** the same one this lineage always logs — the scratch DB spent ~13 minutes
+  in a shifted state on this machine; anyone hitting the local dev server in that window saw a
+  simulated past. No hosted/production data involved; `orders` untouched.
+- **Links:** `D-2.21-7` · `D-2.22-5` · `D-2.24-2` · this session's completion-report addendum
