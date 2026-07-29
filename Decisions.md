@@ -5005,3 +5005,70 @@ start at `D-2.01-6`.*
   this the first time is now on both — which is the same class of protection that already failed once.
 - **Links:** `src/components/system/PhotoSlot.tsx` · `src/app/[locale]/catalog/[slug]/page.tsx` ·
   `D-2.25-10` · `D-Y.03-5`
+
+---
+
+### D-2.25-16 · 2026-07-29 · A minimum gap between the cart's remove button and the `+` stepper
+- **Status:** Accepted
+- **Decided by:** Code, after an adversarial review of the P1 diff measured the two controls flush.
+- **Decision:** the cart's control column gets `sm:gap-4` instead of `sm:gap-0`. **This is a hazard
+  `D-2.25-9` introduced and this entry fixes.** With both controls grown to 44px their combined height
+  exactly equalled the row's, so `justify-between` had nothing left to distribute and the
+  **destructive remove button ended up flush on top of the `+` stepper** — measured at 768px, same x
+  (700), remove's bottom edge at **250.9** and `+`'s top edge at **250.9**, zero separation. Before
+  this phase the two were 16px and 32px tall inside an 88px column, roughly **40px apart**. Growing a
+  target is only an improvement if it does not push a destructive control into its neighbour.
+- **Alternative rejected:** leave it, on the grounds that both controls are now full 44px targets and
+  WCAG 2.5.8's spacing exception only applies to *undersized* ones, so nothing is technically failing.
+  True and beside the point: "passes the SC" is not the same as "a thumb will not delete the line
+  while reaching for `+`".
+- **Downside accepted:** the cart row is ~16px taller from `sm:` up (120 → ~136px), so the desktop
+  cart grew for a reason no desktop user will ever see — the mis-tap this prevents is a touch problem
+  and `sm:` is where the *stacked* layout lives, not where touch stops.
+- **Links:** `src/components/cart/CartView.tsx` · `D-2.25-9` · `D-2.25-12`
+
+---
+
+### D-2.25-17 · 2026-07-29 · The `/styleguide` scroll container is reachable by keyboard
+- **Status:** Accepted
+- **Decided by:** Code, after an adversarial review of the P1 diff.
+- **Decision:** the countdown demo card from `D-2.25-11` gets `tabIndex={0}`, `role="group"` and an
+  `aria-label` from the existing `Styleguide.countdown` string. A scroll container whose content holds
+  **no focusable element** cannot be scrolled by keyboard at all (WCAG 2.2 — 2.1.1); the countdown is a
+  `role="timer"` div with nothing tabbable in it, so `D-2.25-11` had created a region a keyboard-only
+  user could see clipped and never reach the rest of. No new string was authored — the label reuses
+  the section heading key that already exists.
+- **Alternative rejected:** leave it, because `/styleguide` is a dev-only, `noindex` page that no
+  customer reaches and that the 2.04 a11y gate does not cover. That is exactly the reasoning that lets
+  a pattern get copied out of the design-system page into a customer surface with the defect attached.
+- **Downside accepted:** the demo card is now a focusable element in the tab order of a page that has
+  a lot of them, and it takes a tab stop at every viewport — including the ones where it does not
+  scroll and there is nothing to reach.
+- **Links:** `src/app/[locale]/styleguide/page.tsx` · `D-2.25-11`
+
+---
+
+### D-2.25-18 · 2026-07-29 · Two measurement claims from this phase corrected on the record
+- **Status:** Accepted
+- **Decided by:** Code, after an adversarial review of the P1 diff checked the phase's own numbers.
+- **Decision:** two claims this phase made are **wrong as stated** and are corrected here rather than
+  quietly restated. `D-2.25-7`, its code comments and commit `a881dcd` all describe the i18n saving as
+  **"16,308 → 6,241 bytes"**. Those are **character counts**, not bytes — the MK catalog is Cyrillic,
+  which is two UTF-8 bytes per letter. Re-measured on production builds of both sides: **25,039 →
+  8,990 UTF-8 bytes, a 16,049-byte reduction (−64.1%)**, with the served HTML of `/` going **81,023 →
+  70,602 bytes** and `/kontakt` **68,046 → 52,771**. The saving is **larger** than claimed, and the
+  −61.7% figure was the character ratio. Separately, commit `13246fd` claims **"zero colour or raw
+  px/ms literals added"**; the grep behind it covered `src/components` and `src/app/[locale]` and
+  **not `globals.css`**, which does add two raw `44px` values inside `.tap-44::after`. Those are a
+  WCAG constant rather than a `brand.md` §8 design value — the same category as the existing
+  `SCROLL_THRESHOLD_PX` and the footer's pre-phase `min-h-[24px]` — but the claim as written was
+  false and the commit message cannot be edited.
+- **Alternative rejected:** correct the figures silently in the completion report and the state file
+  and let the decision entry and the commit messages stand. Nobody would have noticed. It would also
+  mean the two documents a future reader trusts most — the append-only decision log and the git
+  history — keep a number that does not reproduce.
+- **Downside accepted:** `D-2.25-7`'s text and two commit messages are **left wrong in place**
+  (append-only; a commit message is immutable), so anyone reading them without reaching this entry
+  gets the character count and the incomplete grep. The correction lives here and in the completion
+  report, one hop away.
+- **Links:** `D-2.25-7` · `D-2.25-9` · commits `a881dcd`, `13246fd` · Phase 2.25 completion report

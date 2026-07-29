@@ -162,7 +162,15 @@ export default function StyleguidePage() {
             scroll usable: `justify-center` on a scroll container puts the left overflow out of reach,
             while auto margins collapse to 0 once the content is wider than the box — centred when it
             fits, scrollable from the left edge when it does not. */}
-        <div className="bg-surface overflow-x-auto rounded-[var(--radius-lg)] p-6">
+        <div
+          // `tabIndex={0}` because a scroll container whose content holds no focusable element is
+          // unreachable by keyboard (WCAG 2.2 — 2.1.1): the countdown is a `role="timer"` div, so
+          // without this a keyboard-only user could never scroll to the seconds cell at ≤514px.
+          tabIndex={0}
+          role="group"
+          aria-label={t('countdown')}
+          className="bg-surface overflow-x-auto rounded-[var(--radius-lg)] p-6"
+        >
           <div className="mx-auto w-max">
             <Countdown offsetMs={40_000} />
           </div>

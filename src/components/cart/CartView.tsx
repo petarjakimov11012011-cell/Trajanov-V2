@@ -81,14 +81,15 @@ export function CartView() {
           the same 288px, so it has headroom and is left alone. */}
       <ul className="flex min-w-0 flex-col divide-y divide-[var(--color-border)]">
         {lines.map((l) => (
-          // `flex-wrap` is the adaptation, not decoration (D-2.25-12). Three things have to share the
-          // row: a 64px thumbnail, the details, and the controls — and the controls are now 180px wide
-          // (a 44px remove, a 12px gap and a 124px stepper cluster). At 320px that leaves the details
-          // 68px, and the price `[PLACEHOLDER: …]` pill has a 102px min-content and would sit across
-          // the minus button. So the row WRAPS: the controls drop to their own right-aligned line and
-          // the details keep 208px. `basis-40` is the content-driven flip point — the controls stay
-          // beside the details for as long as the details can hold 160px, which is every width from
-          // roughly a large phone up. Nothing about the row changes at `sm:` and above.
+          // `flex-wrap` is the adaptation, not decoration (D-2.25-12). Three things share the row: a
+          // 64px thumbnail, the details, and the controls — and the controls are now 180px wide
+          // (a 44px remove, a 12px gap, a 124px stepper cluster). ON ONE LINE at 320px that would
+          // leave the details 68px, and the price `[PLACEHOLDER: …]` pill's 102px min-content would
+          // sit across the minus button — that is the state this wrap EXISTS TO PREVENT, not the
+          // state that ships. What ships at 320px, measured: the controls drop to their own
+          // right-aligned line and the details get **208px**, nothing clipped. `basis-40` is the
+          // content-driven flip point — the controls stay beside the details for as long as the
+          // details can hold 160px, which is every width from roughly a large phone up.
           <li key={l.variantId} className="flex flex-wrap gap-4 py-4">
             <div
               className="bg-surface-2 h-20 w-16 shrink-0 rounded-[var(--radius-md)]"
@@ -119,7 +120,13 @@ export function CartView() {
                 From `sm:` this is the shipped stack — remove at the top, steppers at the bottom —
                 unchanged. Below `sm:` they sit on one horizontal line, which is the only shape that
                 fits a wrapped row without doubling its height. */}
-            <div className="ml-auto flex items-center gap-3 sm:flex-col sm:items-end sm:justify-between sm:gap-0">
+            {/* `sm:gap-4` is a safety gap, not spacing taste (D-2.25-16). With both controls at 44px
+                the column's content is exactly as tall as the row, so `justify-between` had nothing
+                left to distribute and the **destructive remove button ended up flush on top of the
+                `+` stepper** — same x, remove's bottom edge at 250.9 and `+`'s top edge at 250.9,
+                measured at 768px. Before this phase they were 16px and 32px tall in an 88px column,
+                ~40px apart. A minimum gap restores the separation the growth ate. */}
+            <div className="ml-auto flex items-center gap-3 sm:flex-col sm:items-end sm:justify-between sm:gap-4">
               {/* Remove — 44×44 for real (D-2.25-9). It is the one destructive control in the cart
                   and it used to be a bare 16px glyph with no box at all. */}
               <button

@@ -13,7 +13,8 @@
 
 > **Scope note.** This report covers the **whole 2.25 branch**, but P0 (`87efc6b`, `27b589d`,
 > decisions `D-2.25-1…4`) was executed by a different session. Everything below marked **P1** is this
-> session's work: commits `a881dcd` and `13246fd`, decisions `D-2.25-5…14`.
+> session's work: commits `a881dcd`, `13246fd`, `277984c`, `4340cec` and the review-fix commit,
+> decisions `D-2.25-5…18`.
 > **The phase is NOT closed** — `/impeccable polish` (P2) and the closing `/impeccable audit` are
 > still owed on this branch. The state files are updated to the P1 waterline, not to a finished phase.
 
@@ -30,9 +31,9 @@
   prop on its textarea branch, so that field rendered a `*` in its label and carried no required
   semantics at all. One-line bug, live since 2.23.
 - **Every page stops shipping the legal pages' text to the browser.** The i18n client provider is
-  scoped to the 14 namespaces client code can reach: **16,308 → 6,241 bytes** of MK messages in the
-  HTML of every route (**−61.7%**). The Terms page title was provably sitting in the Contact page's
-  HTML before this.
+  scoped to the 14 namespaces client code can reach: **25,039 → 8,990 UTF-8 bytes** of MK messages in
+  the HTML of every route (**−64.1%**, measured on production builds of both sides). The Terms page
+  title was provably sitting in the Contact page's HTML before this.
 - **The Home hero is server-rendered again.** `HomeExperience` was `'use client'` for one `useState`,
   one `useEffect` and one `router.refresh()`; the photograph, scrim, tagline, CTAs, drop banners and
   the whole live-drop product grid came along for the ride. Client modules per drop state now:
@@ -47,8 +48,10 @@
 
 ## 2. Decisions I made on my own
 
-Ten, `D-2.25-5…14`. Two of them (`D-2.25-10`, and the token half of `D-2.25-13`) were **put to Petar
-before the edit was made** and are recorded as his calls, not mine.
+**Fourteen, `D-2.25-5…18`.** Two (`D-2.25-10`, and the token half of `D-2.25-13`) were **put to Petar
+before the edit was made** and are recorded as his calls. Four (`D-2.25-15…18`) came out of the
+adversarial review described in §3 — they are fixes to defects **this phase introduced** and to
+claims **this phase got wrong**, and they are listed here rather than folded into the rest.
 
 | ID | Decision | Alternative rejected | Downside accepted |
 |---|---|---|---|
@@ -62,6 +65,10 @@ before the edit was made** and are recorded as his calls, not mine.
 | **D-2.25-12** | Cart row gets `flex-wrap` + `min-w-0` on the `<ul>` **grid item** | A two-row CSS grid with explicit placement | Row is **48px taller at 320px** (125→172) and the flip point is content-driven, so it is invisible in the class list |
 | **D-2.25-13** | `filter: blur()` out of the reveal keyframe; **`--motion-reveal-blur` stays in both files — Petar's call** | Delete the token from `globals.css` and propose the `brand.md` row | A knowingly dead token ships in two files. **And no FPS number is claimed — none could be measured here** (see §3) |
 | **D-2.25-14** | The blanket `prefers-reduced-motion` rule becomes a **backstop**; each animation states its own behaviour | Replace `0.001ms` with `animation: none` globally | The enumerated list is a **comment**. Nothing enforces it; the next animation added will silently fall through |
+| **D-2.25-15** | `PhotoSlot` takes a `sizes` prop; the product page passes its own | Widen the shared constant to cover both surfaces | The geometry now lives in two places kept in step by a comment — the same protection that already failed once |
+| **D-2.25-16** | `sm:gap-4` between the cart's remove button and the `+` stepper | Leave it — both are full 44px targets, nothing fails an SC | The desktop cart row grew ~16px to prevent a **touch** mis-tap |
+| **D-2.25-17** | `/styleguide`'s scroll container gets `tabIndex={0}` + a label | Leave it, it is a dev-only noindex page | One more tab stop, at every viewport, including those where it does not scroll |
+| **D-2.25-18** | Two of this phase's own measurement claims corrected on the record | Fix the numbers silently in this report | `D-2.25-7` and two commit messages are **left wrong in place** (append-only / immutable) |
 
 ---
 
@@ -115,6 +122,40 @@ fourth logged motion exception. **False positive for this codebase; left unchang
 quietly folded into a P1 commit. Same for the untracked `Part-1-Phase-07-Runbook-v2.md`,
 `briefs/Part-2-Phase-13-Code.md`, `briefs/Part-2-Phase-25-P1-Handoff.md` and `docs/seo/`. **Petar
 decides what to do with them.**
+
+**10. Three defects and two false claims of my own were caught by an adversarial review of the
+finished diff, not by me.** After the four items were committed, the whole `27b589d..HEAD` diff was
+re-reviewed by independent agents across four lenses (correctness, CSS/layout, accessibility, and
+claims-vs-reality), each finding then attacked by three separate refuters. **Twenty-five findings were
+raised.** What survived and was fixed:
+
+- **`sizes` was left at 50vw on a slot that is now 100vw** (`D-2.25-15`). Collapsing the product photo
+  grid made the slot full-width on a phone, but `PhotoSlot`'s shared `sizes` constant still promised
+  half that — `next/image` would have requested a source built for half the box and upscaled it. **The
+  page whose entire purpose is the photograph would have shipped a softer photograph than before the
+  change made to show it bigger.** That constant's own comment said "keep in step if either grid
+  changes"; I changed the grid and did not.
+- **The destructive remove button ended up flush on top of the `+` stepper** (`D-2.25-16`). Measured
+  at 768px: same x, remove's bottom edge and `+`'s top edge both at 250.9 — zero separation, where
+  before the phase they were ~40px apart. Growing both to 44px consumed the space `justify-between`
+  had been distributing.
+- **The `/styleguide` scroll container could not be scrolled by keyboard** (`D-2.25-17`, WCAG 2.1.1) —
+  it holds no focusable element, so the fix that stopped the countdown escaping its card created a
+  region a keyboard-only user could see clipped and never reach the rest of.
+- **"16,308 → 6,241 bytes" are character counts, not bytes** (`D-2.25-18`). MK is Cyrillic. The real
+  figures are **25,039 → 8,990 UTF-8 bytes (−64.1%)** — the saving is *larger* than claimed, but the
+  unit was wrong in a decision entry and a commit message that cannot be edited.
+- **"zero raw px/ms literals added" was false** (`D-2.25-18`): the grep behind it did not cover
+  `globals.css`, which adds two raw `44px` values in `.tap-44::after`.
+
+Two further findings were **checked and refuted by measurement rather than argument**: the `.tap-44`
+hit areas on the header wordmark and build credit were said to overlap if that group wraps — forced to
+wrap, their row centres are **55.5px** apart, clear of 44; and the MK·EN clearance was said to be
+mis-stated, which it was (47.5px in a comment vs **44.6px** measured) and is now corrected in the
+source.
+
+**This is the part of the process that worked.** Four of the eighteen decisions on this phase exist
+because the diff was attacked after it was written, and one of them was a defect on the money page.
 
 **9. Proposal, not a change: retire `--motion-reveal-blur`.** Nothing reads it any more. Retiring it
 means deleting the `:root` line in `globals.css` **and** the `brand.md` §6 row in the same commit.
@@ -202,7 +243,8 @@ line-height 19.5px / `rgb(240,133,122)`**.
 
 | | P0 baseline | P1 branch |
 |---|---|---|
-| Client message bytes on `/`, `/kontakt`, `/uslovi`, `/katalog` | **16,308** each | **6,241** each (**−61.7%**) |
+| Client message payload on `/`, `/kontakt`, `/uslovi`, `/katalog` | **25,039 UTF-8 bytes** each | **8,990 UTF-8 bytes** each (**−16,049 B, −64.1%**) |
+| Served HTML, `/` and `/kontakt` | 81,023 / 68,046 bytes | **70,602 / 52,771 bytes** |
 | Namespaces shipped to the client | 23/23 | 14/23 — withheld: `Footer Faq About Terms Privacy ShippingReturns Catalog Styleguide Meta` |
 | Client modules — **ended** | `HomeExperience` + `HomeShowcase` + `SiteHeader` | `HomeShowcase` + `SiteHeader` |
 | Client modules — **live** | `HomeExperience` + `HomeShowcase` + `SiteHeader` | `HomeShowcase` + `SiteHeader` + `SpotlightCard` |
