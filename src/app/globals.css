@@ -223,7 +223,71 @@
   }
 }
 
-/* Respect reduced motion globally; components opt back in deliberately. */
+/*
+  A 44×44 pointer/touch target WITHOUT changing the visual box (Phase 2.25 /adapt, D-2.25-9).
+
+  Top level, next to .faq-item / .header-shell / .reveal-group, NOT inside @layer base: a rule written
+  into that layer after :focus-visible is dropped by the Tailwind v4 pipeline before it reaches the
+  compiled stylesheet — verified by serving the built CSS and grepping for the selector. Every other
+  hand-written class in this file already sits at the top level; this one follows them.
+
+  For the header nav links and the MK·EN switch, growing the real box is not free: the nav's
+  active-page indicator is a `border-b-2` on the link itself, so a taller link would carry the
+  underline 10px down the bar, and a wider MK·EN button would push the `·` separator away from the
+  letters. Both sit in a bar whose height is already set by the 44px cart button, so the *hit* area is
+  the only thing that has to change.
+
+  A transparent ::after is centred on the element at `max(100%, 44px)` in each axis, so it never
+  shrinks a target that is already bigger — a wide nav link keeps its own width and grows only
+  vertically. Rendered pixels, spacing and layout are byte-identical.
+
+  WATCH THE NEIGHBOURS. The pseudo-element captures pointer events over whatever it covers, so two
+  `.tap-44` targets must sit more than 44px apart centre-to-centre or one will steal the other's taps.
+  Measured on the shipped header at 1280px: nav links are far wider than 44px (no horizontal growth at
+  all, 16px apart), and the MK·EN centres are 44.6px apart — a 0.6px gap between the two hit areas.
+  Do NOT paste this onto a dense wrapping list; the footer's rows grow their real boxes instead, for
+  exactly this reason.
+*/
+.tap-44 {
+  position: relative;
+}
+.tap-44::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translate(-50%, -50%);
+}
+
+/*
+  Reduced motion. THIS BLOCK IS A BACKSTOP, NOT THE MECHANISM (Phase 2.25 /animate, D-2.25-14).
+
+  `animation-duration: 0.001ms` is not "reduced motion", it is "motion, but instant". For a property
+  transition that is exactly right — a 420ms colour change becomes a snap, which is what someone who
+  asked for less motion wants. For a KEYFRAME animation it can be actively worse than the animation
+  it replaces: it compresses the whole sequence into a single frame, so a travelling sweep becomes a
+  FLASH. The wordmark shine block near the bottom of this file has documented that failure since 2.19
+  and hand-patches its own case; the lesson generalises, so this block is no longer the site's answer
+  for any animation it actually ships.
+
+  Every keyframe animation in this tree now states its own reduced-motion behaviour:
+    trajanov-reveal            → `animation: none` (below, with the reveal)
+    trajanov-wordmark-shine    → animation AND gradient removed (bottom of this file)
+    .animate-spin              → stopped here; the ring stays as a static busy mark
+    .animate-ping              → stopped here; the LIVE dot's halo goes static, which is what
+                                 brand.md §6 asks for ("The live dot is static under reduced motion")
+    trajanov-showcase-progress → never runs: HomeShowcase kills autoplay through a JS matchMedia
+                                 check, because a CSS rule cannot stop a setTimeout (D-2.21-3)
+
+  What is left below therefore only ever catches something nobody enumerated — a third-party widget,
+  or the next animation someone adds and forgets. Adding an animation to this codebase means adding a
+  line to the list above, not leaning on the `!important` here.
+
+  `scroll-behavior` is included because nothing in this project sets `scroll-behavior: smooth` TODAY,
+  and the day someone does it would otherwise sail straight past a reduced-motion preference.
+*/
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -231,6 +295,26 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/* The enumerated half of the rule above. Deliberately its OWN @media block IN SOURCE: a rule written
+   inside the universal block after the `*` selector is dropped before it reaches the compiled
+   stylesheet — the same Tailwind v4 pipeline behaviour that keeps `.tap-44` out of `@layer base`.
+   The compiler merges these two blocks back into one on the way out, so the shipped CSS has a single
+   `@media (prefers-reduced-motion: reduce)` rule; only the authoring has to be split. Both facts
+   verified by serving the built CSS and reading it. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  /* The two Tailwind keyframe utilities this tree actually uses. Stopping them outright beats the
+     backstop's 0.001ms: the spinner becomes a static busy ring, and the LIVE dot's halo goes static
+     rather than firing one compressed pulse — brand.md §6, "The live dot is static under reduced
+     motion". Neither utility uses a fill mode, so `none` leaves each at its authored resting state. */
+  .animate-spin,
+  .animate-ping {
+    animation: none !important;
   }
 }
 
@@ -461,21 +545,38 @@
     - the no-view section, the countdown section, the ended section  → on the <section>
     - the live drop                                                  → on the product GRID (D-2.16-5)
   It is used nowhere else on the site. Do not add a fifth call site without a new decision.
-  Only opacity, transform and filter animate — none of the three reflows, so this cannot introduce
-  layout shift, and the countdown's own "must not shift as digits change" rule is untouched.
+  Only opacity and transform animate — neither reflows, so this cannot introduce layout shift, and
+  the countdown's own "must not shift as digits change" rule is untouched.
   The stagger is positional (nth-child). Re-ordering a hero section's children re-orders the
   animation; that is the accepted downside of D-2.16-2.
+
+  THE BLUR IS GONE (Phase 2.25 /animate, D-2.25-13). `filter: blur()` was the third animated property
+  and by far the most expensive: it forces an offscreen buffer for the element, sized to the element
+  plus the blur radius, recomposited on every frame of the 760ms entrance. It ran on exactly the
+  elements least able to afford it — the hero's own child is the full-bleed photograph, measured
+  1152×648 = 0.75 megapixels at 1280px, and the live-drop call site puts it on every product card in
+  the grid at once. `opacity` and `transform` are the two properties a compositor can animate without
+  repainting anything, so what is left is the cheapest possible version of the same entrance: it
+  still rises and still fades in, on the same duration, easing and stagger.
+
+  Frame timing was NOT measured for this change and is not claimed. The verification pane this
+  project uses is permanently hidden (`document.hidden === true`), so `requestAnimationFrame` never
+  fires in it and a before/after FPS number cannot be produced here — the D-2.21-7 constraint. The
+  case rests on the mechanism and the measured paint area, not on a local frame count.
+
+  `--motion-reveal-blur` is deliberately LEFT IN PLACE in :root and in brand.md §6, unused, on the
+  owner's call (D-2.25-13): globals.css mirrors brand.md, brand.md is owner territory, and one dead
+  token is a smaller problem than the two files disagreeing. Retiring it from both is a proposal in
+  the Phase 2.25 completion report, not something this phase did.
 */
 @keyframes trajanov-reveal {
   from {
     opacity: 0;
     transform: translateY(var(--motion-reveal-shift));
-    filter: blur(var(--motion-reveal-blur));
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
   }
 }
 .reveal-group > * {

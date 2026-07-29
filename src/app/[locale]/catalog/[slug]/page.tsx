@@ -107,7 +107,7 @@ export default async function ProductPage({
       {jsonLd && <JsonLd data={jsonLd} />}
       <Link
         href="/catalog"
-        className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-small transition-colors duration-[var(--motion-fast)]"
+        className="tap-44 text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-small transition-colors duration-[var(--motion-fast)]"
       >
         <ArrowLeft className="h-4 w-4" /> {t('Product.back')}
       </Link>
@@ -120,7 +120,12 @@ export default async function ProductPage({
             a visible placeholder on purpose: the back / print-detail shot is genuinely still owed
             (register #2), and the page should say so rather than imply the set is complete. Product 03
             has no frame at all, so it keeps two placeholders. */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* One column below `sm:` (D-2.25-10). Two 4:5 slots side by side on a 320px phone measured
+            138×173 each — too small to judge a garment by, which is the only thing this page is for;
+            one column makes each 288×360. The cost is real and accepted, measured at 320px: the price
+            moves from y=567 to y=1107, so the buy path sits below two screens of scroll while the
+            second slot is still a hatched placeholder (register #2). One `sm:` word reverses it. */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <PhotoSlot
             label={t('Placeholder.productPhoto')}
             muted={soldOut}

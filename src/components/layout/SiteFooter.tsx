@@ -25,12 +25,19 @@ export function SiteFooter() {
   const t = useTranslations('Footer');
   const tn = useTranslations('Nav');
 
-  // Full-contrast contact/social item: icon + label, ≥24px tap target (WCAG 2.2 — 2.5.8).
+  // Full-contrast contact/social item: icon + label, 44px tap target.
+  // These grow their REAL box rather than borrowing `.tap-44` (D-2.25-9): the bottom row below wraps
+  // to three lines on a 320px phone, and a pseudo-element 44px tall on a 27.5px row would overlap the
+  // wrapped row above and below it, so a tap near the boundary would open the wrong page.
   const itemClass =
-    'inline-flex min-h-[24px] items-center gap-3 py-1 hover:underline underline-offset-4 transition-colors duration-[var(--motion-fast)]';
-  // Muted bottom-row page link: ≥24px tap target, muted → foreground on hover.
+    'inline-flex min-h-11 items-center gap-3 py-1 hover:underline underline-offset-4 transition-colors duration-[var(--motion-fast)]';
+  // Muted bottom-row page link: 44px tap target, muted → foreground on hover.
+  // `min-w-11` + centring is for the SHORT labels: the MK strings are all wider than 44px, but EN
+  // "About" measures 36.7px and "Terms" 38.3px, so without a floor those two would clear 44px in
+  // height and miss it in width. Centring keeps the visual gap between links even once a box is
+  // wider than its text.
   const pageLinkClass =
-    'inline-flex min-h-[24px] items-center py-1 hover:text-foreground transition-colors duration-[var(--motion-fast)]';
+    'inline-flex min-h-11 min-w-11 items-center justify-center py-1 hover:text-foreground transition-colors duration-[var(--motion-fast)]';
 
   return (
     <footer className="border-border mt-24 border-t">

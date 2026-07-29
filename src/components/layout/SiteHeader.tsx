@@ -154,8 +154,12 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
 
   // The wordmark markup appears twice — in the header bar and in the overlay's top bar (D-2.15-3). Same
   // classes both times.
+  // `tap-44` on the wordmark and on the build credit below: both are 24px tall and both are the only
+  // thing on their line, so the pseudo-element grows purely vertically and can reach no neighbour
+  // (D-2.25-9). The wordmark's `background-clip: text` sweep is untouched — .tap-44::after paints
+  // nothing, it only catches the pointer.
   const wordmarkClass =
-    'wordmark-shine font-display text-foreground text-price rounded-[var(--radius-sm)] font-extrabold uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring';
+    'tap-44 wordmark-shine font-display text-foreground text-price rounded-[var(--radius-sm)] font-extrabold uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring';
 
   // The burger and the overlay's X share size / interaction classes (44px WCAG target, matching the cart).
   const iconButtonClass =
@@ -183,7 +187,7 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
           href="https://www.vertexconsulting.mk/en"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-mustard inline-flex min-h-6 items-center rounded-[var(--radius-sm)] underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:text-mustard-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+          className="tap-44 text-mustard inline-flex min-h-6 items-center rounded-[var(--radius-sm)] underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:text-mustard-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           {chunks}
           <span className="sr-only"> {tc('opensInNewTab')}</span>
@@ -225,8 +229,12 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
                 key={href}
                 href={href}
                 aria-current={active ? 'page' : undefined}
+                // `tap-44` raises the hit area to 44px without moving a pixel (D-2.25-9): the link
+                // is 24px tall, and growing the real box would carry the `border-b-2` active
+                // indicator 10px down the bar with it. The links are wider than 44px already, so the
+                // pseudo-element grows only vertically and cannot reach a neighbour 16px away.
                 className={cn(
-                  'font-display text-small inline-flex min-h-6 items-center justify-center border-b-2 font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+                  'tap-44 font-display text-small inline-flex min-h-6 items-center justify-center border-b-2 font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
                   active
                     ? 'text-foreground border-mustard'
                     : 'text-muted-foreground border-transparent hover:text-foreground',

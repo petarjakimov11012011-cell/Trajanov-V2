@@ -205,7 +205,7 @@ export function HomeExperience({view}: {view: DropView | null}) {
           </Hero>
           <Link
             href="/about"
-            className="text-muted-foreground hover:text-foreground text-small underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:underline"
+            className="tap-44 text-muted-foreground hover:text-foreground text-small underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:underline"
           >
             {t('aboutLink')} →
           </Link>
@@ -250,7 +250,7 @@ export function HomeExperience({view}: {view: DropView | null}) {
               idle={
                 <Link
                   href="/about"
-                  className="text-muted-foreground hover:text-foreground text-small underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:underline"
+                  className="tap-44 text-muted-foreground hover:text-foreground text-small underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:underline"
                 >
                   {t('aboutLink')} →
                 </Link>

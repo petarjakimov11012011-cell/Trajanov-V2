@@ -63,8 +63,12 @@ export function LanguageSwitch({className}: {className?: string}) {
               lang={loc}
               aria-pressed={active}
               onClick={() => switchTo(loc)}
+              // `tap-44` raises the hit area to 44×44 without changing the rendered box (D-2.25-9).
+              // A real 44px box would push the `·` separator away from the letters and widen the
+              // whole MK·EN group; the two buttons' centres are 47.5px apart, so the pseudo-elements
+              // stop just short of each other and neither can steal the other's tap.
               className={cn(
-                'font-display inline-flex min-h-6 min-w-6 items-center justify-center rounded-[var(--radius-sm)] text-small font-bold uppercase tracking-wide transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+                'tap-44 font-display inline-flex min-h-6 min-w-6 items-center justify-center rounded-[var(--radius-sm)] text-small font-bold uppercase tracking-wide transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
                 active
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:text-foreground',

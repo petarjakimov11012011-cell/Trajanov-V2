@@ -26,8 +26,12 @@ function IconBtn({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
+      // 44×44 for real, not a pseudo-element (D-2.25-9): these controls have a visible border, so the
+      // box IS the design — a hit area that did not match it would be a lie about where to press.
+      // The cart is where a customer commits money on a phone; a 32px stepper next to a 32px stepper
+      // is the worst place on the site to be stingy about the target.
       className={cn(
-        'border-border-strong text-foreground inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] border transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+        'border-border-strong text-foreground inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] border transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
         disabled
           ? 'text-muted-foreground cursor-not-allowed opacity-50'
           : 'hover:border-foreground',
@@ -69,10 +73,23 @@ export function CartView() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_20rem] lg:items-start">
-      {/* lines */}
-      <ul className="flex flex-col divide-y divide-[var(--color-border)]">
+      {/* lines. `min-w-0` on the GRID ITEM is the one that actually unlocks the row (D-2.25-12): a
+          grid item defaults to `min-width: auto`, so this list refused to size below its own
+          content and held the single-column track at 322px inside a 288px container — the page
+          scrolled sideways at 320px. Measured with it: track 288, row 288, document scrollWidth 320,
+          no horizontal scroll. The summary panel beside it measures 192.7px of min-content against
+          the same 288px, so it has headroom and is left alone. */}
+      <ul className="flex min-w-0 flex-col divide-y divide-[var(--color-border)]">
         {lines.map((l) => (
-          <li key={l.variantId} className="flex gap-4 py-4">
+          // `flex-wrap` is the adaptation, not decoration (D-2.25-12). Three things have to share the
+          // row: a 64px thumbnail, the details, and the controls — and the controls are now 180px wide
+          // (a 44px remove, a 12px gap and a 124px stepper cluster). At 320px that leaves the details
+          // 68px, and the price `[PLACEHOLDER: …]` pill has a 102px min-content and would sit across
+          // the minus button. So the row WRAPS: the controls drop to their own right-aligned line and
+          // the details keep 208px. `basis-40` is the content-driven flip point — the controls stay
+          // beside the details for as long as the details can hold 160px, which is every width from
+          // roughly a large phone up. Nothing about the row changes at `sm:` and above.
+          <li key={l.variantId} className="flex flex-wrap gap-4 py-4">
             <div
               className="bg-surface-2 h-20 w-16 shrink-0 rounded-[var(--radius-md)]"
               style={{
@@ -81,8 +98,13 @@ export function CartView() {
               }}
               aria-hidden
             />
-            <div className="flex flex-1 flex-col gap-1">
-              <h3 className="font-display text-foreground font-semibold">
+            {/* `min-w-0` is load-bearing here too: a flex item defaults to `min-width: auto` and
+                refuses to shrink below its content, and the names this column holds today are the
+                placeholder "Производ 01" — a real product name from Y.01 is longer. `break-words`
+                covers the other half, a single long word. `grow basis-40` (not `flex-1`, whose basis
+                is 0) is what gives the wrap above something to measure against. */}
+            <div className="flex min-w-0 grow basis-40 flex-col gap-1">
+              <h3 className="font-display text-foreground font-semibold break-words">
                 {tp('productName')} {pad2(l.productIndex)}
               </h3>
               <p className="text-muted-foreground text-small">
@@ -92,12 +114,19 @@ export function CartView() {
                 <Placeholder>{tp('price')}</Placeholder>
               </div>
             </div>
-            <div className="flex flex-col items-end justify-between">
+            {/* Controls. Beside the details when they fit, on their own right-aligned line when they
+                do not (`ml-auto` does the right-aligning in the wrapped case; it is inert otherwise).
+                From `sm:` this is the shipped stack — remove at the top, steppers at the bottom —
+                unchanged. Below `sm:` they sit on one horizontal line, which is the only shape that
+                fits a wrapped row without doubling its height. */}
+            <div className="ml-auto flex items-center gap-3 sm:flex-col sm:items-end sm:justify-between sm:gap-0">
+              {/* Remove — 44×44 for real (D-2.25-9). It is the one destructive control in the cart
+                  and it used to be a bare 16px glyph with no box at all. */}
               <button
                 type="button"
                 aria-label={t('remove')}
                 onClick={() => remove(l.variantId)}
-                className="text-muted-foreground hover:text-foreground transition-colors duration-[var(--motion-fast)]"
+                className="text-muted-foreground hover:text-foreground inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
                 <X className="h-4 w-4" />
               </button>

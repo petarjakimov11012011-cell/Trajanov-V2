@@ -153,8 +153,19 @@ export default function StyleguidePage() {
       </Section>
 
       <Section title={t('countdown')}>
-        <div className="bg-surface flex justify-center rounded-[var(--radius-lg)] p-6">
-          <Countdown offsetMs={40_000} />
+        {/* The countdown row has a hard floor: `--text-h1` bottoms out at its 2.25rem minimum below a
+            514px viewport, so the row measures 306.4px at EVERY viewport ≤514px. On Home that fits —
+            the hero is full-bleed, 0→320 at the narrowest phone. Here the demo card's inner box is
+            240px at 320px, and the row was escaping it by 9.2px on each side (D-2.25-11). Nothing is
+            wrong with the countdown; a demo card that cannot hold its demo is the demo card's
+            problem, so the card scrolls instead. `w-max mx-auto` on the inner row is what makes the
+            scroll usable: `justify-center` on a scroll container puts the left overflow out of reach,
+            while auto margins collapse to 0 once the content is wider than the box — centred when it
+            fits, scrollable from the left edge when it does not. */}
+        <div className="bg-surface overflow-x-auto rounded-[var(--radius-lg)] p-6">
+          <div className="mx-auto w-max">
+            <Countdown offsetMs={40_000} />
+          </div>
         </div>
       </Section>
 
