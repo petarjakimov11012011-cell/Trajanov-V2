@@ -11,9 +11,15 @@ import {Placeholder} from '@/components/system/Placeholder';
 import {ShippingNotice} from '@/components/system/ShippingNotice';
 import {useCart} from '@/components/cart/cart-store';
 import {toOrderItems, cartDropSlug} from '@/lib/cart/cart';
+import {firstInvalidField, focusFormField} from '@/lib/forms/first-invalid';
 import {placeOrder, type PlaceOrderResult} from '@/lib/orders/actions';
 
 type Errors = Partial<Record<'name' | 'phone' | 'city' | 'address', string>>;
+
+// DOM order of the fields, which is NOT the order validate() fills the error map in (it does name /
+// city / address in one loop, then phone). Focus has to land on the first field the customer reaches,
+// so the order is declared here rather than read off Object.keys() (D-2.25-5).
+const FIELD_ORDER = ['name', 'phone', 'city', 'address'] as const;
 
 // One-screen checkout wired to the real order path (Task 6). It reads the customer's cart (client
 // state) for what to submit — variant_id + qty only, never a price or a name (brief Task 6). On submit
@@ -52,7 +58,15 @@ export function CheckoutForm({siteKey}: {siteKey: string}) {
     const form = e.currentTarget;
     const next = validate(form);
     setErrors(next);
-    if (Object.keys(next).length > 0 || !dropSlug || items.length === 0) return;
+    if (Object.keys(next).length > 0 || !dropSlug || items.length === 0) {
+      // Nothing was submitted, so focus must not be left sitting on the button the customer just
+      // pressed — move it to the first invalid field, in DOM order (D-2.25-5). Landing there is what
+      // makes a screen reader read the label, the "invalid entry" state and the error text together,
+      // and it is what puts a sighted keyboard user's caret where the work is.
+      const first = firstInvalidField(next, FIELD_ORDER);
+      if (first) focusFormField(form, first);
+      return;
+    }
 
     const data = new FormData(form);
     setSubmitting(true);
@@ -81,6 +95,9 @@ export function CheckoutForm({siteKey}: {siteKey: string}) {
     setResult(res);
     if (res.status === 'invalid' && res.field === 'phone') {
       setErrors((p) => ({...p, phone: t('errorPhone')}));
+      // The server rejected the phone the client had accepted. Same contract as a client-side failure:
+      // the order did not go through, so focus goes to the field that has to change (D-2.25-5).
+      focusFormField(form, 'phone');
     }
   }
 
@@ -128,7 +145,7 @@ export function CheckoutForm({siteKey}: {siteKey: string}) {
       {/* summary + turnstile + place order */}
       <div className="bg-surface flex flex-col gap-4 rounded-[var(--radius-lg)] p-5 lg:sticky lg:top-20">
         <h2 className="font-display text-foreground font-bold">{t('summary')}</h2>
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-small">
           <span className="text-muted-foreground">{t('summary')}</span>
           <Placeholder>{tp('price')}</Placeholder>
         </div>
@@ -145,12 +162,12 @@ export function CheckoutForm({siteKey}: {siteKey: string}) {
           {submitting ? (
             <>
               <span className="border-mustard h-5 w-5 animate-spin rounded-full border-2 border-t-transparent" aria-hidden />
-              <span className="text-muted-foreground text-sm">{t('verifying')}…</span>
+              <span className="text-muted-foreground text-small">{t('verifying')}…</span>
             </>
           ) : (
             <>
               <ShieldCheck className="text-mustard h-5 w-5" strokeWidth={1.75} aria-hidden />
-              <span className="text-muted-foreground text-sm">{to('protected')}</span>
+              <span className="text-muted-foreground text-small">{to('protected')}</span>
             </>
           )}
         </div>

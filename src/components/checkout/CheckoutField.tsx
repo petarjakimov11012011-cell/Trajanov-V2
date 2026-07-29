@@ -57,10 +57,11 @@ export function CheckoutField({
           name={name}
           placeholder={placeholder}
           disabled={disabled}
+          required={required}
           defaultValue={defaultValue}
           rows={3}
           aria-invalid={!!error}
-          aria-describedby={error ? `${id}-error` : undefined}
+          aria-describedby={`${id}-error`}
           className={fieldClass}
         />
       ) : (
@@ -75,16 +76,32 @@ export function CheckoutField({
           autoComplete={autoComplete}
           inputMode={inputMode}
           aria-invalid={!!error}
-          aria-describedby={error ? `${id}-error` : undefined}
+          aria-describedby={`${id}-error`}
           className={fieldClass}
         />
       )}
 
-      {error && (
-        <p id={`${id}-error`} className="text-error text-small">
-          {error}
-        </p>
-      )}
+      {/* PERSISTENT live region (D-2.25-5). It is in the DOM from first paint — empty, and `sr-only`
+          until there is something to say — rather than being mounted together with its text. A live
+          region inserted in the same tick as its first message is unreliable: several screen readers
+          only announce changes to a region they were already tracking, so the previous
+          conditionally-mounted <p> announced nothing at all on a failed submit and the customer was
+          told about the error only if they navigated back to the field.
+
+          `sr-only` is `position: absolute`, so while the region is empty it contributes no box and
+          the field's spacing is byte-identical to before this change.
+
+          role="alert" is assertive on purpose: a submit the customer just pressed and that did NOT
+          go through has to interrupt, not queue behind whatever is being read.
+
+          The size stays `text-small` (13px, brand.md §4) — see D-2.25-6. */}
+      <p
+        id={`${id}-error`}
+        role="alert"
+        className={cn('text-error text-small', !error && 'sr-only')}
+      >
+        {error}
+      </p>
     </div>
   );
 }

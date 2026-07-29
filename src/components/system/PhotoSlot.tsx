@@ -13,10 +13,16 @@ import {cn} from '@/lib/utils';
 // The whole site's first images (`next/image` was unused before this phase): local files only, no
 // `images` block in `next.config.ts`, no remote host, no new dependency.
 
-// One value serves both surfaces — they happen to compute to the same width. Catalog grid is
-// `grid-cols-2 lg:grid-cols-4` in a `max-w-6xl` (1152px) container → ~280px per card at lg, ~50vw
-// below. The product page's slot pair is `grid-cols-2` inside `lg:grid-cols-2`, i.e. half of 1152
-// split in two → ~280px at lg, ~50vw below. Keep in step if either grid changes.
+// The DEFAULT, which is the catalog grid: `grid-cols-2 lg:grid-cols-4` in a `max-w-6xl` (1152px)
+// container → ~280px per card at lg, ~50vw below. Unchanged.
+//
+// The product page no longer shares it (D-2.25-15). Its slot pair used to be a plain `grid-cols-2`,
+// which computed to the same ~50vw below lg — that is why one constant served both. `D-2.25-10`
+// collapsed that pair to ONE column below `sm:`, so on a phone the slot is now the full column
+// (~100vw) while this string still promised 50vw: the browser would have picked a source sized for
+// half the box and upscaled it, i.e. the page whose entire purpose is the photograph would have
+// shown a softer photograph than before the change. The caller passes its own value instead — the
+// "keep in step if either grid changes" note this constant carried, honoured.
 const CATALOG_SIZES = '(min-width: 1024px) 280px, 50vw';
 
 export function PhotoSlot({
@@ -24,6 +30,7 @@ export function PhotoSlot({
   muted = false,
   className,
   image,
+  sizes = CATALOG_SIZES,
 }: {
   /** Placeholder text. Shown only when there is no `image`; still required, as most slots are empty. */
   label: string;
@@ -31,6 +38,11 @@ export function PhotoSlot({
   className?: string;
   /** A real photograph for this slot, or null/undefined for the placeholder (the default). */
   image?: {src: string; alt: string; objectPosition?: string} | null;
+  /**
+   * The `next/image` `sizes` hint. Defaults to the catalog grid's geometry; a surface whose slot is a
+   * different fraction of the viewport MUST pass its own, or `next/image` requests the wrong source.
+   */
+  sizes?: string;
 }) {
   return (
     <div
@@ -53,7 +65,7 @@ export function PhotoSlot({
           src={image.src}
           alt={image.alt}
           fill
-          sizes={CATALOG_SIZES}
+          sizes={sizes}
           // No `priority`: the catalog grid is below the header and these are not LCP-critical.
           // Lighthouse mobile Performance on Catalog was 94 pre-phase and is a re-check owed to Lazar.
           className="object-cover"

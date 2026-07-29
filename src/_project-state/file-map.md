@@ -6,11 +6,41 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-28** · By: **Claude Code (Phase 2.24 — Instagram glyph replaces the `@` icon)**
+Last updated: **2026-07-29** · By: **Claude Code (Phase 2.25 owner items — showcase named per state + live hero)**
 
 ---
 
 ## Status
+
+**Phase 2.25 owner items landed — one new file (same branch, after P1).** New:
+`docs/i18n/mk-review-2.25.md` (**unsigned** — the two showcase section-name strings,
+`Showcase.headingLast`/`headingLive`, owed register #64). Modified only (no moves, no deletes):
+`src/components/home/{HomeShowcase,HomeExperience}.tsx`, `src/lib/showcase.ts`,
+`src/app/[locale]/page.tsx` (comment), `src/messages/{mk,en}.json` (+2 keys → 274),
+`tests/home/showcase.test.ts`, `docs/i18n/string-inventory.md` (regenerated), `Decisions.md`
+(`D-2.25-22…25`), the state files.
+
+**Phase 2.25 P1 landed — five new files (branch `phase-2.25-impeccable-pass`, NOT yet merged; P2
+`/polish` + the closing `/audit` are still owed on the same branch).** New:
+`src/lib/forms/first-invalid.ts` (new `src/lib/forms/` dir — pure, DOM-free "which field does a
+failed submit focus", shared by CheckoutForm and ContactForm);
+`src/i18n/client-namespaces.ts` (the allow-list of message namespaces the browser is allowed to
+receive, plus `pickClientMessages`); `src/components/home/CountdownOpening.tsx` (the T-0 client
+island — a React context plus `CountdownTicker` / `OpeningSwitch` — extracted so
+`HomeExperience.tsx` could go back to being a **Server Component**);
+`tests/forms/first-invalid.test.ts` (new `tests/forms/` dir, 7 assertions);
+`tests/i18n/client-messages.test.ts` (re-derives the required namespace set by walking the import
+graph out from every `'use client'` boundary — the guard that keeps the allow-list honest).
+Modified: `src/app/[locale]/layout.tsx` (scoped provider), `src/app/globals.css` (new top-level
+`.tap-44` utility; `filter: blur()` removed from `@keyframes trajanov-reveal`; the
+`prefers-reduced-motion` block reframed as a backstop + a second block for the enumerated rules),
+`src/components/checkout/{CheckoutField,CheckoutForm}.tsx`, `src/components/contact/ContactForm.tsx`,
+`src/components/home/HomeExperience.tsx`, `src/components/layout/{SiteHeader,LanguageSwitch,SiteFooter}.tsx`,
+`src/components/cart/CartView.tsx`, `src/app/[locale]/catalog/[slug]/page.tsx`,
+`src/app/[locale]/styleguide/page.tsx`, `Decisions.md` (`D-2.25-5…14`), the state files.
+**No `supabase/`, `create_order`, `expire_reservations`, `src/config/`, `src/lib/drop/`,
+`src/lib/orders/`, `src/messages/`, `facts.md`, `brand.md`, `next.config.ts`, `package.json` or
+npm dependency touched.** Below is the 2.21 history.
 
 **Home showcase landed (Phase 2.21).** The pieces themselves now render on the home page between the
 hero and the FAQ (countdown/ended/no-view; **nothing in `live`** — rendered `<main>` at

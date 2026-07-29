@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 272 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 274 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -131,7 +131,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Footer.rights` | © 2026 Трајанов. Сите права задржани. | © 2026 Trajanov. All rights reserved. | `src/components/layout/SiteFooter.tsx` |
 | `Footer.social` | СЛЕДИ | FOLLOW | `src/components/layout/SiteFooter.tsx` |
 | `Home.aboutLink` | Прво место на конкурс за дизајн | First place in a design competition | `src/components/home/HomeExperience.tsx` |
-| `Home.browseWhileWait` | Разгледај додека чекаш | Browse while you wait | `src/components/home/HomeShowcase.tsx` |
+| `Home.browseWhileWait` | Разгледај додека чекаш | Browse while you wait | _(not found in source)_ |
 | `Home.ctaCatalog` | Каталог | Catalog | `src/components/home/HomeExperience.tsx` |
 | `Home.ctaContact` | Контакт | Contact | `src/components/home/HomeExperience.tsx` |
 | `Home.eyebrow` | Следно спуштање | Next drop | _(not found in source)_ |
@@ -243,6 +243,8 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `ShippingReturns.returnsBody` | Точниот рок сè уште го немаме потврдено. | We don't have the exact window confirmed yet. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.returnsHeading` | Рок за враќање и замена | Returns and exchange window | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.whereHeading` | Каде испорачуваме | Where we ship | `src/app/[locale]/shipping-returns/page.tsx` |
+| `Showcase.headingLast` | Последно спуштање | Last drop | `src/components/home/HomeShowcase.tsx` |
+| `Showcase.headingLive` | Ова спуштање | This drop | `src/components/home/HomeShowcase.tsx` |
 | `Showcase.next` | Следно парче | Next piece | `src/components/home/HomeShowcase.tsx` |
 | `Showcase.pause` | Паузирај | Pause | `src/components/home/HomeShowcase.tsx` |
 | `Showcase.play` | Пушти | Play | `src/components/home/HomeShowcase.tsx` |

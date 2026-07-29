@@ -2,7 +2,7 @@
 // WHAT order. Pure — no React, no I/O — so both HomeShowcase.tsx and a plain vitest run can import
 // it (the src/lib/faq.ts precedent, D-2.11-5).
 //
-// TWO RULES LIVE HERE ON PURPOSE — do not "fix" either later:
+// ONE RULE LIVES HERE ON PURPOSE — do not "fix" it later:
 //
 // 1. A slide requires a real photograph (orchestrator decision 2, Phase 2.21 brief). Products with
 //    no frame in src/lib/product-images.ts are SKIPPED, not shown with a placeholder box. A
@@ -11,10 +11,11 @@
 //    moment Y.01 commits a product's photograph and product-images.ts gains its entry, the product
 //    appears here with zero code change.
 //
-// 2. The `live` state returns NO slides (orchestrator decision 5). During a live drop the buyable
-//    grid IS the page; a second, non-buyable gallery of the same shirts competes with the only
-//    thing that matters that hour. HomeShowcase renders null on an empty list, so the live page's
-//    markup stays exactly what it was before this phase.
+// A SECOND rule used to live here: the `live` state returned NO slides (2.21 brief, orchestrator
+// decision 5 — "during a live drop the buyable grid IS the page"). REVERSED by the owner on
+// 2026-07-29 (D-2.25-23): the showcase now renders in every state that has photographed products,
+// and Home names it per state on the section heading — „Ова спуштање" while live, „Последно
+// спуштање" otherwise (D-2.25-22). The buyable grid keeps its place above the showcase.
 
 import { getProductImage, type ProductImage } from "@/lib/product-images";
 // Type-only: erased at compile time, so the "server-only" guard inside drop/state never runs here.
@@ -37,11 +38,11 @@ export interface ShowcaseSlide {
 
 /**
  * The slides the Home showcase renders, in `view.products` order. Empty when there is no drop at
- * all, when the drop is `live` (rule 2), or when no product has a photograph — HomeShowcase
- * renders nothing in all three cases.
+ * all or when no product has a photograph — HomeShowcase renders nothing in both cases. Every
+ * drop state gets slides, `live` included (D-2.25-23).
  */
 export function showcaseSlides(view: DropView | null): ShowcaseSlide[] {
-  if (!view || view.state === "live") return [];
+  if (!view) return [];
   const slides: ShowcaseSlide[] = [];
   for (const p of view.products) {
     const image = getProductImage(p.slug); // by SLUG, never by index (D-Y.03-1)

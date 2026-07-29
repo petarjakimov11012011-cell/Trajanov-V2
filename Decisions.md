@@ -4588,3 +4588,688 @@ start at `D-2.01-6`.*
   already long enough to be unwieldy, and this is a deviation from the brief's literal Task 5 — which
   is why it is logged here rather than done silently.
 - **Links:** `CLAUDE.md` (state duties) · `src/_project-state/current-state.md` · Phase 2.24 brief Task 5
+
+---
+
+### D-2.25-1 · 2026-07-29 · The brand type scale is registered with tailwind-merge, so `cn()` stops deleting font sizes
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — the root fix that `D-Y.05-9/10` deferred out of that
+  phase's file scope, and that three shipped source comments name by file and function.
+- **Context — this was a live rendering bug, not a tidiness item.** `tailwind-merge` cannot read our
+  CSS. Its default `text-color` class group matches any `text-<word>` it does not already know as a
+  font size, so **every one of the seven brand size tokens was filed as a COLOUR**: `text-countdown`
+  and `text-foreground` shared one conflict group, and inside `cn()` the later class silently deleted
+  the earlier one. Proven empirically against the installed `tailwind-merge@3.6.0` before any file was
+  edited — `twMerge('text-countdown text-foreground')` returns `'text-foreground'`, and
+  `twMerge('font-display text-small … text-muted-foreground hover:text-foreground')` returns the string
+  with `text-small` **gone**. Measured in a live browser on `main`: the `/styleguide` countdown digits
+  computed to **16px**, the header nav to **16px**, the language switch to **16px**. The countdown has
+  rendered at the body default since Phase 1.04, on `main` and in production.
+- **Decision:** `src/lib/utils.ts` builds `cn()` from `extendTailwindMerge`, registering
+  `countdown, h1, h2, body, small, price, eyebrow` under the **`font-size`** class group. A size and a
+  colour are different CSS properties and now stop colliding; two sizes (`text-h1 text-h2`) still
+  resolve last-wins, which is correct. Verified after the change on the same pages: `/styleguide`
+  countdown **16px → 88px**, nav **16px → 13px**, language switch **16px → 13px**.
+- **Alternative rejected:** keep spreading the per-call-site workaround — write every class string that
+  contains a brand size as a plain concatenation instead of `cn()`. That is what 2.15, 2.21 and Y.05
+  each did in turn, and it is why three files carry hand-written notes explaining the same bug. It
+  scales as a permanent tax on every future component, it silently fails the moment somebody uses
+  `cn()` without reading the note, and it had already let the loudest object on the site render at
+  16px for twenty-one phases without anyone noticing.
+- **Also rejected:** passing the whole Tailwind theme to `extendTailwindMerge` via its `theme` option.
+  It would cover future tokens automatically, but it means restating the colour, spacing, radius and
+  motion scales in TypeScript as a second source of truth for values `brand.md` already owns — the
+  exact duplication `CLAUDE.md`'s "tokens come from `brand.md` and nowhere else" exists to prevent.
+- **Downside accepted:** the seven-name list in `src/lib/utils.ts` is a **manual mirror** of the
+  `--text-*` tokens in `globals.css` `@theme inline`. Adding an eighth type token to the brand scale
+  without adding it here reintroduces the identical silent-strip bug for that token alone, with no
+  build error and no test failure to catch it. The list carries a KEEP IN SYNC comment saying so; that
+  is a comment, not an enforcement mechanism.
+- **Second downside accepted:** the fix **changes rendered output on pages nobody asked to change**.
+  Every `cn()` string where a brand size preceded a colour had been rendering at the inherited 16px and
+  now snaps to its token — the drop eyebrow (16px → 12px), the showcase caption (16px → 13px), and the
+  checkout and contact form error lines (16px → 13px). All four are what the author wrote and what
+  `brand.md` §4 prescribes, so they are treated as restorations, not regressions. **The form error
+  lines dropping to 13px is flagged for `/impeccable harden`** rather than pre-empted here.
+- **Links:** `src/lib/utils.ts` · `src/app/globals.css` (`@theme inline`) · `brand.md` §4 ·
+  `D-Y.05-9` · `D-Y.05-10` · `D-2.25-2` · `D-2.25-3` · `CLAUDE.md` (tokens)
+
+---
+
+### D-2.25-2 · 2026-07-29 · The countdown's size moves onto the component root and the digit spans inherit it
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot — a regression that `D-2.25-1` would otherwise have caused.
+- **Context.** `D-Y.05-9/10` worked around the strip by putting `text-h1 md:text-countdown` on a
+  wrapper at the Home call site and letting the digit spans inherit it, because their own
+  `text-countdown` was being deleted. `D-2.25-1` stops deleting it — which means the spans' own
+  `text-countdown` would come back and **override the wrapper**, reinstating the exact clip Y.05
+  measured: at 390px, four 2ch cells at 13vw plus colons and gaps measure ~402px, wider than the
+  viewport. The token was born unfittable on a phone; the 16px bug is the only reason nobody ever saw
+  it clip. Fixing the merge without moving the size would have shipped a horizontal overflow on the
+  Home hero for every phone visitor.
+- **Decision:** the size is declared **once, on the `Countdown` root** —
+  `font-display text-h1 md:text-countdown …` — and the digit and colon spans declare no size at all
+  and inherit. The root is the only place that knows the row is responsive. The Home call site's
+  wrapper `className` is therefore deleted as redundant. Measured after the change: **390px → 36px
+  digits, row 306px wide, `documentElement.scrollWidth` 390 (no overflow); 768px → 88px digits, row
+  669px (fits); 1280px → 88px.**
+- **Alternative rejected:** leave `text-countdown` on the spans and keep the responsive step at the
+  call site. Rejected because a caller would then have to know that the component's own spans will
+  overrule whatever size it passes — the failure mode is invisible in the JSX and only shows up as a
+  clipped row on a phone.
+- **Also rejected:** widen the token, or make `--text-countdown` itself fit 390px. That edits
+  `brand.md` §4 to route around a layout problem in one component, and `brand.md` is owner territory.
+- **Downside accepted:** the countdown is now **smaller than its own brand token below `md:`**, so the
+  "largest type on the site" claim in `brand.md` §4 holds only from 768px up. `/styleguide` also
+  changes: its `<Countdown offsetMs={40_000} />` passes no `className`, so it inherited the bug and
+  rendered at 16px — it now renders at the real token, which is a **visible change to the design-system
+  reference page** that Lazar has not seen. Register row added.
+- **Links:** `src/components/drop/Countdown.tsx` · `src/components/home/HomeExperience.tsx` ·
+  `src/app/[locale]/styleguide/page.tsx` · `D-Y.05-9` · `D-Y.05-10` · `D-2.25-1` · `brand.md` §4
+
+---
+
+### D-2.25-3 · 2026-07-29 · The three "do not use `cn()`" workarounds are retired in the same commit that removes their reason
+- **Status:** Accepted
+- **Decided by:** Claude Code, on the spot.
+- **Decision:** `HomeExperience.tsx`, `HomeShowcase.tsx` and `SiteHeader.tsx` each carried a comment
+  instructing future authors to avoid `cn()` for class strings containing a brand size. All three are
+  rewritten to describe what is now true and to name `D-2.25-1`; `SiteHeader`'s `overlayRow` returns
+  from hand-concatenated strings to `cn()`. The overlay rows were re-measured open, at 390px: **24px
+  `text-h2`, 44px row height, 2px left border, `rgb(171,167,158)`** — identical to before, and the
+  emitted class string is unchanged.
+- **Alternative rejected:** fix `cn()` and leave the comments. A comment that tells the next author to
+  work around a bug that no longer exists is worse than no comment: it would have propagated the
+  workaround into new components indefinitely, which is exactly how this bug survived twenty-one
+  phases.
+- **Downside accepted:** this widens the diff into three files that the P0 item did not name, and
+  `SiteHeader.overlayRow` is a behavioural no-op whose only justification is consistency — a reviewer
+  must read it as such rather than looking for a rendered change.
+- **Links:** `src/components/home/HomeExperience.tsx` · `src/components/home/HomeShowcase.tsx` ·
+  `src/components/layout/SiteHeader.tsx` · `D-2.25-1`
+
+---
+
+### D-2.25-4 · 2026-07-29 · `text-sm` → `text-small` only; the other off-scale sizes are reported, not codemodded
+- **Status:** Accepted
+- **Decided by:** **Petar**, asked and answered before any file was edited (the P0 brief said
+  `text-sm→text-small`; the codebase also carries `text-xs`, `text-base`, `text-lg` and `text-3xl`,
+  none of which `brand.md` §4 sanctions).
+- **Decision:** codemod **`text-sm` → `text-small` only** — 18 call sites across 9 files, `0.875rem`
+  → `0.8125rem`. Zero stock `text-sm` remains in any rendered route (verified against the served HTML
+  of `/`, `/?preview=live`, `/?preview=ended`, `/catalog`, `/cart`, `/checkout`, `/contact`, `/about`,
+  `/styleguide`). The remaining off-scale sizes — `text-xs` ×6, `text-base` ×4, `text-lg` ×2,
+  `text-3xl` ×1 — are carried to `/impeccable polish` and the closing `/impeccable audit` as an
+  inventory item, with the owner deciding there.
+- **Alternative rejected:** migrate the whole file tree onto `brand.md` §4 in this pass
+  (`text-xs`→`text-eyebrow`, `text-base`→`text-body`, `text-lg`/`text-3xl` onto the nearest token).
+  It is where the codebase should end up and `CLAUDE.md` forbids hardcoded sizes, but `text-lg` and
+  `text-3xl` have **no clean brand equivalent**, so the migration cannot be finished mechanically —
+  and doing the easy two-thirds of it inside a P0 bug fix would change more pixels than the item
+  promised, on pages the fix has no reason to touch.
+- **Downside accepted:** the codebase **stays inconsistent on purpose** until `/polish` closes it, and
+  `DropBanner.tsx:28` now reads `text-small … sm:text-base` — one brand token and one stock token in a
+  single responsive pair, which is the least defensible line in the diff. It is left that way rather
+  than quietly widened past the agreed scope.
+- **Links:** `brand.md` §4 · `CLAUDE.md` (tokens) · `src/components/drop/DropBanner.tsx` ·
+  `D-2.25-1` · Phase 2.25 completion report
+
+---
+
+### D-2.25-5 · 2026-07-29 · Persistent `role="alert"` per field + focus to the first invalid field, in DOM order
+- **Status:** Accepted
+- **Decided by:** Code (Phase 2.25 P1 `/impeccable harden`), from the P1 brief §1a.
+- **Decision:** three changes to the shared form path. (1) `CheckoutField` passes `required` through
+  the **textarea** branch — the input branch already had it, so `ContactForm`'s message field has been
+  rendering a `*` in its label with **no required semantics at all** (measured on the P0 baseline:
+  `textarea.required === false`). (2) The error `<p>` becomes a **persistent** `role="alert"` region:
+  always in the DOM, `sr-only` and empty until there is something to say, with `aria-describedby`
+  wired unconditionally. A live region inserted in the same tick as its first message is not reliably
+  announced, which is why the old conditionally-mounted `<p>` announced **nothing** on a failed
+  submit (baseline: `document.querySelectorAll('[role="alert"]').length === 0` before *and* after a
+  failed submit). `sr-only` is `position: absolute`, so while empty it contributes no box — field
+  wrapper measured **71.5px on both sides** with no error and **97px on both sides** with one.
+  (3) Both forms move focus to the first invalid field on a failed submit, in **DOM order** rather
+  than error-map insertion order, via the pure, unit-tested `firstInvalidField()`
+  (`src/lib/forms/first-invalid.ts`, 7 tests). Baseline: focus stayed on the submit button
+  (`document.activeElement === submitButton`). After: focus lands on `#name` / `#contact-name` with
+  `aria-invalid="true"`. Checkout also focuses `phone` when the **server** rejects a phone the client
+  accepted.
+- **Alternative rejected:** one form-level summary region ("3 fields need attention") instead of a
+  region per field — the GOV.UK error-summary pattern. It announces once instead of four times and is
+  quieter, but it needs a **new user-facing string in MK and EN**, which means new MK review debt on a
+  phase that otherwise adds none, and it does not help the case that actually motivated this — the
+  server-side phone rejection, which is a single field changing after the page has settled.
+- **Downside accepted:** on a submit that fails four fields at once, a screen reader now gets four
+  assertive announcements **and** a focus move that re-reads the first field. That is redundant, and
+  it is louder than the error-summary pattern would be. The alternative is recorded above so the next
+  pass can take it if a real screen-reader session says the burst is worse than the silence was.
+- **Links:** `src/components/checkout/CheckoutField.tsx` · `src/components/checkout/CheckoutForm.tsx` ·
+  `src/components/contact/ContactForm.tsx` · `src/lib/forms/first-invalid.ts` ·
+  `tests/forms/first-invalid.test.ts` · P1 brief §1a
+
+---
+
+### D-2.25-6 · 2026-07-29 · Form error text stays at 13px (`text-small`)
+- **Status:** Accepted
+- **Decided by:** Code, on the P1 brief's explicit instruction to "decide deliberately".
+- **Decision:** the checkout and contact error lines **stay `text-small`** (0.8125rem = 13px,
+  `brand.md` §4). P0 restored them from an accidental 16px to their `brand.md`-correct size, and this
+  phase leaves that alone. What the error needed was not to be bigger — it was to be **announced**
+  and to **receive focus**, which is what `D-2.25-5` does. Measured in place: 13px, line-height
+  19.5px, `--color-error` `rgb(240, 133, 122)` on `--color-ground`.
+- **Alternative rejected:** bump the error line to `text-body` (16px). 13px is small for an error on a
+  phone and 16px would read louder. Rejected because the size a token renders at is a `brand.md`
+  question, not a local override — `brand.md` is owner territory, and changing `--text-small` would
+  move every one of the ~40 call sites the P0 codemod just landed on, not only the errors.
+- **Downside accepted:** the error line is the same size as the field's own label and smaller than the
+  16px input text above it, so it is the quietest thing in a field that has just failed. If Lazar
+  wants it louder, the honest fix is a new `brand.md` §4 token for it, not a one-off class here — that
+  is a conversation this phase is deliberately not having on its own.
+- **Links:** `brand.md` §4 · `src/components/checkout/CheckoutField.tsx` · `D-2.25-5` · P1 brief §1a
+
+---
+
+### D-2.25-7 · 2026-07-29 · The i18n client provider ships an allow-list of namespaces, guarded by a test
+- **Status:** Accepted
+- **Decided by:** Code (Phase 2.25 P1 `/impeccable optimize`), from the P1 brief §1b.
+- **Decision:** `NextIntlClientProvider` in `src/app/[locale]/layout.tsx` is handed
+  `pickClientMessages(await getMessages({locale}))` instead of the whole catalog. The allow-list —
+  14 of 23 namespaces — lives in `src/i18n/client-namespaces.ts` and is exactly the set reachable
+  from a `'use client'` boundary, **including modules that carry no directive of their own** and
+  become client code when a client component imports them (`DropBanner`, `StockBadge`, `ProductCard`,
+  `ShippingNotice`, `product-images.ts`). Measured on the MK build, both sides, same dev server:
+  **16,308 → 6,241 bytes** of serialized messages in the HTML of `/`, `/kontakt`, `/uslovi` and
+  `/katalog` alike (**−61.7%**), with `Footer Faq About Terms Privacy ShippingReturns Catalog
+  Styleguide Meta` withheld. The Terms page title was provably sitting in the Contact page's HTML
+  before. All 28 routes (15 MK + 13 EN) return 200 with **zero** `MISSING_MESSAGE` / `IntlError`.
+- **Alternative rejected:** a **deny-list** of the big server-only catalogs instead of an allow-list.
+  It is more forgiving — a new namespace defaults to shipping and nothing breaks — but that is exactly
+  its problem: the default is to keep sending junk, and nobody notices. Also rejected: moving the
+  provider per-route, which would scope tighter but multiplies the number of places that can be wrong.
+- **Downside accepted:** a namespace a client component needs but that is missing from the list does
+  **not** fail the build — it fails at RUNTIME, in the customer's browser, as a `MISSING_MESSAGE`.
+  That is a worse failure mode than before, and the only thing standing between the project and it is
+  `tests/i18n/client-messages.test.ts`, which re-derives the required set by walking the import graph
+  out from every client boundary. If that test is ever deleted or weakened, this optimisation becomes
+  a liability.
+- **Links:** `src/i18n/client-namespaces.ts` · `src/app/[locale]/layout.tsx` ·
+  `tests/i18n/client-messages.test.ts` · P1 brief §1b
+
+---
+
+### D-2.25-8 · 2026-07-29 · `HomeExperience` returns to a Server Component; the T-0 flag moves to a client island
+- **Status:** Accepted
+- **Decided by:** Code (Phase 2.25 P1 `/impeccable optimize`), from the P1 brief §1b.
+- **Decision:** `HomeExperience.tsx` loses `'use client'`. The three things that needed the browser —
+  `useState(opening)`, the `setInterval(router.refresh)` effect, and the `onComplete` handler — move
+  into `src/components/home/CountdownOpening.tsx`: a React context provider plus `CountdownTicker`
+  and `OpeningSwitch`. Everything visual (the hero photograph, the scrim, the tagline, both CTAs, all
+  three drop banners, the whole live-drop product grid and the about link) is server-rendered and
+  handed to those components as `children` / slots. Context providers and fragments emit no DOM, so
+  the `<section>`'s direct children — and therefore the `.reveal-group > *:nth-child()` stagger — are
+  unchanged. Measured, both sides, client component modules referenced in the served HTML:
+  **ended** `HomeExperience + HomeShowcase + SiteHeader` → `HomeShowcase + SiteHeader`;
+  **live** `HomeExperience + HomeShowcase + SiteHeader` → `HomeShowcase + SiteHeader + SpotlightCard`;
+  **countdown** `HomeExperience + HomeShowcase + SiteHeader` → `HomeShowcase + SiteHeader +
+  CountdownOpening`. Drop state stays server-computed and `force-dynamic` is untouched (`D-1.04-9`);
+  the T-0 handover was exercised end to end with a temporary `target={Date.now() + 6000}` maneuver
+  (reverted, diff-proven empty): the "Opening…" status replaced the tagline and both CTAs, the about
+  link disappeared, the hero photograph survived, and `router.refresh()` kept firing on its interval.
+- **Alternative rejected:** leave the countdown branch as one client island containing `<Hero>`.
+  It is a much smaller diff — one component instead of four exports and a context — but it keeps the
+  photograph, the scrim and the CTAs in the client bundle for the state the site sits in for most of
+  its life, which is the state the brief was pointing at.
+- **Downside accepted:** the T-0 swap is now coordinated through a **React context** rather than one
+  local `useState`, so three components have to stay in agreement about it, and a slot rendered
+  outside the provider silently shows its idle content instead of throwing. That failure mode is
+  chosen on purpose (the front door must not crash), but it means a mis-wired slot fails **quietly**.
+- **Links:** `src/components/home/HomeExperience.tsx` · `src/components/home/CountdownOpening.tsx` ·
+  `src/app/[locale]/page.tsx` · `D-1.04-9` · `D-2.16-2` · P1 brief §1b
+
+---
+
+### D-2.25-9 · 2026-07-29 · `.tap-44` raises the hit area where the visual box must not move; the footer grows its real boxes
+- **Status:** Accepted
+- **Decided by:** Code (Phase 2.25 P1 `/impeccable adapt`), from the P1 brief §1c.
+- **Decision:** a new top-level `.tap-44` utility in `globals.css` puts a transparent, centred
+  `::after` at `max(100%, 44px)` in each axis on the element, so a target grows its **hit area**
+  without moving a rendered pixel. Applied to the header nav links (whose `border-b-2` active
+  indicator would otherwise drop 10px down the bar), the MK·EN switch (a wider real box would push the
+  `·` away from the letters), the wordmark, the build credit, the product page's back link and the
+  Home about link. The **footer grows its real boxes instead** (`min-h-11`, plus `min-w-11` for the
+  short EN labels "About" 36.7px and "Terms" 38.3px), because its bottom row wraps and a 44px
+  pseudo-element over a 27.5px row would overlap the wrapped rows above and below it. The cart's
+  steppers (32→44px) and remove button (a bare 16px glyph → a real 44×44 box) also grow for real:
+  they carry a visible border, so a hit area that did not match the box would be a lie about where to
+  press. Measured at 1280px MK, both sides: header bar **70px → 70px**, nav boxes **24px → 24px** at
+  identical x, active underline bottom **47 → 47**, MK/EN **24×24 → 24×24** at identical x — the
+  header is pixel-identical, with hit areas now 44px. `elementFromPoint` 9px above a nav link's box
+  resolves to the link; 15px above does not. MK·EN hit areas are **0.6px apart** and do not overlap.
+- **Alternative rejected:** make every target a real 44px box. Simpler, one mechanism, no pseudo-element
+  to reason about — and it would have moved the nav's active underline, widened the MK·EN group and
+  changed a header Lazar signed off in 2.13/2.18.
+- **Downside accepted:** the site now has **two** mechanisms for the same requirement, and the
+  pseudo-element one is invisible — it captures pointer events over whatever it covers, so anyone
+  adding `.tap-44` to a dense or wrapping list will create targets that steal each other's taps with
+  nothing on screen to show it. The rule carries a "WATCH THE NEIGHBOURS" comment and the measured
+  clearances, which is a comment, not a guard.
+- **Links:** `src/app/globals.css` · `src/components/layout/SiteHeader.tsx` ·
+  `src/components/layout/LanguageSwitch.tsx` · `src/components/layout/SiteFooter.tsx` ·
+  `src/components/cart/CartView.tsx` · P1 brief §1c
+
+---
+
+### D-2.25-10 · 2026-07-29 · The product photo grid collapses to one column below `sm:`, and the buy path pays for it
+- **Status:** Accepted
+- **Decided by:** **Petar**, asked with the measured cost in hand before the edit was made.
+- **Decision:** `src/app/[locale]/catalog/[slug]/page.tsx` renders `grid-cols-1 sm:grid-cols-2`. At
+  320px the two 4:5 slots measured **138×173 each** — too small to judge a garment by, which is the
+  only thing the page is for; one column makes each **288×360**.
+- **Alternative rejected:** a horizontal scroll-snap strip below `sm:` — photo ~250px wide with the
+  next peeking, strip only ~312px tall, price landing at ~y=660 instead of y=1107. It is better on
+  both axes, and it was rejected because it needs a new MK+EN `aria-label` (new MK review debt) and
+  `tabindex="0"` for keyboard scrollability, which is more surface than an `/adapt` pass should add.
+- **Downside accepted:** measured at 320px, the price moves from **y=567 to y=1107** — the buy path
+  now sits below two screens of scroll, and the second thing the customer scrolls past is a **hatched
+  placeholder** (register #2), not a photograph. This is the single most questionable trade in the
+  phase. It reverses by deleting one `sm:`.
+- **Links:** `src/app/[locale]/catalog/[slug]/page.tsx` · placeholder register #2 · P1 brief §1c
+
+---
+
+### D-2.25-11 · 2026-07-29 · The `/styleguide` countdown demo card scrolls; the countdown is not shrunk
+- **Status:** Accepted
+- **Decided by:** Code (Phase 2.25 P1 `/impeccable adapt`), from the P1 brief §1c.
+- **Decision:** the countdown row has a hard floor — `--text-h1` bottoms out at its `2.25rem` minimum
+  below a 514px viewport, so the row measures **306.4px at every viewport ≤514px**. On Home that fits
+  (the hero is full-bleed, 0→320 at the narrowest phone). On `/styleguide` the demo card's inner box
+  is 240px and the row was escaping the card by **9.2px on each side** (measured on the P0 baseline:
+  card 16→304, row 6.8→313.2, card `overflow-x: visible`). The **card** now scrolls
+  (`overflow-x-auto` with an inner `mx-auto w-max`), so the row sits inside the card's padding at
+  40→346.4 and the card scrolls to reveal the rest; page `scrollWidth` stays 320.
+- **Alternative rejected:** step the countdown down to `text-h2` below `sm:` so it fits the card. That
+  would shrink the **real Home countdown** — the loudest object on the site, and the thing P0 just
+  spent a phase restoring — on every phone, to fix a dev-only page.
+- **Downside accepted:** on a ≤514px viewport the `/styleguide` countdown demo has to be scrolled
+  horizontally to be seen whole, so the design-system reference page no longer shows that component
+  entire at phone widths. `mx-auto w-max` is used rather than `justify-center` because
+  `justify-content: center` in a scroll container puts the left overflow permanently out of reach.
+- **Links:** `src/app/[locale]/styleguide/page.tsx` · `src/components/drop/Countdown.tsx` ·
+  `D-Y.05-10` · `D-2.25-2` · P1 brief §1c
+
+---
+
+### D-2.25-12 · 2026-07-29 · The cart row wraps, and `min-w-0` on the grid item is what actually fixes it
+- **Status:** Accepted
+- **Decided by:** Code (Phase 2.25 P1 `/impeccable adapt`), after the 44px controls surfaced it.
+- **Decision:** widening the cart controls to 44px pushed the row's min-content to 322px inside a
+  288px track and the viewport was being forced to 338px. Measuring the P0 baseline showed the defect
+  was **already there**: the row was **298px in a 288px track**, escaping by 10px, before this phase
+  touched it. Root cause is `min-width: auto` on the `<ul>`, which is a **grid item** — it refused to
+  size below its own content and held the track open. Fixed with `min-w-0` on the `<ul>`, `min-w-0` +
+  `break-words` on the details column, and `flex-wrap` + `grow basis-40` on the row so the controls
+  drop to their own right-aligned line when they cannot sit beside the details. Measured at 320px
+  after: row 288 in a 288 track, details column **68 → 208px**, **zero** elements with
+  `scrollWidth > clientWidth` in `<main>`, `document.scrollWidth` 320. At 768px the row does not wrap
+  and the shipped vertical control stack is unchanged.
+- **Alternative rejected:** rebuild the row as a two-row CSS grid with explicit line placement. It is
+  more declarative about what goes where, and it hardcodes the two-row shape at a viewport breakpoint
+  rather than letting the content decide — `flex-wrap` flips at the width where the content actually
+  stops fitting, which is what `/adapt` asks for.
+- **Downside accepted:** the row is **48px taller at 320px** (125 → 172px) because the controls take
+  their own line, and the flip point is content-driven, so it is not visible in the class list — a
+  future change to the product name, the price pill or the thumbnail moves it. The price
+  `[PLACEHOLDER: …]` pill's 102px min-content is what set the floor; when real prices land, the
+  headroom changes again.
+- **Links:** `src/components/cart/CartView.tsx` · placeholder register #4/#7 · `D-2.25-9`
+
+---
+
+### D-2.25-13 · 2026-07-29 · `filter: blur()` leaves the reveal keyframe; `--motion-reveal-blur` stays in both files
+- **Status:** Accepted
+- **Decided by:** Code for the keyframe (P1 brief §1d); **Petar** for the token's fate, asked before
+  the edit.
+- **Decision:** `@keyframes trajanov-reveal` animates **opacity and transform only**.
+  `filter: blur()` was the one property of the three that forces an offscreen buffer per element per
+  frame for the whole 760ms entrance, and it ran on the elements least able to afford it — the hero's
+  own child is the full-bleed photograph, measured **1152×648 = 0.75 megapixels** at 1280px, and the
+  live-drop call site puts it on every product card in the grid at once. The entrance keeps its
+  duration, easing and stagger. **`--motion-reveal-blur` is deliberately left in place, unused, in
+  both `globals.css` `:root` and `brand.md` §6.**
+- **Alternative rejected:** delete the token from `globals.css` and propose the matching `brand.md` §6
+  row deletion in the completion report. That leaves the code clean — and it leaves `globals.css` and
+  `brand.md` **disagreeing by one row** until the owner acts, in a file whose header says it MIRRORS
+  brand.md. The owner chose the dead token over the drift.
+- **Downside accepted:** a token that nothing reads now ships in both files, and the next reader
+  cannot tell it is dead without grepping. Retiring it from both is written up as a proposal in the
+  Phase 2.25 completion report. Separately: **no frame-rate number is claimed for this change and
+  none was measured** — the verification pane this project uses is permanently hidden
+  (`document.hidden === true`), so `requestAnimationFrame` never fires in it and a before/after FPS
+  delta cannot be produced here (the `D-2.21-7` constraint). The case rests on the mechanism and the
+  measured paint area, not on a local frame count.
+- **Links:** `src/app/globals.css` · `brand.md` §6 · `D-2.16-3` · `D-2.21-7` · P1 brief §1d
+
+---
+
+### D-2.25-14 · 2026-07-29 · The blanket `prefers-reduced-motion` rule becomes a backstop; every animation states its own behaviour
+- **Status:** Accepted
+- **Decided by:** Code (Phase 2.25 P1 `/impeccable animate`), from the P1 brief §1d.
+- **Decision:** the site-wide `animation-duration: 0.001ms !important` rule **stays**, but it is no
+  longer the answer for any animation the project actually ships. It is relabelled in place as a
+  backstop, and each keyframe animation now states its own reduced-motion behaviour:
+  `trajanov-reveal` → `animation: none` (already there); `trajanov-wordmark-shine` → animation and
+  gradient both removed (already there, `D-2.19-1`); `.animate-spin` and `.animate-ping` → **`animation:
+  none`, new** — the Turnstile/BuyButton spinner becomes a static busy ring and the LIVE dot's halo
+  goes static, which is what `brand.md` §6 asks for ("The live dot is static under reduced motion");
+  `trajanov-showcase-progress` → never runs, because `HomeShowcase` kills autoplay through a JS
+  `matchMedia` check (`D-2.21-3`). `scroll-behavior: auto !important` is added for the day someone
+  sets `scroll-behavior: smooth`. The new rules are authored in a **second** `@media
+  (prefers-reduced-motion: reduce)` block: a rule written inside the first block after the `*`
+  selector is dropped before it reaches the compiled stylesheet, the same Tailwind v4 pipeline
+  behaviour that keeps `.tap-44` out of `@layer base`. Both facts were verified by serving the built
+  CSS and reading it; the compiler merges the two blocks back into one on the way out.
+- **Alternative rejected:** replace the blanket's `animation-duration: 0.001ms` with `animation: none`
+  outright. It is the honest reading of "reduced motion" and it would break any animation that relies
+  on a `forwards`/`both` fill to reach its final state — the element would be stranded in its `from`
+  keyframe, which is a worse bug than a flash and one nobody would see in review.
+- **Downside accepted:** the enumerated list lives in a **comment**. Nothing enforces it, so the next
+  animation added to this codebase will silently fall through to the backstop and get the
+  "motion, but instant" treatment the block itself now argues against.
+- **Links:** `src/app/globals.css` · `brand.md` §6 · `D-2.19-1` · `D-2.21-3` · `D-2.25-13` ·
+  P1 brief §1d
+
+---
+
+### D-2.25-15 · 2026-07-29 · `PhotoSlot` takes a `sizes` prop; the product page passes its own
+- **Status:** Accepted
+- **Decided by:** Code, after an adversarial review of the P1 diff caught the defect.
+- **Decision:** `PhotoSlot` gained an optional `sizes` prop defaulting to the existing
+  `CATALOG_SIZES` (`(min-width: 1024px) 280px, 50vw`), and the product page passes
+  `(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw`. **This is a bug `D-2.25-10`
+  introduced and this entry fixes.** One `sizes` constant used to serve both surfaces because both
+  computed to ~50vw below `lg` — and `PhotoSlot`'s own comment said "**keep in step if either grid
+  changes**". `D-2.25-10` changed one of those grids to a single column below `sm:` and did not keep
+  it in step, so on a phone the slot became the full column (~100vw) while `sizes` still promised
+  50vw: `next/image` would have picked a source built for **half the box** and upscaled it. The page
+  whose entire purpose is the photograph would have shipped a **softer** photograph than before the
+  change that was made to show it bigger. Verified on the production build (`next start`):
+  `/katalog/test-mustard-ochre` serves the new three-stop `sizes` against a 384w…3840w srcset;
+  the catalog list and the Home hero are untouched.
+- **Alternative rejected:** widen the shared `CATALOG_SIZES` constant to cover both surfaces. One
+  string, one place — and it would silently over-fetch on the catalog grid, where a card genuinely is
+  50vw, to fix a page that is not. A `sizes` hint that is wrong in the generous direction is still
+  wrong; it just costs bytes instead of sharpness.
+- **Downside accepted:** the geometry now lives in **two** places that must be kept in agreement by
+  hand, and the second one is a bare string constant in a page file. The comment that failed to stop
+  this the first time is now on both — which is the same class of protection that already failed once.
+- **Links:** `src/components/system/PhotoSlot.tsx` · `src/app/[locale]/catalog/[slug]/page.tsx` ·
+  `D-2.25-10` · `D-Y.03-5`
+
+---
+
+### D-2.25-16 · 2026-07-29 · A minimum gap between the cart's remove button and the `+` stepper
+- **Status:** Accepted
+- **Decided by:** Code, after an adversarial review of the P1 diff measured the two controls flush.
+- **Decision:** the cart's control column gets `sm:gap-4` instead of `sm:gap-0`. **This is a hazard
+  `D-2.25-9` introduced and this entry fixes.** With both controls grown to 44px their combined height
+  exactly equalled the row's, so `justify-between` had nothing left to distribute and the
+  **destructive remove button ended up flush on top of the `+` stepper** — measured at 768px, same x
+  (700), remove's bottom edge at **250.9** and `+`'s top edge at **250.9**, zero separation. Before
+  this phase the two were 16px and 32px tall inside an 88px column, roughly **40px apart**. Growing a
+  target is only an improvement if it does not push a destructive control into its neighbour.
+- **Alternative rejected:** leave it, on the grounds that both controls are now full 44px targets and
+  WCAG 2.5.8's spacing exception only applies to *undersized* ones, so nothing is technically failing.
+  True and beside the point: "passes the SC" is not the same as "a thumb will not delete the line
+  while reaching for `+`".
+- **Downside accepted:** the cart row is ~16px taller from `sm:` up (120 → ~136px), so the desktop
+  cart grew for a reason no desktop user will ever see — the mis-tap this prevents is a touch problem
+  and `sm:` is where the *stacked* layout lives, not where touch stops.
+- **Links:** `src/components/cart/CartView.tsx` · `D-2.25-9` · `D-2.25-12`
+
+---
+
+### D-2.25-17 · 2026-07-29 · The `/styleguide` scroll container is reachable by keyboard
+- **Status:** Accepted
+- **Decided by:** Code, after an adversarial review of the P1 diff.
+- **Decision:** the countdown demo card from `D-2.25-11` gets `tabIndex={0}`, `role="group"` and an
+  `aria-label` from the existing `Styleguide.countdown` string. A scroll container whose content holds
+  **no focusable element** cannot be scrolled by keyboard at all (WCAG 2.2 — 2.1.1); the countdown is a
+  `role="timer"` div with nothing tabbable in it, so `D-2.25-11` had created a region a keyboard-only
+  user could see clipped and never reach the rest of. No new string was authored — the label reuses
+  the section heading key that already exists.
+- **Alternative rejected:** leave it, because `/styleguide` is a dev-only, `noindex` page that no
+  customer reaches and that the 2.04 a11y gate does not cover. That is exactly the reasoning that lets
+  a pattern get copied out of the design-system page into a customer surface with the defect attached.
+- **Downside accepted:** the demo card is now a focusable element in the tab order of a page that has
+  a lot of them, and it takes a tab stop at every viewport — including the ones where it does not
+  scroll and there is nothing to reach.
+- **Links:** `src/app/[locale]/styleguide/page.tsx` · `D-2.25-11`
+
+---
+
+### D-2.25-18 · 2026-07-29 · Two measurement claims from this phase corrected on the record
+- **Status:** Accepted
+- **Decided by:** Code, after an adversarial review of the P1 diff checked the phase's own numbers.
+- **Decision:** two claims this phase made are **wrong as stated** and are corrected here rather than
+  quietly restated. `D-2.25-7`, its code comments and commit `a881dcd` all describe the i18n saving as
+  **"16,308 → 6,241 bytes"**. Those are **character counts**, not bytes — the MK catalog is Cyrillic,
+  which is two UTF-8 bytes per letter. Re-measured on production builds of both sides: **25,039 →
+  8,990 UTF-8 bytes, a 16,049-byte reduction (−64.1%)**, with the served HTML of `/` going **81,023 →
+  70,602 bytes** and `/kontakt` **68,046 → 52,771**. The saving is **larger** than claimed, and the
+  −61.7% figure was the character ratio. Separately, commit `13246fd` claims **"zero colour or raw
+  px/ms literals added"**; the grep behind it covered `src/components` and `src/app/[locale]` and
+  **not `globals.css`**, which does add two raw `44px` values inside `.tap-44::after`. Those are a
+  WCAG constant rather than a `brand.md` §8 design value — the same category as the existing
+  `SCROLL_THRESHOLD_PX` and the footer's pre-phase `min-h-[24px]` — but the claim as written was
+  false and the commit message cannot be edited.
+- **Alternative rejected:** correct the figures silently in the completion report and the state file
+  and let the decision entry and the commit messages stand. Nobody would have noticed. It would also
+  mean the two documents a future reader trusts most — the append-only decision log and the git
+  history — keep a number that does not reproduce.
+- **Downside accepted:** `D-2.25-7`'s text and two commit messages are **left wrong in place**
+  (append-only; a commit message is immutable), so anyone reading them without reaching this entry
+  gets the character count and the incomplete grep. The correction lives here and in the completion
+  report, one hop away.
+- **Links:** `D-2.25-7` · `D-2.25-9` · commits `a881dcd`, `13246fd` · Phase 2.25 completion report
+
+---
+
+### D-2.25-19 · 2026-07-29 · The "Tailwind drops rules after `*` / after `:focus-visible`" claim is FALSE and is withdrawn
+- **Status:** Accepted. **Corrects the reasoning in `D-2.25-14` and in `D-2.25-18`'s framing** —
+  neither decision's outcome changes, but the fact each cited does not exist.
+- **Decided by:** Code, after an adversarial review of the P1 diff refused to take the claim on trust
+  and reproduced it properly.
+- **Decision:** `D-2.25-14` and two comments in `globals.css` asserted that a hand-written rule placed
+  **inside `@layer base` after `:focus-visible`**, or **inside the first
+  `@media (prefers-reduced-motion: reduce)` block after the `*` selector**, is silently dropped by the
+  Tailwind v4 pipeline, and that this was "verified by serving the built CSS". **It is not true.**
+  Tested properly — two probe rules inserted at exactly those two positions, `.next` deleted, one
+  fresh `npm run build`, then grep the emitted stylesheet — **both probes compile through and appear
+  in the production CSS.** What the earlier session actually observed was a **dev-server caching
+  artifact**: `@tailwindcss/postcss` keeps a module-level cache keyed on the input path and rebuilds
+  off the file's mtime rather than the CSS it is handed, and the same dev server was independently
+  seen serving `.tap-44` twice and then zero times from the same URL **with no source change in
+  between**. So: the second `@media (prefers-reduced-motion: reduce)` block is **folded back into the
+  first**, the two false comments are **deleted**, and `.tap-44` **stays at the top level for the real
+  reason** — every other hand-written class in the file (`.faq-item`, `.header-shell`,
+  `.reveal-group`, `.spotlight-card`, `.wordmark-shine`, `.showcase-*`) lives there. Compiled output
+  re-verified after the fold: one merged block carrying all three rules, `.tap-44` present, no blur in
+  the reveal keyframe, no probes left behind.
+- **Alternative rejected:** leave the split block and the comments, since the shipped CSS and the
+  reduced-motion behaviour were **correct either way** — this is a zero-user-impact defect. Rejected
+  because the cost of a false "verified by measurement" note in a shared stylesheet is not paid by the
+  user, it is paid by the next author, who will either copy the workaround into new code or waste a
+  session re-deriving that it was never real. This project's whole method is that a measured claim can
+  be trusted; a wrong one that survives is worse than no comment at all.
+- **Downside accepted:** `D-2.25-14`'s and `D-2.25-18`'s text keep the false justification (append-only)
+  and one commit message (`0159a53`) repeats it immutably — this entry is the only place the record is
+  straight. And the honest summary is unflattering: **a claim this phase presented as verified was
+  never tested against a clean build**, and it took an adversarial pass to catch it.
+- **Links:** `src/app/globals.css` · `D-2.25-14` · `D-2.25-18` · `D-2.25-9`
+
+---
+
+### D-2.25-20 · 2026-07-29 · The cart comments credited the wrong class; `flex-wrap` is the fix and both `min-w-0`s are forward guards
+- **Status:** Accepted. **Corrects the attribution and two figures in `D-2.25-12`**; the shipped
+  markup is unchanged and the decision's outcome stands.
+- **Decided by:** Code, after an adversarial review of the P1 diff reverted the shipped classes one at
+  a time in a live browser instead of trusting the comment.
+- **Decision:** `D-2.25-12` and the `CartView` comments say "**`min-w-0` on the GRID ITEM is the one
+  that actually unlocks the row**" and quote a 322px track and a 68px details column. Re-measured on
+  the **production build** at 320px, reverting one shipped class at a time in the live DOM:
+  | state | `ul` | details | `scrollWidth` | clipped |
+  |---|---|---|---|---|
+  | shipped | 288 | 208 | 320 | 0 |
+  | `min-w-0` off the `<ul>` alone | 288 | 208 | 320 | **0 — no change** |
+  | `min-w-0` off the details alone | 288 | 208 | 320 | **0 — no change** |
+  | `flex-wrap` off the row alone | 288 | **12** | 320 | **3** |
+  | all three reverted | **378** | 102 | **394** | 2 |
+  So **`flex-wrap` is the class carrying the layout**, and both `min-w-0`s are **inert at today's
+  content**. The quoted 322px and 68px are real measurements of a real **intermediate** state — after
+  the 44px control bump, while the controls were still a 124px stacked column and before the wrap
+  existed — but the comments name the *shipped* 180px horizontal controls in the same sentence, so the
+  arithmetic they present does not follow from the operands they give. On one line with the shipped
+  controls the details are **12px**, not 68; reverting the three named fixes gives **378**, not 322.
+  Both comments are rewritten to say what is true, carry the measured table, and describe the two
+  `min-w-0`s as what they are.
+- **Alternative rejected:** delete the two `min-w-0` classes, since they demonstrably do nothing today
+  and dead code is worse than no code. Rejected because they are not dead, they are **early**: the
+  cart's names are the placeholder "Производ 01" and its prices are a `[PLACEHOLDER: …]` pill, and the
+  moment Y.01 lands a real product name wider than the wrapped column, `min-width: auto` re-engages
+  and pushes the track open again. Removing them would make the row's robustness depend on the
+  placeholder content being short.
+- **Downside accepted:** the codebase now carries two classes that **cannot be shown to do anything by
+  testing what is on screen** — the only evidence for them is an argument about content that does not
+  exist yet. `D-2.25-12`'s text keeps the wrong attribution (append-only), and commits `13246fd` and
+  `0159a53` repeat it immutably.
+- **Links:** `src/components/cart/CartView.tsx` · `D-2.25-12` · `D-2.25-16` · placeholder register #4
+
+
+---
+
+### D-2.25-21 · 2026-07-29 · The product page's stated cost mixed an MK "before" with an EN "after"
+- **Status:** Accepted. **Corrects the figures in `D-2.25-10`**; the decision itself is unchanged and
+  stays Petar's call.
+- **Decided by:** Code, after an adversarial review of the P1 diff re-measured the pair in both
+  locales instead of trusting it.
+- **Decision:** `D-2.25-10`, its code comment, the completion report and the owed-verification register
+  all state the cost of collapsing the product photo grid as "the price moves from **y=567 to
+  y=1107** at 320px". **Those two numbers are from different locales.** 567 is MK
+  (`/katalog/test-mustard-ochre`) and 1107 is EN (`/en/catalog/test-mustard-ochre`) — the exact
+  `NEXT_LOCALE` bounce the P1 brief §4 warns about (`D-2.24-2`), which the probes recorded and I then
+  read past. Re-measured on the **production build**, one locale at a time, by hot-toggling the shipped
+  class on the live node: **MK 567.4 → 1126.9** and **EN 547.9 → 1107.4** — a **559.5px** shift in
+  both, not the 540px the mismatched pair implies. The slot pair itself goes **172.5px → 732px** in
+  both locales. The ~19.5px offset between them is one extra wrapped line of `PreviewNotice`
+  (`--text-small` at line-height 1.5). The true cost is therefore **worse** than stated, by ~20px.
+- **Alternative rejected:** quote only the delta (559.5px) and drop the absolute y positions, since
+  the delta is locale-independent and arithmetically forced by the layout. Rejected because the
+  absolute number is what makes the trade-off legible to Lazar in owed row **#62** — "the price is
+  1127px down a 320px screen" lands; "the price moved 559.5px" does not.
+- **Downside accepted:** `D-2.25-10`'s text keeps the mismatched pair (append-only), as do commits
+  `13246fd` and `277984c`. More uncomfortably, this is the **second** locale-bounce error in this
+  phase's measurements and the brief warned about it explicitly — asserting
+  `document.documentElement.lang` in a probe is not enough if nobody compares it between the two
+  probes being subtracted.
+- **Links:** `src/app/[locale]/catalog/[slug]/page.tsx` · `D-2.25-10` · `D-2.24-2` · owed register #62
+
+
+### D-2.25-22 · 2026-07-29 · The showcase gets a visible name that changes with the drop state
+- **Status:** Accepted. **Supersedes the 2.21 brief's decision 8** (the visually-hidden,
+  "title-less" heading) — that was a brief-level call, not a `D-` entry, so no Status line changes.
+- **Decided by:** Petar (owner), 2026-07-29, in this session's instruction: "name it 'Last drop'"
+  (countdown/ended) and "'This drop'" (live). The rendering treatment is Code's.
+- **Decision:** The Home showcase's `<h2>` is now **visible** and named per server-computed drop
+  state: **„Ова спуштање" / "This drop"** while `live`, **„Последно спуштање" / "Last drop"**
+  otherwise. Two new `Showcase` keys (`headingLast`, `headingLive`), MK+EN; the treatment is the
+  FAQ's established section-heading recipe (`font-display text-h2 font-bold`), left-aligned on the
+  section's own axis. `Home.browseWhileWait` is retired from render again (key kept, the `D-Y.04-2`
+  treatment; inventory re-flags it "(not found in source)").
+- **Alternative rejected:** (a) keeping the sr-only heading and adding no visible name — rejected
+  because it is the owner's explicit instruction; (b) an eyebrow-styled label instead of a real
+  heading — rejected because the house section-heading recipe (FAQ h2) already exists and a
+  12px label naming a full-viewport section reads as lost, and the craft floor bans
+  eyebrow-over-heading structures.
+- **Downside accepted:** two new MK strings post-date every native review (owed row **#64**,
+  `docs/i18n/mk-review-2.25.md`, unsigned). And a semantic caveat the owner should reread once a
+  SECOND drop exists: during a **countdown**, `view.products` are the products of the drop being
+  counted down TO (`pickActiveDrop` prefers upcoming over most-recent). Today that drop is the same
+  record as the last one, so „Последно спуштање" is accurate — but the moment a NEW drop is loaded
+  with a future window, the countdown state will tease the NEW drop's pieces under a heading that
+  says "Last drop". Flagged in the completion report; the label-per-state map is one `t()` call to
+  change.
+- **Links:** `src/components/home/HomeShowcase.tsx` · `src/messages/{mk,en}.json` ·
+  `docs/i18n/mk-review-2.25.md` · owed register #64/#65 · `D-2.25-23`
+
+### D-2.25-23 · 2026-07-29 · The live state renders showcase slides — the 2.21 live-hide is reversed
+- **Status:** Accepted. **Reverses the 2.21 brief's orchestrator decision 5** ("the `live` state
+  returns NO slides"); brief-level call, no `D-` Status line to flip.
+- **Decided by:** Petar (owner), 2026-07-29: "when a drop is live keep the products slider …
+  name as 'This drop'."
+- **Decision:** `showcaseSlides()` no longer special-cases `live` — every state with photographed
+  products yields slides; the only exclusions left are no-drop and no-photograph (2.21 decision 2,
+  untouched). On the live page the showcase renders **below the buyable grid** (unchanged sibling
+  order in `page.tsx`), so the grid keeps the top of the page in the hour that matters.
+  `tests/home/showcase.test.ts` re-pins the new behaviour.
+- **Alternative rejected:** keeping the live-hide and rendering the slider only in the two waiting
+  states. That was 2.21's own reasoning ("a second, non-buyable gallery of the same shirts competes
+  with the only thing that matters that hour") — rejected because the owner weighed exactly that
+  and chose continuity of the section across all states.
+- **Downside accepted:** the 2.21 concern is real and now lives on the page: during a live drop the
+  same 2 products render twice (buyable cards, then non-buyable slides). Mitigated by order (grid
+  first) and by the heading naming the relationship („Ова спуштање"). Also the live `<main>` is no
+  longer byte-comparable to `main`'s live page — the sha256-identity claims in past phase records
+  are historical, not current invariants.
+- **Links:** `src/lib/showcase.ts` · `tests/home/showcase.test.ts` · `src/app/[locale]/page.tsx` ·
+  `D-2.25-22` · `D-2.25-24`
+
+### D-2.25-24 · 2026-07-29 · The hero photograph stays during live; the live banner rides inside it
+- **Status:** Accepted.
+- **Decided by:** Petar (owner), 2026-07-29: "keep the hero photo even when a drop is live." The
+  composition inside the hero is Code's.
+- **Decision:** The `live` branch of `HomeExperience` now renders the same `Hero` (mustard frame
+  below `sm:`, trio composite from `sm:`, ground-only scrim) as every other state. The
+  `DropLiveBanner` moves **inside** the hero as this state's drop-state element (the Y.05 content
+  model: state element + words on the photograph), constrained `max-w-md` to mirror the ended
+  banner; the tagline stays beneath it; **no CTAs** — the buyable grid directly below is the
+  action. The hero is deliberately NOT inside a reveal-group in this branch: at T-0 the photograph
+  appears instantly and only the cards animate.
+- **Alternative rejected:** (a) status quo — banner + grid only (the 2.04-era live page); rejected
+  by the owner's instruction. (b) Keeping the banner above the grid and shipping the hero with no
+  drop-state element — rejected because every other state anchors its state element on the
+  photograph, and a bare photo above a banner reads as two disconnected headers.
+- **Downside accepted:** on a phone the buyable grid moves roughly one viewport down during the
+  buy hour — the exact cost 2.21 refused; the owner accepted it for continuity of the front door.
+  The `live` state also gains the mustard LCP preload it previously lacked (it used to ship zero
+  image preloads): **`D-Y.05-4`'s "exactly one preload" now holds uniformly in all four states**,
+  and live LCP becomes the photograph rather than the banner. PSI on production post-merge will
+  tell (existing rows #42/#45 lineage).
+- **Links:** `src/components/home/HomeExperience.tsx` · `D-Y.05-4` · `D-Y.05-6` · `D-2.25-23`
+
+### D-2.25-25 · 2026-07-29 · Verification maneuvers: stale prod server killed, scratch-drop windows shifted −2 months and restored, `pg` scratchpad-only
+- **Status:** Accepted (the `D-2.21-7` / `D-2.22-5` / `D-2.23-7` lineage).
+- **Decided by:** Code, on the spot.
+- **Decision:** (1) The leftover `npm run start` on :3000 (PID 69677, serving the 04:29 build,
+  previews refused in prod mode) was killed per the P1 handoff's "use it or stop it"; `next dev`
+  took the port. (2) To make the committed sample drop (`test-drop`, the only one with
+  photographed products) the active drop, the two rehearsal drops' windows were shifted **−2
+  months** (`test-open-drop` 07-21→05-21 / 07-29→05-29; `test-upcoming-drop` 07-29→05-29 /
+  08-05→06-05; exact prior values recorded FIRST in the maneuver script and this session's log) and
+  **restored byte-exact after** — the post-restore inspect matches the pre-shift snapshot
+  timestamp-for-timestamp. `test-drop` itself was never touched. (3) Because the service-role key
+  has UPDATE revoked on `drops` (writes are SQL-editor-only by design), the shift ran over
+  `SUPABASE_DB_URL` with `pg` installed **into the session scratchpad only** — the project's
+  `package.json`/lockfile are untouched. (4) Headless-pane artifacts recorded for the next session:
+  the pane can report a 0×0 viewport until a `resize_window` + navigation lands (numeric probes
+  meaningless until `clientWidth` is real), lazy images never intersect so they need
+  `loading='eager'` forced before a screenshot, and the pane's Chromium still lacks mk ICU
+  (client-rendered prices group „1,199" while SSR correctly serves „1.199" — the known recorded
+  issue, not new).
+- **Alternative rejected:** verifying against the rehearsal drop that happened to be live
+  (`test-tee-*` products) — rejected because those slugs have no photographs, so the showcase
+  renders nothing and items 1/3 would have shipped sight-unseen against the products that matter.
+- **Downside accepted:** the same one this lineage always logs — the scratch DB spent ~13 minutes
+  in a shifted state on this machine; anyone hitting the local dev server in that window saw a
+  simulated past. No hosted/production data involved; `orders` untouched.
+- **Links:** `D-2.21-7` · `D-2.22-5` · `D-2.24-2` · this session's completion-report addendum

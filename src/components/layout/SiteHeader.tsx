@@ -154,23 +154,29 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
 
   // The wordmark markup appears twice — in the header bar and in the overlay's top bar (D-2.15-3). Same
   // classes both times.
+  // `tap-44` on the wordmark and on the build credit below: both are 24px tall and both are the only
+  // thing on their line, so the pseudo-element grows purely vertically and can reach no neighbour
+  // (D-2.25-9). The wordmark's `background-clip: text` sweep is untouched — .tap-44::after paints
+  // nothing, it only catches the pointer.
   const wordmarkClass =
-    'wordmark-shine font-display text-foreground text-price rounded-[var(--radius-sm)] font-extrabold uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring';
+    'tap-44 wordmark-shine font-display text-foreground text-price rounded-[var(--radius-sm)] font-extrabold uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring';
 
   // The burger and the overlay's X share size / interaction classes (44px WCAG target, matching the cart).
   const iconButtonClass =
     'text-foreground inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] transition-colors duration-[var(--motion-fast)] hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring';
 
   // The overlay's stacked rows: large, left-aligned, a LEFT vertical accent on the active one (D-2.15-4).
-  // A plain template string, NOT cn(): tailwind-merge treats the custom `text-h2` utility as a text-colour
-  // and would drop it when a `text-foreground` / `text-muted-foreground` follows through the merge, shrinking
-  // the row to the 16px default. The rest of the codebase writes `text-h2 text-foreground` as a plain string
-  // for exactly this reason (font-size + colour are different CSS properties and never truly conflict).
+  // This used to be hand-concatenated rather than cn(), because tailwind-merge filed the custom `text-h2`
+  // utility as a text-colour and dropped it whenever `text-foreground` / `text-muted-foreground` followed —
+  // shrinking the row to the 16px default. src/lib/utils.ts now registers the brand sizes under `font-size`
+  // (D-2.25-1), so a size and a colour no longer collide and cn() is safe here again.
   const overlayRow = (active: boolean) =>
-    'font-display text-h2 flex min-h-11 items-center gap-3 border-l-2 pl-4 font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring ' +
-    (active
-      ? 'text-foreground border-mustard'
-      : 'text-muted-foreground border-transparent hover:text-foreground');
+    cn(
+      'font-display text-h2 flex min-h-11 items-center gap-3 border-l-2 pl-4 font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+      active
+        ? 'text-foreground border-mustard'
+        : 'text-muted-foreground border-transparent hover:text-foreground',
+    );
 
   // The build credit — subordinate, muted; only "Vertex Consulting" is the link (facts.md §11). Rendered
   // in the header bar (desktop) and again, centred, near the bottom of the overlay. A fresh node each call.
@@ -181,7 +187,7 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
           href="https://www.vertexconsulting.mk/en"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-mustard inline-flex min-h-6 items-center rounded-[var(--radius-sm)] underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:text-mustard-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+          className="tap-44 text-mustard inline-flex min-h-6 items-center rounded-[var(--radius-sm)] underline-offset-4 transition-colors duration-[var(--motion-fast)] hover:text-mustard-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           {chunks}
           <span className="sr-only"> {tc('opensInNewTab')}</span>
@@ -223,8 +229,12 @@ export function SiteHeader({cartCount = 0}: {cartCount?: number}) {
                 key={href}
                 href={href}
                 aria-current={active ? 'page' : undefined}
+                // `tap-44` raises the hit area to 44px without moving a pixel (D-2.25-9): the link
+                // is 24px tall, and growing the real box would carry the `border-b-2` active
+                // indicator 10px down the bar with it. The links are wider than 44px already, so the
+                // pseudo-element grows only vertically and cannot reach a neighbour 16px away.
                 className={cn(
-                  'font-display text-small inline-flex min-h-6 items-center justify-center border-b-2 font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
+                  'tap-44 font-display text-small inline-flex min-h-6 items-center justify-center border-b-2 font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring',
                   active
                     ? 'text-foreground border-mustard'
                     : 'text-muted-foreground border-transparent hover:text-foreground',

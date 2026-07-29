@@ -25,6 +25,13 @@ export const dynamic = 'force-dynamic';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
+// This page's slot geometry, which stopped matching PhotoSlot's catalog default when the pair
+// collapsed to one column below `sm:` (D-2.25-10 / D-2.25-15). Measured against the real layout:
+// below 640px the slot is the whole `max-w-6xl px-4` column (~100vw); from 640px the pair is two
+// columns of that same full-width column (~50vw); from 1024px the outer `lg:grid-cols-2` halves the
+// 1152px container first, so each slot is ~280px. If either grid changes, this changes with it.
+const PRODUCT_SLOT_SIZES = '(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw';
+
 // Per-locale title from the product's real name (or the neutral placeholder + index while names are
 // OWED); generic per-locale description; reciprocal hreflang for the SHARED product slug (D-2.01-2/5/6).
 export async function generateMetadata({
@@ -107,7 +114,7 @@ export default async function ProductPage({
       {jsonLd && <JsonLd data={jsonLd} />}
       <Link
         href="/catalog"
-        className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-sm transition-colors duration-[var(--motion-fast)]"
+        className="tap-44 text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-1.5 text-small transition-colors duration-[var(--motion-fast)]"
       >
         <ArrowLeft className="h-4 w-4" /> {t('Product.back')}
       </Link>
@@ -120,10 +127,19 @@ export default async function ProductPage({
             a visible placeholder on purpose: the back / print-detail shot is genuinely still owed
             (register #2), and the page should say so rather than imply the set is complete. Product 03
             has no frame at all, so it keeps two placeholders. */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* One column below `sm:` (D-2.25-10, figures corrected by D-2.25-21). Two 4:5 slots side by
+            side on a 320px phone measured 138×173 each — too small to judge a garment by, which is
+            the only thing this page is for; one column makes each 288×360. The cost is real and
+            accepted: the slot pair grows 172.5px → 732px, pushing the price down **559.5px** at
+            320px — measured in BOTH locales on the production build, MK 567.4 → 1126.9 and EN
+            547.9 → 1107.4 (the ~19.5px locale offset is one extra wrapped line of `PreviewNotice`).
+            So the buy path sits below two screens of scroll while the second slot is still a hatched
+            placeholder (register #2). One `sm:` word reverses it. */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <PhotoSlot
             label={t('Placeholder.productPhoto')}
             muted={soldOut}
+            sizes={PRODUCT_SLOT_SIZES}
             image={
               photo && {
                 src: photo.src,
@@ -132,7 +148,11 @@ export default async function ProductPage({
               }
             }
           />
-          <PhotoSlot label={t('Placeholder.productPhoto')} muted={soldOut} />
+          <PhotoSlot
+            label={t('Placeholder.productPhoto')}
+            muted={soldOut}
+            sizes={PRODUCT_SLOT_SIZES}
+          />
         </div>
 
         <div className="flex flex-col gap-5 lg:sticky lg:top-20">
@@ -184,7 +204,7 @@ export default async function ProductPage({
           <h2 className="font-display text-foreground font-bold">
             {t('Product.shipping')}
           </h2>
-          <p className="text-muted-foreground text-sm">{t('Product.shippingBody')}</p>
+          <p className="text-muted-foreground text-small">{t('Product.shippingBody')}</p>
         </section>
       </div>
     </div>

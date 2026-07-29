@@ -71,7 +71,7 @@ export function ProductCard({product}: {product: ProductView}) {
         </h2>
 
         {product.priceMkd != null ? (
-          <span className="text-foreground text-sm font-semibold tabular">
+          <span className="text-foreground text-small font-semibold tabular">
             {formatMkd(product.priceMkd, t('Common.currency'), locale)}
           </span>
         ) : (
@@ -87,7 +87,7 @@ export function ProductCard({product}: {product: ProductView}) {
             <StockBadge level="low" remaining={product.remaining} />
           )}
           {soldOut && (
-            <span className="text-soldout text-sm font-semibold">
+            <span className="text-soldout text-small font-semibold">
               {t('Stock.soldOut')}
             </span>
           )}
