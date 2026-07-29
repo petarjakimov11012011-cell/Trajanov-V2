@@ -14,7 +14,7 @@
 > **Scope note.** This report covers the **whole 2.25 branch**, but P0 (`87efc6b`, `27b589d`,
 > decisions `D-2.25-1…4`) was executed by a different session. Everything below marked **P1** is this
 > session's work: commits `a881dcd`, `13246fd`, `277984c`, `4340cec` and the review-fix commit,
-> decisions `D-2.25-5…20`.
+> decisions `D-2.25-5…21`.
 > **The phase is NOT closed** — `/impeccable polish` (P2) and the closing `/impeccable audit` are
 > still owed on this branch. The state files are updated to the P1 waterline, not to a finished phase.
 
@@ -48,8 +48,8 @@
 
 ## 2. Decisions I made on my own
 
-**Sixteen, `D-2.25-5…20`.** Two (`D-2.25-10`, and the token half of `D-2.25-13`) were **put to Petar
-before the edit was made** and are recorded as his calls. Six (`D-2.25-15…20`) came out of the
+**Seventeen, `D-2.25-5…21`.** Two (`D-2.25-10`, and the token half of `D-2.25-13`) were **put to Petar
+before the edit was made** and are recorded as his calls. Seven (`D-2.25-15…21`) came out of the
 adversarial review described in §3 — they are fixes to defects **this phase introduced** and to
 claims **this phase got wrong**, and they are listed here rather than folded into the rest.
 
@@ -60,7 +60,7 @@ claims **this phase got wrong**, and they are listed here rather than folded int
 | **D-2.25-7** | i18n client provider gets an **allow-list**, guarded by a test that re-derives it from the import graph | A deny-list of the big server-only catalogs | A missing namespace fails at **runtime in the customer's browser**, not at build. The guard test is the only thing standing in front of that |
 | **D-2.25-8** | `HomeExperience` → Server Component; the T-0 flag moves to a context + 3 small client components | Keep the countdown branch as one client island containing `<Hero>` | The T-0 swap is coordinated through context, so a slot rendered outside the provider fails **quietly** (shows idle content) rather than throwing |
 | **D-2.25-9** | `.tap-44` pseudo-element where the visual box must not move; **real** boxes in the footer and cart | Make every target a real 44px box | Two mechanisms for one requirement, and the pseudo-element one is invisible — it can silently steal a neighbour's taps |
-| **D-2.25-10** | Product photo grid `grid-cols-1 sm:grid-cols-2` — **Petar's call, asked with the numbers** | A horizontal scroll-snap strip (better on both axes; needs a new MK+EN string + `tabindex`) | **Price moves y=567 → y=1107 at 320px.** Two screens of scroll to the buy path, past a hatched placeholder |
+| **D-2.25-10** | Product photo grid `grid-cols-1 sm:grid-cols-2` — **Petar's call, asked with the numbers** | A horizontal scroll-snap strip (better on both axes; needs a new MK+EN string + `tabindex`) | **The price drops 559.5px at 320px** (MK 567.4 → 1126.9, EN 547.9 → 1107.4). Two screens of scroll to the buy path, past a hatched placeholder |
 | **D-2.25-11** | `/styleguide` countdown **card scrolls**; the countdown is not shrunk | Step the countdown down to `text-h2` below `sm:` | The design-system page no longer shows that component whole at ≤514px |
 | **D-2.25-12** | Cart row gets `flex-wrap` + `min-w-0` on the `<ul>` **grid item** | A two-row CSS grid with explicit placement | Row is **48px taller at 320px** (125→172) and the flip point is content-driven, so it is invisible in the class list |
 | **D-2.25-13** | `filter: blur()` out of the reveal keyframe; **`--motion-reveal-blur` stays in both files — Petar's call** | Delete the token from `globals.css` and propose the `brand.md` row | A knowingly dead token ships in two files. **And no FPS number is claimed — none could be measured here** (see §3) |
@@ -71,6 +71,7 @@ claims **this phase got wrong**, and they are listed here rather than folded int
 | **D-2.25-18** | Two of this phase's own measurement claims corrected on the record | Fix the numbers silently in this report | `D-2.25-7` and two commit messages are **left wrong in place** (append-only / immutable) |
 | **D-2.25-19** | The "Tailwind drops rules after `*` / `:focus-visible`" claim **withdrawn as false**; the split `@media` block folded back | Leave it — the shipped CSS was correct either way, zero user impact | `D-2.25-14`, `D-2.25-18` and commit `0159a53` keep the false justification; this entry is the only straight record |
 | **D-2.25-20** | Cart comments corrected: **`flex-wrap` is the fix**, both `min-w-0`s are inert-today forward guards | Delete the two inert `min-w-0` classes | Two classes ship that **cannot be shown to do anything** by testing what is on screen; the argument for them is about content that does not exist yet |
+| **D-2.25-21** | The product page's stated cost **mixed an MK before with an EN after**; re-measured per locale | Quote only the locale-independent 559.5px delta | The real cost is ~20px **worse** than stated, and this is the phase's **second** locale-bounce error after the brief warned about it |
 
 ---
 
@@ -139,7 +140,8 @@ decides what to do with them.**
 finished diff, not by me.** After the four items were committed, the whole `27b589d..HEAD` diff was
 re-reviewed by independent agents across four lenses (correctness, CSS/layout, accessibility, and
 claims-vs-reality), each finding then attacked by three separate refuters. **Twenty-five findings were
-raised, and each was then attacked by three independent refuters.** What survived and was fixed:
+raised, and each was then attacked by three independent refuters.** Everything below is a defect or a
+false claim of **mine** that the pass found and I then reproduced myself before fixing:
 
 - **`sizes` was left at 50vw on a slot that is now 100vw** (`D-2.25-15`). Collapsing the product photo
   grid made the slot full-width on a phone, but `PhotoSlot`'s shared `sizes` constant still promised
@@ -174,8 +176,14 @@ wrap, their row centres are **55.5px** apart, clear of 44; and the MK·EN cleara
 mis-stated, which it was (47.5px in a comment vs **44.6px** measured) and is now corrected in the
 source.
 
-**This is the part of the process that worked.** Four of the eighteen decisions on this phase exist
-because the diff was attacked after it was written, and one of them was a defect on the money page.
+**This is the part of the process that worked, and it is not flattering.** Seven of the seventeen
+decisions on this phase exist only because the diff was attacked after it was written. One was a
+defect on the money page. Three were claims I had written the word "verified" next to and had not
+actually verified against a clean build. The pattern is the same each time: **I measured on the dev
+server, which serves stale CSS, and I compared numbers taken in different locales.** The two
+operational rules that come out of it, for the next brief: **measure CSS by grepping `.next/static`
+after a clean build, never against `next dev`**; and **when subtracting two measurements, compare the
+`lang` you recorded in each — recording it is not the same as checking it.**
 
 **9. Proposal, not a change: retire `--motion-reveal-blur`.** Nothing reads it any more. Retiring it
 means deleting the `:root` line in `globals.css` **and** the `brand.md` §6 row in the same commit.

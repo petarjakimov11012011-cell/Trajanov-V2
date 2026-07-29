@@ -5145,3 +5145,32 @@ start at `D-2.01-6`.*
   `0159a53` repeat it immutably.
 - **Links:** `src/components/cart/CartView.tsx` · `D-2.25-12` · `D-2.25-16` · placeholder register #4
 
+
+---
+
+### D-2.25-21 · 2026-07-29 · The product page's stated cost mixed an MK "before" with an EN "after"
+- **Status:** Accepted. **Corrects the figures in `D-2.25-10`**; the decision itself is unchanged and
+  stays Petar's call.
+- **Decided by:** Code, after an adversarial review of the P1 diff re-measured the pair in both
+  locales instead of trusting it.
+- **Decision:** `D-2.25-10`, its code comment, the completion report and the owed-verification register
+  all state the cost of collapsing the product photo grid as "the price moves from **y=567 to
+  y=1107** at 320px". **Those two numbers are from different locales.** 567 is MK
+  (`/katalog/test-mustard-ochre`) and 1107 is EN (`/en/catalog/test-mustard-ochre`) — the exact
+  `NEXT_LOCALE` bounce the P1 brief §4 warns about (`D-2.24-2`), which the probes recorded and I then
+  read past. Re-measured on the **production build**, one locale at a time, by hot-toggling the shipped
+  class on the live node: **MK 567.4 → 1126.9** and **EN 547.9 → 1107.4** — a **559.5px** shift in
+  both, not the 540px the mismatched pair implies. The slot pair itself goes **172.5px → 732px** in
+  both locales. The ~19.5px offset between them is one extra wrapped line of `PreviewNotice`
+  (`--text-small` at line-height 1.5). The true cost is therefore **worse** than stated, by ~20px.
+- **Alternative rejected:** quote only the delta (559.5px) and drop the absolute y positions, since
+  the delta is locale-independent and arithmetically forced by the layout. Rejected because the
+  absolute number is what makes the trade-off legible to Lazar in owed row **#62** — "the price is
+  1127px down a 320px screen" lands; "the price moved 559.5px" does not.
+- **Downside accepted:** `D-2.25-10`'s text keeps the mismatched pair (append-only), as do commits
+  `13246fd` and `277984c`. More uncomfortably, this is the **second** locale-bounce error in this
+  phase's measurements and the brief warned about it explicitly — asserting
+  `document.documentElement.lang` in a probe is not enough if nobody compares it between the two
+  probes being subtracted.
+- **Links:** `src/app/[locale]/catalog/[slug]/page.tsx` · `D-2.25-10` · `D-2.24-2` · owed register #62
+
