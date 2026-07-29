@@ -73,23 +73,34 @@ export function CartView() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_20rem] lg:items-start">
-      {/* lines. `min-w-0` on the GRID ITEM is the one that actually unlocks the row (D-2.25-12): a
-          grid item defaults to `min-width: auto`, so this list refused to size below its own
-          content and held the single-column track at 322px inside a 288px container — the page
-          scrolled sideways at 320px. Measured with it: track 288, row 288, document scrollWidth 320,
-          no horizontal scroll. The summary panel beside it measures 192.7px of min-content against
-          the same 288px, so it has headroom and is left alone. */}
+      {/* lines. `min-w-0` here is a GUARD, not the fix — it is inert at today's content and becomes
+          load-bearing later (D-2.25-12, corrected by D-2.25-20). A grid item defaults to
+          `min-width: auto` and refuses to size below its own content, which is what held this track
+          open before; but with the row wrapping (below), the track no longer presses against it.
+          Measured on the production build at 320px, reverting one class at a time in the live DOM:
+
+            shipped                       ul 288  details 208  scrollWidth 320  clipped 0
+            `min-w-0` off THIS element     ul 288  details 208  scrollWidth 320  clipped 0   ← no change
+            `min-w-0` off the details      ul 288  details 208  scrollWidth 320  clipped 0   ← no change
+            `flex-wrap` off the row        ul 288  details  12  scrollWidth 320  clipped 3   ← the fix
+            all three reverted             ul 378  details 102  scrollWidth 394  clipped 2
+
+          So `flex-wrap` is the class carrying the layout. This one earns its place the moment Y.01
+          lands a real product name: a name wider than the wrapped details column re-engages
+          `min-width: auto` and pushes the track open again. The summary panel beside it measures
+          192.7px of min-content against the same 288px, so it has headroom and is left alone. */}
       <ul className="flex min-w-0 flex-col divide-y divide-[var(--color-border)]">
         {lines.map((l) => (
-          // `flex-wrap` is the adaptation, not decoration (D-2.25-12). Three things share the row: a
-          // 64px thumbnail, the details, and the controls — and the controls are now 180px wide
-          // (a 44px remove, a 12px gap, a 124px stepper cluster). ON ONE LINE at 320px that would
-          // leave the details 68px, and the price `[PLACEHOLDER: …]` pill's 102px min-content would
-          // sit across the minus button — that is the state this wrap EXISTS TO PREVENT, not the
-          // state that ships. What ships at 320px, measured: the controls drop to their own
-          // right-aligned line and the details get **208px**, nothing clipped. `basis-40` is the
-          // content-driven flip point — the controls stay beside the details for as long as the
-          // details can hold 160px, which is every width from roughly a large phone up.
+          // `flex-wrap` is the adaptation, and it is the class that actually carries this layout
+          // (D-2.25-12, corrected by D-2.25-20). Three things share the row: a 64px thumbnail, the
+          // details, and the controls, which are 180px wide below `sm:` (a 44px remove, a 12px gap,
+          // a 124px stepper cluster). ON ONE LINE at 320px that leaves the details
+          // 288 − 64 − 16 − 16 − 180 = **12px** — measured, with three elements clipped, the price
+          // `[PLACEHOLDER: …]` pill (102px min-content) among them. That is the state this wrap
+          // EXISTS TO PREVENT, not a state that ships. What ships at 320px, measured: the controls
+          // drop to their own right-aligned line and the details get **208px**, nothing clipped.
+          // `basis-40` is the content-driven flip point — the controls stay beside the details for
+          // as long as the details can hold 160px, which is every width from roughly a large phone up.
           <li key={l.variantId} className="flex flex-wrap gap-4 py-4">
             <div
               className="bg-surface-2 h-20 w-16 shrink-0 rounded-[var(--radius-md)]"
@@ -99,11 +110,12 @@ export function CartView() {
               }}
               aria-hidden
             />
-            {/* `min-w-0` is load-bearing here too: a flex item defaults to `min-width: auto` and
-                refuses to shrink below its content, and the names this column holds today are the
-                placeholder "Производ 01" — a real product name from Y.01 is longer. `break-words`
-                covers the other half, a single long word. `grow basis-40` (not `flex-1`, whose basis
-                is 0) is what gives the wrap above something to measure against. */}
+            {/* `min-w-0` + `break-words` here are the same forward guard as on the `<ul>`, and are
+                equally inert today (D-2.25-20): reverting either alone changes nothing measurable at
+                320px, because the wrap already gives this column 208px and the widest thing in it is
+                the 102px price pill. They matter when Y.01 replaces the placeholder "Производ 01"
+                with a real product name, or when one long unbroken word arrives. `grow basis-40`
+                (not `flex-1`, whose basis is 0) is what gives the wrap above something to measure. */}
             <div className="flex min-w-0 grow basis-40 flex-col gap-1">
               <h3 className="font-display text-foreground font-semibold break-words">
                 {tp('productName')} {pad2(l.productIndex)}

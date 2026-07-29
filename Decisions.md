@@ -5107,3 +5107,41 @@ start at `D-2.01-6`.*
   straight. And the honest summary is unflattering: **a claim this phase presented as verified was
   never tested against a clean build**, and it took an adversarial pass to catch it.
 - **Links:** `src/app/globals.css` · `D-2.25-14` · `D-2.25-18` · `D-2.25-9`
+
+---
+
+### D-2.25-20 · 2026-07-29 · The cart comments credited the wrong class; `flex-wrap` is the fix and both `min-w-0`s are forward guards
+- **Status:** Accepted. **Corrects the attribution and two figures in `D-2.25-12`**; the shipped
+  markup is unchanged and the decision's outcome stands.
+- **Decided by:** Code, after an adversarial review of the P1 diff reverted the shipped classes one at
+  a time in a live browser instead of trusting the comment.
+- **Decision:** `D-2.25-12` and the `CartView` comments say "**`min-w-0` on the GRID ITEM is the one
+  that actually unlocks the row**" and quote a 322px track and a 68px details column. Re-measured on
+  the **production build** at 320px, reverting one shipped class at a time in the live DOM:
+  | state | `ul` | details | `scrollWidth` | clipped |
+  |---|---|---|---|---|
+  | shipped | 288 | 208 | 320 | 0 |
+  | `min-w-0` off the `<ul>` alone | 288 | 208 | 320 | **0 — no change** |
+  | `min-w-0` off the details alone | 288 | 208 | 320 | **0 — no change** |
+  | `flex-wrap` off the row alone | 288 | **12** | 320 | **3** |
+  | all three reverted | **378** | 102 | **394** | 2 |
+  So **`flex-wrap` is the class carrying the layout**, and both `min-w-0`s are **inert at today's
+  content**. The quoted 322px and 68px are real measurements of a real **intermediate** state — after
+  the 44px control bump, while the controls were still a 124px stacked column and before the wrap
+  existed — but the comments name the *shipped* 180px horizontal controls in the same sentence, so the
+  arithmetic they present does not follow from the operands they give. On one line with the shipped
+  controls the details are **12px**, not 68; reverting the three named fixes gives **378**, not 322.
+  Both comments are rewritten to say what is true, carry the measured table, and describe the two
+  `min-w-0`s as what they are.
+- **Alternative rejected:** delete the two `min-w-0` classes, since they demonstrably do nothing today
+  and dead code is worse than no code. Rejected because they are not dead, they are **early**: the
+  cart's names are the placeholder "Производ 01" and its prices are a `[PLACEHOLDER: …]` pill, and the
+  moment Y.01 lands a real product name wider than the wrapped column, `min-width: auto` re-engages
+  and pushes the track open again. Removing them would make the row's robustness depend on the
+  placeholder content being short.
+- **Downside accepted:** the codebase now carries two classes that **cannot be shown to do anything by
+  testing what is on screen** — the only evidence for them is an argument about content that does not
+  exist yet. `D-2.25-12`'s text keeps the wrong attribution (append-only), and commits `13246fd` and
+  `0159a53` repeat it immutably.
+- **Links:** `src/components/cart/CartView.tsx` · `D-2.25-12` · `D-2.25-16` · placeholder register #4
+

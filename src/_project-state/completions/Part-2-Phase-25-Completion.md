@@ -14,7 +14,7 @@
 > **Scope note.** This report covers the **whole 2.25 branch**, but P0 (`87efc6b`, `27b589d`,
 > decisions `D-2.25-1…4`) was executed by a different session. Everything below marked **P1** is this
 > session's work: commits `a881dcd`, `13246fd`, `277984c`, `4340cec` and the review-fix commit,
-> decisions `D-2.25-5…19`.
+> decisions `D-2.25-5…20`.
 > **The phase is NOT closed** — `/impeccable polish` (P2) and the closing `/impeccable audit` are
 > still owed on this branch. The state files are updated to the P1 waterline, not to a finished phase.
 
@@ -48,8 +48,8 @@
 
 ## 2. Decisions I made on my own
 
-**Fifteen, `D-2.25-5…19`.** Two (`D-2.25-10`, and the token half of `D-2.25-13`) were **put to Petar
-before the edit was made** and are recorded as his calls. Five (`D-2.25-15…19`) came out of the
+**Sixteen, `D-2.25-5…20`.** Two (`D-2.25-10`, and the token half of `D-2.25-13`) were **put to Petar
+before the edit was made** and are recorded as his calls. Six (`D-2.25-15…20`) came out of the
 adversarial review described in §3 — they are fixes to defects **this phase introduced** and to
 claims **this phase got wrong**, and they are listed here rather than folded into the rest.
 
@@ -70,6 +70,7 @@ claims **this phase got wrong**, and they are listed here rather than folded int
 | **D-2.25-17** | `/styleguide`'s scroll container gets `tabIndex={0}` + a label | Leave it, it is a dev-only noindex page | One more tab stop, at every viewport, including those where it does not scroll |
 | **D-2.25-18** | Two of this phase's own measurement claims corrected on the record | Fix the numbers silently in this report | `D-2.25-7` and two commit messages are **left wrong in place** (append-only / immutable) |
 | **D-2.25-19** | The "Tailwind drops rules after `*` / `:focus-visible`" claim **withdrawn as false**; the split `@media` block folded back | Leave it — the shipped CSS was correct either way, zero user impact | `D-2.25-14`, `D-2.25-18` and commit `0159a53` keep the false justification; this entry is the only straight record |
+| **D-2.25-20** | Cart comments corrected: **`flex-wrap` is the fix**, both `min-w-0`s are inert-today forward guards | Delete the two inert `min-w-0` classes | Two classes ship that **cannot be shown to do anything** by testing what is on screen; the argument for them is about content that does not exist yet |
 
 ---
 
@@ -138,7 +139,7 @@ decides what to do with them.**
 finished diff, not by me.** After the four items were committed, the whole `27b589d..HEAD` diff was
 re-reviewed by independent agents across four lenses (correctness, CSS/layout, accessibility, and
 claims-vs-reality), each finding then attacked by three separate refuters. **Twenty-five findings were
-raised.** What survived and was fixed:
+raised, and each was then attacked by three independent refuters.** What survived and was fixed:
 
 - **`sizes` was left at 50vw on a slot that is now 100vw** (`D-2.25-15`). Collapsing the product photo
   grid made the slot full-width on a phone, but `PhotoSlot`'s shared `sizes` constant still promised
@@ -153,6 +154,14 @@ raised.** What survived and was fixed:
 - **The `/styleguide` scroll container could not be scrolled by keyboard** (`D-2.25-17`, WCAG 2.1.1) —
   it holds no focusable element, so the fix that stopped the countdown escaping its card created a
   region a keyboard-only user could see clipped and never reach the rest of.
+- **My cart comments credited the wrong class** (`D-2.25-20`). They said `min-w-0` on the grid item
+  "is the one that actually unlocks the row" and quoted a 322px track and a 68px details column.
+  Reverting each shipped class one at a time on the production build: removing **either** `min-w-0`
+  alone changes **nothing**; removing `flex-wrap` alone collapses the details to 12px and clips three
+  elements. **`flex-wrap` is the fix.** The 322/68 figures are real measurements of a real
+  *intermediate* state, quoted in sentences that name the *shipped* operands — so the arithmetic on
+  the page did not follow from the numbers on the page. Markup unchanged; comments rewritten with the
+  measured table.
 - **"16,308 → 6,241 bytes" are character counts, not bytes** (`D-2.25-18`). MK is Cyrillic. The real
   figures are **25,039 → 8,990 UTF-8 bytes (−64.1%)** — the saving is *larger* than claimed, but the
   unit was wrong in a decision entry and a commit message that cannot be edited.
