@@ -39,7 +39,8 @@ const iconButton =
 // FAQ. Layout and interaction follow the reference; every fact on a slide is one we hold: the
 // photograph (product-images.ts), the name (real or the neutral slot), the price, the stock state,
 // and one link to the product page. No description, no buy button, no sizes (decisions 3–4).
-// Which products appear, and that `live`/no-drop render NOTHING, is decided in src/lib/showcase.ts.
+// Which products appear is decided in src/lib/showcase.ts. Since D-2.25-23 (owner, 2026-07-29) the
+// `live` state renders slides too — only no-drop and no-photographed-product render nothing.
 export function HomeShowcase({view}: {view: DropView | null}) {
   const t = useTranslations();
   const locale = useLocale();
@@ -107,11 +108,17 @@ export function HomeShowcase({view}: {view: DropView | null}) {
       // The CSS progress fill reads this var — same constant as the JS timer, single source.
       style={{'--showcase-autoplay': `${AUTOPLAY_MS}ms`} as React.CSSProperties}
     >
-      {/* Visually hidden on the brief's instruction (decision 8): keeps the reference's clean,
-          title-less look while the section stays labelled and the outline stays h1 → h2 → h3.
-          Reuses the already-native-reviewed Home.browseWhileWait — no new MK review debt. */}
-      <h2 id="home-showcase-heading" className="sr-only">
-        {t('Home.browseWhileWait')}
+      {/* VISIBLE, named per drop state (owner instruction 2026-07-29, D-2.25-22 — supersedes the
+          2.21 "title-less" call, that brief's decision 8): the section says which drop these
+          pieces belong to — „Ова спуштање" while the drop is live, „Последно спуштање" otherwise.
+          Same section-heading recipe as the FAQ's h2, left-aligned on this section's own axis;
+          the outline stays h1 → h2 → h3. Home.browseWhileWait is retired from render again (key
+          kept, the D-Y.04-2 treatment). */}
+      <h2
+        id="home-showcase-heading"
+        className="font-display text-h2 text-foreground mb-8 font-bold sm:mb-10"
+      >
+        {t(view?.state === 'live' ? 'Showcase.headingLive' : 'Showcase.headingLast')}
       </h2>
 
       <div

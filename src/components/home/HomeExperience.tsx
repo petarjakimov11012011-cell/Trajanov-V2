@@ -188,7 +188,21 @@ export function HomeExperience({view}: {view: DropView | null}) {
           {/* The live drop grid renders product-card <h2>s; a single visually-hidden <h1> anchors the
               page so heading order never skips a level (WCAG 2.2 — Task 8). */}
           <h1 className="sr-only">{t('title')}</h1>
-          <DropLiveBanner remaining={view.remaining} />
+          {/* The photograph stays on the front door during the live hour too (owner instruction
+              2026-07-29, D-2.25-24 — until then live was the one state with no hero). The live
+              banner is this state's drop-state element and rides INSIDE the hero like every other
+              state's does; max-w-md mirrors the ended banner so the mustard bar doesn't span the
+              whole 1152px photograph. No CTAs here — the buyable grid directly below is the
+              action, and a „Каталог" button would point away from it. The hero is NOT inside a
+              reveal-group in this branch (deliberate): at T-0 the photograph appears instantly
+              while the cards below reveal, and the buy surface carries no extra motion in the
+              hour that matters. Preload consequence: live used to ship zero image preloads; it
+              now ships the same single mustard preload as every other state (D-Y.05-4's "exactly
+              one" invariant intact, now uniform across all four states). */}
+          <Hero>
+            <DropLiveBanner remaining={view.remaining} className="max-w-md" />
+            <p className="text-foreground max-w-md text-balance">{t('sub')}</p>
+          </Hero>
           <div className="reveal-group grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {view.products.map((p) => (
               <ProductCard key={p.slug} product={p} />

@@ -4,9 +4,11 @@ import type { DropView } from "@/lib/drop/state";
 import type { DropState, ProductView } from "@/types/drop";
 
 // Pure unit tests for the Home showcase slide source (Phase 2.21). No DB, no React: showcaseSlides
-// decides WHICH products get a slide and in WHAT order, and its two deliberate exclusions — no
-// photograph → no slide (decision 2), `live` → no slides at all (decision 5) — are the behaviour
-// under test, so nobody "fixes" either without failing here first.
+// decides WHICH products get a slide and in WHAT order. Its one deliberate exclusion — no
+// photograph → no slide (2.21 decision 2) — is behaviour under test, so nobody "fixes" it without
+// failing here first. The former second exclusion (`live` → no slides, 2.21 decision 5) was
+// REVERSED by the owner on 2026-07-29 (D-2.25-23): live now yields slides like every other state,
+// and that too is pinned below.
 
 function product(overrides: Partial<ProductView> & { slug: string; index: number }): ProductView {
   return {
@@ -46,8 +48,9 @@ describe("showcaseSlides", () => {
     expect(showcaseSlides(null)).toEqual([]);
   });
 
-  it("returns [] in the live state — the buyable grid is the page (decision 5)", () => {
-    expect(showcaseSlides(view("live"))).toEqual([]);
+  it("live: the same photographed slides as every other state (D-2.25-23, reversing 2.21 decision 5)", () => {
+    const slides = showcaseSlides(view("live"));
+    expect(slides.map((s) => s.slug)).toEqual(["test-mustard-ochre", "test-off-white"]);
   });
 
   it("countdown: only the photographed products, in view.products order", () => {
@@ -66,7 +69,7 @@ describe("showcaseSlides", () => {
   });
 
   it("never includes test-baby-blue — no photograph exists (register #8, decision 2)", () => {
-    for (const state of ["countdown", "ended"] as const) {
+    for (const state of ["countdown", "live", "ended"] as const) {
       const slugs = showcaseSlides(view(state)).map((s) => s.slug);
       expect(slugs).not.toContain("test-baby-blue");
     }

@@ -35,6 +35,8 @@
     "ctaContact": "Контакт"
   },
   "Showcase": {
+    "headingLast": "Последно спуштање",
+    "headingLive": "Ова спуштање",
     "regionLabel": "Парчиња",
     "prev": "Претходно парче",
     "next": "Следно парче",

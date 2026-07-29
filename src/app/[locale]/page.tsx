@@ -39,9 +39,12 @@ export default async function HomePage({
   return (
     <>
       <HomeExperience view={view} />
-      {/* Same server-computed `view` as the hero — no second query. It self-hides during a live
-          drop (and with no drop / no photographed product): src/lib/showcase.ts returns no slides,
-          so the buyable grid stays the whole page in the hour that matters (Phase 2.21). */}
+      {/* Same server-computed `view` as the hero — no second query. Renders in every drop state,
+          `live` included (D-2.25-23, owner 2026-07-29 — reversing the 2.21 live-hide), named per
+          state on its heading: „Ова спуштање" while live, „Последно спуштање" otherwise
+          (D-2.25-22). Self-hides only with no drop / no photographed product (src/lib/showcase.ts
+          returns no slides). During live it sits BELOW the buyable grid — the grid keeps the top
+          of the page in the hour that matters. */}
       <HomeShowcase view={view} />
       {/* Static content — renders identically in all three drop states and in preview; takes no props
           from `view` (Phase 2.11). Sits under the hero, above the dev-only preview switch. */}

@@ -35,6 +35,8 @@
     "ctaContact": "Contact"
   },
   "Showcase": {
+    "headingLast": "Last drop",
+    "headingLive": "This drop",
     "regionLabel": "Pieces",
     "prev": "Previous piece",
     "next": "Next piece",
