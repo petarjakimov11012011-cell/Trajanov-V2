@@ -226,10 +226,16 @@
 /*
   A 44×44 pointer/touch target WITHOUT changing the visual box (Phase 2.25 /adapt, D-2.25-9).
 
-  Top level, next to .faq-item / .header-shell / .reveal-group, NOT inside @layer base: a rule written
-  into that layer after :focus-visible is dropped by the Tailwind v4 pipeline before it reaches the
-  compiled stylesheet — verified by serving the built CSS and grepping for the selector. Every other
-  hand-written class in this file already sits at the top level; this one follows them.
+  Top level, next to .faq-item / .header-shell / .reveal-group / .spotlight-card — where every other
+  hand-written class in this file already lives. (An earlier version of this comment claimed a rule
+  placed inside `@layer base` after `:focus-visible` is dropped by the build. That is FALSE and was a
+  dev-server caching artifact; a probe rule in that exact position compiles through to the production
+  stylesheet. See D-2.25-19. The placement here is a convention, not a workaround.)
+
+  One consequence of being unlayered: `position: relative` here beats Tailwind's own `relative` /
+  `absolute` utilities, which sit in @layer utilities and lose to unlayered CSS regardless of source
+  order. Same for every other class in this file, but worth knowing before combining `tap-44` with a
+  positioning utility on the same element.
 
   For the header nav links and the MK·EN switch, growing the real box is not free: the nav's
   active-page indicator is a `border-b-2` on the link itself, so a taller link would carry the
@@ -281,9 +287,9 @@
     trajanov-showcase-progress → never runs: HomeShowcase kills autoplay through a JS matchMedia
                                  check, because a CSS rule cannot stop a setTimeout (D-2.21-3)
 
-  What is left below therefore only ever catches something nobody enumerated — a third-party widget,
-  or the next animation someone adds and forgets. Adding an animation to this codebase means adding a
-  line to the list above, not leaning on the `!important` here.
+  The universal rule below therefore only ever catches something nobody enumerated — a third-party
+  widget, or the next animation someone adds and forgets. Adding an animation to this codebase means
+  adding a line to the list above, not leaning on the `!important`.
 
   `scroll-behavior` is included because nothing in this project sets `scroll-behavior: smooth` TODAY,
   and the day someone does it would otherwise sail straight past a reduced-motion preference.
@@ -296,22 +302,14 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-}
-
-/* The enumerated half of the rule above. Deliberately its OWN @media block IN SOURCE: a rule written
-   inside the universal block after the `*` selector is dropped before it reaches the compiled
-   stylesheet — the same Tailwind v4 pipeline behaviour that keeps `.tap-44` out of `@layer base`.
-   The compiler merges these two blocks back into one on the way out, so the shipped CSS has a single
-   `@media (prefers-reduced-motion: reduce)` rule; only the authoring has to be split. Both facts
-   verified by serving the built CSS and reading it. */
-@media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto !important;
   }
   /* The two Tailwind keyframe utilities this tree actually uses. Stopping them outright beats the
-     backstop's 0.001ms: the spinner becomes a static busy ring, and the LIVE dot's halo goes static
-     rather than firing one compressed pulse — brand.md §6, "The live dot is static under reduced
-     motion". Neither utility uses a fill mode, so `none` leaves each at its authored resting state. */
+     backstop's 0.001ms above: the spinner becomes a static busy ring, and the LIVE dot's halo goes
+     static rather than firing one compressed pulse — brand.md §6, "The live dot is static under
+     reduced motion". Neither utility uses a fill mode, so `none` leaves each at its authored
+     resting state. */
   .animate-spin,
   .animate-ping {
     animation: none !important;

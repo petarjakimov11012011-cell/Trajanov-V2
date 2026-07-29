@@ -14,7 +14,7 @@
 > **Scope note.** This report covers the **whole 2.25 branch**, but P0 (`87efc6b`, `27b589d`,
 > decisions `D-2.25-1…4`) was executed by a different session. Everything below marked **P1** is this
 > session's work: commits `a881dcd`, `13246fd`, `277984c`, `4340cec` and the review-fix commit,
-> decisions `D-2.25-5…18`.
+> decisions `D-2.25-5…19`.
 > **The phase is NOT closed** — `/impeccable polish` (P2) and the closing `/impeccable audit` are
 > still owed on this branch. The state files are updated to the P1 waterline, not to a finished phase.
 
@@ -48,8 +48,8 @@
 
 ## 2. Decisions I made on my own
 
-**Fourteen, `D-2.25-5…18`.** Two (`D-2.25-10`, and the token half of `D-2.25-13`) were **put to Petar
-before the edit was made** and are recorded as his calls. Four (`D-2.25-15…18`) came out of the
+**Fifteen, `D-2.25-5…19`.** Two (`D-2.25-10`, and the token half of `D-2.25-13`) were **put to Petar
+before the edit was made** and are recorded as his calls. Five (`D-2.25-15…19`) came out of the
 adversarial review described in §3 — they are fixes to defects **this phase introduced** and to
 claims **this phase got wrong**, and they are listed here rather than folded into the rest.
 
@@ -69,6 +69,7 @@ claims **this phase got wrong**, and they are listed here rather than folded int
 | **D-2.25-16** | `sm:gap-4` between the cart's remove button and the `+` stepper | Leave it — both are full 44px targets, nothing fails an SC | The desktop cart row grew ~16px to prevent a **touch** mis-tap |
 | **D-2.25-17** | `/styleguide`'s scroll container gets `tabIndex={0}` + a label | Leave it, it is a dev-only noindex page | One more tab stop, at every viewport, including those where it does not scroll |
 | **D-2.25-18** | Two of this phase's own measurement claims corrected on the record | Fix the numbers silently in this report | `D-2.25-7` and two commit messages are **left wrong in place** (append-only / immutable) |
+| **D-2.25-19** | The "Tailwind drops rules after `*` / `:focus-visible`" claim **withdrawn as false**; the split `@media` block folded back | Leave it — the shipped CSS was correct either way, zero user impact | `D-2.25-14`, `D-2.25-18` and commit `0159a53` keep the false justification; this entry is the only straight record |
 
 ---
 
@@ -92,13 +93,20 @@ class that does nothing to fix a problem that does not reproduce would be cargo 
 already passing AA. The work was done as briefed and the site is now better than it was — but the
 next brief should say **AAA / 2.5.5** so nobody thinks the site was failing AA.
 
-**4. Two rules written in the obvious place never reached the compiled stylesheet.** A rule added
-inside `@layer base` after `:focus-visible`, and a rule added inside the existing
-`@media (prefers-reduced-motion: reduce)` block after the `*` selector, are both **silently dropped**
-by the Tailwind v4 pipeline. Verified by serving the built CSS and grepping for the selectors — the
-class was in the DOM, the rule was in the source, and the compiled CSS did not contain it. Both are
-now authored at the top level / in a second `@media` block (which the compiler merges back into one).
-**This will bite the next person who edits `globals.css`**; both workarounds carry a comment saying why.
+**4. I claimed the build drops rules in certain positions. It does not. The claim was mine, it was
+wrong, and it was presented as verified** (`D-2.25-19`). Mid-phase I concluded that a rule written
+inside `@layer base` after `:focus-visible`, or inside the first `prefers-reduced-motion` block after
+the `*` selector, is silently dropped by the Tailwind v4 pipeline — and wrote that into two
+`globals.css` comments and a decision entry as "verified by serving the built CSS". The adversarial
+review refused to take it on trust. Tested properly (probe rules at exactly those two positions,
+`.next` deleted, one fresh `npm run build`, grep the emitted stylesheet) **both probes compile
+through**. What I had actually hit was a **dev-server caching artifact** — `@tailwindcss/postcss`
+caches on the input path and rebuilds off mtime, and that same dev server was separately caught
+serving `.tap-44` twice and then zero times from the same URL with no source change. The second
+`@media` block is folded back into the first, the false comments are deleted, and `.tap-44` stays at
+the top level for the real reason (that is where every other hand-written class in the file lives).
+**Zero user impact — the shipped CSS was correct either way.** The damage would have been to the next
+person editing that file.
 
 **5. Frame timing for `/animate` could not be measured, and no number is claimed.** This project's
 verification pane is permanently hidden (`document.hidden === true`), so `requestAnimationFrame`
@@ -107,10 +115,13 @@ What is measured is the mechanism and the paint area: the blurred element on the
 **1152×648 = 0.75 MPx** at 1280px, and the live-drop call site puts the same filter on every product
 card at once. **A real before/after on a real device is owed (#59).**
 
-**6. The dev server on :3000 belonging to another session died mid-phase**, and before that it served
-**stale CSS** for a while (a compiled chunk that did not contain a rule the source had). Everything in
-this report was re-measured against a fresh server started by this session. If a measurement in an
-earlier session's notes disagrees with one here, prefer this one.
+**6. The dev server is not a reliable measuring instrument for CSS, and it cost me a false finding.**
+The :3000 server belonging to another session died mid-phase, and both it and my own replacement were
+caught serving **stale CSS chunks** — the same URL returning a rule twice and then not at all with no
+source change in between. That artifact is what produced surprise #4. **Every number in this report was
+re-measured against a `npm run build` + `next start` production server**, and the CSS claims were
+re-checked by grepping the emitted stylesheet in `.next/static` directly. If an earlier session's notes
+disagree with a figure here, prefer this one — and do not measure CSS against `next dev`.
 
 **7. `/impeccable`'s design hook flags `globals.css` for `gradient-text`.** That is the **wordmark
 hover shine** — owner-requested, ratified `D-2.19-1`/`D-2.20-1/2/3`, documented in `brand.md` §6 as the

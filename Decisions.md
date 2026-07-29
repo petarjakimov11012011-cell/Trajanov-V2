@@ -5072,3 +5072,38 @@ start at `D-2.01-6`.*
   gets the character count and the incomplete grep. The correction lives here and in the completion
   report, one hop away.
 - **Links:** `D-2.25-7` · `D-2.25-9` · commits `a881dcd`, `13246fd` · Phase 2.25 completion report
+
+---
+
+### D-2.25-19 · 2026-07-29 · The "Tailwind drops rules after `*` / after `:focus-visible`" claim is FALSE and is withdrawn
+- **Status:** Accepted. **Corrects the reasoning in `D-2.25-14` and in `D-2.25-18`'s framing** —
+  neither decision's outcome changes, but the fact each cited does not exist.
+- **Decided by:** Code, after an adversarial review of the P1 diff refused to take the claim on trust
+  and reproduced it properly.
+- **Decision:** `D-2.25-14` and two comments in `globals.css` asserted that a hand-written rule placed
+  **inside `@layer base` after `:focus-visible`**, or **inside the first
+  `@media (prefers-reduced-motion: reduce)` block after the `*` selector**, is silently dropped by the
+  Tailwind v4 pipeline, and that this was "verified by serving the built CSS". **It is not true.**
+  Tested properly — two probe rules inserted at exactly those two positions, `.next` deleted, one
+  fresh `npm run build`, then grep the emitted stylesheet — **both probes compile through and appear
+  in the production CSS.** What the earlier session actually observed was a **dev-server caching
+  artifact**: `@tailwindcss/postcss` keeps a module-level cache keyed on the input path and rebuilds
+  off the file's mtime rather than the CSS it is handed, and the same dev server was independently
+  seen serving `.tap-44` twice and then zero times from the same URL **with no source change in
+  between**. So: the second `@media (prefers-reduced-motion: reduce)` block is **folded back into the
+  first**, the two false comments are **deleted**, and `.tap-44` **stays at the top level for the real
+  reason** — every other hand-written class in the file (`.faq-item`, `.header-shell`,
+  `.reveal-group`, `.spotlight-card`, `.wordmark-shine`, `.showcase-*`) lives there. Compiled output
+  re-verified after the fold: one merged block carrying all three rules, `.tap-44` present, no blur in
+  the reveal keyframe, no probes left behind.
+- **Alternative rejected:** leave the split block and the comments, since the shipped CSS and the
+  reduced-motion behaviour were **correct either way** — this is a zero-user-impact defect. Rejected
+  because the cost of a false "verified by measurement" note in a shared stylesheet is not paid by the
+  user, it is paid by the next author, who will either copy the workaround into new code or waste a
+  session re-deriving that it was never real. This project's whole method is that a measured claim can
+  be trusted; a wrong one that survives is worse than no comment at all.
+- **Downside accepted:** `D-2.25-14`'s and `D-2.25-18`'s text keep the false justification (append-only)
+  and one commit message (`0159a53`) repeats it immutably — this entry is the only place the record is
+  straight. And the honest summary is unflattering: **a claim this phase presented as verified was
+  never tested against a clean build**, and it took an adversarial pass to catch it.
+- **Links:** `src/app/globals.css` · `D-2.25-14` · `D-2.25-18` · `D-2.25-9`
