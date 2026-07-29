@@ -25,6 +25,13 @@ export const dynamic = 'force-dynamic';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
+// This page's slot geometry, which stopped matching PhotoSlot's catalog default when the pair
+// collapsed to one column below `sm:` (D-2.25-10 / D-2.25-15). Measured against the real layout:
+// below 640px the slot is the whole `max-w-6xl px-4` column (~100vw); from 640px the pair is two
+// columns of that same full-width column (~50vw); from 1024px the outer `lg:grid-cols-2` halves the
+// 1152px container first, so each slot is ~280px. If either grid changes, this changes with it.
+const PRODUCT_SLOT_SIZES = '(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw';
+
 // Per-locale title from the product's real name (or the neutral placeholder + index while names are
 // OWED); generic per-locale description; reciprocal hreflang for the SHARED product slug (D-2.01-2/5/6).
 export async function generateMetadata({
@@ -129,6 +136,7 @@ export default async function ProductPage({
           <PhotoSlot
             label={t('Placeholder.productPhoto')}
             muted={soldOut}
+            sizes={PRODUCT_SLOT_SIZES}
             image={
               photo && {
                 src: photo.src,
@@ -137,7 +145,11 @@ export default async function ProductPage({
               }
             }
           />
-          <PhotoSlot label={t('Placeholder.productPhoto')} muted={soldOut} />
+          <PhotoSlot
+            label={t('Placeholder.productPhoto')}
+            muted={soldOut}
+            sizes={PRODUCT_SLOT_SIZES}
+          />
         </div>
 
         <div className="flex flex-col gap-5 lg:sticky lg:top-20">

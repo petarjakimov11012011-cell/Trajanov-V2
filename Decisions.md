@@ -4978,3 +4978,30 @@ start at `D-2.01-6`.*
   "motion, but instant" treatment the block itself now argues against.
 - **Links:** `src/app/globals.css` · `brand.md` §6 · `D-2.19-1` · `D-2.21-3` · `D-2.25-13` ·
   P1 brief §1d
+
+---
+
+### D-2.25-15 · 2026-07-29 · `PhotoSlot` takes a `sizes` prop; the product page passes its own
+- **Status:** Accepted
+- **Decided by:** Code, after an adversarial review of the P1 diff caught the defect.
+- **Decision:** `PhotoSlot` gained an optional `sizes` prop defaulting to the existing
+  `CATALOG_SIZES` (`(min-width: 1024px) 280px, 50vw`), and the product page passes
+  `(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw`. **This is a bug `D-2.25-10`
+  introduced and this entry fixes.** One `sizes` constant used to serve both surfaces because both
+  computed to ~50vw below `lg` — and `PhotoSlot`'s own comment said "**keep in step if either grid
+  changes**". `D-2.25-10` changed one of those grids to a single column below `sm:` and did not keep
+  it in step, so on a phone the slot became the full column (~100vw) while `sizes` still promised
+  50vw: `next/image` would have picked a source built for **half the box** and upscaled it. The page
+  whose entire purpose is the photograph would have shipped a **softer** photograph than before the
+  change that was made to show it bigger. Verified on the production build (`next start`):
+  `/katalog/test-mustard-ochre` serves the new three-stop `sizes` against a 384w…3840w srcset;
+  the catalog list and the Home hero are untouched.
+- **Alternative rejected:** widen the shared `CATALOG_SIZES` constant to cover both surfaces. One
+  string, one place — and it would silently over-fetch on the catalog grid, where a card genuinely is
+  50vw, to fix a page that is not. A `sizes` hint that is wrong in the generous direction is still
+  wrong; it just costs bytes instead of sharpness.
+- **Downside accepted:** the geometry now lives in **two** places that must be kept in agreement by
+  hand, and the second one is a bare string constant in a page file. The comment that failed to stop
+  this the first time is now on both — which is the same class of protection that already failed once.
+- **Links:** `src/components/system/PhotoSlot.tsx` · `src/app/[locale]/catalog/[slug]/page.tsx` ·
+  `D-2.25-10` · `D-Y.03-5`
