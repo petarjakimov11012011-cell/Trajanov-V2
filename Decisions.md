@@ -5273,3 +5273,21 @@ start at `D-2.01-6`.*
   in a shifted state on this machine; anyone hitting the local dev server in that window saw a
   simulated past. No hosted/production data involved; `orders` untouched.
 - **Links:** `D-2.21-7` · `D-2.22-5` · `D-2.24-2` · this session's completion-report addendum
+
+### D-2.25-26 · 2026-07-29 · Phase 2.25 merged BEFORE P2 `/polish` and the closing `/audit` — the six-items-one-PR plan is superseded
+- **Status:** Accepted. **Supersedes the plan recorded in the P1 handoff brief §0/§6** ("one preview
+  after all six items land"; "Do not push or open the PR") — Petar's own plan, changed by Petar.
+- **Decided by:** Petar (owner), 2026-07-29, after reviewing the branch on localhost:3000: "all good
+  push/merge all to main."
+- **Decision:** The branch merged with **four of the six** planned items on it (P0 `typeset`, P1
+  `harden`/`optimize`/`adapt`/`animate`, plus the owner items `D-2.25-22…24`). PR
+  [#40](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/40), merge `daa91e6`,
+  operator-authorised per `D-0-3`; branch deleted, remote + local refs pruned. P0's `.gitignore`
+  one-liner (ignore `.claude/skills/impeccable/`) was committed under the same "all" (`2f52d01`).
+- **Alternative rejected:** holding the branch until `/polish` + `/audit` land, per the original
+  instruction. Rejected by the instruction's own author after a hands-on review.
+- **Downside accepted:** production ships without the polish items (stock-badge de-dup, cart heading
+  level, size-picker group name, the deferred off-scale sizes `text-xs`/`text-base`/`text-lg`/
+  `text-3xl`, `DropBanner.tsx:28`'s mixed pair) and without a closing audit over the branch — both
+  move to a future branch, and the one-phase-branch rule re-arms now that this one is merged.
+- **Links:** PR #40 · `D-0-3` · `D-2.25-4` · P1 handoff brief §6/§7 · completion report §10

@@ -429,3 +429,32 @@ Lazar). Placeholder register **unchanged**. Decisions **`D-2.25-22…25`**. File
 `src/app/[locale]/page.tsx` (comment only), `src/messages/{mk,en}.json`,
 `tests/home/showcase.test.ts`, `docs/i18n/{string-inventory,mk-review-2.25}.md`, `Decisions.md`,
 the state files. **No dependency, config, `supabase/`, or stock/order logic touched.**
+
+---
+
+## 11. Merge + production verification (2026-07-29)
+
+**Merged to `main` the same day, BEFORE P2 `/polish` and the closing `/audit`, on Petar's explicit
+instruction after his localhost:3000 review** ("all good push/merge all to main") — `D-2.25-26`
+supersedes the six-items-one-PR plan; `D-0-3` satisfied (operator authorised, not Code). PR
+[#40](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/40), merge `daa91e6`; branch
+deleted, remote + local refs pruned; P0's `.gitignore` one-liner committed under the same
+instruction (`2f52d01`). The local scratch DB's review shift was **restored byte-exact before the
+push** (same `D-2.25-25` script, post-restore inspect matched).
+
+**Production deploy VERIFIED on `https://www.trajanovv.com` (~5 min after merge; Vercel status
+`success` on `daa91e6`):**
+
+- `/` (MK, real state **ended**): „Последно спуштање" **×2** (rendered h2 + serialized payload),
+  „Ова спуштање" ×1 (payload only — correct outside live), ended banner present, **2 slides**,
+  prices **„1.199" ×2** (MK dot grouping, zero comma), **zero** EN strings ("Last drop"/"This
+  drop" = 0).
+- `/en`: "Last drop" **×2**, "This drop" ×1 payload, **zero** MK leakage, prices **"1,199" ×2**.
+- Both locales: **exactly one `rel="preload" as="image"` (the mustard frame)** and **exactly one
+  `<h1>`**; `lang` correct.
+- Catalog photo `mustard-ochre-01.webp` serves **200 `image/webp` at its exact committed
+  214,370 B**.
+
+**Not verifiable from here, unchanged:** the real-device rows (#44/#49/#55/#58/#60/#65), PSI
+(#42/#45), and the MK reviews (#48/#56/#64). The live-state hero/showcase cannot be seen on
+production until a drop actually opens — #65 covers it via `?preview=` on a device.

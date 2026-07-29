@@ -6,7 +6,7 @@ built twice in two places under two names.
 Updated by Code on every phase that adds, moves, or deletes a file. **A file map that lies is worse
 than no file map.**
 
-Last updated: **2026-07-29** · By: **Claude Code (Phase 2.25 owner items — showcase named per state + live hero)**
+Last updated: **2026-07-29** · By: **Claude Code (Phase 2.25 merged — PR #40, `daa91e6`)**
 
 ---
 
@@ -20,7 +20,7 @@ Last updated: **2026-07-29** · By: **Claude Code (Phase 2.25 owner items — sh
 `tests/home/showcase.test.ts`, `docs/i18n/string-inventory.md` (regenerated), `Decisions.md`
 (`D-2.25-22…25`), the state files.
 
-**Phase 2.25 P1 landed — five new files (branch `phase-2.25-impeccable-pass`, NOT yet merged; P2
+**Phase 2.25 P1 landed — five new files (MERGED to `main` 2026-07-29 via PR #40 with the rest of the branch, `D-2.25-26`; P2
 `/polish` + the closing `/audit` are still owed on the same branch).** New:
 `src/lib/forms/first-invalid.ts` (new `src/lib/forms/` dir — pure, DOM-free "which field does a
 failed submit focus", shared by CheckoutForm and ContactForm);
