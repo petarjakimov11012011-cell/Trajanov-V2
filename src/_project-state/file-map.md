@@ -289,7 +289,7 @@ Trajanov-V2/
 │   │   ├── faq.ts                   # single source for the Home FAQ — 3 groups × ordered q/a KEYS (keys only, no strings); read by HomeFaq + faq-jsonld (2.11, D-2.11-5)
 │   │   ├── showcase.ts              # single source for the Home showcase — which products get a slide (photo REQUIRED, `live` → none) + wrapIndex; pure, vitest-importable (2.21)
 │   │   ├── product-images.ts        # slug→photo map for Catalog/Product — keyed by SLUG, never index (Y.03, D-Y.03-1); baby-blue absent → null. (Tree line missing since Y.03; added Y.06)
-│   │   ├── product-care.ts          # slug→{mk,en} composition & care, read out of config/products.ts — keyed by SLUG, never index (Y.06, D-Y.06-1); all null today → the product page keeps its placeholder (D-Y.06-2)
+│   │   ├── product-care.ts          # slug→{mk,en} composition & care, read out of config/products.ts — keyed by SLUG, never index (Y.06, D-Y.06-1); all six FILLED by Y.07 (100% cotton / 30 °C, facts.md §7, D-Y.07-1/3); null still → placeholder (D-Y.06-2)
 │   │   ├── seo/                     # structured-data builders (2.04)
 │   │   │   ├── site-jsonld.ts       # Organization + WebSite @graph — no address/logo/SearchAction/partner
 │   │   │   ├── product-jsonld.ts    # Product node, gated on a real name; availability from drop state
@@ -323,7 +323,7 @@ Trajanov-V2/
 │   │   ├── schema.ts                # DropConfig/ProductConfig types + validators + constants
 │   │   ├── time.ts                  # Europe/Skopje wall-clock → UTC instant, DST-aware (D-1.04-4)
 │   │   ├── drops.ts                 # the schedule — the switch Lazar flips
-│   │   ├── products.ts              # the catalogue — prices, names, stock
+│   │   ├── products.ts              # the catalogue — prices, names, stock, composition & care copy (careMk/careEn, Y.07)
 │   │   └── index.ts                 # joins drops+products; re-exports config surface
 │   │
 │   ├── messages/
