@@ -8,7 +8,7 @@
 | **Operator** | Petar (the cap-removal call) / Lazar (orchestrator) |
 | **Date** | 2026-08-27 |
 | **Branch** | `phase-y.06-care-wiring-and-cap-removal` |
-| **PR** | *(not opened — see § 10; the other operator merges, `D-0-3`)* |
+| **PR** | [#41](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/41) — open, **not merged** (the other operator merges, `D-0-3`) |
 | **Brief** | `briefs/Part-2-Phase-Y06-Code.md` |
 
 ---
@@ -321,7 +321,7 @@ only in tool output in this session, never in a file. Nothing in the diff carrie
 
 | Item | Waiting on | Owner |
 |---|---|---|
-| **PR not opened; branch not merged** | The brief requires a **fresh Claude Code session — one that did not write this code — to review the PR against the brief before merge**, and forbids me merging my own PR. Both stand. | Lazar / Petar |
+| **PR [#41](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/41) open; not merged** | The brief requires a **fresh Claude Code session — one that did not write this code — to review the PR against the brief before merge**, and forbids me merging my own PR. Both stand. | Lazar / Petar |
 | **Migration not on hosted** (owed #68) | `supabase db push` after merge, before any drop opens | Lazar |
 | Native MK review of the four changed strings (owed #66) | Two native speakers | Lazar / Petar |
 | A real 3-unit order on production (owed #67) | A live drop — the 2.06 rehearsal | Lazar + Vladimir |
