@@ -7,7 +7,7 @@ import {pageMetadata} from '@/lib/metadata';
 
 // The order path runs server-side (Turnstile → rate limit → create_order). What it submits comes from
 // the customer's cart (client state), read inside the form; create_order remains the sole authority on
-// the window, cap, price, and stock (D-1.04-9). The page itself only needs the public Turnstile key.
+// the window, quantity, price, and stock (D-1.04-9). The page itself only needs the public Turnstile key.
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({

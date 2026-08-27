@@ -7,13 +7,13 @@ import {
   toOrderItems,
   totalUnits,
   atCap,
-  MAX_UNITS_PER_ORDER,
+  SANITY_MAX_UNITS_PER_ORDER,
   type CartItem,
 } from "../../src/lib/cart/cart";
 
-// The pure cart logic (Phase 1.06). Node env, no DB, no jsdom — just the reducer that decides what the
-// customer's choice is and enforces the whole-order cap. The integration half (that this choice reaches
-// order_items) lives in tests/orders/checkout-items.test.ts.
+// The pure cart logic (Phase 1.06, cap removed in Y.06). Node env, no DB, no jsdom — just the reducer
+// that decides what the customer's choice is and holds it under the 99-unit SANITY ceiling. The
+// integration half (that this choice reaches order_items) lives in tests/orders/checkout-items.test.ts.
 
 const A: Omit<CartItem, "qty"> = {
   variantId: "var-A",
@@ -71,42 +71,61 @@ describe("cart — the customer's choice is recorded faithfully", () => {
   });
 });
 
-describe("cart — the 2-unit whole-order cap (mirrors create_order TR003)", () => {
-  it("the cap constant is 2, matching what create_order() enforces", () => {
-    expect(MAX_UNITS_PER_ORDER).toBe(2);
+describe("cart — the 99-unit SANITY ceiling (not a business rule — D-Y.06-3/4)", () => {
+  // The 2-unit business cap is GONE (D-Y.06-3, Petar's call, supersedes D-1.06-6). What is left is
+  // input validation: a ceiling absurd enough that no real customer meets it, kept only so a malformed
+  // or absurd quantity is refused cleanly (TR003) instead of becoming a cast error or a 500 at the one
+  // moment that matters. Nothing here limits how much of a drop one person may buy — real stock, the
+  // per-drop rate limit (D-1.04-7) and TR005 (one live order per phone per drop) do that.
+  it("the ceiling is 99, matching what create_order() enforces", () => {
+    expect(SANITY_MAX_UNITS_PER_ORDER).toBe(99);
   });
 
-  it("refuses a third unit across different lines — cart returned unchanged", () => {
+  it("ACCEPTS a third unit across different lines — the old cap is gone", () => {
     let cart = addItem(emptyCart, A); // 1
-    cart = addItem(cart, B); // 2 (total 2 — at cap)
-    expect(totalUnits(cart)).toBe(2);
-    expect(atCap(cart)).toBe(true);
-    const capped = addItem(cart, C); // would be 3
-    expect(capped).toEqual(cart); // unchanged
-    expect(totalUnits(capped)).toBe(2);
+    cart = addItem(cart, B); // 2
+    expect(atCap(cart)).toBe(false); // 2 was the old cap; it is nothing now
+    cart = addItem(cart, C); // 3 — refused before Y.06
+    expect(totalUnits(cart)).toBe(3);
+    expect(cart.items.map((i) => i.variantId)).toEqual(["var-A", "var-B", "var-C"]);
   });
 
-  it("refuses a third unit on the same line too", () => {
-    let cart = addItem(emptyCart, A); // qty 1
-    cart = addItem(cart, A); // qty 2
-    cart = addItem(cart, A); // would be qty 3
-    expect(cart.items[0].qty).toBe(2);
-  });
-
-  it("setItemQty clamps to the cap and removes the line at zero", () => {
+  it("ACCEPTS a third unit on the same line too", () => {
     let cart = addItem(emptyCart, A);
-    cart = setItemQty(cart, "var-A", 5); // clamps to 2
-    expect(cart.items[0].qty).toBe(2);
+    cart = addItem(cart, A);
+    cart = addItem(cart, A); // qty 3 — clamped to 2 before Y.06
+    expect(cart.items[0].qty).toBe(3);
+  });
+
+  it("setItemQty sets 3 exactly, and still removes the line at zero", () => {
+    let cart = addItem(emptyCart, A);
+    cart = setItemQty(cart, "var-A", 3); // clamped to 2 before Y.06
+    expect(cart.items[0].qty).toBe(3);
     cart = setItemQty(cart, "var-A", 0); // removes
     expect(cart.items).toHaveLength(0);
   });
 
-  it("setItemQty on one line respects units already held by the others", () => {
+  it("atCap is false at ordinary quantities and true only AT the ceiling", () => {
+    let cart = addItem(emptyCart, A, 98);
+    expect(atCap(cart)).toBe(false);
+    cart = addItem(cart, B, 1); // 99
+    expect(totalUnits(cart)).toBe(99);
+    expect(atCap(cart)).toBe(true);
+  });
+
+  it("refuses to cross the ceiling — cart returned unchanged", () => {
+    const cart = addItem(emptyCart, A, 99);
+    const over = addItem(cart, B); // would be 100
+    expect(over).toEqual(cart);
+    expect(totalUnits(over)).toBe(99);
+  });
+
+  it("setItemQty clamps to the ceiling, counting units already held by the other lines", () => {
     let cart = addItem(emptyCart, A); // A qty 1
-    cart = addItem(cart, B); // B qty 1 (total 2)
-    cart = setItemQty(cart, "var-A", 2); // A wants 2, but B holds 1 → clamp A to 1
-    expect(cart.items.find((i) => i.variantId === "var-A")!.qty).toBe(1);
-    expect(totalUnits(cart)).toBe(2);
+    cart = addItem(cart, B, 10); // B qty 10 (total 11)
+    cart = setItemQty(cart, "var-A", 500); // A wants 500; B holds 10 → clamp A to 89
+    expect(cart.items.find((i) => i.variantId === "var-A")!.qty).toBe(89);
+    expect(totalUnits(cart)).toBe(99);
   });
 });
 
