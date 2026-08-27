@@ -1,7 +1,7 @@
 # Part Y · Phase 07 · Code — Completion Report
 
 **Date:** 2026-08-27 · **Executing model:** Claude Opus 5, medium effort
-**Branch:** `phase-Y.07-care-copy` · **Commit range:** `f916178` (one commit; report commit follows)
+**Branch:** `phase-Y.07-care-copy` · **Commit range:** `f916178..3e8bed6` · **PR:** [#42](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/42) — open, awaiting operator review, **not merged**
 **Outcome (one line):** Every product page now tells the customer what the shirt is made of and how to wash it — `100% cotton, 30 °C` — on Vladimir's own statement, recorded as his statement and not as a label read.
 
 ---
@@ -57,7 +57,7 @@ Two things were deliberately **not** done. Nothing beyond "100% cotton" and "was
 - ✅ **`D-Y.06-9` marked `Superseded by D-Y.07-4`; body not edited.** Evidence: Status line replaced; the entry also records that part (a) (blank-safe trimming) survives.
 - ✅ **Neither old entry's body edited.** Evidence: `git diff origin/main -- Decisions.md | grep '^-'` returns **exactly two lines**, both `- **Status:** Accepted`. Nothing else in the file was removed.
 - ✅ **`supabase/migrations/` untouched and `supabase db push` was not run.** Evidence: `git diff origin/main -- supabase/` → **empty**; no `supabase` command was run this session other than a read-only `supabase status`.
-- ✅ **One PR open from `phase-Y.07-care-copy`, body quoting both strings and the `facts.md` source line.** URL in §5.
+- ✅ **One PR open from `phase-Y.07-care-copy`, body quoting both strings and the `facts.md` source line.** Evidence: [#42](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/42) — body carries both `careMk`/`careEn` literals in their `\u00A0`-escaped source form, the full `facts.md` §7 row quoted verbatim, and a "what to actually check" section naming the character-for-character match as the whole risk of the phase.
 
 **Owed to Lazar / Petar (register, not this checklist):** rows **#69** and **#70**.
 
