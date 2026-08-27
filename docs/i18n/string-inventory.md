@@ -29,7 +29,6 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Buy.viewCart` | Кон кошничката | View cart | `src/components/product/AddToCartPanel.tsx` |
 | `Buy.viewProduct` | Погледни | View | _(not found in source)_ |
 | `Cart.backToDrop` | Назад кон спуштањето | Back to the drop | `src/components/cart/CartView.tsx`<br>`src/components/checkout/CheckoutForm.tsx` |
-| `Cart.capNotice` | Најмногу 2 парчиња по нарачка — залихите се ограничени и се резервираат при нарачка. | Max 2 items per order — stock is limited and reserved when you order. | `src/components/cart/CartView.tsx` |
 | `Cart.checkout` | Кон нарачка | Checkout | `src/components/cart/CartView.tsx` |
 | `Cart.codNote` | Плаќање со готовина при преземање. | Cash on delivery. | `src/components/cart/CartView.tsx` |
 | `Cart.decrease` | Намали количина | Decrease quantity | `src/components/cart/CartView.tsx` |
@@ -107,7 +106,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Drop.seconds` | СЕК | SEC | `src/components/drop/Countdown.tsx` |
 | `Faq.a1` | Само додека трае спуштање. Меѓу спуштањата сè може да се разгледа, но ништо не може да се купи. Тајмерот на почетната страница покажува кога се отвора следното. | Only while a drop is on. Between drops you can look at everything, but nothing is buyable. The timer on the home page shows when the next one opens. | _(not found in source)_ |
 | `Faq.a2` | Готовина при преземање, кога пратката ќе пристигне. Нема картички, нема банкарски трансфер, нема плаќање однапред. | Cash on delivery, when the package arrives. No cards, no bank transfer, no paying up front. | _(not found in source)_ |
-| `Faq.a3` | Најмногу 2 парчиња по нарачка. Залихата е вистинска и ограничена — кога ќе се распродаде, готово е. | Two pieces per order, maximum. The stock is real and limited — once it's sold out, it's gone. | _(not found in source)_ |
+| `Faq.a3` | Колку што има на залиха. Нема ограничување по нарачка — залихата е вистинска и ограничена, па кога ќе се распродаде, готово е. | As many as are in stock. There's no per-order limit — the stock is real and limited, so once it's sold out, it's gone. | _(not found in source)_ |
 | `Faq.a4` | Само во Северна Македонија. Нема испорака во странство. | Within North Macedonia only. No international shipping. | _(not found in source)_ |
 | `Faq.a5` | Рок на достава: 3–5 работни дена. Курирот и цената на испораката сè уште не се потврдени и нема да ги погодуваме — плаќаш готовина на врата. | Delivery takes 3 to 5 business days. The courier and the delivery cost aren't confirmed yet and we're not going to guess them — you pay cash at the door. | _(not found in source)_ |
 | `Faq.a6` | Нарачката ја резервира залихата 48 часа — не се продава веднаш. Те бараме телефонски за да ја потврдиме. Ако не те фатиме, резервацијата истекува и парчето се враќа во продажба. | Your order holds the stock for 48 hours — it isn't sold on the spot. We call you to confirm it. If we can't reach you, the hold expires and the piece goes back on sale. | _(not found in source)_ |
@@ -175,7 +174,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Nav.privacy` | Приватност | Privacy | `src/components/layout/SiteFooter.tsx` |
 | `Nav.shipping` | Испорака и враќање | Shipping & returns | `src/components/layout/SiteFooter.tsx` |
 | `Nav.terms` | Услови | Terms | `src/components/layout/SiteFooter.tsx` |
-| `Order.capViolated` | Најмногу 2 парчиња по нарачка. | Max 2 items per order. | `src/components/checkout/CheckoutForm.tsx` |
+| `Order.quantityInvalid` | Провери ја количината во кошничката и обиди се повторно. | Check the quantity in your cart and try again. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.duplicatePhone` | Веќе имаш активна нарачка со овој број за ова спуштање. | You already have a live order with this number for this drop. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.emptyCart` | Кошничката е празна. | Your cart is empty. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.genericError` | Нешто тргна наопаку. Пробај повторно. | Something went wrong. Try again. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
@@ -220,7 +219,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Product.chooseSize` | Избери величина | Choose a size | `src/components/product/AddToCartPanel.tsx` |
 | `Product.composition` | Состав и нега | Composition & care | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Product.details` | Детали | Details | _(not found in source)_ |
-| `Product.oneUnitLimit` | Најмногу 2 парчиња по нарачка. | Max 2 items per order. | `src/components/product/AddToCartPanel.tsx` |
+| `Product.quantityLimit` | Ја достигна максималната количина за една нарачка. | You've reached the maximum quantity for one order. | `src/components/product/AddToCartPanel.tsx` |
 | `Product.photoAltComposite` | Окер и крем-бели маици со црвен принт, носени. | Ochre and off-white t-shirts with red print, worn. | `src/components/home/HomeExperience.tsx` |
 | `Product.photoAltOchre` | Окер маица со црвен принт, носена. | Ochre t-shirt with red print, worn. | `src/components/home/HomeExperience.tsx`<br>`src/lib/product-images.ts` |
 | `Product.photoAltOffWhite` | Крем-бела маица со црвен принт, носена. | Off-white t-shirt with red print, worn. | `src/lib/product-images.ts` |
@@ -275,7 +274,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Terms.noBody` | Нема профили, нема зачувани картички, нема претплати, нема кодови за попуст. | No accounts, no saved cards, no subscriptions, no discount codes. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.noHeading` | Што не правиме | What we don't do | `src/app/[locale]/terms/page.tsx` |
 | `Terms.orderingBody1` | Кога нарачуваш, залихата се резервира 48 часа — не се продава веднаш. Те бараме телефонски за да ја потврдиме. Ако не те фатиме, резервацијата истекува и парчето се враќа во продажба. | When you order, the stock is reserved for 48 hours — not sold on the spot. We call you to confirm. If we can't reach you, the reservation lapses and the piece goes back on sale. | `src/app/[locale]/terms/page.tsx` |
-| `Terms.orderingBody2` | Најмногу 2 парчиња по нарачка. Спуштањата се ограничени и залихата е вистинска — кога ќе се распродаде, готово е. | Maximum 2 items per order. Drops are limited and the stock is real — when it's gone, it's gone. | `src/app/[locale]/terms/page.tsx` |
+| `Terms.orderingBody2` | Спуштањата се ограничени и залихата е вистинска — кога ќе се распродаде, готово е. | Drops are limited and the stock is real — when it's gone, it's gone. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.orderingHeading` | Како тече нарачката | How ordering works | `src/app/[locale]/terms/page.tsx` |
 | `Terms.paymentBody` | Плаќаш готовина при преземање, кога пратката ќе пристигне. Нема картички, нема банкарски трансфер, нема плаќање однапред. | You pay cash on delivery, when the parcel arrives. No cards, no bank transfer, no paying in advance. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.paymentHeading` | Плаќање | Payment | `src/app/[locale]/terms/page.tsx` |
@@ -312,3 +311,28 @@ different MK wording. **Not** an error on its own.
 | `Common.languageMk` | МК |
 | `Home.title` | Trajanov |
 | `Nav.brand` | TRAJANOV |
+
+---
+
+## Y.06 amendment (2026-08-27) — cap strings
+
+The **2-unit-per-order cap was removed** (`D-Y.06-3`, superseding `D-1.06-6`), so four rows above moved:
+
+| Before | After |
+|---|---|
+| `Cart.capNotice` | **deleted** — the summary banner and its key are both gone |
+| `Product.oneUnitLimit` | **renamed** `Product.quantityLimit`, re-worded; inline feedback only (the standing line under the buy button is deleted) |
+| `Order.capViolated` | **renamed** `Order.quantityInvalid`, re-worded; still the `TR003` message |
+| `Terms.orderingBody2` | first sentence dropped; the rest byte-identical |
+| `Faq.a3` | **rewritten** — not in the brief's list; found by the closing grep (`D-Y.06-8`) |
+
+`Faq.a3` answers "How many pieces can I order?" on the **home page** *and* inside the **FAQPage JSON-LD**
+(`src/lib/faq.ts` → `src/lib/seo/faq-jsonld.ts`), so the old answer was a machine-readable public claim of
+a rule the code no longer enforces — the worst place for it to survive. The key and the 8-item FAQ
+structure are unchanged; only the answer text moved, so the JSON-LD shape and `tests/seo/faq-jsonld.test.ts`
+are untouched. `docs/i18n/mk-review-2.11.md` is a dated review record and is deliberately left alone.
+
+Net: **273 keys, MK ⇔ EN identical** (`tests/i18n/catalog-parity.test.ts`). Neither new string states a
+number, so neither can go stale if the ceiling ever moves. All three changed strings are **owed a fresh
+native MK review** (owed-verification register); `mk-review-2.02.md` and `mk-review-2.03.md` are dated
+records of reviews that happened and are deliberately left untouched.

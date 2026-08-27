@@ -82,8 +82,7 @@ Every About claim is traced to a specific `facts.md` section by number, per the 
 | "Cash on delivery." | `Cart.codNote` | cart | §7 | VERIFIED |
 | "Your order reserves stock for 48 hours." | `Checkout.reserveNote` | checkout | code: `orders.reserved_until` + `create_order()` 48h hold + `expire_reservations()` pg_cron (`D-1.03-2`, `D-1.04-2`) | VERIFIED |
 | "Order {n} received and reserved for 48 hours. You pay cash on delivery — we'll call you to confirm." | `Order.success` | checkout success | code: 48h reservation (above); §7 (COD); Z.01 notification email → Vladimir phones to confirm (`D-Z.01-5`) | VERIFIED |
-| "Max 2 items per order — stock is limited and reserved when you order." | `Cart.capNotice` | cart | code: `create_order()` cap = 2 total units + reservation model (`D-1.06-6`) | VERIFIED |
-| "Max 2 items per order." | `Product.oneUnitLimit`, `Order.capViolated` | product, checkout | code: `create_order()` cap = 2 | VERIFIED |
+| "You've reached the maximum quantity for one order." / "Check the quantity in your cart and try again." | `Product.quantityLimit`, `Order.quantityInvalid` | product, checkout | code: `create_order()` step 3 + `order_items.quantity` CHECK, both **1..99** — a sanity ceiling, **not** a business cap (`D-Y.06-3/4/5`, supersedes `D-1.06-6`). Neither string states a number | VERIFIED |
 | "The drop is live — stock is real and limited." | `Catalog.live` | /catalog | §7 (limited drops); code: real per-size stock in `variants` | VERIFIED |
 | "The drop isn't open yet … buying unlocks when the timer hits zero." | `Catalog.countdownIntro` | /catalog | code: server drop window (`D-1.04-9`) | VERIFIED |
 | **"Shipping — calculated on delivery"** (order-summary value) | `Cart.shipping`, `Cart.shippingValue` | cart | §7 (COD — all money settled at the door); **see Finding F-2 — the delivery *cost* itself is an owed placeholder this phase** | VERIFIED (operational) · flagged |
@@ -243,7 +242,7 @@ email stays unpublished, and no cookie banner is added (Decision 4).*
 | COD only — no cards, no bank transfer, no paying in advance | `Terms.paymentBody` | §7 (payment COD); code: no payment integration exists | VERIFIED |
 | Ships North Macedonia only, no delivery abroad | `Terms.shippingBody` | §7 (shipping) | VERIFIED |
 | Order reserves stock 48h (not sold on the spot); we call to confirm; if unreachable the reservation lapses and stock returns | `Terms.orderingBody1` | code: `create_order()` 48h hold + `orders.reserved_until` + `expire_reservations()` (`D-1.03-2`); Z.01 call-to-confirm (`D-Z.01-5`) | VERIFIED |
-| Max 2 items per order; drops limited, stock real — "when it's gone, it's gone" | `Terms.orderingBody2` | code: `create_order()` cap = 2; §7 (limited drops) | VERIFIED |
+| Drops limited, stock real — "when it's gone, it's gone" | `Terms.orderingBody2` | §7 (limited drops); code: real per-size stock in `variants`. **The "Maximum 2 items per order" sentence was REMOVED from this paragraph in Y.06** — the rule it stated no longer exists (`D-Y.06-3/6`) | VERIFIED |
 | Prices in MKD, on the product page, what you pay the courier; no currency conversion | `Terms.pricesBody` | §7 (MKD; no USD — `D-2.01-8`) | VERIFIED |
 | No accounts, no saved cards, no subscriptions, no discount codes | `Terms.noBody` | code: none of these exist in the codebase | VERIFIED |
 | Eyebrow / h1 / section headings | `Terms.eyebrow/h1/*Heading` | — | NOT A CLAIM |
@@ -318,3 +317,25 @@ on any of the three pages.
   placeholders rather than guesses. **Zero UNSOURCED.**
 - **§10 check:** clean — no reviews, ratings, testimonials, counts, stockists, partners, sustainability
   claims, team, or second location anywhere on the site.
+
+---
+
+## Y.06 amendment (2026-08-27) — the 2-item cap is gone
+
+Three rows above changed because the **2-unit-per-order business cap was removed** on Petar's call
+(`D-Y.06-3`, superseding `D-1.06-6`). This is an amendment, not a re-audit: the 2.03 audit itself and
+`docs/i18n/mk-review-2.02.md` / `mk-review-2.03.md` are **dated records of reviews that actually
+happened** and are left alone.
+
+- **`Cart.capNotice` — row deleted.** The key no longer exists in either catalog (`D-Y.06-6`).
+- **`Product.oneUnitLimit` → `Product.quantityLimit`, `Order.capViolated` → `Order.quantityInvalid`** —
+  renamed and re-worded. A key called `capViolated` in an audited catalog after the cap is gone is a
+  lie in the codebase. Neither new string names a number, so neither can go stale again.
+- **`Terms.orderingBody2`** lost its first sentence only; the rest is byte-identical and keeps its
+  2.02/2.03 MK review. The three changed strings are **owed a fresh native MK review** — logged on the
+  owed-verification register, not ticked here.
+
+**What the audit can no longer say:** nothing in the code now limits how much of a drop one person may
+buy. Real stock, the per-drop rate limit (`D-1.04-7`) and `TR005` (one live order per phone per drop)
+are what remain. The `1..99` ceiling in `create_order()` and on `order_items.quantity` is input
+validation (`D-Y.06-4`), and no customer-facing string states it.
