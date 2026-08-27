@@ -13,7 +13,7 @@ Last updated: **2026-08-27** · By: **Claude Code (Phase Y.07 — composition & 
 ## Status
 
 **Phase Y.07 — Composition & care copy — COMPLETE (2026-08-27, branch `phase-Y.07-care-copy`, one PR
-to `main`).** The slot Y.06 shipped inert now carries a fact. Vladimir confirmed **100% cotton** and a
+to `main`; report: `src/_project-state/completions/Part-Y-Phase-07-Completion.md`).** The slot Y.06 shipped inert now carries a fact. Vladimir confirmed **100% cotton** and a
 **30 °C** wash (via Petar, 2026-08-27); `facts.md` §7 moved **UNVERIFIED — OWED → VERIFIED** with the
 provenance written into the row as **the owner's statement, explicitly NOT a label read** (`D-Y.07-1`),
 and the "read the label" paragraph under it was **rewritten rather than deleted** — the two confirmed
