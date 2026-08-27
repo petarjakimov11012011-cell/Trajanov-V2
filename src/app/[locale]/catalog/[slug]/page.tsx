@@ -6,6 +6,7 @@ import {ArrowLeft} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {getProductImage} from '@/lib/product-images';
+import {getProductCare} from '@/lib/product-care';
 import {Placeholder} from '@/components/system/Placeholder';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {ShippingNotice} from '@/components/system/ShippingNotice';
@@ -83,6 +84,15 @@ export default async function ProductPage({
 
   // Looked up by SLUG, never by position (D-Y.03-1). Null for Product 03 and for anything unphotographed.
   const photo = getProductImage(product.slug);
+
+  // Composition & care, also looked up by SLUG and never by position (D-Y.06-1) — a fabric claim landing
+  // on the wrong colourway is a false material claim, not a cosmetic slip. `product` above is a
+  // ProductView built from the DATABASE, which has no care column (that is Y.01, D-1.06-3), so the copy
+  // comes from `src/config/products.ts` beside it — the same shape as the photo lookup. Every entry is
+  // null today (facts.md §7 OWED; placeholder register #3/#9), so `careCopy` is null and the section
+  // renders the unchanged placeholder (D-Y.06-2).
+  const care = getProductCare(product.slug);
+  const careCopy = (locale === 'mk' ? care?.mk : care?.en) ?? null;
 
   // Buy state from the SERVER's drop state + stock (the 6 handover states — no new ones):
   //  sold out → sold-out · pre-drop → disabled/"coming soon" · live → default · ended (with stock) →
@@ -198,7 +208,13 @@ export default async function ProductPage({
           <h2 className="font-display text-foreground font-bold">
             {t('Product.composition')}
           </h2>
-          <Placeholder>{t('Placeholder.composition')}</Placeholder>
+          {/* Real copy is styled like the adjacent Shipping body, NOT like a placeholder — once it is a
+              fact off the label it should read as one. Null → the byte-identical placeholder (D-Y.06-2). */}
+          {careCopy ? (
+            <p className="text-muted-foreground text-small">{careCopy}</p>
+          ) : (
+            <Placeholder>{t('Placeholder.composition')}</Placeholder>
+          )}
         </section>
         <section className="flex flex-col gap-2">
           <h2 className="font-display text-foreground font-bold">

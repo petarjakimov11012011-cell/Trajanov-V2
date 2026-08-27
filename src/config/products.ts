@@ -20,6 +20,12 @@
 // same placeholders as the two above. It joins THIS ended rehearsal drop (the only drop the catalog reads)
 // so it renders browsable-but-not-buyable; it is NOT assigned to any live/real drop — that is Y.01.
 
+// PHASE Y.06 (D-Y.06-1): `careMk` / `careEn` below are now READ BY THE PRODUCT PAGE, by slug, through
+// `src/lib/product-care.ts`. They are still not persisted (no DB column until Y.01, D-1.06-3), so this
+// file is the only source — filling one in publishes composition/care copy on a live page and needs a
+// DEPLOY, not `npm run sync:drop`. All six are null and stay null until Vladimir reads the labels
+// (facts.md §7 OWED; placeholder register #3/#9). Never write a guessed composition here.
+
 import type { ProductConfig } from "./schema";
 
 export const PRODUCTS: Readonly<Record<string, readonly ProductConfig[]>> = {

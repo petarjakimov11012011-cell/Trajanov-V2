@@ -37,7 +37,13 @@ export interface ProductConfig {
   readonly priceMkd: number | null;
   /** Forward-looking (photos land in 1.06). No DB column yet, so the sync does not persist this. */
   readonly photoPath?: string | null;
-  /** Forward-looking fabric/care copy (from the label, OWED by Vladimir — facts.md §7). Not yet persisted. */
+  /** Fabric/care copy read off the garment's label (OWED by Vladimir — facts.md §7; placeholder register
+   *  #3/#9). Still NOT persisted — there is no DB column and the sync does not write one (that is Y.01,
+   *  D-1.06-3) — but since Y.06 the product page DOES read it, by SLUG, through `src/lib/product-care.ts`
+   *  (D-Y.06-1). Non-null here → the real copy replaces the `[PLACEHOLDER: состав и нега]` block on
+   *  `/katalog/<slug>` and `/en/catalog/<slug>`; null → that placeholder, unchanged. So filling these in
+   *  publishes a consumer-protection claim on a live page and needs a DEPLOY, not a `npm run sync:drop`.
+   *  Never guess a composition — it is a claim about what the customer is paying cash for at the door. */
   readonly careMk?: string | null;
   readonly careEn?: string | null;
   /** At least one size. */
