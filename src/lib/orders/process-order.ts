@@ -45,7 +45,8 @@ export type OrderOutcome =
 /**
  * Gate order creation. Order matters: Turnstile FIRST (a bot must not even consume a rate-limit slot or
  * reach the database), then the IP rate limit, and only then create_order() — which is, and remains, the
- * sole authority on the drop window, the unit cap, price, and stock.
+ * sole authority on the drop window, quantity, price, and stock. (The 2-unit business cap it used to
+ * enforce was removed in Y.06 — D-Y.06-3; only the 99-unit sanity ceiling remains.)
  */
 export async function processOrder(
   token: string,

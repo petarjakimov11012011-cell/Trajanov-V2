@@ -64,15 +64,59 @@ describe("create_order — happy path, drop window, and error vocabulary", () =>
     expect(error?.code).toBe(ORDER_ERROR_CODES.DROP_NOT_FOUND);
   });
 
-  it("rejects more than 2 total units with quantity_cap_violated", async () => {
-    const { error } = await svc.rpc("create_order", {
+  it("ACCEPTS a 3-unit order end to end — previously TR003 (D-Y.06-3)", async () => {
+    // The exact order that was rejected before Y.06: 2 units of one variant + 1 of another. It now
+    // succeeds, decrements both variants, and returns a real order number and total.
+    // ARRANGE both variants explicitly. `beforeEach` only resets M, and every suite shares one database
+    // (vitest `fileParallelism: false`), so L's stock depends on what ran before — an absolute
+    // assertion on it would be order-dependent. Set it here and the test stands alone.
+    const blackL = await getVariantId("test-tee-black", "L");
+    await setStock("test-tee-black", "L", 10);
+    const { data, error } = await svc.rpc("create_order", {
       p_drop_slug: "test-open-drop",
-      p_customer_name: "Алчен",
+      p_customer_name: "Три парчиња",
       p_phone: "070444555",
       p_phone_normalized: "+38970444555",
       p_address: "Адреса",
       p_city: "Струмица",
-      p_items: [{ variant_id: variantId, quantity: 2 }, { variant_id: await getVariantId("test-tee-black", "L"), quantity: 1 }],
+      p_items: [
+        { variant_id: variantId, quantity: 2 },
+        { variant_id: blackL, quantity: 1 },
+      ],
+    });
+    expect(error).toBeNull();
+    expect(data?.[0]?.order_number).toMatch(/^TRJ-\d{4}$/);
+    // 3 units × 999 MKD (test-tee-black's seeded price).
+    expect(data?.[0]?.total_mkd).toBe(2997);
+    expect(await getStock("test-tee-black", "M")).toBe(1); // 3 − 2
+    expect(await getStock("test-tee-black", "L")).toBe(9); // 10 − 1
+  });
+
+  it("still rejects 100 total units with quantity_cap_violated — the sanity ceiling (D-Y.06-4)", async () => {
+    const { error } = await svc.rpc("create_order", {
+      p_drop_slug: "test-open-drop",
+      p_customer_name: "Апсурд",
+      p_phone: "070444666",
+      p_phone_normalized: "+38970444666",
+      p_address: "Адреса",
+      p_city: "Струмица",
+      p_items: [
+        { variant_id: variantId, quantity: 99 },
+        { variant_id: await getVariantId("test-tee-black", "L"), quantity: 1 },
+      ],
+    });
+    expect(error?.code).toBe(ORDER_ERROR_CODES.QUANTITY_CAP_VIOLATED);
+  });
+
+  it("still rejects a zero-quantity line with quantity_cap_violated", async () => {
+    const { error } = await svc.rpc("create_order", {
+      p_drop_slug: "test-open-drop",
+      p_customer_name: "Нула",
+      p_phone: "070444777",
+      p_phone_normalized: "+38970444777",
+      p_address: "Адреса",
+      p_city: "Струмица",
+      p_items: [{ variant_id: variantId, quantity: 0 }],
     });
     expect(error?.code).toBe(ORDER_ERROR_CODES.QUANTITY_CAP_VIOLATED);
   });

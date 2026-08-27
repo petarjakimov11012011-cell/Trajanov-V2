@@ -228,7 +228,7 @@ function orderMessage(
         case 'TR002':
           return {text: to('notOpen'), tone: 'neutral'};
         case 'TR003':
-          return {text: to('capViolated'), tone: 'error'};
+          return {text: to('quantityInvalid'), tone: 'error'};
         case 'TR005':
           return {text: to('duplicatePhone'), tone: 'error'};
         case 'TR006':

@@ -13,7 +13,8 @@ import { normalizeMkPhone } from "./phone";
 // The order Server Action (Task 6). The checkout form calls this with a FRESH Turnstile token minted at
 // submit (D-1.04-8). It re-validates on the server (never trusting the client), then runs the pipeline:
 // Turnstile Siteverify → IP rate limit → create_order(). create_order() remains the only authority on the
-// window, cap, price, and stock. No order PII is ever logged (CLAUDE.md).
+// window, quantity, price, and stock — no quantity rule lives here (the 2-unit cap was removed in Y.06,
+// D-Y.06-3). No order PII is ever logged (CLAUDE.md).
 
 export interface PlaceOrderInput {
   token: string;

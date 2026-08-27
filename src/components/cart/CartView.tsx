@@ -160,6 +160,9 @@ export function CartView() {
                 <span className="tabular text-foreground w-5 text-center font-semibold">
                   {l.qty}
                 </span>
+                {/* Disabled only AT the 99-unit sanity ceiling (D-Y.06-4) — the 2-unit business cap
+                    and its summary banner are gone (D-Y.06-3). This is a backstop so `+` can never
+                    build a quantity create_order() would refuse with TR003, not a purchase limit. */}
                 <IconBtn
                   label={t('increase')}
                   disabled={atCap}
@@ -175,11 +178,6 @@ export function CartView() {
 
       {/* summary */}
       <div className="bg-surface flex flex-col gap-4 rounded-[var(--radius-lg)] p-5 lg:sticky lg:top-20">
-        {atCap && (
-          <p className="border-border-strong bg-mustard-tint-6 text-foreground rounded-[var(--radius-md)] border px-3 py-2 text-small">
-            {t('capNotice')}
-          </p>
-        )}
         <div className="flex items-center justify-between text-small">
           <span className="text-muted-foreground">{t('subtotal')}</span>
           <Placeholder>{tp('price')}</Placeholder>

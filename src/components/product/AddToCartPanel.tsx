@@ -10,9 +10,12 @@ import type {SizeOption} from '@/types/drop';
 
 // Wires the product page's buy cluster to the cart (brief Task 4). Owns the selected variant and
 // coordinates the SizePicker (available / selected / unavailable) with the BuyButton (the six handover
-// states — no new ones). A size must be chosen before Add does anything; the whole-order cap is
-// enforced here too. Nothing here touches the database — the cart is a suggestion, create_order() is
-// the fact. Returns a fragment so the parent's `gap-5` column spacing is unchanged.
+// states — no new ones). A size must be chosen before Add does anything. Nothing here touches the
+// database — the cart is a suggestion, create_order() is the fact. Returns a fragment so the parent's
+// `gap-5` column spacing is unchanged.
+//
+// Y.06: the standing per-order-limit line under the button is GONE with the rule it stated (D-Y.06-3).
+// Only the 99-unit sanity ceiling remains, as inline feedback nobody will ever trigger.
 
 type Feedback = {kind: 'chooseSize' | 'cap' | 'added'} | null;
 
@@ -89,12 +92,13 @@ export function AddToCartPanel({
           ) : feedback?.kind === 'chooseSize' ? (
             <span className="text-foreground">{t('chooseSize')}</span>
           ) : feedback?.kind === 'cap' ? (
-            <span className="text-foreground">{t('oneUnitLimit')}</span>
+            // The 99-unit sanity ceiling (D-Y.06-4), not a business cap — the standing per-order-limit
+            // line is gone with the rule (D-Y.06-3). Kept because a button that does nothing and says
+            // nothing is worse than a message nobody will ever see.
+            <span className="text-foreground">{t('quantityLimit')}</span>
           ) : null}
         </p>
       </div>
-
-      <p className="text-muted-foreground text-small">{t('oneUnitLimit')}</p>
     </>
   );
 }

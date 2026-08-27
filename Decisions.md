@@ -1145,7 +1145,7 @@ decisions start at `D-1.05-8`.*
 - **Links:** `src/lib/cart/cart.ts` · `src/components/cart/cart-store.ts` · brief Task 3
 
 ### D-1.06-6 · 2026-07-15 · The cart cap is 2 TOTAL units per order, mirroring create_order (not the per-row CHECK)
-- **Status:** Accepted
+- **Status:** Superseded by `D-Y.06-3`
 - **Context:** Brief Task 2: read what `create_order()` actually enforces before building the client
   cap. `create_order()` step 3 asserts the **sum** of quantities across the order is in `1..2`; the
   `order_items.qty` `1..2` CHECK is a looser per-row backstop that never binds once the total is capped
@@ -5291,3 +5291,147 @@ start at `D-2.01-6`.*
   `text-3xl`, `DropBanner.tsx:28`'s mixed pair) and without a closing audit over the branch — both
   move to a future branch, and the one-phase-branch rule re-arms now that this one is merged.
 - **Links:** PR #40 · `D-0-3` · `D-2.25-4` · P1 handoff brief §6/§7 · completion report §10
+
+### D-Y.06-1 · 2026-08-27 · Composition & care reaches the page through a SLUG-keyed config lookup, not a DB column
+- **Status:** Accepted
+- **Decided by:** Lazar (orchestrator decision, pre-made in the Phase Y.06 brief); executed by Claude Code.
+- **Context:** `careMk` / `careEn` have existed on `ProductConfig` since 1.06 but nothing read them, so
+  the "Состав и нега" section on every product page rendered `<Placeholder>` unconditionally. The page's
+  `product` is a `ProductView` built from the **database**, and there is no care column there.
+- **Decision:** New `src/lib/product-care.ts` exposes `getProductCare(slug)`, resolving the slug against
+  `PRODUCTS` in `src/config/products.ts` across all drops — mirroring `src/lib/product-images.ts`
+  (`D-Y.03-1`). The product page calls it beside the DB-derived product and renders the real per-locale
+  string when non-null, the existing placeholder when null.
+- **Alternative rejected:** a DB column plus a sync change. Rejected because photo and fabric columns are
+  **Y.01's** job (`D-1.06-3`) and adding one here would collide with that phase.
+- **Downside accepted:** care copy is not in the database, so changing it needs a **deploy**, not a
+  `npm run sync:drop`. Recorded in the header of `product-care.ts`, in `schema.ts`, and in `products.ts`
+  so nobody discovers it at the wrong moment.
+- **Links:** `D-Y.03-1` · `D-1.06-3` · `src/lib/product-care.ts` · brief Task 1/2
+
+### D-Y.06-2 · 2026-08-27 · While care copy is null the page renders TODAY'S placeholder, byte-identical
+- **Status:** Accepted
+- **Decided by:** Lazar (pre-made in the brief); executed by Claude Code.
+- **Context:** `facts.md` §7 has fabric/composition/care as `UNVERIFIED — OWED (Vladimir)`. All six
+  `careMk`/`careEn` values are null and stay null this phase.
+- **Decision:** Null → the unchanged `<Placeholder>{t('Placeholder.composition')}</Placeholder>`.
+  Verified by rendering `main`'s `page.tsx` and this branch's against the same server and **diffing the
+  section HTML — identical in both locales.** Placeholder register rows **#3** and **#9** stay OPEN.
+- **Alternative rejected:** shipping any interim fabric text.
+- **Downside accepted:** this half of the phase is invisible on production. That is the point — it is
+  plumbing, and filling it later is a one-line config edit instead of another code phase.
+- **Links:** `D-Y.06-1` · `facts.md` §7 · placeholder register #3/#9 · completion report §4
+
+### D-Y.06-3 · 2026-08-27 · The 2-unit-per-order business cap is REMOVED
+- **Status:** Accepted. **Supersedes `D-1.06-6`.**
+- **Decided by:** **Petar (owner), 2026-08-27**, recorded in the Phase Y.06 brief; executed by Claude Code.
+- **Context:** The cap lived in six places: `MAX_UNITS_PER_ORDER` in the cart module, `create_order()`
+  step 3, the `order_items.quantity` CHECK, the standing line under the buy button, the cart summary
+  banner, and four message keys × two catalogs.
+- **Decision:** All six are removed or relaxed. Nothing in this codebase now limits how much of a drop
+  one person may buy.
+- **Alternative rejected:** removing only the standing line and keeping the rule.
+- **Downside accepted — named plainly:** with no per-order cap, and cash on delivery meaning ordering
+  costs nothing up front, **one person can take an entire drop having paid nothing.** What is left
+  holding that line is real stock, the per-drop rate limit (`D-1.04-7`), and `TR005` (one live order per
+  phone per drop). This is written into `src/lib/cart/cart.ts` and the migration header so it cannot be
+  rediscovered as a surprise.
+- **Links:** `D-1.06-6` (superseded) · `D-1.04-7` · `D-Y.06-4/5/6` · brief Decisions table
+
+### D-Y.06-4 · 2026-08-27 · A 99-unit SANITY CEILING replaces the cap — input validation, not a business rule
+- **Status:** Accepted
+- **Decided by:** Lazar (pre-made in the brief); executed by Claude Code.
+- **Context:** Removing the guard entirely would let an absurd or malformed quantity reach a cast and an
+  INSERT, turning a bad request into a 500 at the one moment that matters.
+- **Decision:** `SANITY_MAX_UNITS_PER_ORDER = 99` in the cart module and `1..99` in `create_order()` step
+  3, keeping `TR003` alive. The per-loop `v_qty < 1` guard is unchanged. **No customer-facing string
+  states the number** (`D-Y.06-6`), so it cannot go stale if the ceiling ever moves.
+- **Alternative rejected:** no ceiling at all.
+- **Downside accepted:** a customer who genuinely wanted 100 units in one order cannot. Nobody will.
+- **Links:** `D-Y.06-3` · `D-Y.06-5` · `src/lib/cart/cart.ts` · migration step 3
+
+### D-Y.06-5 · 2026-08-27 · The `order_items.quantity` CHECK is relaxed in a NEW migration, and the constraint is dropped by DISCOVERED name
+- **Status:** Accepted
+- **Decided by:** Lazar (pre-made in the brief); the discovered-name mechanism decided by Claude Code.
+- **Context — the landmine.** `20260715021215_schema.sql:137` declares `quantity integer not null check
+  (quantity between 1 and 2)`. Relaxing only the function would let a 3-unit line pass step 3, decrement
+  real stock in step 4, and then die at the step-6b INSERT with a raw `23514` — a 500 served to a real
+  customer instead of a clean TR code. The two limits must move together or not at all.
+- **Decision:** New migration `20260827120000_remove_order_quantity_cap.sql` does both:
+  `create or replace function public.create_order(...)` with the **identical signature** (preserving the
+  EXECUTE grants) and body byte-for-byte the 1.04 body except step 3; then a `DO` block that finds
+  **every** CHECK on `order_items` whose definition mentions `quantity`, drops each **by its real
+  `pg_constraint` name**, and adds `check (quantity between 1 and 99)` — followed by a post-condition
+  block that raises unless exactly one such CHECK remains and it mentions 99.
+- **Alternatives rejected:** (a) editing `20260715021215_schema.sql` in place — existing migrations are
+  never edited; (b) `drop constraint if exists order_items_quantity_check` with the name assumed —
+  rejected because if the name ever differed the drop would **silently no-op**, leaving the old 1..2
+  CHECK in force. That is the exact silent failure this migration exists to prevent, so the name is
+  discovered rather than assumed.
+- **Downside accepted:** one more migration file, and a `DO` block where a one-line `ALTER` would read
+  more simply. Worth it: verified on a **fresh chain**, on a **hand-restored pre-Y.06 database**, and
+  **re-applied twice** — grants intact (`postgres`, `service_role` only) in every case.
+- **Links:** `D-Y.06-3/4` · `schema.sql:137` (superseded intent) · completion report §5
+
+### D-Y.06-6 · 2026-08-27 · Three message keys are RENAMED, one deleted, and no new string states a number
+- **Status:** Accepted
+- **Decided by:** Lazar (pre-made in the brief); executed by Claude Code.
+- **Decision:** `Cart.capNotice` **deleted**; `Product.oneUnitLimit` → **`Product.quantityLimit`**;
+  `Order.capViolated` → **`Order.quantityInvalid`**; `Terms.orderingBody2` loses its first sentence and
+  keeps the rest verbatim (already MK-reviewed — not re-translated). Both catalogs, 273 keys, MK ⇔ EN
+  identical.
+- **Alternative rejected:** keeping the old key names with new values. A key called `capViolated` in an
+  audited catalog after the cap is gone is a lie in the codebase.
+- **Downside accepted:** three renames ripple into `docs/legal/facts-audit-2.03.md` and
+  `docs/i18n/string-inventory.md`, both amended. The three changed strings are **owed a fresh native MK
+  review** — on the register, not ticked here.
+- **Links:** `D-Y.06-3` · `D-Y.06-8` · owed-verification register
+
+### D-Y.06-7 · 2026-08-27 · The cart still does not know about stock
+- **Status:** Accepted. Re-affirms `D-1.06-5`.
+- **Decided by:** Lazar (pre-made in the brief).
+- **Decision:** Unchanged: the cart never reads stock. A customer can now build a cart bigger than the
+  stock and only find out at checkout.
+- **Alternative rejected:** teaching the cart to read stock.
+- **Downside accepted:** they get a clean `TR004 insufficient_stock` at checkout instead of a disabled
+  `+` earlier. A stock-aware cart would either lie (stale numbers) or reserve stock, and a reserving cart
+  hands a saboteur a free stock-lock.
+- **Links:** `D-1.06-5` · `D-Y.06-3`
+
+### D-Y.06-8 · 2026-08-27 · The Home FAQ answer stating the cap is rewritten — a machine-readable claim the brief did not list
+- **Status:** Accepted
+- **Decided by:** **Claude Code, on the spot.** Not in the brief; surfaced by the phase's own closing grep.
+- **Context:** The brief enumerated six places the cap lived. There was a **seventh**: `Faq.a3` —
+  "How many pieces can I order?" → "Two pieces per order, maximum." It renders on the **home page** and,
+  through `src/lib/faq.ts` → `src/lib/seo/faq-jsonld.ts`, ships inside the **FAQPage JSON-LD**. Leaving it
+  would have left the site publicly asserting a rule the code no longer enforces, in the one format built
+  to be read by Google and AI answer surfaces — strictly worse than the Terms sentence the brief did list.
+- **Decision:** The **answer text** is rewritten in both catalogs; the key, the question, and the 8-item
+  FAQ structure are untouched, so the JSON-LD shape and `tests/seo/faq-jsonld.test.ts` are unaffected.
+  MK: „Колку што има на залиха. Нема ограничување по нарачка — залихата е вистинска и ограничена, па кога
+  ќе се распродаде, готово е." EN: "As many as are in stock. There's no per-order limit — the stock is
+  real and limited, so once it's sold out, it's gone."
+- **Alternative rejected:** deleting `q3`/`a3` outright. Rejected — "how many can I order" is a real
+  customer question that now has a real answer, and deleting it would shrink the FAQ to 7 and change the
+  structured data for no reason.
+- **Downside accepted:** a string the brief did not authorise was changed, and it is **owed the same
+  native MK review** as the other three (added to the register). `docs/i18n/mk-review-2.11.md` now records
+  a superseded value; like `mk-review-2.02/2.03`, it is a dated record of a review that happened and is
+  deliberately left untouched.
+- **Links:** `D-Y.06-3/6` · `D-2.11-5` · `src/lib/faq.ts` · completion report §6
+
+### D-Y.06-9 · 2026-08-27 · Blank care copy is treated as "not supplied", and the care lookup gets its own test
+- **Status:** Accepted
+- **Decided by:** **Claude Code, on the spot.**
+- **Decision:** (a) `getProductCare` trims and maps an empty/whitespace-only config value to `null`, so a
+  stray `careMk: ""` renders the honest placeholder rather than an empty "Composition & care" section
+  that reads as "we checked and there is nothing to say". (b) A new `tests/config/product-care.test.ts`
+  asserts the lookup is slug-keyed **and that every configured product still has null care copy in both
+  locales** — so the suite goes RED the moment anyone commits a plausible-sounding composition without a
+  label to read it off.
+- **Alternative rejected:** trusting review to catch invented fabric copy. On a consumer-protection claim
+  sold cash-on-delivery by a minor, a test is cheaper than a recall.
+- **Downside accepted:** when Vladimir's real care copy lands, that test must be updated in the same
+  commit — deliberately, rather than silently satisfied.
+- **Links:** `D-Y.06-1/2` · `facts.md` §7 · `D-0-6`
+

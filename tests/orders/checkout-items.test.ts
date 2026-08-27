@@ -117,46 +117,97 @@ describe("cart → create_order — the customer's choice reaches order_items", 
     ]);
   });
 
-  it("the cart cap matches create_order: a 3rd unit is refused client-side AND rejected server-side (TR003)", async () => {
-    // Client: the cart never lets a third unit in, so a 3-unit order cannot even be built from it.
-    let full = addItem(emptyCart, {
+  it("a 3rd unit is ACCEPTED client-side AND server-side — the 2-unit cap is gone (D-Y.06-3)", async () => {
+    // Before Y.06 the cart refused the third unit and create_order() raised TR003 on it. Both now let
+    // it through: what limits an order is real stock, not a number in the cart module.
+    let cart = addItem(emptyCart, {
       variantId: twoL,
       dropSlug: DROP,
       productSlug: "test-tee-two",
       productIndex: 2,
       size: "L",
     });
-    full = addItem(full, {
+    cart = addItem(cart, {
       variantId: blackM,
       dropSlug: DROP,
       productSlug: "test-tee-black",
       productIndex: 1,
       size: "M",
     });
-    const overfilled = addItem(full, {
+    cart = addItem(cart, {
       variantId: twoM,
       dropSlug: DROP,
       productSlug: "test-tee-two",
       productIndex: 2,
       size: "M",
     });
-    expect(overfilled).toEqual(full); // refused — cart unchanged
-    expect(totalUnits(overfilled)).toBe(2);
+    expect(totalUnits(cart)).toBe(3); // the cart kept all three — it would have refused the last one
+    expect(cart.items).toHaveLength(3);
 
-    // Server: even if a client bypasses the cart, create_order rejects 3 units before any decrement.
     const { error } = await svc.rpc("create_order", {
       p_drop_slug: DROP,
-      p_customer_name: "Алчен",
+      p_customer_name: "Три",
       p_phone: "070555666",
       p_phone_normalized: "+38970555666",
       p_address: "Адреса",
       p_city: "Струмица",
-      p_items: [
-        { variant_id: twoL, quantity: 2 },
-        { variant_id: blackM, quantity: 1 },
-      ], // 3 units
+      p_items: submitItems(toOrderItems(cart)),
+    });
+    expect(error).toBeNull();
+
+    // All three lines reached order_items with the quantities the customer chose.
+    expect(await writtenOrderItems()).toEqual([
+      { slug: "test-tee-black", size: "M", quantity: 1 },
+      { slug: "test-tee-two", size: "L", quantity: 1 },
+      { slug: "test-tee-two", size: "M", quantity: 1 },
+    ]);
+  });
+
+  it("a single line of 3 units of ONE variant is accepted — the per-row CHECK was 1..2 before Y.06", async () => {
+    // The landmine D-Y.06-5 defuses: relaxing only the function would have let this line reach the
+    // INSERT and fail with a raw 23514 check violation — a 500 served to a real customer.
+    const cart = addItem(
+      emptyCart,
+      {
+        variantId: twoL,
+        dropSlug: DROP,
+        productSlug: "test-tee-two",
+        productIndex: 2,
+        size: "L",
+      },
+      3,
+    );
+    expect(totalUnits(cart)).toBe(3);
+
+    const { error } = await svc.rpc("create_order", {
+      p_drop_slug: DROP,
+      p_customer_name: "Три на еден ред",
+      p_phone: "070555777",
+      p_phone_normalized: "+38970555777",
+      p_address: "Адреса",
+      p_city: "Струмица",
+      p_items: submitItems(toOrderItems(cart)),
+    });
+    expect(error).toBeNull();
+    expect(await writtenOrderItems()).toEqual([
+      { slug: "test-tee-two", size: "L", quantity: 3 },
+    ]);
+  });
+
+  it("100 units is still refused with TR003 — the sanity ceiling, not a business cap (D-Y.06-4)", async () => {
+    // The cart cannot build this (it clamps at 99), so this is the server refusing a client that
+    // bypassed the cart. It must be a clean TR003, not a cast error and not a 500.
+    const { error } = await svc.rpc("create_order", {
+      p_drop_slug: DROP,
+      p_customer_name: "Апсурд",
+      p_phone: "070555888",
+      p_phone_normalized: "+38970555888",
+      p_address: "Адреса",
+      p_city: "Струмица",
+      p_items: [{ variant_id: twoL, quantity: 100 }],
     });
     expect(error?.code).toBe(ORDER_ERROR_CODES.QUANTITY_CAP_VIOLATED);
+    expect(await countOrders()).toBe(0);
   });
 
   it("a variant selling out between add-to-cart and submit → clean TR004, no partial order", async () => {
