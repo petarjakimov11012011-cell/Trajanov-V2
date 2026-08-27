@@ -5435,3 +5435,52 @@ start at `D-2.01-6`.*
   commit — deliberately, rather than silently satisfied.
 - **Links:** `D-Y.06-1/2` · `facts.md` §7 · `D-0-6`
 
+### D-Y.06-10 · 2026-08-27 · Y.06 merged on Petar's instruction WITHOUT the fresh-session review the brief required
+- **Status:** Accepted. **Supersedes the review requirement recorded in `briefs/Part-2-Phase-Y06-Code.md`
+  § "Branch, PR, review"** ("a fresh Claude Code session — one that did not write this code — reviews the
+  PR against this brief" before merge; "Do not merge your own PR. The other operator merges").
+- **Decided by:** **Petar (owner), 2026-08-27** — "merge to main", given after reading the completion
+  summary, which flagged both the missing review and the hosted-migration hazard. Operator-authorised per
+  `D-0-3`, the same route as `D-2.25-26`. Executed by Claude Code (the session that wrote the code).
+- **Context:** `D-0-3` makes the human operator the review gate on this project — there is no GitHub
+  review Action. The brief additionally asked for a fresh-session read because this phase edits
+  `create_order()`. That read did not happen.
+- **Decision:** PR [#41](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/41) merged to
+  `main` as **`7ad80f1`** (merge commit, matching every prior phase); branch deleted, remote + local refs
+  pruned, so the one-phase-branch rule re-arms.
+- **Alternative rejected:** holding the PR until a fresh session reviewed it — rejected by the operator
+  who owns that gate, with the risk stated in front of him.
+- **Downside accepted:** the change to the one function standing between this project and a public
+  oversell shipped with **no second reader at all**. What stands in its place is mechanical, not
+  editorial: the function body differs from the proven 1.04 body by **one executable line**, step 4's
+  atomic conditional UPDATE and its `variant_id` ORDER BY are byte-identical, both concurrency gates pass
+  (10-vs-3 and the new 5×3-unit case), and the migration was verified on three separate database states.
+  **That is evidence, not review** — it cannot catch a mistake in what the code was asked to do, only in
+  whether it does it. Recorded here so nobody later reads "merged" as "reviewed".
+- **Links:** `D-0-3` · `D-2.25-26` (same route) · `D-Y.06-11` · PR #41 · merge `7ad80f1`
+
+### D-Y.06-11 · 2026-08-27 · The Y.06 migration is NOT on hosted; the mismatch it creates is LATENT because no drop is open
+- **Status:** Accepted — **open hazard, tracked as owed register #68.**
+- **Decided by:** Claude Code, recording verified state after the merge.
+- **Context — measured on hosted, not assumed (read-only queries, 2026-08-27, after merge `7ad80f1`):**
+  `supabase_migrations.schema_migrations` tops out at **`20260716120000`** — `20260827120000` is **not
+  applied**. Hosted `create_order()` step 3 still reads `v_total_qty > 2`, and
+  `order_items_quantity_check` still reads `CHECK ((quantity >= 1) AND (quantity <= 2))`. Meanwhile the
+  merge-triggered redeploy **has** landed: `https://www.trajanovv.com` now serves no per-order-limit copy
+  on any route, both locales.
+- **Decision:** Record the mismatch rather than silently push a schema change to production. **It is
+  LATENT, not live:** the only hosted drop (`test-drop`) ended **2026-06-08**, so `open_now = false` and
+  `create_order()` refuses every order at step 2 with `TR002` long before step 3 could raise `TR003`.
+  **Nothing is buyable, so no customer can reach the disagreement today.** It goes live the instant a
+  drop opens.
+- **Alternative rejected:** running `supabase db push` unprompted as part of "merge to main". Rejected —
+  a production schema change is a separate, outward-facing action the operator did not ask for, and the
+  hazard is latent, so there is time to ask.
+- **Downside accepted:** `main` and hosted now disagree, and they will keep disagreeing until someone
+  runs the push. **If a drop is opened first, a customer adds 3 units, is told nothing anywhere, fills in
+  the whole checkout form, and is refused at the final click** with „Провери ја количината во кошничката…"
+  and no way to know what is wrong. The mitigation is a register row and this entry, not a code change.
+- **Note:** hosted `orders` is **empty (0 rows)** today, but `D-1.07-15` still stands — **never**
+  `supabase db reset --linked` here; the correct command is `supabase db push`.
+- **Links:** owed register #68 · `D-1.07-15` · `D-Y.06-5` · `D-Y.06-3`
+

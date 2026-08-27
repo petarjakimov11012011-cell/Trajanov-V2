@@ -8,7 +8,7 @@
 | **Operator** | Petar (the cap-removal call) / Lazar (orchestrator) |
 | **Date** | 2026-08-27 |
 | **Branch** | `phase-y.06-care-wiring-and-cap-removal` |
-| **PR** | [#41](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/41) — open, **not merged** (the other operator merges, `D-0-3`) |
+| **PR** | [#41](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/41) — **MERGED 2026-08-27**, merge commit `7ad80f1`, on Petar's instruction **without the fresh-session review** (`D-Y.06-10`) |
 | **Brief** | `briefs/Part-2-Phase-Y06-Code.md` |
 
 ---
@@ -321,7 +321,7 @@ only in tool output in this session, never in a file. Nothing in the diff carrie
 
 | Item | Waiting on | Owner |
 |---|---|---|
-| **PR [#41](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/41) open; not merged** | The brief requires a **fresh Claude Code session — one that did not write this code — to review the PR against the brief before merge**, and forbids me merging my own PR. Both stand. | Lazar / Petar |
+| ~~PR open; not merged~~ **MERGED `7ad80f1`** — see the addendum | ~~The brief requires a **fresh Claude Code session — one that did not write this code — to review the PR against the brief before merge**, and forbids me merging my own PR.~~ **Both were waived by Petar on 2026-08-27 (`D-Y.06-10`, operator-authorised per `D-0-3`).** | Petar (decided) |
 | **Migration not on hosted** (owed #68) | `supabase db push` after merge, before any drop opens | Lazar |
 | Native MK review of the four changed strings (owed #66) | Two native speakers | Lazar / Petar |
 | A real 3-unit order on production (owed #67) | A live drop — the 2.06 rehearsal | Lazar + Vladimir |
@@ -353,3 +353,48 @@ both concurrency gates pass, and the migration was verified on three separate da
 branch. Phase Y.06 — Composition & care wiring + removal of the 2-item order cap — CODE COMPLETE on
 branch phase-y.06-care-wiring-and-cap-removal, awaiting the fresh-session PR review and the other
 operator's merge.`
+
+---
+
+## 12. Addendum — merged 2026-08-27 (`D-Y.06-10`, `D-Y.06-11`)
+
+**Merged on Petar's instruction ("merge to main"), given after reading the summary that flagged both
+the missing fresh-session review and the hosted-migration hazard.** PR
+[#41](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/41) → `main` as merge commit
+**`7ad80f1`**; branch deleted, remote + local refs pruned, `git branch --no-merged main` empty, so the
+one-phase-branch rule re-arms.
+
+**Say it plainly: this shipped with no second reader.** The brief asked for a fresh Claude Code session
+to review a change to `create_order()`; that did not happen, and `D-0-3` operator authorisation replaced
+it — the same route `D-2.25-26` took. What stands in place of review is mechanical and does not
+substitute for it: one executable line changed in the function, step 4 byte-identical, both concurrency
+gates green, migration verified on three database states. **Nobody should read "merged" as "reviewed."**
+
+### Production verified after the redeploy (`https://www.trajanovv.com`)
+
+| Check | Result |
+|---|---|
+| Per-order-limit copy anywhere on the live site | **Gone** — 16 routes swept, both locales, **0 hits** |
+| `/uslovi` · `/en/terms` | shortened paragraph only — MK „Спуштањата се ограничени и залихата е вистинска — кога ќе се распродаде, готово е." |
+| `/` · `/en` | the rewritten FAQ answer is **live** in both locales (`D-Y.06-8`) |
+| All 6 product pages (3 products × 2 locales) | composition **placeholder present**, buy panel intact, **0 `Product` JSON-LD nodes** — the care half is byte-unchanged in production, as `D-Y.06-2` intended |
+
+### ⚠ The hosted database still enforces the old cap
+
+Verified read-only against hosted, **after** the merge:
+
+```
+supabase_migrations.schema_migrations  → tops out at 20260716120000  (20260827120000 NOT applied)
+create_order() step 3                  → v_total_qty > 2
+order_items_quantity_check             → CHECK ((quantity >= 1) AND (quantity <= 2))
+drops                                  → test-drop ended 2026-06-08, open_now = false
+orders                                 → 0 rows
+```
+
+**This is latent, not live.** No drop is open, so every order is refused at `TR002` before `TR003` could
+fire — no customer can reach the disagreement today. **It goes live the instant a drop opens**, and at
+that moment the site says nothing about a limit while the database enforces one.
+
+**`supabase db push`** applies the one missing migration. **Never `supabase db reset --linked`**
+(`D-1.07-15`) — hosted `orders` being empty makes that command survivable, not safe. Tracked as owed
+register **#68**, re-verified and re-worded rather than closed.
