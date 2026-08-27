@@ -9,7 +9,7 @@ in `src/_project-state/current-state.md`. The register must be empty before cuto
 No exceptions. No inventing. No "it's probably fine." This file is the only legal source for
 factual claims on the site.
 
-Last updated: 2026-07-18 · Maintained by: Lazar (orchestrator turn) — executors propose additions
+Last updated: 2026-08-27 · Maintained by: Lazar (orchestrator turn) — executors propose additions
 via completion reports, they do not silently add.
 
 ---
@@ -170,7 +170,7 @@ survive being pasted into an Instagram story or bio link — see the OG requirem
 | Courier + delivery cost | — | **UNVERIFIED — OWED** (Vladimir) |
 | Payment | **Cash on delivery only** | VERIFIED (owner, intake) |
 | Sizes available | **S, M, L, XL** — except the **off-white** shirt, which is **XL only** | **VERIFIED** — owner via Lazar, 2026-07-18 |
-| Fabric / composition / care | — | **UNVERIFIED — OWED** (Vladimir; read off the labels) |
+| Fabric / composition / care | **100% cotton. Wash at 30 °C.** — and nothing more. Renders as MK `100% памук. Перење на 30 °C.` / EN `100% cotton. Wash at 30 °C.` (the space before `°C` is U+00A0). **Covers all three colourways** — mustard/ochre, off-white and baby blue — on the one statement | **VERIFIED** — **Owner (Vladimir, via Petar), 2026-08-27.** **This is the owner's statement, NOT a label read** — no label has been photographed or read by anyone on this project |
 | Products per drop | 3–5 | VERIFIED (owner, intake) |
 
 **The real price for this drop is 1199 MKD (VERIFIED 2026-07-18).** The old "up to $65 / ~3,700
@@ -178,10 +178,19 @@ MKD" was a ballpark Lazar gave to describe the range — it was never a price an
 site renders MKD only; **no USD figure ever renders.** Price is per drop: each future drop still
 needs its own real MKD price from Vladimir before its page ships.
 
-**Fabric and care are not optional and not guessable.** They are printed on the shirts' own labels.
-Vladimir has 30 of them. Do not write "premium heavyweight cotton" because it sounds right — read
-the label. A false composition claim on a product page is a consumer-protection issue, not a copy
-issue. **Still OWED.**
+**Fabric and care are two facts now, and only two.** Vladimir has confirmed the composition
+(**100% cotton**) and the wash temperature (**30 °C**) for all three colourways, 2026-08-27 — that much
+may render, and it does, on every product page in both locales. **It is his statement, not a label
+read:** nobody on this project has photographed or read one of the labels, so if a label later says
+something else, the label wins and this row is what gets superseded (`D-Y.07-1`).
+
+**Everything beyond those two facts is still unknown and still must not be written.** No fabric weight
+or GSM, no drying instruction, no ironing instruction, no bleach symbol, no fibre origin, no country of
+manufacture, and no adjective — not "premium", not "heavyweight", not "soft". Do not write "premium
+heavyweight cotton" because it sounds right; "100% cotton" is the whole of what we know. A false
+composition claim on a product page is a consumer-protection issue, not a copy issue. The two permitted
+strings are fixed by `D-Y.07-3` and enforced by `tests/config/product-care.test.ts` — changing a word
+means changing this row first.
 
 **Sizes (VERIFIED 2026-07-18):** the drop runs in **S, M, L, XL**, with the **off-white** shirt
 available in **XL only**. That is the size *list*, not a measurement chart — the cm/fit measurements
@@ -201,14 +210,14 @@ live-ready the moment the photos and fabric arrive — without inventing anythin
 | Price | **1999 MKD** | **VERIFIED** — owner, 2026-07-22 |
 | Sizes | **S, M, L, XL** | **VERIFIED** — owner, 2026-07-22 |
 | Photos | — | **UNVERIFIED — OWED** (Vladimir) |
-| Fabric / composition / care | — | **UNVERIFIED — OWED** (Vladimir; read off the label) |
+| Fabric / composition / care | **100% cotton. Wash at 30 °C.** — the same statement as the other two colourways | **VERIFIED** — **Owner (Vladimir, via Petar), 2026-08-27.** Owner's statement, **not** a label read; it covers baby blue explicitly, which **amends `D-Y.02-1`** (`D-Y.07-2`) — baby blue's fabric is no longer waiting on baby blue's own label |
 
 **Baby blue is owner-stated, not photographed.** The other two colourways are VERIFIED *by photos on
 hand*; baby blue is confirmed by Vladimir, but no product (or lifestyle) photo of it exists yet. So it
-ships in the catalog with a visible photo placeholder, a fabric/care placeholder, and the neutral name
-slot ("Производ 03") — never a stand-in image, never an invented composition or name (`D-0-6`,
-`D-Y.02-1`). Its price (1999 MKD) and sizes (S/M/L/XL) render as real, VERIFIED facts. **Photos +
-fabric are OWED before it can enter a live drop** — that assignment is `Y.01`.
+ships in the catalog with a visible photo placeholder and the neutral name slot ("Производ 03") — never
+a stand-in image, never an invented composition or name (`D-0-6`, `D-Y.02-1`). Its price (1999 MKD),
+sizes (S/M/L/XL) and **now its composition and care** render as real, VERIFIED facts. **Its photo and
+its real name are still OWED before it can enter a live drop** — that assignment is `Y.01`.
 
 ---
 
@@ -356,4 +365,5 @@ site header only. It does **not** go in the Organization or WebSite JSON-LD, `sa
 | 2026-07-19 | **§ 1 Responsible party amended (Phase 2.03 Code, `D-2.03-1`).** The row now records that the party **displayed** on Terms + Privacy is **Vladimir Trajanov, alone** (Lazar's call), while keeping the underlying VERIFIED intake fact (Vladimir Trajanov and his parents) visible in the same cell — neither overwritten nor deleted. The §1 open flag (confirm legal responsibility with the parents before cutover) is **unchanged and still open**. Full walk of every rendered claim recorded in `docs/legal/facts-audit-2.03.md`; no other claim needed a `facts.md` change. Edit made by Code on explicit orchestrator instruction and surfaced in the completion report — not a silent add. | Claude Code (per 2.03 brief) |
 | 2026-07-22 | **§ 7 Product 03 — baby blue added (Phase Y.02 Code, Task 1, `D-Y.02-1`).** A **third colourway, baby blue**, working name "Product 03": **price 1999 MKD VERIFIED** (owner, 2026-07-22) and **sizes S/M/L/XL VERIFIED** (owner); the colourway itself is **owner-stated, NOT photographed** (explicitly not "VERIFIED (photos)" like the other two); **photos + fabric/care UNVERIFIED — OWED** (Vladimir); the real customer-facing name is OWED. Recorded as a new `### Product 03` sub-block in § 7. Owner-authorised out-of-order insert (Lazar, 2026-07-22). Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.02 brief) |
 | 2026-07-26 | **§ 8 Photography — permissions recorded, frame count corrected, Catalog/Product line overridden as an interim (Phase Y.03 Code).** New **§ 8.1** records **five** permissions as GIVEN by fact/date/channel only — venue („Вторник"), the adult model (**21**, her own consent), Vladimir's own instruction, the backdrop call (Vladimir, in favour, and written to cover **a person in frame holding a drink**, not only a backdrop), and **guardian consent for Vladimir's own image** (his parents, confirmed by the orchestrator in session). **No message text, screenshot, handle, phone number, or the model's name is committed** (`D-0-1`); evidence is held by Lazar and Petar outside the repo. **Frame count corrected 4 → 3** (`D-Y.03-8`) — a fourth does not exist. The **"It cannot carry Catalog or Product"** sentence is **NOT retracted**; it is overridden for **two frames only** as a logged interim (`D-Y.03-7`, **Lazar's** call — a mismatch with this section's assignment of these calls to Vladimir, recorded rather than smoothed over). The **neutral product set remains OWED**; placeholder register #2 stays OPEN and #8 is untouched. Resolves Known Issue #6; adds a line item to the still-open Known Issue #4. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.03 brief) |
+| 2026-08-27 | **§ 7 Fabric / composition / care → VERIFIED (Phase Y.07 Code, Task 4, `D-Y.07-1/2/3`).** The row now carries **100% cotton; wash at 30 °C** — provenance **Owner (Vladimir, via Petar), 2026-08-27**, recorded explicitly as the **owner's statement and NOT a label read**, because no label has been read or photographed by anyone on this project; if one later disagrees, the label wins and `D-Y.07-1` is what gets superseded. **The one statement covers all three colourways** (mustard/ochre, off-white, baby blue), which **amends `D-Y.02-1`** — baby blue's fabric no longer waits on baby blue's own label (`D-Y.07-2`); the `### Product 03` sub-table row and its paragraph were updated to match, so the file does not contradict itself. The **"read the label" paragraph is rewritten**, not deleted: the two confirmed facts may render, and **weight/GSM, drying, ironing, bleach, fibre origin, country of manufacture and every adjective remain forbidden**. The two permitted strings — MK `100% памук. Перење на 30 °C.` and EN `100% cotton. Wash at 30 °C.`, both with U+00A0 before `°C` — are fixed by `D-Y.07-3` and enforced by `tests/config/product-care.test.ts`. Placeholder register rows **#3** and **#9** are cleared by this. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.07 brief) |
 | 2026-07-23 | **§ 11 Site build credit added (Phase 2.08 Code).** New section recording the site as built by **Vertex Consulting** (VERIFIED, operator/Lazar, 2026-07-23) and its URL `https://www.vertexconsulting.mk/en` (VERIFIED — click-test owed before ship). Scoped hard: a build credit in the site header only, **not** a partner/sponsor/stockist, and barred from JSON-LD/`sameAs`/OG/`llms.txt`/sitemap/footer/legal pages. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per 2.08 brief) |

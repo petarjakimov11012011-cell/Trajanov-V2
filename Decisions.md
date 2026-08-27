@@ -2539,7 +2539,10 @@ start at `D-2.01-6`.*
 ## Phase Y.02 — Product 03 (baby blue) catalog stub
 
 ### D-Y.02-1 · 2026-07-22 · Owner-authorised out-of-order insert — Product 03 added as a catalog stub ahead of Y.01
-- **Status:** Accepted
+- **Status:** Accepted. **AMENDED by `D-Y.07-2`** (2026-08-27) — the "baby blue's fabric/care is read
+  off baby blue's own label" part is retired: the owner's one statement covers all three colourways.
+  **Amended, not superseded** — the rest of this entry (the out-of-order stub, the photo and name
+  placeholders, the price + sizes) stands unchanged.
 - **Decided by:** Lazar (owner), 2026-07-22 — handed to Code in the Phase Y.02 brief.
 - **Context:** Vladimir has confirmed a third colourway (baby blue) with a real price (1999 MKD) and real
   sizes (S/M/L/XL). The critical path is the 2.06 operator rehearsal, then `Y.01` (the full drop-content
@@ -5421,7 +5424,9 @@ start at `D-2.01-6`.*
 - **Links:** `D-Y.06-3/6` · `D-2.11-5` · `src/lib/faq.ts` · completion report §6
 
 ### D-Y.06-9 · 2026-08-27 · Blank care copy is treated as "not supplied", and the care lookup gets its own test
-- **Status:** Accepted
+- **Status:** **Superseded by `D-Y.07-4`** (2026-08-27) — part (b)'s "every product still has null care
+  copy" guard is replaced by an exact-string allowlist now that `facts.md` §7 is VERIFIED. Part (a)
+  (blank-safe trimming in `getProductCare`) is untouched and still live.
 - **Decided by:** **Claude Code, on the spot.**
 - **Decision:** (a) `getProductCare` trims and maps an empty/whitespace-only config value to `null`, so a
   stray `careMk: ""` renders the honest placeholder rather than an empty "Composition & care" section
@@ -5484,3 +5489,100 @@ start at `D-2.01-6`.*
   `supabase db reset --linked` here; the correct command is `supabase db push`.
 - **Links:** owed register #68 · `D-1.07-15` · `D-Y.06-5` · `D-Y.06-3`
 
+### D-Y.07-1 · 2026-08-27 · Fabric/composition/care is VERIFIED on the OWNER'S STATEMENT, not on a label read
+- **Status:** Accepted
+- **Decided by:** **Petar (owner), 2026-08-27**, relaying Vladimir's statement; recorded in the Phase Y.07
+  brief and executed by Claude Code.
+- **Context:** `facts.md` §7 has had fabric/composition/care as `UNVERIFIED — OWED (Vladimir; read off the
+  labels)` since intake, and the paragraph under it said in as many words: *read the label*. Y.06 built the
+  render slot (`D-Y.06-1/2`) and deliberately left it null. Vladimir has now confirmed **100% cotton** and
+  a **30 °C** wash. He did not photograph a label and nobody on this project has read one.
+- **Decision:** Mark the row **VERIFIED** with the provenance written out as **Owner (Vladimir, via Petar),
+  2026-08-27**, and state **in the row itself** that this is the owner's statement and **not** a label read.
+  Fill `careMk`/`careEn` on all three products so the copy renders. Placeholder register rows **#3** and
+  **#9** close.
+- **Alternative rejected:** holding the row at OWED until a label is photographed. Rejected by the owner —
+  the customer pays cash at the door for a garment the page currently says nothing about, and the person
+  who makes the shirts has now said what they are made of. A blank is not more honest than his answer.
+- **Downside accepted:** **a label read would be stronger.** An owner's recollection of his own stock is
+  not the printed care label, and the two can disagree. **If a label later says something different, the
+  label wins and THIS entry is the one that gets superseded** — which is exactly why the provenance is
+  written into the row instead of being smoothed into a generic "VERIFIED".
+- **Links:** `facts.md` §7 + change log · `D-Y.06-1/2` · `D-Y.07-2/3/4` · placeholder register #3/#9
+
+### D-Y.07-2 · 2026-08-27 · The one statement covers all three colourways — `D-Y.02-1` is AMENDED, not ignored
+- **Status:** Accepted
+- **Decided by:** **Petar (owner), 2026-08-27**, relaying Vladimir; executed by Claude Code.
+- **Context:** `D-Y.02-1` added baby blue as a stub whose fabric/care was to be **read off baby blue's own
+  label** and never inherited from the other two colourways — a deliberate guard against a claim drifting
+  between garments, and the reason `getProductCare` is keyed by slug at all (`D-Y.06-1`).
+- **Decision:** Vladimir's statement is given as covering **all three** colourways, so the same two strings
+  are set on mustard/ochre, off-white **and** baby blue. `D-Y.02-1`'s Status becomes
+  `Amended by D-Y.07-2` — **amended, not superseded**: its stub, its photo and name placeholders, and its
+  price + sizes all still stand. Its body is left byte-unchanged.
+- **Alternative rejected:** leaving baby blue's care null while the other two render. Rejected — it would
+  invent a distinction the owner did not make, and would ship a product page that states a composition for
+  two colourways and a placeholder for the third of the same garment.
+- **Downside accepted:** the inheritance `D-Y.02-1` forbade has effectively happened — **by the owner's
+  word rather than by assumption, which is the whole difference**, and is why this is logged instead of
+  quietly done. If baby blue turns out to be a different cloth, all three rows are wrong together.
+- **Links:** `D-Y.02-1` (Status amended) · `D-Y.07-1` · `facts.md` §7 Product 03 sub-block
+
+### D-Y.07-3 · 2026-08-27 · Two exact strings, non-breaking space included, are the only permitted care copy
+- **Status:** Accepted
+- **Decided by:** Lazar (pre-made in the Phase Y.07 brief); executed by Claude Code.
+- **Decision:** The only care copy that may appear anywhere in this codebase until `facts.md` §7 says
+  otherwise is **MK `100% памук. Перење на 30\u00A0°C.`** and **EN `100% cotton. Wash at 30\u00A0°C.`**,
+  written in the TS source with the `\u00A0` **escape** so the non-breaking space survives copy-paste and
+  is visible in a diff. `%` sits tight against `100`; `памук` is lower-case. The values are set **per
+  product**, explicitly — no shared constant, no default, no fallback, because a silent default is the
+  same drift bug `D-Y.06-1` exists to prevent, wearing a different hat.
+- **Alternative rejected:** a plain space before `°C`. Rejected — the product column is narrow enough on a
+  320px phone to break `30 / °C` across two lines, which reads as a defect on a page whose whole job here
+  is to look like a stated fact. (Measured after the change: one line at 320px, 390px and 1180px.)
+- **Alternative rejected:** hoisting the strings into one exported constant and referencing it three times.
+  Rejected — it is tidier and it is exactly how a future fourth product silently inherits a material claim
+  nobody gave it.
+- **Downside accepted:** four literals to keep in step instead of one, and a copy change touches three
+  places. The allowlist test (`D-Y.07-4`) is what keeps them identical.
+- **Links:** `D-Y.06-1` · `D-Y.07-4` · `src/config/products.ts` · `facts.md` §7
+
+### D-Y.07-4 · 2026-08-27 · The "no care copy committed" guard is REPLACED by an exact-string allowlist, not deleted
+- **Status:** Accepted
+- **Decided by:** Lazar (pre-made in the brief); executed by Claude Code.
+- **Context:** `D-Y.06-9`(b) asserted every product's care copy was still null — a guard designed to go RED
+  the moment anyone committed a plausible-sounding composition. Filling the config makes it go red for the
+  right reason, which means the guard has done its job and must now be rewritten rather than removed.
+- **Decision:** Test Group 2 of `tests/config/product-care.test.ts` becomes an **allowlist**: for every
+  product in every drop, `careMk` is `null` **or** exactly the approved MK string, `careEn` is `null` **or**
+  exactly the approved EN string, **and** the two are either both null or both non-null. The approved
+  strings are defined once at the top of the file with `facts.md` §7 and the date named as their source.
+  Test Group 1 (slug keying) is unchanged. `D-Y.06-9`'s Status becomes `Superseded by D-Y.07-4`; part (a)
+  of it (blank-safe trimming) is untouched and still live.
+- **Alternative rejected:** deleting Group 2 now that the fact is verified. Rejected — the risk did not go
+  away when the fact landed, it changed shape: the new failure is a *near-miss* (a plain space before `°C`,
+  a stray adjective, an MK string with no EN twin), and only an exact-match guard catches that.
+- **Downside accepted:** the test now hard-codes copy, so every future care-copy change is a two-file edit —
+  `facts.md` first, then this test. That friction is the feature.
+- **Links:** `D-Y.06-9` (Status superseded) · `D-Y.07-3` · `tests/config/product-care.test.ts`
+
+### D-Y.07-5 · 2026-08-27 · The Product 03 sub-block and the stale in-file comments were corrected too, not just the row the brief named
+- **Status:** Accepted
+- **Decided by:** **Claude Code, on the spot.**
+- **Context:** The brief scoped Task 4 to "`facts.md` §7 — the fabric/composition/care row" and its
+  paragraph. But **four other places in the repo asserted the same fact was still owed**: the
+  `### Product 03 — baby blue` sub-table's own fabric row (`UNVERIFIED — OWED … read off the label`), the
+  baby-blue paragraph under it ("ships … with a fabric/care placeholder", "Photos + fabric are OWED"), and
+  three comment blocks in `src/config/products.ts` ("All six are null and stay null until Vladimir reads the
+  labels", "fabric/care are still OWED", "its photo, fabric/care, and real name are OWED").
+- **Decision:** Update all of them in this phase. `facts.md` is the only legal source for factual claims, and
+  a source that contradicts itself two sub-sections apart is not a source — a later reader landing on the
+  Product 03 block would have concluded baby blue's rendered composition was invented.
+- **Alternative rejected:** changing only the row the brief listed and flagging the rest for a follow-up.
+  Rejected — it would leave `facts.md` stating both that baby blue's fabric is VERIFIED and that it is OWED,
+  for however long the follow-up took, on the one file whose job is to be unambiguous.
+- **Downside accepted:** this phase edited more of `facts.md` and more comment prose than the brief
+  enumerated. **No factual claim beyond `D-Y.07-1`'s was added anywhere** — every edit either restates that
+  one fact or removes a now-false "still owed". Recorded here so the reviewer checks the diff rather than
+  trusting the summary.
+- **Links:** `D-Y.07-1/2` · `facts.md` §7 Product 03 · `src/config/products.ts`
