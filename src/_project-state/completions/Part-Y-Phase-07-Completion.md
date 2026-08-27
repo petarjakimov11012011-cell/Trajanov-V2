@@ -168,3 +168,57 @@ Two things worth a second look beyond that:
 
 - **`D-Y.07-5` is mine and it widened the `facts.md` edit** past what the brief enumerated — the Product 03 sub-block, its paragraph, and three comment blocks in `products.ts`. Please check that none of those edits added a claim rather than removing a stale "still owed".
 - The MK wording is **not** yet native-reviewed (owed **#70**). If „Перење на 30 °C." is not how a Macedonian care label actually phrases it, that is a copy fix, not a fact fix — `facts.md` stays as it is.
+
+---
+
+# Addendum — filed 2026-08-27, after merge
+
+*The report above is the record as filed at PR time and is left unedited. Everything below happened after it, on Petar's explicit instruction, and is appended rather than folded in.*
+
+## A1. Merged
+
+**PR [#42](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/42) → `main`, merge commit `36c08e5`.** Branch deleted, remote and local refs pruned, one-branch rule re-armed. PR state at merge: `MERGEABLE` / `CLEAN`, Vercel preview `SUCCESS`.
+
+**GitHub records `reviews: []` — no review at all.** `D-0-3` makes review an operator matter and the merge was the operator's instruction, so this is authorised. It is recorded here and in `D-Y.07-7` for the same reason `D-Y.06-10` recorded it for PR #41: **nobody should read "merged" as "reviewed".** The highest-risk thing in this phase is a material claim about a physical garment on a cash-on-delivery page, and Code checking its own work is not a second reader. If Lazar reads the diff later and disagrees with a word, it is a one-line config change plus a `facts.md` edit.
+
+## A2. `supabase db push` — run, and owed #68 closed
+
+Run on Petar's instruction (`D-Y.07-6`), which is the instruction `D-Y.06-11` was waiting for.
+
+**Before applying:** `--dry-run` showed exactly one migration would apply — `20260827120000_remove_order_quantity_cap.sql`, no seeds, no roles. Its SQL was read and confirmed non-destructive: `create or replace function` plus one CHECK constraint dropped by discovered name and re-added as `1..99`. No `drop table`, no `delete`, no `truncate`. `orders` held **0 rows**.
+
+**After applying — read back from the live database, not assumed.** The same three queries that recorded the mismatch in `D-Y.06-11`:
+
+| Check | Before | After |
+|---|---|---|
+| `schema_migrations` max version | `20260716120000` | **`20260827120000`** |
+| `create_order()` step 3 | `v_total_qty > 2` | **`v_total_qty > 99`** |
+| `order_items_quantity_check` | `quantity <= 2` | **`quantity <= 99`** |
+
+Applied at the safest available moment: `orders` at 0 rows, `test-drop` ended 2026-06-08, `open_now = false` — **no customer could have been mid-checkout.** `supabase db reset --linked` was not used (`D-1.07-15`).
+
+**Credentials:** sourced from `.env.hosted` into the command environment only. No value was printed, logged, or committed; every command's output was filtered through a connection-string redaction pass (`D-0-1`).
+
+## A3. Production verified — owed #69 closed
+
+All six pages on `https://www.trajanovv.com` after the merge deploy landed:
+
+| Page | Rendered care section | NBSP | `Product` JSON-LD |
+|---|---|---|---|
+| `/katalog/test-mustard-ochre` | `100% памук. Перење на 30 °C.` | ✅ | none |
+| `/katalog/test-off-white` | `100% памук. Перење на 30 °C.` | ✅ | none |
+| `/katalog/test-baby-blue` | `100% памук. Перење на 30 °C.` | ✅ | none |
+| `/en/catalog/test-mustard-ochre` | `100% cotton. Wash at 30 °C.` | ✅ | none |
+| `/en/catalog/test-off-white` | `100% cotton. Wash at 30 °C.` | ✅ | none |
+| `/en/catalog/test-baby-blue` | `100% cotton. Wash at 30 °C.` | ✅ | none |
+
+The section was extracted from the `<h2>` to its `</section>` and contains **only** the real string — `/PLACEHOLDER/.test(section.innerText)` → `false` on all six. U+00A0 confirmed at codepoint level: `0x33 0x30 0xa0 0xb0 0x43`. Looked at on a real **390px** viewport in both locales (EN mustard/ochre, MK baby blue): one line, `careP.className === shipP.className`, computed 13px / `rgb(171,167,158)` — body copy beside Shipping, not a badge. **19 routes swept, all 200.** Y.06's cap-copy check re-run across 6 routes: **0 hits**.
+
+**One thing worth knowing, because it will trip the next person who greps.** The string `[PLACEHOLDER: состав и нега — од етикетата]` **does** still appear in the production HTML — inside the serialized next-intl message catalog, i.e. the `Placeholder.composition` key we deliberately kept so the next drop still renders an honest marker. It is **not rendered**. A raw `grep` of the page source hits it and looks like a failure; it is not one. My own first production check hit exactly this and had to be run down properly before I could call the row closed.
+
+## A4. Register state after all of this
+
+- **CLOSED:** placeholder **#3**, **#9**; owed **#68**, **#69**.
+- **STILL OPEN — owed:** **#65** (live-state front door on a real screen), **#66** (native MK review of the four Y.06 strings), **#67** (a real 3-unit order end to end on production — needs a live drop; the relaxed CHECK has never been exercised against a real order), **#70** (native MK check of the new care string — check with #66).
+- **STILL OPEN — placeholder:** **#2**, **#4**, **#6**, **#7**, **#8**, **#10**. Six rows; must reach zero before the first REAL drop.
+- **Next:** `[P2] /impeccable polish` + the closing `/impeccable audit` on a new branch (`D-2.25-26`). **Y.01** is still the gate.

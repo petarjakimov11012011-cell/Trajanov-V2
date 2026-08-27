@@ -5465,7 +5465,10 @@ start at `D-2.01-6`.*
 - **Links:** `D-0-3` · `D-2.25-26` (same route) · `D-Y.06-11` · PR #41 · merge `7ad80f1`
 
 ### D-Y.06-11 · 2026-08-27 · The Y.06 migration is NOT on hosted; the mismatch it creates is LATENT because no drop is open
-- **Status:** Accepted — **open hazard, tracked as owed register #68.**
+- **Status:** **RESOLVED 2026-08-27 by `D-Y.07-6`** — `supabase db push` was run on Petar's
+  explicit instruction and the result verified against the live database. The mismatch this entry
+  recorded no longer exists; owed register **#68** is closed. The entry stands as the record of why the
+  push was deferred rather than run unprompted at merge time.
 - **Decided by:** Claude Code, recording verified state after the merge.
 - **Context — measured on hosted, not assumed (read-only queries, 2026-08-27, after merge `7ad80f1`):**
   `supabase_migrations.schema_migrations` tops out at **`20260716120000`** — `20260827120000` is **not
@@ -5586,3 +5589,56 @@ start at `D-2.01-6`.*
   one fact or removes a now-false "still owed". Recorded here so the reviewer checks the diff rather than
   trusting the summary.
 - **Links:** `D-Y.07-1/2` · `facts.md` §7 Product 03 · `src/config/products.ts`
+
+### D-Y.07-6 · 2026-08-27 · `supabase db push` run against hosted on Petar's instruction; the Y.06 migration is applied and verified
+- **Status:** Accepted. **Resolves `D-Y.06-11` and owed register #68.**
+- **Decided by:** **Petar (owner), 2026-08-27**, explicit instruction ("run supabase db push"); executed
+  by Claude Code.
+- **Context:** `D-Y.06-11` recorded that `main` and the production database disagreed about the per-order
+  cap: the site served no limit anywhere while hosted `create_order()` still refused any order over 2
+  units. Latent only because no drop was open. `D-Y.06-11` deliberately did **not** push, on the grounds
+  that a production schema change is a separate outward-facing action the operator had not asked for.
+  He has now asked for it.
+- **Decision:** Run `supabase db push` against the linked hosted project, credentials sourced from
+  `.env.hosted` into the command environment only — **no value printed, logged, or committed** (`D-0-1`),
+  and every command's output filtered through a redaction pass for connection strings.
+- **What was checked BEFORE applying.** A `--dry-run` first: exactly one migration would apply,
+  `20260827120000_remove_order_quantity_cap.sql`; no seeds, no roles. Its SQL was read and confirmed
+  non-destructive — a `create or replace function` plus one CHECK constraint dropped **by discovered name**
+  (`D-Y.06-5`) and re-added as `1..99`. **No `drop table`, no `delete`, no `truncate`.** `orders` held
+  **0 rows**, so relaxing the CHECK could not fail against existing data.
+- **What was verified AFTER applying — read back from the live database, not assumed.** The same three
+  queries that recorded the mismatch: `supabase_migrations.schema_migrations` max version
+  **`20260716120000` → `20260827120000`**; `create_order()` step 3 **`v_total_qty > 2` → `> 99`**;
+  `order_items_quantity_check` **`quantity <= 2` → `<= 99`**. Plus: `orders` still 0 rows, and the most
+  recent drop (`test-drop`) ends 2026-06-08 with `open_now = false`.
+- **Alternative rejected:** `supabase db reset --linked`. Rejected — **`D-1.07-15` forbids it on this
+  project** and it cannot rebuild what it drops. It was never a candidate; naming it here so nobody
+  reaches for it next time the two disagree.
+- **Downside accepted:** the change was applied to a live production database. It was applied at the
+  safest possible moment — **zero orders, no open drop, so no customer could be mid-checkout** — and it
+  only widens an accepted range, so no existing row could violate the new constraint. The residual cost
+  is that hosted schema history now has a migration nobody has exercised against a real order; **owed
+  #67 (a real 3-unit order end to end on production) is still open and still needs a live drop.**
+- **Links:** `D-Y.06-11` (Status resolved) · `D-Y.06-3/4/5` · `D-1.07-15` · owed #68 (closed), #67 (open)
+
+### D-Y.07-7 · 2026-08-27 · Y.07 merged on Petar's instruction; no operator review is recorded on the PR
+- **Status:** Accepted
+- **Decided by:** **Petar (owner), 2026-08-27**, explicit instruction ("merge to main"); executed by
+  Claude Code.
+- **Context:** `D-0-3` waives the house automated-review gate and puts the whole review burden on the
+  other operator — "Petar reviews Lazar's PR and Lazar reviews Petar's". The Y.07 brief confirmed this is
+  not a 1.03/1.04 phase, so **no fresh-session review was required**; the operator review still applied.
+  PR #42 was merged with `reviews: []` — GitHub records **no review at all**.
+- **Decision:** Merge as instructed (`36c08e5`, merge commit, branch deleted, refs pruned, one-branch rule
+  re-armed). **Record plainly that no review is on the record**, exactly as `D-Y.06-10` did for PR #41, so
+  nobody reading this history mistakes "merged" for "reviewed".
+- **Alternative rejected:** holding the merge until a review is recorded. Rejected — the owner gave a
+  direct instruction, and `D-0-3` makes review an operator matter, not Code's to gate.
+- **Downside accepted:** **the highest-risk thing in this phase went to production unreviewed by a second
+  human.** That risk is specifically a *material claim about a physical garment* on a page selling to
+  customers who pay cash at the door. Code verified the strings byte-for-byte against `facts.md` §7 and on
+  all six live pages, but **Code checking its own work is not a second reader.** If Lazar reads the diff
+  later and disagrees with a word, the fix is a one-line config change plus a `facts.md` edit — cheap,
+  which is the only reason this downside is tolerable.
+- **Links:** `D-0-3` · `D-Y.06-10` (the same call on PR #41) · PR #42 · owed #70 (native MK check, open)
