@@ -205,19 +205,25 @@ live-ready the moment the photos and fabric arrive — without inventing anythin
 
 | Fact | Value | Status |
 |---|---|---|
-| Colourway | **Baby blue** | **VERIFIED (owner-stated)** — Vladimir, 2026-07-22. **NOT yet photographed** — do **not** mark "VERIFIED (photos)" like the mustard/ochre + off-white row above |
+| Colourway | **Baby blue** | **VERIFIED (owner-stated)** — Vladimir, 2026-07-22. **NOT yet photographed** — do **not** mark "VERIFIED (photos)" like the mustard/ochre + off-white row above. **Unchanged by the 2026-09-29 frames (`D-Y.08-2`):** under the venue's warm tungsten light the shirt reads **pale grey**, not blue (sampled garment RGB ~(158,152,147) / ~(168,157,145)), so those photographs cannot confirm the colourway and this row stays **owner-stated** |
 | Working name | **"Product 03"** | Owner working name / placeholder — the real customer-facing name is **UNVERIFIED — OWED** (Vladimir) |
 | Price | **1999 MKD** | **VERIFIED** — owner, 2026-07-22 |
 | Sizes | **S, M, L, XL** | **VERIFIED** — owner, 2026-07-22 |
-| Photos | — | **UNVERIFIED — OWED** (Vladimir) |
+| Photos | **Two interim lifestyle frames on hand** (bar location) — `baby-blue-01`, `baby-blue-02`, received via Lazar 2026-09-29 | **Interim only.** Neutral front/back/print-detail set **still OWED** (Vladimir). The two frames render on the catalog card and both product-page slots (`D-Y.08-2/3`); they are **replaced**, not extended, when the neutral set lands |
 | Fabric / composition / care | **100% cotton. Wash at 30 °C.** — the same statement as the other two colourways | **VERIFIED** — **Owner (Vladimir, via Petar), 2026-08-27.** Owner's statement, **not** a label read; it covers baby blue explicitly, which **amends `D-Y.02-1`** (`D-Y.07-2`) — baby blue's fabric is no longer waiting on baby blue's own label |
 
-**Baby blue is owner-stated, not photographed.** The other two colourways are VERIFIED *by photos on
-hand*; baby blue is confirmed by Vladimir, but no product (or lifestyle) photo of it exists yet. So it
-ships in the catalog with a visible photo placeholder and the neutral name slot ("Производ 03") — never
-a stand-in image, never an invented composition or name (`D-0-6`, `D-Y.02-1`). Its price (1999 MKD),
-sizes (S/M/L/XL) and **now its composition and care** render as real, VERIFIED facts. **Its photo and
-its real name are still OWED before it can enter a live drop** — that assignment is `Y.01`.
+**Baby blue is owner-stated, and now photographed only as an interim.** The other two colourways are
+VERIFIED *by photos on hand*; baby blue is confirmed by Vladimir. **Amended 2026-09-29 (`D-Y.08-2`):**
+two real lifestyle frames of the baby-blue shirt now exist and render, so the catalog card and both
+product-page slots show a photograph instead of a placeholder. They are **real photographs of the
+actual shirt** — never a stand-in, never a generated image, never another colourway's photo
+(`D-0-6`, `D-Y.02-1`). The neutral name slot ("Производ 03") is **unchanged**. Its price (1999 MKD),
+sizes (S/M/L/XL) and its composition and care render as real, VERIFIED facts.
+
+**What the interim frames do NOT settle.** They do not confirm the colourway (they read grey — see the
+row above), they are **640 px wide** against 1333 px for the other two colourways, and they are styled
+bar frames rather than front / back / print detail on a neutral background. **The neutral product set
+and the real customer-facing name are still OWED before a live drop** — that assignment is `Y.01`.
 
 ---
 
@@ -225,13 +231,30 @@ its real name are still OWED before it can enter a live drop** — that assignme
 
 | Asset | Status |
 |---|---|
-| Lifestyle shots — bar location, 2 models, mustard + off-white tees, **3 frames** | **VERIFIED, on hand** |
+| Lifestyle shots — bar location, 2 models, mustard + off-white + **baby-blue** tees, **5 frames** | **VERIFIED, on hand** — 3 from July 2026, **2 baby-blue frames added 2026-09-29** (`D-Y.08-2`) |
 | Product shots — front / back / print detail, neutral background | **DOES NOT EXIST — OWED** (Vladimir) |
 
 **Frame count corrected 2026-07-26 (`D-Y.03-8`): three frames, not four.** This row read "4 frames"
-from the scaffold onwards. Vladimir holds **three**; a fourth does not exist yet. Only two of the
-three are wired to anything — there is **no baby-blue frame**, which is why Product 03 still ships
+from the scaffold onwards. Vladimir held **three**; a fourth did not exist then. Only two of the
+three were wired to anything — there was **no baby-blue frame**, which is why Product 03 shipped
 with a photo placeholder (placeholder register #8).
+
+**Superseded 2026-09-29 (`D-Y.08-2`): five frames.** Two baby-blue frames arrived via Lazar —
+`baby-blue-01.webp` (640×800) and `baby-blue-02.webp` (640×960). The "no baby-blue frame" sentence
+above is **updated, not deleted**: it was true from 2026-07-26 to 2026-09-28 and it is the reason
+register row #8 exists. **Row #8 is NARROWED, not cleared** — an interim lifestyle frame is not the
+neutral product photo it waits for. Both new frames are **real photographs** of the actual shirt, same
+venue and same two people as the July set; not generated, not retouched beyond the crop below and WebP
+conversion (`D-0-6`).
+
+**`baby-blue-01` is cropped to 4:5 above the legs on Vladimir's own instruction** (via Lazar,
+2026-09-29 — `D-Y.08-4`). Do not re-crop it, re-expand it, or replace it with an uncropped version.
+
+**Two defects recorded, not fixed.** (a) **Colour** — see the §7 colourway row: the shirt reads pale
+grey under tungsten light, worse than the mustard shift because warm light neutralises a pale blue
+outright, so §7 stays owner-stated. (b) **Resolution** — 640 px wide against 1333 px for the other
+two; fine at the ~280 px desktop slot, visibly soft full-width on a high-density phone. **Do not
+upscale** — upscaling invents pixels. Swapping in full-size originals later is a file swap.
 
 The lifestyle set is good and carries the Home hero and the About page. **It cannot carry Catalog
 or Product** — no clean front, no back, no print detail, and the mustard reads differently under
@@ -301,6 +324,31 @@ rather than left to be read into the word "backdrop" (`D-Y.03-6`).
 parental conversation already open under Known Issue **#4** (legal responsibility, cutover blocker,
 owner Vladimir + parents). Permission #5 covers **this publication**; it does not close #4.
 
+### 8.1a Note added 2026-09-29 — the two baby-blue frames (Phase Y.08)
+
+The frames `baby-blue-01` and `baby-blue-02` are from the **same venue** as the July set (permission
+**#1**, „Вторник"), show the **same adult model** (permission **#2**, she is 21 — her own consent is
+sufficient and covers these frames), and `baby-blue-01` shows **Vladimir himself** (permission **#3**,
+his own instruction to publish, together with his instruction to crop above the legs — `D-Y.08-4`).
+
+**Permission #5 — guardian consent — is OWED again for the new frame, and it is a MERGE GATE.**
+Permission #5 was given on 2026-07-26 and recorded **for the July frames**; it is consent for *that
+publication*, not a standing licence for any future photograph. Vladimir is a **minor** (§1; Known
+Issue #4), his face is fully identifiable in `baby-blue-01`, and the frame is used **commercially** on
+the catalog card, the product page and the Home front door. **His parents must confirm this specific
+frame may be used commercially before the Y.08 PR is merged.** Owner: **Lazar**. No names, no message
+text, no screenshots — the fact, date and channel only, as above (PII rule, `D-0-1`).
+
+**Flagged for the same conversation — a minor beside a drink.** Permission **#4** (backdrop call,
+Vladimir in favour) was written to cover "a person in frame holding a drink, not only a backdrop"
+(`D-Y.03-6`), but the person in that July frame was the **adult** model. In `baby-blue-01` the person
+seated at the bar is **Vladimir, a minor**, with a tumbler of a pink/amber drink beside his hand on the
+bar. As with the off-white frame, **the contents are not determinable from the photograph**, and the
+audience starts at age 12 (§8 location note). This is a step beyond what #4 was written to cover, so it
+is **written down here rather than read into #4** — it is an owner-level call for Vladimir and his
+parents, to be made alongside the #5 consent above and **before merge**. Recorded by Code, not decided
+by Code.
+
 ---
 
 ## 9. Domain
@@ -366,4 +414,5 @@ site header only. It does **not** go in the Organization or WebSite JSON-LD, `sa
 | 2026-07-22 | **§ 7 Product 03 — baby blue added (Phase Y.02 Code, Task 1, `D-Y.02-1`).** A **third colourway, baby blue**, working name "Product 03": **price 1999 MKD VERIFIED** (owner, 2026-07-22) and **sizes S/M/L/XL VERIFIED** (owner); the colourway itself is **owner-stated, NOT photographed** (explicitly not "VERIFIED (photos)" like the other two); **photos + fabric/care UNVERIFIED — OWED** (Vladimir); the real customer-facing name is OWED. Recorded as a new `### Product 03` sub-block in § 7. Owner-authorised out-of-order insert (Lazar, 2026-07-22). Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.02 brief) |
 | 2026-07-26 | **§ 8 Photography — permissions recorded, frame count corrected, Catalog/Product line overridden as an interim (Phase Y.03 Code).** New **§ 8.1** records **five** permissions as GIVEN by fact/date/channel only — venue („Вторник"), the adult model (**21**, her own consent), Vladimir's own instruction, the backdrop call (Vladimir, in favour, and written to cover **a person in frame holding a drink**, not only a backdrop), and **guardian consent for Vladimir's own image** (his parents, confirmed by the orchestrator in session). **No message text, screenshot, handle, phone number, or the model's name is committed** (`D-0-1`); evidence is held by Lazar and Petar outside the repo. **Frame count corrected 4 → 3** (`D-Y.03-8`) — a fourth does not exist. The **"It cannot carry Catalog or Product"** sentence is **NOT retracted**; it is overridden for **two frames only** as a logged interim (`D-Y.03-7`, **Lazar's** call — a mismatch with this section's assignment of these calls to Vladimir, recorded rather than smoothed over). The **neutral product set remains OWED**; placeholder register #2 stays OPEN and #8 is untouched. Resolves Known Issue #6; adds a line item to the still-open Known Issue #4. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.03 brief) |
 | 2026-08-27 | **§ 7 Fabric / composition / care → VERIFIED (Phase Y.07 Code, Task 4, `D-Y.07-1/2/3`).** The row now carries **100% cotton; wash at 30 °C** — provenance **Owner (Vladimir, via Petar), 2026-08-27**, recorded explicitly as the **owner's statement and NOT a label read**, because no label has been read or photographed by anyone on this project; if one later disagrees, the label wins and `D-Y.07-1` is what gets superseded. **The one statement covers all three colourways** (mustard/ochre, off-white, baby blue), which **amends `D-Y.02-1`** — baby blue's fabric no longer waits on baby blue's own label (`D-Y.07-2`); the `### Product 03` sub-table row and its paragraph were updated to match, so the file does not contradict itself. The **"read the label" paragraph is rewritten**, not deleted: the two confirmed facts may render, and **weight/GSM, drying, ironing, bleach, fibre origin, country of manufacture and every adjective remain forbidden**. The two permitted strings — MK `100% памук. Перење на 30 °C.` and EN `100% cotton. Wash at 30 °C.`, both with U+00A0 before `°C` — are fixed by `D-Y.07-3` and enforced by `tests/config/product-care.test.ts`. Placeholder register rows **#3** and **#9** are cleared by this. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.07 brief) |
+| 2026-09-29 | **§ 7 + § 8 + § 8.1 — Product 03's first two photographs recorded (Phase Y.08 Code, `D-Y.08-2/4/7`).** § 7 `Photos` row now records **two interim lifestyle frames on hand** (`baby-blue-01`, `baby-blue-02`, via Lazar 2026-09-29) with the **neutral front/back/print-detail set still OWED**; the **colourway row is UNCHANGED at "VERIFIED (owner-stated)"** and gains one sentence recording that under the venue's warm tungsten light the shirt reads **pale grey** (sampled RGB ~(158,152,147) / ~(168,157,145)), so the photographs **cannot** upgrade it to "VERIFIED (photos)". § 8 asset table frame count **3 → 5**; the **"no baby-blue frame" sentence is updated, not deleted**, and dated, because it is why register row #8 exists — **#8 is NARROWED, not cleared**. The **4:5 crop above the legs is recorded as Vladimir's own instruction** (`D-Y.08-4`). Two defects recorded and deliberately **not** fixed: colour shift, and 640 px width against 1333 px (**do not upscale**). New **§ 8.1a** records the new frames against permissions #1/#2/#3, and records **#5 guardian consent for the new frame of Vladimir as OWED — a MERGE GATE** (the 2026-07-26 #5 was consent for the July frames, not a standing licence). Also flags that permission **#4** was written for an **adult** holding a drink, whereas `baby-blue-01` shows a **minor** beside a drink — raised, not decided, by Code. No names, no message text, no screenshots (`D-0-1`). Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.08 brief) |
 | 2026-07-23 | **§ 11 Site build credit added (Phase 2.08 Code).** New section recording the site as built by **Vertex Consulting** (VERIFIED, operator/Lazar, 2026-07-23) and its URL `https://www.vertexconsulting.mk/en` (VERIFIED — click-test owed before ship). Scoped hard: a build credit in the site header only, **not** a partner/sponsor/stockist, and barred from JSON-LD/`sameAs`/OG/`llms.txt`/sitemap/footer/legal pages. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per 2.08 brief) |

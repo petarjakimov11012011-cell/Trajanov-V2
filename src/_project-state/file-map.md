@@ -288,7 +288,7 @@ Trajanov-V2/
 │   │   ├── metadata.ts              # localeAlternates() (2.01) + pageMetadata()/ogImageUrl() — OG+Twitter+noindex (2.04)
 │   │   ├── faq.ts                   # single source for the Home FAQ — 3 groups × ordered q/a KEYS (keys only, no strings); read by HomeFaq + faq-jsonld (2.11, D-2.11-5)
 │   │   ├── showcase.ts              # single source for the Home showcase — which products get a slide (photo REQUIRED, `live` → none) + wrapIndex; pure, vitest-importable (2.21)
-│   │   ├── product-images.ts        # slug→photo map for Catalog/Product — keyed by SLUG, never index (Y.03, D-Y.03-1); baby-blue absent → null. (Tree line missing since Y.03; added Y.06)
+│   │   ├── product-images.ts        # slug→photo maps for Catalog/Product — keyed by SLUG, never index (Y.03, D-Y.03-1). PRODUCT_IMAGES: all 3 colourways (baby blue added Y.08). PRODUCT_SECOND_IMAGES + getProductSecondImage: baby blue ONLY (Y.08, D-Y.08-3)
 │   │   ├── product-care.ts          # slug→{mk,en} composition & care, read out of config/products.ts — keyed by SLUG, never index (Y.06, D-Y.06-1); all six FILLED by Y.07 (100% cotton / 30 °C, facts.md §7, D-Y.07-1/3); null still → placeholder (D-Y.06-2)
 │   │   ├── seo/                     # structured-data builders (2.04)
 │   │   │   ├── site-jsonld.ts       # Organization + WebSite @graph — no address/logo/SearchAction/partner
@@ -337,7 +337,9 @@ Trajanov-V2/
 ├── public/
 │   └── images/
 │       ├── products/               # .gitkeep — REAL neutral photos only — D-0-6 — STILL EMPTY
-│       └── lifestyle/              # the bar shoot — permissions GIVEN (facts.md §8.1, Y.03)
+│       └── lifestyle/              # the bar shoot — 5 frames. Permissions: §8.1 #1-#4 GIVEN; #5 guardian
+│                                       # consent for the NEW Vladimir frame is OWED and GATES THE Y.08 MERGE
+│                                       # (facts.md §8.1a, D-Y.08-7). baby-blue-01/02 added Y.08
 │           ├── mustard-ochre-01.webp   # Product 01 interim — 1333×2000, 209 KB — D-Y.03-1/4
 │           ├── off-white-01.webp       # Product 02 interim — 1333×2000, 154 KB — D-Y.03-1/4
 │           └── trio-composite-01.webp  # Home hero composite (≥640px) — 1672×941, 185 KB, serif TRAJANOV burned in — Y.05, D-Y.05-3
@@ -374,6 +376,9 @@ Trajanov-V2/
 │   │   └── contact-message.test.ts  # 2.23 sender — Resend MOCKED: compose/prefix, replyTo, success + send_error/timeout/unconfigured/exception, no PII
 │   ├── contact/
 │   │   └── process-contact.test.ts  # 2.23 pipeline — PURE: caps, email shape, header-injection reject, turnstile fail-closed, no sent:true unconfirmed
+│   ├── catalog/                    # NEW in Y.08
+│   │   └── product-images.test.ts  # PURE unit test — the slug→photo maps: which file lands on which slug,
+│   │                               # getProductSecondImage null for 01/02 + unknown, shared alt key (D-Y.08-3/5)
 │   ├── concurrency/
 │   │   ├── oversell.test.ts        # 10 orders / 3 units → exactly 3 succeed, 7 insufficient_stock
 │   │   └── expiry.test.ts          # stock returned exactly once, incl. 2 concurrent sweeps
@@ -384,7 +389,7 @@ Trajanov-V2/
 │   ├── drop/
 │   │   └── size-order.test.ts      # PURE unit test — canonical size comparator (S·M·L·XL), 8 cases, RED→GREEN (2.09)
 │   ├── home/
-│   │   └── showcase.test.ts        # PURE unit test — showcaseSlides (null/live → [], photo-required, order preserved, baby-blue never) + wrapIndex (2.21)
+│   │   └── showcase.test.ts        # PURE unit test — showcaseSlides (null → [], live yields slides D-2.25-23, photo-required, order preserved, baby blue NOW included + `test-no-photo` still skipped D-Y.08-6) + wrapIndex (2.21, updated Y.08)
 │   ├── rls/anon-access.test.ts     # anon wall: orders unreadable, variants readable, no writes/rpc
 │   └── orders/
 │       ├── create-order.test.ts    # happy path, drop window (D-1.03-7), full error vocabulary
@@ -438,6 +443,7 @@ On every phase that adds, moves, or deletes a file:
 
 | Date | Phase | Change | By |
 |---|---|---|---|
+| 2026-09-29 | Y.08 (Code) | **Product 03 (baby blue) — first photographs on Catalog, Product and the Home front door.** New: `public/images/lifestyle/baby-blue-01.webp` (640×800, 4:5, **90,910 B** — pre-cropped above the legs on **Vladimir's own instruction**, `D-Y.08-4`) + `baby-blue-02.webp` (640×960, 2:3, **53,876 B** — the adult model, §8.1 #2); `tests/catalog/product-images.test.ts` (**new `tests/catalog/` dir**, 8 pure assertions, watched RED first); `docs/i18n/mk-review-y08.md` (**unsigned**, 1 string); `completions/Part-Y-Phase-08-Completion.md`. Modified: `src/lib/product-images.ts` (`test-baby-blue` added to `PRODUCT_IMAGES` with `objectPosition: "center"`; **new slug-keyed `PRODUCT_SECOND_IMAGES` + `getProductSecondImage`**, baby blue its only entry at `center 40%`, `D-Y.08-3`; `AltKey` union +1; header comment rewritten — the grey-shift and 640px defects recorded, **do not upscale**), `src/app/[locale]/catalog/[slug]/page.tsx` (**second `PhotoSlot` now receives `getProductSecondImage(slug)`**; null → renders exactly as before, so Products 01/02 are visually untouched; slot comment rewritten), `src/messages/{mk,en}.json` (**+1 key** `Product.photoAltBabyBlue`, MK ⇔ EN identical, **273→274**), `tests/home/showcase.test.ts` (the "never includes test-baby-blue" assertions **replaced** — Product 03 is now included, and the skip rule is re-pinned against a slug with no entry, `test-no-photo`, so it stays under test), `docs/i18n/string-inventory.md` (regen **274**), `facts.md` (§7 Photos row + colourway sentence + paragraph, §8 frame count **3→5** with the "no baby-blue frame" sentence **updated not deleted**, **new §8.1a** permissions note + the **#5 guardian-consent MERGE GATE** + the minor-beside-a-drink flag, changelog row), `Decisions.md` (`D-Y.08-1…9`), `current-state.md` (line 1 status — **`NEXT:` target byte-unchanged**, `D-Y.08-1`; placeholder **#8 NARROWED not cleared**, #2 note; owed **#71–#73**), this file. **Product 03 entered the Home showcase with ZERO code change** — `showcase.ts` selects on `product-images.ts` (`D-Y.08-6`). **No `src/config/products.ts` or `drops.ts`, `supabase/`, `create_order`, `expire_reservations`, cart, checkout, `src/lib/drop/`, `PhotoSlot.tsx`, `ProductCard.tsx`, `showcase.ts`, `HomeExperience.tsx`, `globals.css`, `brand.md`, `next.config.ts`, or npm dependency touched (diff-proven).** `npm test` **186/186**. **PR OPEN, NOT MERGED — merge gated on owed #71.** `D-Y.08-*`. | Claude Code |
 | 2026-07-14 | — | Template seeded at kickoff. Nothing built. | Claude Chat |
 | 2026-07-14 | 1.01 | Replaced the intended tree with the real on-disk tree. Scaffolded Next.js/TS/Tailwind/shadcn/next-intl. Added `src/i18n/` + `src/proxy.ts` (not in the kickoff sketch). Route folders deferred to 2.01. | Claude Code |
 | 2026-07-15 | 1.02 | Added routes (`catalog`, `catalog/[slug]`, `cart`, `checkout`, `styleguide`), component dirs `{system,cart,checkout,layout,home}`, `lib/demo.ts`, `types/drop.ts`, and the committed handover. Filled `globals.css` from `brand.md`; loaded Rubik+Inter. Non-localised slugs (2.01 localises). `D-1.02-4/5/6`. | Claude Code |

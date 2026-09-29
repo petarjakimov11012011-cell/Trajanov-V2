@@ -22,8 +22,10 @@ function product(overrides: Partial<ProductView> & { slug: string; index: number
   };
 }
 
-// The three committed catalog products in sort order. Photographs exist for the first two only
-// (src/lib/product-images.ts); test-baby-blue deliberately has none (placeholder register #8).
+// The three committed catalog products in sort order. All three now have an interim lifestyle frame
+// in src/lib/product-images.ts — test-baby-blue gained one in Y.08, so Product 03 entered the
+// showcase with no code change (D-Y.08-6). The skip rule is still live behaviour and is pinned
+// below against `test-no-photo`, a slug with no entry in the image map.
 const PRODUCTS: ProductView[] = [
   product({ slug: "test-mustard-ochre", index: 1, priceMkd: 1199, stock: "in-stock", remaining: 5 }),
   product({ slug: "test-off-white", index: 2, priceMkd: 1199, stock: "low", remaining: 2 }),
@@ -50,28 +52,51 @@ describe("showcaseSlides", () => {
 
   it("live: the same photographed slides as every other state (D-2.25-23, reversing 2.21 decision 5)", () => {
     const slides = showcaseSlides(view("live"));
-    expect(slides.map((s) => s.slug)).toEqual(["test-mustard-ochre", "test-off-white"]);
+    expect(slides.map((s) => s.slug)).toEqual([
+      "test-mustard-ochre",
+      "test-off-white",
+      "test-baby-blue",
+    ]);
   });
 
   it("countdown: only the photographed products, in view.products order", () => {
     const slides = showcaseSlides(view("countdown"));
-    expect(slides.map((s) => s.slug)).toEqual(["test-mustard-ochre", "test-off-white"]);
-    expect(slides.map((s) => s.index)).toEqual([1, 2]);
+    expect(slides.map((s) => s.slug)).toEqual([
+      "test-mustard-ochre",
+      "test-off-white",
+      "test-baby-blue",
+    ]);
+    expect(slides.map((s) => s.index)).toEqual([1, 2, 3]);
     for (const slide of slides) {
       expect(slide.image).not.toBeNull();
       expect(slide.image.src).toMatch(/^\/images\/lifestyle\//);
     }
   });
 
-  it("ended: same two slides — the state gate is live-only, not ended", () => {
+  it("ended: the same three slides — the state gate is live-only, not ended", () => {
     const slides = showcaseSlides(view("ended"));
-    expect(slides.map((s) => s.slug)).toEqual(["test-mustard-ochre", "test-off-white"]);
+    expect(slides.map((s) => s.slug)).toEqual([
+      "test-mustard-ochre",
+      "test-off-white",
+      "test-baby-blue",
+    ]);
   });
 
-  it("never includes test-baby-blue — no photograph exists (register #8, decision 2)", () => {
+  it("includes test-baby-blue in every state — it has a photograph now (D-Y.08-6)", () => {
     for (const state of ["countdown", "live", "ended"] as const) {
-      const slugs = showcaseSlides(view(state)).map((s) => s.slug);
-      expect(slugs).not.toContain("test-baby-blue");
+      const slides = showcaseSlides(view(state));
+      const babyBlue = slides.find((s) => s.slug === "test-baby-blue");
+      expect(babyBlue).toBeDefined();
+      expect(babyBlue!.image.src).toBe("/images/lifestyle/baby-blue-01.webp");
+    }
+  });
+
+  it("still skips a product with NO frame in the image map (rule 1, unchanged by Y.08)", () => {
+    for (const state of ["countdown", "live", "ended"] as const) {
+      const products = [...PRODUCTS, product({ slug: "test-no-photo", index: 4 })];
+      const slugs = showcaseSlides(view(state, products)).map((s) => s.slug);
+      expect(slugs).not.toContain("test-no-photo");
+      expect(slugs).toHaveLength(3);
     }
   });
 
@@ -89,11 +114,15 @@ describe("showcaseSlides", () => {
   it("preserves a re-ordered products array (order comes from the view, never from the image map)", () => {
     const reversed = [...PRODUCTS].reverse();
     const slides = showcaseSlides(view("countdown", reversed));
-    expect(slides.map((s) => s.slug)).toEqual(["test-off-white", "test-mustard-ochre"]);
+    expect(slides.map((s) => s.slug)).toEqual([
+      "test-baby-blue",
+      "test-off-white",
+      "test-mustard-ochre",
+    ]);
   });
 
   it("returns [] when no product has a photograph", () => {
-    const slides = showcaseSlides(view("countdown", [product({ slug: "test-baby-blue", index: 3 })]));
+    const slides = showcaseSlides(view("countdown", [product({ slug: "test-no-photo", index: 4 })]));
     expect(slides).toEqual([]);
   });
 });
