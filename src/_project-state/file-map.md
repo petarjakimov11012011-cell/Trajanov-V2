@@ -12,6 +12,24 @@ Last updated: **2026-07-29** · By: **Claude Code (Phase 2.25 merged — PR #40,
 
 ## Status
 
+**Phase Y.09 — Shipping page, delivery cost, approximate USD on EN (2026-09-29, PR #44 open).** New:
+`src/config/currency.ts` (`MKD_PER_USD = 54.3` + `USD_RATE_DATE`, display-only, hand-updated — `D-Y.09-4`),
+`src/config/shipping.ts` (`DELIVERY_COST_MKD = 200`, `D-Y.09-2/7`),
+`src/components/system/WithUsdApprox.tsx` (EN-only `≈ $N` beside a price; returns the price untouched on MK —
+`D-Y.09-8`), four test files — `tests/format/usd-approx.test.ts`, `tests/config/delivery-cost.test.ts`,
+`tests/i18n/delivery-cost-copy.test.ts`, `tests/pages/shipping-page.test.ts` (two new test folders,
+`format/` and `pages/`) — `docs/i18n/mk-review-y09.md` (**unsigned**, 9 strings), `briefs/Part-Y-Phase-09-Code.md`
+(the brief as supplied in session) and the completion report.
+Modified: `src/lib/format.ts` (+`formatUsdApprox`, +`formatMkdWithApproxUsd`; `formatMkd` unchanged),
+`src/app/[locale]/shipping-returns/page.tsx` (4 sections, no Placeholder), `src/app/[locale]/terms/page.tsx`
+(`LAST_UPDATED` only), `src/app/[locale]/catalog/[slug]/page.tsx`, `src/components/product/ProductCard.tsx`,
+`src/components/home/{HomeShowcase,HomeFaq}.tsx`, `src/components/cart/CartView.tsx`,
+`src/app/llms.txt/route.ts` (Shipping label/note), `src/messages/{mk,en}.json` (**−6 keys → 268**),
+`docs/i18n/string-inventory.md` (regenerated), `facts.md` §7, `Decisions.md` (`D-Y.09-1…12`; `D-2.01-8`
+Status → superseded in part), the state files. **No move, no delete of a file.** Route slugs, `supabase/`,
+the order path, `src/lib/drop/`, `src/config/{drops,products,index}.ts`, structured data, images and
+dependencies untouched.
+
 **Phase 2.25 owner items landed — one new file (same branch, after P1).** New:
 `docs/i18n/mk-review-2.25.md` (**unsigned** — the two showcase section-name strings,
 `Showcase.headingLast`/`headingLive`, owed register #64). Modified only (no moves, no deletes):
@@ -220,7 +238,8 @@ Trajanov-V2/
 │   │   ├── mk-review-y04.md         # native-MK review pack for the 2 hero CTA strings — unsigned (Y.04)
 │   │   ├── mk-review-y05.md         # native-MK review pack for the composite alt string — unsigned (Y.05)
 │   │   ├── mk-review-2.21.md        # native-MK review pack for the 7 showcase strings — unsigned (2.21; tree line added 2.23)
-│   │   └── mk-review-2.23.md        # native-MK review pack — 21 rows incl. 2 REWRITTEN 2.03-stamped Privacy strings — unsigned (2.23)
+│   │   ├── mk-review-2.23.md        # native-MK review pack — 21 rows incl. 2 REWRITTEN 2.03-stamped Privacy strings — unsigned (2.23)
+│   │   └── mk-review-y09.md         # native-MK review pack — 9 Shipping/FAQ/Cart/Terms strings, {cost} shown filled — unsigned (Y.09)
 │   ├── legal/
 │   │   └── facts-audit-2.03.md      # every rendered claim traced; 2 findings; zero UNSOURCED (2.03)
 │   └── ops/                          # operator runbooks (2.06)
@@ -253,7 +272,7 @@ Trajanov-V2/
 │   │       ├── contact/page.tsx     # STATIC — 2.23: message form (client island) + 3-row rail from social.ts; no address (facts §1)
 │   │       ├── terms/page.tsx         # STATIC — Terms of sale; Vladimir alone (D-2.03-1); no statute (2.03)
 │   │       ├── privacy/page.tsx       # STATIC — Privacy; fields match orders schema; no cookie banner (2.03)
-│   │       ├── shipping-returns/page.tsx  # STATIC — reuses ShippingNotice; 2 visible placeholders (2.03)
+│   │       ├── shipping-returns/page.tsx  # STATIC — „Испорака“/"Shipping": 4 sections, cost from DELIVERY_COST_MKD, NO placeholder; returns removed by owner decision; slug kept (2.03, Y.09)
 │   │       ├── catalog/page.tsx     # drop grid
 │   │       ├── catalog/[slug]/page.tsx  # product page
 │   │       ├── cart/page.tsx        # cart at 2-unit cap
@@ -278,12 +297,12 @@ Trajanov-V2/
 │   │   ├── legal/                  # LegalPage + LegalSection — shared shell for the 3 legal pages (2.03, D-2.03-3)
 │   │   ├── seo/                    # JsonLd — renders a JSON-LD <script> (2.04)
 │   │   ├── home/                   # HomeExperience (props-driven from server drop state, 1.04); HomeFaq — server-rendered FAQ section under the hero (2.11); HomeShowcase — client carousel of the photographed pieces between hero and FAQ, hidden in `live` (2.21)
-│   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice, DevPreviewSwitch (1.04), ShippingNotice (MK-only shipping, 2.01), InstagramIcon — local outline Instagram glyph, this Lucide ships no brand icons (2.24, D-2.24-1)
+│   │   └── system/                 # Placeholder, PhotoSlot, PreviewNotice, DevPreviewSwitch (1.04), ShippingNotice (MK-only shipping, 2.01), InstagramIcon — local outline Instagram glyph, this Lucide ships no brand icons (2.24, D-2.24-1), WithUsdApprox — EN-only `≈ $N` beside a price, MK untouched (Y.09, D-Y.09-8)
 │   │
 │   ├── lib/
 │   │   ├── utils.ts                 # cn() — shadcn helper
 │   │   ├── social.ts                # facts-backed public contact constants: IG handle/URL + phone (1.04/1.05)
-│   │   ├── format.ts                # formatMkd(amount,currency,locale) — locale-aware price formatter (1.04, locale-aware 2.01)
+│   │   ├── format.ts                # formatMkd (1.04, locale-aware 2.01) + formatUsdApprox (EN-only ≈ $N) + formatMkdWithApproxUsd (prose {cost}) (Y.09)
 │   │   ├── site.ts                  # SITE_URL origin constant — hreflang/canonical base (2.05: https://www.trajanovv.com)
 │   │   ├── metadata.ts              # localeAlternates() (2.01) + pageMetadata()/ogImageUrl() — OG+Twitter+noindex (2.04)
 │   │   ├── faq.ts                   # single source for the Home FAQ — 3 groups × ordered q/a KEYS (keys only, no strings); read by HomeFaq + faq-jsonld (2.11, D-2.11-5)
@@ -324,7 +343,9 @@ Trajanov-V2/
 │   │   ├── time.ts                  # Europe/Skopje wall-clock → UTC instant, DST-aware (D-1.04-4)
 │   │   ├── drops.ts                 # the schedule — the switch Lazar flips
 │   │   ├── products.ts              # the catalogue — prices, names, stock, composition & care copy (careMk/careEn, Y.07)
-│   │   └── index.ts                 # joins drops+products; re-exports config surface
+│   │   ├── currency.ts              # MKD_PER_USD 54.3 + USD_RATE_DATE — EN display-only reference rate, HAND-UPDATED (Y.09, D-Y.09-4)
+│   │   ├── shipping.ts              # DELIVERY_COST_MKD 200 — the ONE place the delivery cost lives (Y.09, D-Y.09-2/7)
+│   │   └── index.ts                 # joins drops+products; re-exports config surface (sync/tests only)
 │   │
 │   ├── messages/
 │   │   ├── mk.json                  # default language — UI strings + About/Contact namespaces (1.05)
@@ -368,7 +389,12 @@ Trajanov-V2/
 │   ├── helpers/db.ts               # anon/service supabase-js clients + direct pg admin conn
 │   ├── i18n/                       # NO DB — pure catalog/config assertions (2.01)
 │   │   ├── catalog-parity.test.ts  # mk.json ⇔ en.json identical key sets + no empty value (bar About.quoteNote)
-│   │   └── pathnames.test.ts       # route folders ⇔ routing.pathnames; both-locale slugs; no orphan
+│   │   ├── pathnames.test.ts       # route folders ⇔ routing.pathnames; both-locale slugs; no orphan
+│   │   └── delivery-cost-copy.test.ts # no literal 200 in copy, no "unconfirmed cost" left, {cost} interpolates (incl. FAQ JSON-LD), no $ in mk (Y.09)
+│   ├── format/                     # NEW in Y.09 — PURE
+│   │   └── usd-approx.test.ts      # ≈ $22 / $37 / $4, null on mk, half-up, grouping; formatMkd unchanged; rate 54.3
+│   ├── pages/                      # NEW in Y.09 — SOURCE guards (D-Y.09-10)
+│   │   └── shipping-page.test.ts   # no Placeholder, exactly 4 sections, removed keys gone, titled Shipping, LAST_UPDATED
 │   ├── cart/
 │   │   └── cart.test.ts            # PURE cart reducer: choice recorded, 2-unit cap, toOrderItems boundary (1.06)
 │   ├── email/
@@ -383,6 +409,7 @@ Trajanov-V2/
 │   │   ├── oversell.test.ts        # 10 orders / 3 units → exactly 3 succeed, 7 insufficient_stock
 │   │   └── expiry.test.ts          # stock returned exactly once, incl. 2 concurrent sweeps
 │   ├── config/
+│   │   ├── delivery-cost.test.ts   # DELIVERY_COST_MKD === 200 (Y.09)
 │   │   ├── time.test.ts            # DST resolver — summer 18:00Z + winter 19:00Z (D-1.04-4)
 │   │   ├── sync.test.ts            # no-reset-stock, idempotent, refuses null price / price-after-open
 │   │   └── cron.test.ts            # both pg_cron jobs scheduled + active from db reset
@@ -443,6 +470,7 @@ On every phase that adds, moves, or deletes a file:
 
 | Date | Phase | Change | By |
 |---|---|---|---|
+| 2026-09-29 | Y.09 (Code) | **Shipping page: 200 MKD delivery cost, returns removed, approximate USD on EN.** New: `src/config/currency.ts`, `src/config/shipping.ts`, `src/components/system/WithUsdApprox.tsx`, `tests/format/usd-approx.test.ts`, `tests/config/delivery-cost.test.ts`, `tests/i18n/delivery-cost-copy.test.ts`, `tests/pages/shipping-page.test.ts`, `docs/i18n/mk-review-y09.md` (unsigned), `briefs/Part-Y-Phase-09-Code.md`, `completions/Part-Y-Phase-09-Completion.md`. Modified: `src/lib/format.ts`, `src/app/[locale]/{shipping-returns,terms,catalog/[slug]}/page.tsx`, `src/components/{product/ProductCard,home/HomeShowcase,home/HomeFaq,cart/CartView}.tsx`, `src/app/llms.txt/route.ts`, `src/messages/{mk,en}.json` (−6 keys → 268), `docs/i18n/string-inventory.md`, `facts.md`, `Decisions.md`, state files. No file moved or deleted; route slugs kept (`D-Y.09-3`). | Claude Code |
 | 2026-09-29 | Y.08 (Code) | **Product 03 (baby blue) — first photographs on Catalog, Product and the Home front door.** New: `public/images/lifestyle/baby-blue-01.webp` (640×800, 4:5, **90,910 B** — pre-cropped above the legs on **Vladimir's own instruction**, `D-Y.08-4`) + `baby-blue-02.webp` (640×960, 2:3, **53,876 B** — the adult model, §8.1 #2); `tests/catalog/product-images.test.ts` (**new `tests/catalog/` dir**, 8 pure assertions, watched RED first); `docs/i18n/mk-review-y08.md` (**unsigned**, 1 string); `completions/Part-Y-Phase-08-Completion.md`. Modified: `src/lib/product-images.ts` (`test-baby-blue` added to `PRODUCT_IMAGES` with `objectPosition: "center"`; **new slug-keyed `PRODUCT_SECOND_IMAGES` + `getProductSecondImage`**, baby blue its only entry at `center 40%`, `D-Y.08-3`; `AltKey` union +1; header comment rewritten — the grey-shift and 640px defects recorded, **do not upscale**), `src/app/[locale]/catalog/[slug]/page.tsx` (**second `PhotoSlot` now receives `getProductSecondImage(slug)`**; null → renders exactly as before, so Products 01/02 are visually untouched; slot comment rewritten), `src/messages/{mk,en}.json` (**+1 key** `Product.photoAltBabyBlue`, MK ⇔ EN identical, **273→274**), `tests/home/showcase.test.ts` (the "never includes test-baby-blue" assertions **replaced** — Product 03 is now included, and the skip rule is re-pinned against a slug with no entry, `test-no-photo`, so it stays under test), `docs/i18n/string-inventory.md` (regen **274**), `facts.md` (§7 Photos row + colourway sentence + paragraph, §8 frame count **3→5** with the "no baby-blue frame" sentence **updated not deleted**, **new §8.1a** permissions note + the **#5 guardian-consent MERGE GATE** + the minor-beside-a-drink flag, changelog row), `Decisions.md` (`D-Y.08-1…9`), `current-state.md` (line 1 status — **`NEXT:` target byte-unchanged**, `D-Y.08-1`; placeholder **#8 NARROWED not cleared**, #2 note; owed **#71–#73**), this file. **Product 03 entered the Home showcase with ZERO code change** — `showcase.ts` selects on `product-images.ts` (`D-Y.08-6`). **No `src/config/products.ts` or `drops.ts`, `supabase/`, `create_order`, `expire_reservations`, cart, checkout, `src/lib/drop/`, `PhotoSlot.tsx`, `ProductCard.tsx`, `showcase.ts`, `HomeExperience.tsx`, `globals.css`, `brand.md`, `next.config.ts`, or npm dependency touched (diff-proven).** `npm test` **186/186**. **PR [#43](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/43) MERGED to `main` (merge `e82e26d`, 2026-09-29, operator-authorised `D-0-3` / `D-Y.08-12`, no review on the PR record); the `D-Y.08-7` gate was CLOSED FIRST by guardian consent (`D-Y.08-10`, `facts.md` §8.1a row 5b, owed #71 closed); production deploy verified on `https://www.trajanovv.com`, six URLs 200, zero rendered photo placeholders on Product 03. New owed **#74** (minor-beside-a-drink backdrop call) stays OPEN.** `D-Y.08-*`. | Claude Code |
 | 2026-07-14 | — | Template seeded at kickoff. Nothing built. | Claude Chat |
 | 2026-07-14 | 1.01 | Replaced the intended tree with the real on-disk tree. Scaffolded Next.js/TS/Tailwind/shadcn/next-intl. Added `src/i18n/` + `src/proxy.ts` (not in the kickoff sketch). Route folders deferred to 2.01. | Claude Code |
