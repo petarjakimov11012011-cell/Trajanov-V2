@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 268 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 269 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -63,7 +63,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Checkout.summary` | Преглед на нарачката | Order summary | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.title` | Нарачка | Checkout | `src/app/[locale]/checkout/page.tsx` |
 | `Checkout.verifying` | се проверува | verifying | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
-| `Common.currency` | ден | MKD | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/home/HomeFaq.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
+| `Common.currency` | ден | MKD | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/home/HomeFaq.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/AmountDue.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Common.languageEn` | EN | EN | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.languageMk` | МК | МК | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.lastUpdated` | Последно ажурирано | Last updated | `src/app/[locale]/privacy/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/app/[locale]/terms/page.tsx` |
@@ -213,6 +213,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Privacy.whoHeading` | Кој ги гледа | Who sees it | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.whyBody` | За да ти ја доставиме маицата и да те побараме телефонски за да ја потврдиме нарачката. Тоа е единствената употреба. | To deliver the shirt and to call you to confirm the order. That is the only use. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.whyHeading` | Зошто | Why | `src/app/[locale]/privacy/page.tsx` |
+| `Product.amountDue` | Плаќате {amount} во готово при достава. | You pay {amount} in cash on delivery. | `src/components/product/AmountDue.tsx` |
 | `Product.back` | Назад кон каталогот | Back to catalog | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Product.chooseSize` | Избери величина | Choose a size | `src/components/product/AddToCartPanel.tsx` |
 | `Product.composition` | Состав и нега | Composition & care | `src/app/[locale]/catalog/[slug]/page.tsx` |
@@ -273,7 +274,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Terms.orderingHeading` | Како тече нарачката | How ordering works | `src/app/[locale]/terms/page.tsx` |
 | `Terms.paymentBody` | Плаќаш готовина при преземање, кога пратката ќе пристигне. Нема картички, нема банкарски трансфер, нема плаќање однапред. | You pay cash on delivery, when the parcel arrives. No cards, no bank transfer, no paying in advance. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.paymentHeading` | Плаќање | Payment | `src/app/[locale]/terms/page.tsx` |
-| `Terms.pricesBody` | Цените се во денари (MKD) и стојат на страницата на производот. Тоа е износот што му го плаќаш на курирот. На англиската верзија прикажуваме и приближна цена во долари, само за информација. Секогаш плаќаш во денари. | Prices are in Macedonian denars (MKD) and shown on the product page. That is the amount you pay the courier. On the English site we also show an approximate price in US dollars, for reference only. You always pay in denars. | `src/app/[locale]/terms/page.tsx` |
+| `Terms.pricesBody` | Цените се во денари (MKD) и стојат на страницата на производот. Тоа е износот што му го плаќаш на курирот. На англиската верзија прикажуваме и приближна цена во долари, само за информација. Секогаш плаќаш во денари. | Prices are set in Macedonian denars (MKD). That is what you pay the courier. The English site shows prices in US dollars as an approximate guide, and each product page shows the exact amount in denars. You always pay in denars. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.pricesHeading` | Цени | Prices | `src/app/[locale]/terms/page.tsx` |
 | `Terms.sellerBody` | Trajanov го води Владимир Трајанов, од Струмица, Северна Македонија. Нема регистрирана фирма и нема продавница со адреса. Еден човек стои зад брендот. | Trajanov is run by Vladimir Trajanov, in Strumica, North Macedonia. There is no registered company and no shop with an address. One person stands behind the brand. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.sellerHeading` | Од кого купуваш | Who you buy from | `src/app/[locale]/terms/page.tsx` |

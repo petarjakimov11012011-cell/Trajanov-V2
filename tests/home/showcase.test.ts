@@ -29,7 +29,7 @@ function product(overrides: Partial<ProductView> & { slug: string; index: number
 const PRODUCTS: ProductView[] = [
   product({ slug: "test-mustard-ochre", index: 1, priceMkd: 1199, stock: "in-stock", remaining: 5 }),
   product({ slug: "test-off-white", index: 2, priceMkd: 1199, stock: "low", remaining: 2 }),
-  product({ slug: "test-baby-blue", index: 3, priceMkd: 1999 }),
+  product({ slug: "test-baby-blue", index: 3, priceMkd: 1199 }),
 ];
 
 function view(state: DropState, products: ProductView[] = PRODUCTS): DropView {
