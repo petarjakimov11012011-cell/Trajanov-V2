@@ -9,7 +9,7 @@ in `src/_project-state/current-state.md`. The register must be empty before cuto
 No exceptions. No inventing. No "it's probably fine." This file is the only legal source for
 factual claims on the site.
 
-Last updated: 2026-08-27 · Maintained by: Lazar (orchestrator turn) — executors propose additions
+Last updated: 2026-09-29 · Maintained by: Lazar (orchestrator turn) — executors propose additions
 via completion reports, they do not silently add.
 
 ---
@@ -164,19 +164,35 @@ survive being pasted into an Instagram story or bio link — see the OG requirem
 | Colourways seen so far | Mustard/ochre, off-white | VERIFIED (photos, 2026-07-14) |
 | ~~Price ceiling~~ | ~~**~$65 / approx. 3,700 MKD — INDICATIVE ONLY, not a real price**~~ | **SUPERSEDED** — a real price now exists (below); the indicative ceiling is retired |
 | Actual price — this drop | **1199 MKD** (the shirts in the current drop) | **VERIFIED** — owner via Lazar, 2026-07-18 |
-| Currency | **MKD (денари)** — the site renders MKD only, never USD | **VERIFIED** — owner via Lazar, 2026-07-18 |
+| ~~Currency~~ | ~~**MKD (денари)** — the site renders MKD only, never USD~~ | **AMENDED 2026-09-29** (`D-Y.09-4`) — this wording was **VERIFIED, owner via Lazar, 2026-07-18**; MKD is still the price, but the "never USD" half no longer holds — see the next row |
+| Currency | **MKD (денари) is the price and the amount paid.** The **EN** locale also shows an approximate USD reference at a fixed rate (the *USD reference rate* row below); **MK shows MKD only** | MKD: **VERIFIED** — owner via Lazar, 2026-07-18. EN USD reference: **owner decision via Lazar, 2026-09-29, `D-Y.09-4`** |
+| USD reference rate | **1 USD = 54.3 MKD** (1,000 MKD = 18.43 USD), mid-market, **2026-09-29**. Renders only as a rounded `≈ $N` beside an MKD figure on the EN locale. Lives in `src/config/currency.ts`, **updated by hand** | **Reference rate as supplied** in the Y.09 brief (Lazar / orchestrator, 2026-09-29) — **not independently re-checked by Code**. **Display only** — never used to compute anything charged. **Goes stale:** re-check before the first real drop and at least every three months (owed register) |
 | Shipping | **North Macedonia only** | VERIFIED (owner, intake) |
 | Delivery time | **3–5 business days** | **VERIFIED** — Owner, 2026-07-21 |
-| Courier + delivery cost | — | **UNVERIFIED — OWED** (Vladimir) |
+| Delivery cost | **200 MKD** — the customer pays it, in cash, to the courier. Renders as MK `200 ден` / EN `200 MKD (≈ $4)` from the one constant `DELIVERY_COST_MKD` (`src/config/shipping.ts`) | **VERIFIED** — owner via Lazar, 2026-09-29 (`D-Y.09-2`) |
+| Courier name | — **not supplied** | **Not rendered anywhere** (`D-Y.09-2`). Do not name a courier until the owner does |
+| Returns / exchange window | — **unknown** | **The site makes no statement about a returns window — owner decision via Lazar, 2026-09-29 (`D-Y.09-3`).** The window itself **remains UNKNOWN**; this row records a removal, not a fact. No statutory withdrawal period is cited either (2.03 Decision 5) |
 | Payment | **Cash on delivery only** | VERIFIED (owner, intake) |
 | Sizes available | **S, M, L, XL** — except the **off-white** shirt, which is **XL only** | **VERIFIED** — owner via Lazar, 2026-07-18 |
 | Fabric / composition / care | **100% cotton. Wash at 30 °C.** — and nothing more. Renders as MK `100% памук. Перење на 30 °C.` / EN `100% cotton. Wash at 30 °C.` (the space before `°C` is U+00A0). **Covers all three colourways** — mustard/ochre, off-white and baby blue — on the one statement | **VERIFIED** — **Owner (Vladimir, via Petar), 2026-08-27.** **This is the owner's statement, NOT a label read** — no label has been photographed or read by anyone on this project |
 | Products per drop | 3–5 | VERIFIED (owner, intake) |
 
 **The real price for this drop is 1199 MKD (VERIFIED 2026-07-18).** The old "up to $65 / ~3,700
-MKD" was a ballpark Lazar gave to describe the range — it was never a price and is now retired. The
-site renders MKD only; **no USD figure ever renders.** Price is per drop: each future drop still
-needs its own real MKD price from Vladimir before its page ships.
+MKD" was a ballpark Lazar gave to describe the range — it was never a price and is now retired.
+~~The site renders MKD only; **no USD figure ever renders.**~~ *(2026-07-18 — amended 2026-09-29,
+`D-Y.09-4`:)* **MKD is the price and the amount paid, in both locales.** The **English** site also
+shows an approximate US-dollar figure beside each denar price and in the delivery cost (`1,199 MKD ≈ $22`,
+`200 MKD (≈ $4)`), at the fixed reference rate in the table — a guide, never a quote, never the amount
+charged. The **Macedonian** site shows no dollar figure anywhere. Structured data, order emails and the
+database stay MKD-only (`D-Y.09-5`). Price is per drop: each future drop still needs its own real MKD
+price from Vladimir before its page ships.
+
+**Delivery and returns (2026-09-29).** Delivery costs **200 MKD** (`D-Y.09-2`); the courier's name was not
+supplied and is not rendered. The Shipping page's returns/exchange window and "What we can't do yet"
+sections were **removed by owner decision** (`D-Y.09-3`) — the site now says nothing about returns, which
+does **not** mean a returns window is known, and does not change the rights the law gives a
+distance-selling customer. Do not write a window, a "no returns" policy, or a statutory period without a
+new VERIFIED row.
 
 **Fabric and care are two facts now, and only two.** Vladimir has confirmed the composition
 (**100% cotton**) and the wash temperature (**30 °C**) for all three colourways, 2026-08-27 — that much
@@ -428,3 +444,4 @@ site header only. It does **not** go in the Organization or WebSite JSON-LD, `sa
 | 2026-09-29 | **§ 7 + § 8 + § 8.1 — Product 03's first two photographs recorded (Phase Y.08 Code, `D-Y.08-2/4/7`).** § 7 `Photos` row now records **two interim lifestyle frames on hand** (`baby-blue-01`, `baby-blue-02`, via Lazar 2026-09-29) with the **neutral front/back/print-detail set still OWED**; the **colourway row is UNCHANGED at "VERIFIED (owner-stated)"** and gains one sentence recording that under the venue's warm tungsten light the shirt reads **pale grey** (sampled RGB ~(158,152,147) / ~(168,157,145)), so the photographs **cannot** upgrade it to "VERIFIED (photos)". § 8 asset table frame count **3 → 5**; the **"no baby-blue frame" sentence is updated, not deleted**, and dated, because it is why register row #8 exists — **#8 is NARROWED, not cleared**. The **4:5 crop above the legs is recorded as Vladimir's own instruction** (`D-Y.08-4`). Two defects recorded and deliberately **not** fixed: colour shift, and 640 px width against 1333 px (**do not upscale**). New **§ 8.1a** records the new frames against permissions #1/#2/#3, and records **#5 guardian consent for the new frame of Vladimir as OWED — a MERGE GATE** (the 2026-07-26 #5 was consent for the July frames, not a standing licence). Also flags that permission **#4** was written for an **adult** holding a drink, whereas `baby-blue-01` shows a **minor** beside a drink — raised, not decided, by Code. No names, no message text, no screenshots (`D-0-1`). Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.08 brief) |
 | 2026-09-29 | **§ 8.1a — guardian consent for `baby-blue-01` recorded as GIVEN (Phase Y.08 close, `D-Y.08-10`).** A **separate** permission row **5b** records that Vladimir's parents confirmed **this specific frame** may be used commercially — date 2026-09-29, channel *his parents, confirmed by the orchestrator (Petar) in session*, the same channel by which #5 was recorded on 2026-07-26. Fact, date and channel only; **no names, no message text, no screenshots, no handles** (`D-0-1`); evidence held by Lazar and Petar outside the repo. This **closes the `D-Y.08-7` merge gate and owed #71**. It is consent for **this publication only** — it does **not** close Known Issue #4 and does **not** cover any future photograph of Vladimir. The separate **backdrop/editorial flag** (a minor in frame beside a drink, a step beyond what permission #4 was written to cover) was **not** answered by this consent and **stays open** as owed **#74**. Edit made by Code on the operator's explicit in-session confirmation and surfaced in the completion report — not a silent add. | Claude Code (Y.08 close) |
 | 2026-07-23 | **§ 11 Site build credit added (Phase 2.08 Code).** New section recording the site as built by **Vertex Consulting** (VERIFIED, operator/Lazar, 2026-07-23) and its URL `https://www.vertexconsulting.mk/en` (VERIFIED — click-test owed before ship). Scoped hard: a build credit in the site header only, **not** a partner/sponsor/stockist, and barred from JSON-LD/`sameAs`/OG/`llms.txt`/sitemap/footer/legal pages. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per 2.08 brief) |
+| 2026-09-29 | **§ 7 — delivery cost VERIFIED, USD reference added on EN, returns statement removed (Phase Y.09 Code, `D-Y.09-2/3/4/5`).** The **Courier + delivery cost** row (UNVERIFIED — OWED since 2.03) is **split**: **Delivery cost 200 MKD — VERIFIED, owner via Lazar, 2026-09-29**, and **Courier name — not supplied, not rendered anywhere**. The **Currency** row is **amended, not deleted**: the 2026-07-18 wording ("the site renders MKD only, never USD") stays visible **struck through with its date**, and a new Currency row records that **MKD is the price and the amount paid** while the **EN locale also shows an approximate USD reference** (owner decision via Lazar, `D-Y.09-4`); MK shows MKD only. **New row: USD reference rate — 1 USD = 54.3 MKD, mid-market, 2026-09-29, display only**, recorded as *supplied* in the brief and **not independently re-checked by Code**. **New row: Returns / exchange window** — the site makes **no statement** about one by owner decision (`D-Y.09-3`); the window itself **remains unknown**. The "no USD figure ever renders" sentence under the table is **struck through and dated**, with the amended text beside it, plus a short *Delivery and returns* paragraph. Header "Last updated" → 2026-09-29. Edit made by Code on explicit brief instruction and surfaced in the completion report — not a silent add. | Claude Code (per Y.09 brief) |

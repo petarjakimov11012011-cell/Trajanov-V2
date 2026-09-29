@@ -7,7 +7,7 @@
     "contact": "Contact",
     "terms": "Terms",
     "privacy": "Privacy",
-    "shipping": "Shipping & returns",
+    "shipping": "Shipping",
     "location": "Strumica, North Macedonia",
     "brand": "TRAJANOV",
     "menu": "Menu",
@@ -61,7 +61,7 @@
     "q4": "Where do you ship?",
     "a4": "Within North Macedonia only. No international shipping.",
     "q5": "How long does delivery take?",
-    "a5": "Delivery takes 3 to 5 business days. The courier and the delivery cost aren't confirmed yet and we're not going to guess them — you pay cash at the door.",
+    "a5": "Delivery takes 3 to 5 business days and costs {cost}. You pay cash at the door.",
     "q6": "What happens after I order?",
     "a6": "Your order holds the stock for 48 hours — it isn't sold on the spot. We call you to confirm it. If we can't reach you, the hold expires and the piece goes back on sale.",
     "q7": "What sizes are there?",
@@ -121,7 +121,7 @@
     "orderingBody1": "When you order, the stock is reserved for 48 hours — not sold on the spot. We call you to confirm. If we can't reach you, the reservation lapses and the piece goes back on sale.",
     "orderingBody2": "Drops are limited and the stock is real — when it's gone, it's gone.",
     "pricesHeading": "Prices",
-    "pricesBody": "Prices are in Macedonian denars (MKD) and shown on the product page. That is the amount you pay the courier. There is no conversion to any other currency.",
+    "pricesBody": "Prices are in Macedonian denars (MKD) and shown on the product page. That is the amount you pay the courier. On the English site we also show an approximate price in US dollars, for reference only. You always pay in denars.",
     "noHeading": "What we don't do",
     "noBody": "No accounts, no saved cards, no subscriptions, no discount codes."
   },
@@ -150,20 +150,16 @@
   },
   "ShippingReturns": {
     "eyebrow": "Legal",
-    "h1": "Shipping & returns",
-    "intro": "Where we ship, how you pay, and what to do if something's wrong.",
+    "h1": "Shipping",
+    "intro": "Where we ship, how you pay, what delivery costs, and who to call if something goes wrong.",
     "whereHeading": "Where we ship",
     "paymentHeading": "Payment on delivery",
     "paymentBody": "You pay the courier in cash when the parcel arrives.",
-    "deliveryHeading": "Courier, delivery time and cost",
+    "deliveryHeading": "Delivery time and cost",
     "deliveryTime": "Delivery time: 3–5 business days.",
-    "deliveryBody": "The courier and delivery cost aren't confirmed yet. We won't guess, because you pay cash at the door.",
+    "deliveryBody": "Delivery cost: {cost}.",
     "problemHeading": "If something is wrong with your order",
-    "problemBody": "Wrong size sent, damaged packaging, or the parcel never arrived — call the phone number and Vladimir will sort it out directly.",
-    "limitsHeading": "What we can't do yet",
-    "limitsBody": "There is no online returns portal and no prepaid return label. If you need to return something, it goes through the phone.",
-    "returnsHeading": "Returns and exchange window",
-    "returnsBody": "We don't have the exact window confirmed yet."
+    "problemBody": "Wrong size sent, damaged packaging, or the parcel never arrived — call the phone number and Vladimir will sort it out directly."
   },
   "Drop": {
     "days": "DAYS",
@@ -224,7 +220,7 @@
     "increase": "Increase quantity",
     "subtotal": "Subtotal",
     "shipping": "Shipping",
-    "shippingValue": "calculated on delivery",
+    "shippingValue": "{cost}",
     "total": "Total",
     "codNote": "Cash on delivery.",
     "checkout": "Checkout"
@@ -276,8 +272,6 @@
     "price": "[PLACEHOLDER: price MKD]",
     "sizesSample": "sizes — sample, pending Vladimir",
     "composition": "[PLACEHOLDER: composition & care — from the label]",
-    "courier": "[PLACEHOLDER: courier and delivery cost — Vladimir]",
-    "returnsWindow": "[PLACEHOLDER: returns and exchange window — Vladimir]",
     "notice": "Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase."
   },
   "Styleguide": {
@@ -314,7 +308,7 @@
     "termsDescription": "How ordering works: cash on delivery, shipping within North Macedonia only, 48-hour reservation.",
     "privacyTitle": "Privacy — Trajanov",
     "privacyDescription": "What we collect when you order or write to us, and why. No advertising cookies.",
-    "shippingTitle": "Shipping & returns — Trajanov",
+    "shippingTitle": "Shipping — Trajanov",
     "shippingDescription": "Shipping within North Macedonia only, cash on delivery. If something is wrong, call us.",
     "styleguideTitle": "Design system — Trajanov",
     "styleguideDescription": "Internal design-system reference."

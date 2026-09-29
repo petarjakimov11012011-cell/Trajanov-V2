@@ -1,8 +1,10 @@
-import {getTranslations} from 'next-intl/server';
+import {getLocale, getTranslations} from 'next-intl/server';
 import {Plus} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
 import {JsonLd} from '@/components/seo/JsonLd';
+import {DELIVERY_COST_MKD} from '@/config/shipping';
 import {FAQ_GROUPS} from '@/lib/faq';
+import {formatMkdWithApproxUsd} from '@/lib/format';
 import {faqJsonLd} from '@/lib/seo/faq-jsonld';
 
 // Home FAQ (Phase 2.11) — a SERVER component: no 'use client', no state, no effects, no handlers.
@@ -16,6 +18,13 @@ import {faqJsonLd} from '@/lib/seo/faq-jsonld';
 // identically in all three drop states and in preview — it takes no `view` prop.
 export async function HomeFaq() {
   const t = await getTranslations('Faq');
+  const tc = await getTranslations('Common');
+  const locale = await getLocale();
+  // The delivery cost (a5) is an ICU `{cost}` slot filled from the one constant (D-Y.09-2). Every answer
+  // goes through this ONE translator — the visible list and the JSON-LD both — so the structured answer
+  // can never carry a literal `{cost}` the page does not (D-2.11-5). Unused values are ignored by ICU.
+  const cost = formatMkdWithApproxUsd(DELIVERY_COST_MKD, tc('currency'), locale);
+  const faqText = (key: string) => t(key, {cost});
 
   return (
     <section
@@ -47,7 +56,7 @@ export async function HomeFaq() {
                     <Plus className="faq-icon" aria-hidden="true" />
                   </summary>
                   <div className="faq-answer">
-                    <p>{t(item.answerKey)}</p>
+                    <p>{faqText(item.answerKey)}</p>
                   </div>
                 </details>
               ))}
@@ -69,7 +78,7 @@ export async function HomeFaq() {
       </div>
 
       {/* FAQPage structured data, built from the same keys as the visible copy (D-2.11-5). */}
-      <JsonLd data={faqJsonLd((key) => t(key))} />
+      <JsonLd data={faqJsonLd(faqText)} />
     </section>
   );
 }

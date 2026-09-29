@@ -1858,7 +1858,7 @@ start at `D-2.01-6`.*
   VERIFIED) · `src/app/[locale]/catalog/[slug]/page.tsx` · `src/components/checkout/CheckoutForm.tsx`
 
 ### D-2.01-8 · 2026-07-19 · formatMkd takes an explicit locale argument
-- **Status:** Accepted
+- **Status:** Superseded by D-Y.09-4 — **in part only**: its "MKD always / no currency conversion exists anywhere" clause. The explicit-`locale`-argument decision itself still stands (`D-Y.09-6`).
 - **Decided by:** Claude Code (executor).
 - **Decision:** `formatMkd(amount, currency, locale)` gains a required `locale` param and groups the number
   for that locale (`mk` → `1.199`, `en` → `1,199`); the amount and currency are unchanged (MKD always).
@@ -5871,3 +5871,221 @@ start at `D-2.01-6`.*
   but **Code checking its own work is not a second reader**, and the pattern is now a habit rather than an
   exception. Cheap to fix if wrong: the imagery is a one-line map revert plus a redeploy.
 - **Links:** `D-0-3` · `D-Y.06-10` · `D-Y.07-7` · PR #43 · owed #72, #73, #74 (all open)
+
+---
+
+### D-Y.09-1 · 2026-09-29 · Y.09 runs out of order, ahead of the NEXT target; NEXT is unchanged
+- **Status:** Accepted
+- **Decided by:** **Lazar, 2026-09-29**, instruction relayed in the Y.09 brief; executed by Claude Code.
+- **Context:** Line 1 of `current-state.md` names the `/impeccable polish` pass + closing audit as NEXT
+  (`D-2.25-26`). Vladimir's side confirmed the delivery cost (200 MKD), Lazar decided to drop the returns
+  section and to show an approximate USD price on the English site — and the Shipping page was still
+  telling customers the cost was unknown, with two placeholder boxes.
+- **Decision:** Run Y.09 **before** the NEXT target. `/impeccable polish` is **not replaced or
+  reprioritised** — line 1's NEXT target stays exactly as it was; only its status text records that Y.09
+  shipped.
+- **Alternative rejected:** waiting for the polish pass to finish first. Rejected — a real delivery cost
+  and two cleared placeholder rows are customer-facing facts, and the polish pass would otherwise polish
+  a page (Shipping) that was about to lose a third of its sections.
+- **Downside accepted:** the polish pass inherits one more visual element it did not scope — the muted
+  `≈ $22` beside every EN price — and a Shipping page that changed shape after the design work was
+  planned. If the polish pass wants a different treatment for the dollar figure, it re-does this work.
+- **Links:** `D-2.25-26` · `current-state.md` line 1 · `D-Y.08-1` (the same pattern)
+
+### D-Y.09-2 · 2026-09-29 · Delivery cost 200 MKD, rendered from one constant; the courier is not named
+- **Status:** Accepted
+- **Decided by:** **Lazar, 2026-09-29** (the cost, owner via Lazar); the orchestrator (one constant, no
+  courier placeholder); executed by Claude Code.
+- **Context:** Placeholder register #6 (courier + delivery cost) had been open since 2.03. The owner has
+  now confirmed the cost — 200 MKD, paid by the customer — but not the courier's name.
+- **Decision:** `DELIVERY_COST_MKD = 200` in `src/config/shipping.ts` is the **only** place the number
+  lives. Every mention — `ShippingReturns.deliveryBody`, `Faq.a5` (and so the FAQPage JSON-LD),
+  `Cart.shippingValue` — carries an ICU `{cost}` slot filled through `formatMkdWithApproxUsd` (EN
+  `200 MKD (≈ $4)`, MK `200 ден`). A test fails if the literal `200` is ever typed into either catalog.
+  The courier `<Placeholder>` is removed and "Courier" leaves the section heading („Рок и цена на достава" /
+  "Delivery time and cost"). `Placeholder.courier` is deleted from both catalogs.
+- **Alternative rejected:** keeping a courier-name placeholder until Vladimir names the company.
+  Rejected — the customer pays cash at the door, and what they need is the amount and the time, both now
+  VERIFIED; a grey `[PLACEHOLDER]` box beside a real price reads as unfinished, not honest.
+- **Downside accepted:** **a customer does not know which company will knock on the door.** If the
+  courier's uniform is unfamiliar, a cautious customer may not open it. Filling it later is a copy change
+  plus a new `facts.md` row — no placeholder is left to remind anyone, so it lives only in `facts.md` §7
+  ("Courier name: not supplied, not rendered anywhere").
+- **Links:** `facts.md` §7 · placeholder register #6 (CLEARED) · `D-2.03` (the page) · `D-2.11-5` (one key,
+  two outputs) · `tests/i18n/delivery-cost-copy.test.ts`
+
+### D-Y.09-3 · 2026-09-29 · Returns window and "What we can't do yet" removed; page retitled "Shipping"; route slugs kept
+- **Status:** Accepted
+- **Decided by:** **Lazar, 2026-09-29**; executed by Claude Code.
+- **Context:** Placeholder register #7 (the returns/exchange window) had been open since 2.03, owner
+  Vladimir, with no window ever supplied. The page's "What we can't do yet" section existed to explain the
+  returns gap.
+- **Decision:** Delete both sections from the page and their keys (`limitsHeading/Body`,
+  `returnsHeading/Body`, `Placeholder.returnsWindow`) from both catalogs. The page, the nav/footer label
+  and the meta title become "Shipping" / „Испорака"; the intro and `llms.txt` stop mentioning returns.
+  **Route slugs are deliberately unchanged** — `/shipping-returns` and `/isporaka-i-vrakjanje` (and the
+  `shipping-returns/` folder) stay, so existing links, the sitemap and search results keep resolving.
+  The site now makes **no statement** about a returns window; it still cites **no** statutory withdrawal
+  period (2.03 Decision 5).
+- **Alternative rejected:** keeping the placeholder until Vladimir supplies a window. Rejected by Lazar —
+  a year-old `[PLACEHOLDER]` on a legal page is worse than silence, and no window was coming.
+- **Downside accepted:** **the site now says nothing about returns.** A customer who wants to send a shirt
+  back has only the phone number under "If something is wrong with your order". **The consumer rights the
+  law gives a distance-selling customer apply whatever the page says** — removing the section does not
+  remove the obligation, it only removes the site's statement of it. And **the URL still says "returns"
+  while the page does not.** Register #7 is recorded as CLOSED — removed by owner decision — **not** as
+  filled; the window itself remains unknown.
+- **Links:** `facts.md` §7 · placeholder register #7 (CLOSED) · `D-2.03` · `src/i18n/routing.ts` (untouched)
+
+### D-Y.09-4 · 2026-09-29 · Approximate USD on the EN locale only; MKD stays the price
+- **Status:** Accepted — **Supersedes `D-2.01-8` in part** (its "MKD always / no currency conversion" clause)
+  and the 2026-07-18 `facts.md` §7 Currency wording ("the site renders MKD only, never USD").
+- **Decided by:** **Lazar, 2026-09-29** (show USD on the English site); settled with the orchestrator
+  (MKD primary, USD as a reference beside it, EN only); executed by Claude Code.
+- **Context:** English-language visitors see denar prices with no sense of scale. But this is cash on
+  delivery: the customer hands the courier denars, so the amount on the page must be the amount paid.
+- **Decision:** On the **EN locale only**, every rendered MKD price is followed by `≈ $<whole dollars>`,
+  computed as `amountMkd / MKD_PER_USD` rounded half-up, where `MKD_PER_USD = 54.3` (a mid-market reference
+  rate, 1,000 MKD = 18.43 USD on 2026-09-29) in `src/config/currency.ts`, updated **by hand**. The dollar
+  figure is muted, at the `text-small` token and regular weight — never larger or heavier than the price.
+  MK shows no dollar figure anywhere. `Terms.pricesBody` says so in both locales ("for reference only. You
+  always pay in denars.").
+- **Alternatives rejected:** (a) **USD only on EN** — rejected: it misstates what a cash-on-delivery
+  customer pays; the courier takes denars. (b) **A live exchange-rate API** — rejected: a runtime
+  dependency and a failure mode on drop day, for a figure that only needs to be roughly right.
+- **Downside accepted:** **the rate goes stale and nobody is alerted.** Nothing refreshes it; the owed
+  register carries a re-check before the first real drop and every three months after. The dollar figure
+  is a guide, not a quote — a customer who budgets to the dollar may find the denar amount worth a little
+  more or less on the day.
+- **Links:** `D-2.01-8` (partly superseded) · `facts.md` §7 (Currency + USD reference rate rows) ·
+  `src/lib/format.ts` · `src/components/system/WithUsdApprox.tsx` · `tests/format/usd-approx.test.ts`
+
+### D-Y.09-5 · 2026-09-29 · Structured data, order emails and the database stay MKD-only
+- **Status:** Accepted
+- **Decided by:** the orchestrator (Y.09 brief); executed by Claude Code.
+- **Context:** `D-Y.09-4` adds a dollar figure to rendered EN prices. Structured data, order emails and the
+  database state what is actually charged.
+- **Decision:** No USD figure reaches `src/lib/seo/product-jsonld.ts` (or any structured-data price), the
+  order emails, `create_order`, `expire_reservations`, `supabase/` or `src/config/products.ts`. The
+  delivery cost is display copy only — nothing adds it to an order, and the cart still computes no total.
+- **Alternative rejected:** mirroring the dollar reference into structured data or the emails for
+  "consistency". Rejected — a machine-readable price must be the currency charged, and an email that says
+  "$22" to a customer about to pay 1,199 ден at the door invites a dispute.
+- **Downside accepted:** EN visitors see a dollar figure on the page that a search result or a shared
+  card will not show; the two surfaces deliberately differ.
+- **Links:** `D-Y.09-4` · `D-2.04` (Product JSON-LD) · Z.01 (order email)
+
+### D-Y.09-6 · 2026-09-29 · `D-2.01-8` is marked superseded IN PART, not wholesale
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor), on the brief's instruction to mark the 2.01 currency decision.
+- **Context:** The brief says to set "the 2.01 currency decision" to `Superseded by D-Y.09-4`. The only
+  2.01 entry carrying the no-conversion rule is `D-2.01-8`, whose actual decision is that `formatMkd` takes
+  an explicit locale argument — which Y.09 keeps and builds on (`formatUsdApprox` takes one too).
+- **Decision:** Change only `D-2.01-8`'s Status line, to `Superseded by D-Y.09-4 — in part only`, naming
+  the clause superseded and stating that the locale-argument decision stands. Its body is untouched.
+- **Alternative rejected:** a plain `Superseded by D-Y.09-4`. Rejected — a reader would take the
+  explicit-locale-argument design as retired, and it is live code.
+- **Downside accepted:** a Status line that is longer and more qualified than the template expects, and a
+  reader has to open `D-Y.09-4` to see exactly which sentence is no longer true.
+- **Links:** `D-2.01-8` · `D-Y.09-4`
+
+### D-Y.09-7 · 2026-09-29 · `DELIVERY_COST_MKD` lives in a new `src/config/shipping.ts`
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor) — the brief said "pick the file and state it in the report".
+- **Context:** The constant belongs "next to the other commerce config" in `src/config/`. The candidates
+  were `products.ts` (the per-drop catalogue), `currency.ts` (new this phase), `index.ts` (the sync/test
+  surface, not imported by the app) or a new file.
+- **Decision:** A new single-purpose `src/config/shipping.ts`, mirroring `currency.ts`: one constant, a
+  comment citing `facts.md` §7, and a note that it is display-only.
+- **Alternatives rejected:** `products.ts` — it is keyed by drop and read by `npm run sync:drop`; the
+  delivery cost is not a product fact and should not look like something the sync writes. `currency.ts` —
+  mixes a verified business fact with a hand-maintained display rate that has its own staleness rule.
+  `index.ts` — explicitly not imported by the Next.js app.
+- **Downside accepted:** two more tiny files in `src/config/`, and a client bundle (`CartView`) now
+  imports from `src/config/` — harmless (plain constants, no server-only code), but new.
+- **Links:** `D-Y.09-2` · `src/config/shipping.ts`
+
+### D-Y.09-8 · 2026-09-29 · One shared `WithUsdApprox` wrapper; on MK it returns the price untouched
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** Three call sites render a price (`ProductCard`, `HomeShowcase`, the product page), each with
+  its own MKD styling that must not change. The brief requires the dollar figure to be identical in weight
+  and colour everywhere, and MK to be unchanged.
+- **Decision:** `src/components/system/WithUsdApprox.tsx` takes the already-styled price element as
+  children and, on EN, wraps it with the muted `text-small` dollar figure in a `flex flex-wrap
+  items-baseline gap-x-2` span (`whitespace-nowrap` keeps `≈ $22` whole). When `formatUsdApprox` returns
+  null (MK) it returns the children **with no wrapper**, so the MK markup is byte-identical to `main` —
+  verified in the rendered HTML of `/katalog`, `/katalog/test-mustard-ochre` and `/`.
+- **Alternatives rejected:** (a) inline markup at each of the three sites — the dollar styling could
+  drift between them, which is exactly what the "never larger or heavier" rule forbids. (b) an always-on
+  wrapper — visually identical on MK, but changes the MK DOM for no reason and makes "MK is unchanged"
+  something you have to reason about instead of diff.
+- **Downside accepted:** the EN and MK DOMs now differ in shape (EN has one extra span around each price),
+  so a future style change to a price element has to be checked in both locales.
+- **Links:** `D-Y.09-4` · the three call sites
+
+### D-Y.09-9 · 2026-09-29 · Prose cost is one helper string with ordinary spaces
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** The `{cost}` slot needs one string: EN `200 MKD (≈ $4)`, MK `200 ден`. In running prose
+  (the FAQ answer) a line could in principle break inside `(≈ $4)`.
+- **Decision:** `formatMkdWithApproxUsd(amount, currency, locale)` in `src/lib/format.ts` — `formatMkd`,
+  plus ` (≈ $N)` on EN — with **ordinary spaces**, matching the brief's literal strings byte for byte.
+- **Alternative rejected:** non-breaking spaces inside the cost phrase (the `D-Y.07` `30 °C` pattern).
+  Rejected for now — it would make the rendered text differ in bytes from what the brief, the DoD and a
+  reviewer's grep expect (`200 MKD (≈ $4)`), and at 390 px the FAQ line was measured and the phrase stays
+  on one line.
+- **Downside accepted:** at some other width the FAQ answer or the cart line could wrap as `(≈` / `$4)`.
+  Cosmetic, not factual; the fix is a two-character change in one function.
+- **Links:** `D-Y.09-2` · `src/lib/format.ts`
+
+### D-Y.09-10 · 2026-09-29 · The "no Placeholder on the Shipping page" test is a SOURCE guard, not a render
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** The brief asks for a test that "the Shipping page renders no `Placeholder` element". The page
+  is an async server component that needs next-intl's request context; the test runner is plain Node.
+- **Decision:** `tests/pages/shipping-page.test.ts` reads the page source and asserts: no `<Placeholder`
+  element and no import of it, exactly four `LegalSection`s in the right order, no reference to the removed
+  keys, and `LAST_UPDATED = '2026-09-29'`; it also asserts the removed keys are gone from both catalogs.
+  The **rendered** HTML was checked by hand (Task 9): zero `data-placeholder` elements on both locales.
+- **Alternative rejected:** rendering the server component under Vitest with `next-intl/server` mocked.
+  Rejected — the test would mostly exercise the mocks, and it adds a jsdom/React-server setup this suite
+  has deliberately avoided.
+- **Downside accepted:** a Placeholder that reached the page indirectly (inside a child component) would
+  pass this test. Today the page's only children are `LegalPage`, `LegalSection` and `ShippingNotice`, none
+  of which render one.
+- **Links:** `D-Y.09-2` · `D-Y.09-3`
+
+### D-Y.09-11 · 2026-09-29 · Local seed drops parked in the past to render the real catalog, then reset
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** Locally, `supabase/seed.sql` creates an **open** fixture drop (`test-open-drop`, 999 / 1,500
+  MKD) for the concurrency tests, and the catalog shows the open drop first — so `/catalog` and the Home
+  showcase rendered fixture prices, not the three real shirts production shows. The DoD requires `≈ $22`
+  beside 1,199 MKD and `≈ $37` beside 1,999 MKD on those pages.
+- **Decision:** In the **local** database only (`127.0.0.1`, guarded in the script), move the two seed
+  drops' windows to January 2026 so `test-drop` becomes the most recent ended drop — exactly production's
+  state — render and check, then `supabase db reset` + `npm run sync:drop` to restore the seed before the
+  final `npm test`. Never `--linked` (`D-1.07-15`); hosted was not touched.
+- **Alternative rejected:** checking the catalog against the fixture prices (999 → `≈ $18`, 1,500 →
+  `≈ $28`). Rejected — it proves the formatter, not the DoD figures on the pages customers see.
+- **Downside accepted:** a database action the brief did not authorise, like `D-Y.08-9`'s reset. It was
+  local, reversible, and reversed; the final test run (225/225) ran against a fresh seed.
+- **Links:** `D-Y.08-9` · `D-1.07-15` · `supabase/seed.sql` (untouched)
+
+### D-Y.09-12 · 2026-09-29 · Two stale public claims found in passing are reported, NOT fixed
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** While rendering, two pre-existing claims were found that contradict the record: (1)
+  `src/app/llms.txt/route.ts` line 58 still says "a maximum of 2 units per order" — the cap was removed by
+  `D-Y.06-3` and the FAQ says "There's no per-order limit"; (2) every product page shows
+  `Placeholder.sizesSample` ("sizes — sample, pending Vladimir") unconditionally, though sizes are VERIFIED
+  in `facts.md` §7 since 2026-07-18.
+- **Decision:** Leave both untouched in this PR and report them in the completion report for the
+  orchestrator to brief. This phase touches `llms.txt` only for the Shipping label/note (brief Task 6).
+- **Alternative rejected:** fixing them here — each is a one-line change. Rejected — neither is in the
+  brief, the orchestrator ratifies nothing silently, and folding unrelated fact changes into a copy phase
+  is how a reviewer misses one.
+- **Downside accepted:** **both false statements stay live** until a follow-up ships — one on a
+  machine-readable file AI assistants read, one on every product page.
+- **Links:** `D-Y.06-3` · `facts.md` §7 · `src/components/product/AddToCartPanel.tsx`

@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 274 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 268 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -37,7 +37,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Cart.qty` | Количина | Qty | _(not found in source)_ |
 | `Cart.remove` | Отстрани | Remove | `src/components/cart/CartView.tsx` |
 | `Cart.shipping` | Испорака | Shipping | `src/components/cart/CartView.tsx` |
-| `Cart.shippingValue` | се пресметува при подигање | calculated on delivery | `src/components/cart/CartView.tsx` |
+| `Cart.shippingValue` | {cost} | {cost} | `src/components/cart/CartView.tsx` |
 | `Cart.size` | Величина | Size | `src/components/cart/CartView.tsx` |
 | `Cart.subtotal` | Меѓузбир | Subtotal | `src/components/cart/CartView.tsx` |
 | `Cart.title` | Кошничка | Cart | `src/app/[locale]/cart/page.tsx` |
@@ -63,7 +63,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Checkout.summary` | Преглед на нарачката | Order summary | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.title` | Нарачка | Checkout | `src/app/[locale]/checkout/page.tsx` |
 | `Checkout.verifying` | се проверува | verifying | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
-| `Common.currency` | ден | MKD | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
+| `Common.currency` | ден | MKD | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/home/HomeFaq.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Common.languageEn` | EN | EN | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.languageMk` | МК | МК | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.lastUpdated` | Последно ажурирано | Last updated | `src/app/[locale]/privacy/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/app/[locale]/terms/page.tsx` |
@@ -108,7 +108,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Faq.a2` | Готовина при преземање, кога пратката ќе пристигне. Нема картички, нема банкарски трансфер, нема плаќање однапред. | Cash on delivery, when the package arrives. No cards, no bank transfer, no paying up front. | _(not found in source)_ |
 | `Faq.a3` | Колку што има на залиха. Нема ограничување по нарачка — залихата е вистинска и ограничена, па кога ќе се распродаде, готово е. | As many as are in stock. There's no per-order limit — the stock is real and limited, so once it's sold out, it's gone. | _(not found in source)_ |
 | `Faq.a4` | Само во Северна Македонија. Нема испорака во странство. | Within North Macedonia only. No international shipping. | _(not found in source)_ |
-| `Faq.a5` | Рок на достава: 3–5 работни дена. Курирот и цената на испораката сè уште не се потврдени и нема да ги погодуваме — плаќаш готовина на врата. | Delivery takes 3 to 5 business days. The courier and the delivery cost aren't confirmed yet and we're not going to guess them — you pay cash at the door. | _(not found in source)_ |
+| `Faq.a5` | Рок на достава: 3–5 работни дена. Цената на доставата е {cost}. Плаќаш готовина на врата. | Delivery takes 3 to 5 business days and costs {cost}. You pay cash at the door. | _(not found in source)_ |
 | `Faq.a6` | Нарачката ја резервира залихата 48 часа — не се продава веднаш. Те бараме телефонски за да ја потврдиме. Ако не те фатиме, резервацијата истекува и парчето се враќа во продажба. | Your order holds the stock for 48 hours — it isn't sold on the spot. We call you to confirm it. If we can't reach you, the hold expires and the piece goes back on sale. | _(not found in source)_ |
 | `Faq.a7` | Величините стојат на страницата на секое парче, заедно со тоа што е сè уште достапно. Маиците се оверсајз унисекс крој. Точни мерки во сантиметри сè уште не се објавени. | Sizes are listed on each piece's own page, along with what's still available. The t-shirts are an oversized unisex cut. Exact measurements in centimetres aren't published yet. | _(not found in source)_ |
 | `Faq.a8` | Секое спуштање е од 3 до 5 парчиња, во ограничен број. Кога ќе пишува „Распродадено“, навистина е распродадено — залихата се води на серверот, не на екранот. | Each drop is 3 to 5 pieces, in limited numbers. When it says "Sold out", it really is sold out — the stock is counted on the server, not on the screen. | _(not found in source)_ |
@@ -155,7 +155,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Meta.privacyTitle` | Приватност — Trajanov | Privacy — Trajanov | `src/app/[locale]/privacy/page.tsx` |
 | `Meta.productDescription` | Оверсајз унисекс маица. Испорака само во Северна Македонија, готовина при преземање. | Oversized unisex t-shirt. Shipping within North Macedonia only, cash on delivery. | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Meta.shippingDescription` | Испорака само во Северна Македонија, плаќање готовина при преземање. Ако нешто не е во ред, јави се. | Shipping within North Macedonia only, cash on delivery. If something is wrong, call us. | `src/app/[locale]/shipping-returns/page.tsx` |
-| `Meta.shippingTitle` | Испорака и враќање — Trajanov | Shipping & returns — Trajanov | `src/app/[locale]/shipping-returns/page.tsx` |
+| `Meta.shippingTitle` | Испорака — Trajanov | Shipping — Trajanov | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Meta.siteDescription` | Оверсајз унисекс маици од Струмица, во ограничени спуштања. | Oversized unisex t-shirts from Strumica, in limited drops. | `src/app/[locale]/layout.tsx` |
 | `Meta.siteTitle` | Trajanov — спуштања на облека | Trajanov — clothing drops | `src/app/[locale]/layout.tsx` |
 | `Meta.styleguideDescription` | Внатрешен преглед на дизајн-системот. | Internal design-system reference. | `src/app/[locale]/styleguide/page.tsx` |
@@ -172,7 +172,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Nav.location` | Струмица, Северна Македонија | Strumica, North Macedonia | _(not found in source)_ |
 | `Nav.menu` | Мени | Menu | `src/components/layout/SiteHeader.tsx` |
 | `Nav.privacy` | Приватност | Privacy | `src/components/layout/SiteFooter.tsx` |
-| `Nav.shipping` | Испорака и враќање | Shipping & returns | `src/components/layout/SiteFooter.tsx` |
+| `Nav.shipping` | Испорака | Shipping | `src/components/layout/SiteFooter.tsx` |
 | `Nav.terms` | Услови | Terms | `src/components/layout/SiteFooter.tsx` |
 | `Order.duplicatePhone` | Веќе имаш активна нарачка со овој број за ова спуштање. | You already have a live order with this number for this drop. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.emptyCart` | Кошничката е празна. | Your cart is empty. | `src/components/checkout/CheckoutForm.tsx` |
@@ -187,12 +187,10 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Order.success` | Нарачка {orderNumber} е примена и резервирана 48 часа. Плаќаш со готовина при преземање — ќе те побараме телефонски за да ја потврдиме. | Order {orderNumber} received and reserved for 48 hours. You pay cash on delivery — we'll call you to confirm. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Order.turnstileFailed` | Проверката не помина. Пробај повторно. | That check didn't pass. Try again. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Placeholder.composition` | [PLACEHOLDER: состав и нега — од етикетата] | [PLACEHOLDER: composition & care — from the label] | `src/app/[locale]/catalog/[slug]/page.tsx` |
-| `Placeholder.courier` | [PLACEHOLDER: курир и цена на испорака — Владимир] | [PLACEHOLDER: courier and delivery cost — Vladimir] | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Placeholder.notice` | Преглед на дизајн-системот. Податоците за производите (назив, цена, величини, состав, фотографии) се примероци — вистинските ги внесува Владимир во подоцнежна фаза. | Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase. | `src/components/system/PreviewNotice.tsx` |
 | `Placeholder.price` | [PLACEHOLDER: цена MKD] | [PLACEHOLDER: price MKD] | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/checkout/CheckoutForm.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Placeholder.productName` | Производ | Product | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Placeholder.productPhoto` | [PLACEHOLDER: фотографија — Владимир] | [PLACEHOLDER: product photo — Vladimir] | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/product/ProductCard.tsx` |
-| `Placeholder.returnsWindow` | [PLACEHOLDER: рок за враќање и замена — Владимир] | [PLACEHOLDER: returns and exchange window — Vladimir] | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Placeholder.sizesSample` | величини — примерок, се чекаат од Владимир | sizes — sample, pending Vladimir | `src/components/product/AddToCartPanel.tsx` |
 | `Privacy.abuseBody` | Бидејќи нарачувањето е бесплатно, чуваме еднонасочно хеширана верзија на твојата IP-адреса за да ограничиме колку нарачки доаѓаат од една врска. Суровата IP-адреса никогаш не се чува. | Because ordering is free, we store a one-way hashed form of your IP address to limit how many orders come from one connection. The raw IP is never stored. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.abuseHeading` | Заштита од злоупотреба | Anti-abuse | `src/app/[locale]/privacy/page.tsx` |
@@ -228,20 +226,16 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Product.shippingBody` | Само во Северна Македонија. Плаќање со готовина при преземање. | North Macedonia only. Cash on delivery. | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Product.size` | Величина | Size | `src/components/product/AddToCartPanel.tsx` |
 | `Product.sizeGuide` | Водич за величини | Size guide | _(not found in source)_ |
-| `ShippingReturns.deliveryBody` | Курирот и цената на испорака сè уште ги немаме потврдено. Не сакаме да погодуваме бидејќи плаќаш готовина на врата. | The courier and delivery cost aren't confirmed yet. We won't guess, because you pay cash at the door. | `src/app/[locale]/shipping-returns/page.tsx` |
-| `ShippingReturns.deliveryHeading` | Курир, време и цена на испорака | Courier, delivery time and cost | `src/app/[locale]/shipping-returns/page.tsx` |
+| `ShippingReturns.deliveryBody` | Цена на достава: {cost}. | Delivery cost: {cost}. | `src/app/[locale]/shipping-returns/page.tsx` |
+| `ShippingReturns.deliveryHeading` | Рок и цена на достава | Delivery time and cost | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.deliveryTime` | Рок на достава: 3–5 работни дена. | Delivery time: 3–5 business days. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.eyebrow` | Правно | Legal | `src/app/[locale]/shipping-returns/page.tsx` |
-| `ShippingReturns.h1` | Испорака и враќање | Shipping & returns | `src/app/[locale]/shipping-returns/page.tsx` |
-| `ShippingReturns.intro` | Каде испорачуваме, како плаќаш и што да правиш ако нешто не е во ред. | Where we ship, how you pay, and what to do if something's wrong. | `src/app/[locale]/shipping-returns/page.tsx` |
-| `ShippingReturns.limitsBody` | Нема онлајн систем за враќање и нема претплатена етикета за враќање. Ако треба да вратиш нешто, оди преку телефон. | There is no online returns portal and no prepaid return label. If you need to return something, it goes through the phone. | `src/app/[locale]/shipping-returns/page.tsx` |
-| `ShippingReturns.limitsHeading` | Што сè уште не можеме | What we can't do yet | `src/app/[locale]/shipping-returns/page.tsx` |
+| `ShippingReturns.h1` | Испорака | Shipping | `src/app/[locale]/shipping-returns/page.tsx` |
+| `ShippingReturns.intro` | Каде испорачуваме, како плаќаш, колку чини доставата и кого да го викаш ако нешто тргне наопаку. | Where we ship, how you pay, what delivery costs, and who to call if something goes wrong. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.paymentBody` | Плаќаш готовина на курирот кога пратката ќе пристигне. | You pay the courier in cash when the parcel arrives. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.paymentHeading` | Плаќање при достава | Payment on delivery | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.problemBody` | Погрешна величина, оштетено пакување или пратката не пристигнала — јави се на телефонскиот број и Владимир ќе го среди директно. | Wrong size sent, damaged packaging, or the parcel never arrived — call the phone number and Vladimir will sort it out directly. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.problemHeading` | Ако нешто не е во ред со нарачката | If something is wrong with your order | `src/app/[locale]/shipping-returns/page.tsx` |
-| `ShippingReturns.returnsBody` | Точниот рок сè уште го немаме потврдено. | We don't have the exact window confirmed yet. | `src/app/[locale]/shipping-returns/page.tsx` |
-| `ShippingReturns.returnsHeading` | Рок за враќање и замена | Returns and exchange window | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.whereHeading` | Каде испорачуваме | Where we ship | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Showcase.headingLast` | Последно спуштање | Last drop | `src/components/home/HomeShowcase.tsx` |
 | `Showcase.headingLive` | Ова спуштање | This drop | `src/components/home/HomeShowcase.tsx` |
@@ -279,7 +273,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Terms.orderingHeading` | Како тече нарачката | How ordering works | `src/app/[locale]/terms/page.tsx` |
 | `Terms.paymentBody` | Плаќаш готовина при преземање, кога пратката ќе пристигне. Нема картички, нема банкарски трансфер, нема плаќање однапред. | You pay cash on delivery, when the parcel arrives. No cards, no bank transfer, no paying in advance. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.paymentHeading` | Плаќање | Payment | `src/app/[locale]/terms/page.tsx` |
-| `Terms.pricesBody` | Цените се во денари (MKD) и стојат на страницата на производот. Тоа е износот што му го плаќаш на курирот. Нема конверзија во друга валута. | Prices are in Macedonian denars (MKD) and shown on the product page. That is the amount you pay the courier. There is no conversion to any other currency. | `src/app/[locale]/terms/page.tsx` |
+| `Terms.pricesBody` | Цените се во денари (MKD) и стојат на страницата на производот. Тоа е износот што му го плаќаш на курирот. На англиската верзија прикажуваме и приближна цена во долари, само за информација. Секогаш плаќаш во денари. | Prices are in Macedonian denars (MKD) and shown on the product page. That is the amount you pay the courier. On the English site we also show an approximate price in US dollars, for reference only. You always pay in denars. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.pricesHeading` | Цени | Prices | `src/app/[locale]/terms/page.tsx` |
 | `Terms.sellerBody` | Trajanov го води Владимир Трајанов, од Струмица, Северна Македонија. Нема регистрирана фирма и нема продавница со адреса. Еден човек стои зад брендот. | Trajanov is run by Vladimir Trajanov, in Strumica, North Macedonia. There is no registered company and no shop with an address. One person stands behind the brand. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.sellerHeading` | Од кого купуваш | Who you buy from | `src/app/[locale]/terms/page.tsx` |
@@ -308,6 +302,7 @@ different MK wording. **Not** an error on its own.
 
 | Key | Value |
 |---|---|
+| `Cart.shippingValue` | {cost} |
 | `Common.languageEn` | EN |
 | `Common.languageMk` | МК |
 | `Home.title` | Trajanov |
