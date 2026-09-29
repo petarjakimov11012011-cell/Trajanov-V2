@@ -5,7 +5,7 @@ import {notFound} from 'next/navigation';
 import {ArrowLeft} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
-import {getProductImage} from '@/lib/product-images';
+import {getProductImage, getProductSecondImage} from '@/lib/product-images';
 import {getProductCare} from '@/lib/product-care';
 import {Placeholder} from '@/components/system/Placeholder';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
@@ -84,6 +84,7 @@ export default async function ProductPage({
 
   // Looked up by SLUG, never by position (D-Y.03-1). Null for Product 03 and for anything unphotographed.
   const photo = getProductImage(product.slug);
+  const photo2 = getProductSecondImage(product.slug);
 
   // Composition & care, also looked up by SLUG and never by position (D-Y.06-1) — a fabric claim landing
   // on the wrong colourway is a false material claim, not a cosmetic slip. `product` above is a
@@ -133,10 +134,14 @@ export default async function ProductPage({
 
       {/* Buy path above the fold */}
       <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
-        {/* FIRST slot takes the interim lifestyle frame when one exists (D-Y.03-1/7). The SECOND stays
-            a visible placeholder on purpose: the back / print-detail shot is genuinely still owed
-            (register #2), and the page should say so rather than imply the set is complete. Product 03
-            has no frame at all, so it keeps two placeholders. */}
+        {/* BOTH slots are slug-keyed lookups, never positional (D-Y.03-1). The first takes the interim
+            lifestyle frame when one exists (D-Y.03-7, extended to baby blue by D-Y.08-2); the second
+            takes a second frame only where one exists, which today is Product 03 alone (D-Y.08-3).
+            Products 01 and 02 keep a visible placeholder in slot 2 on purpose: their back /
+            print-detail shot is genuinely still owed (register #2), and the page should say so
+            rather than imply the set is complete. The cost of filling Product 03's second slot is
+            that its page no longer visibly signals the same debt — recorded in D-Y.08-3, and the
+            neutral set stays OWED for all three colourways. */}
         {/* One column below `sm:` (D-2.25-10, figures corrected by D-2.25-21). Two 4:5 slots side by
             side on a 320px phone measured 138×173 each — too small to judge a garment by, which is
             the only thing this page is for; one column makes each 288×360. The cost is real and
@@ -162,6 +167,13 @@ export default async function ProductPage({
             label={t('Placeholder.productPhoto')}
             muted={soldOut}
             sizes={PRODUCT_SLOT_SIZES}
+            image={
+              photo2 && {
+                src: photo2.src,
+                alt: t(photo2.altKey),
+                objectPosition: photo2.objectPosition,
+              }
+            }
           />
         </div>
 

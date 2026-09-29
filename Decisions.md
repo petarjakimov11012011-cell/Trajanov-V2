@@ -5642,3 +5642,232 @@ start at `D-2.01-6`.*
   later and disagrees with a word, the fix is a one-line config change plus a `facts.md` edit — cheap,
   which is the only reason this downside is tolerable.
 - **Links:** `D-0-3` · `D-Y.06-10` (the same call on PR #41) · PR #42 · owed #70 (native MK check, open)
+
+---
+
+### D-Y.08-1 · 2026-09-29 · Y.08 runs out of order, ahead of the NEXT target; NEXT is unchanged
+- **Status:** Accepted
+- **Decided by:** **Lazar, 2026-09-29**, instruction relayed in the Y.08 brief; executed by Claude Code.
+- **Context:** Line 1 of `current-state.md` names the `/impeccable polish` pass + closing audit as NEXT
+  (`D-2.25-26`). Vladimir supplied two real frames of the baby-blue shirt, and Product 03 was the only
+  shirt on the site still showing an empty photo box on the catalog card.
+- **Decision:** Run Y.08 **before** the NEXT target. `/impeccable polish` is **not replaced or
+  reprioritised** — line 1's NEXT target stays exactly as it was; only the status text records that Y.08
+  shipped.
+- **Alternative rejected:** waiting for the polish pass to finish first. Rejected — the polish pass is a
+  whole-site design phase, and running it over a page that still has an empty photo box means polishing a
+  layout that is about to change.
+- **Downside accepted:** the polish pass now has to account for imagery it has not seen, and Product 03's
+  slots changed shape (two photographs instead of two placeholders) after the design work was scoped. If
+  the polish pass wants a different slot treatment, it re-does work this phase just did.
+- **Links:** `D-2.25-26` · `current-state.md` line 1
+
+### D-Y.08-2 · 2026-09-29 · `D-Y.03-7`'s interim-lifestyle override is extended to Product 03
+- **Status:** Accepted
+- **Decided by:** **Lazar, 2026-09-29** (same authority as `D-Y.03-7`); executed by Claude Code.
+- **Context:** `facts.md` §8 says the lifestyle set "cannot carry Catalog or Product". `D-Y.03-7`
+  overrode that for the mustard and off-white frames as a logged interim. The two new baby-blue frames
+  are the same kind of photograph from the same shoot.
+- **Decision:** Extend the override to Product 03. `baby-blue-01` renders on the catalog card and the
+  first product-page slot; the §8 defect sentence is **updated and not retracted**; placeholder register
+  **#8 is NARROWED, not cleared**, and **#2 stays OPEN**.
+- **Alternative rejected:** leaving Product 03's placeholder up until the neutral set arrives. Rejected —
+  a real photograph of the actual shirt beats a hatched empty box for a customer trying to decide, and
+  the frames exist now while the neutral set has no date.
+- **Downside accepted:** **under the bar's tungsten light the shirt reads pale grey, not baby blue**
+  (sampled RGB ~(158,152,147) / ~(168,157,145)) — a worse shift than the mustard frame's, because warm
+  light neutralises a pale blue outright. On **cash on delivery** the customer pays at the door for what
+  they saw, so a customer may hand over 1999 MKD for a shirt **bluer than the one in the photograph**.
+  That is a real mis-set expectation on a real transaction, accepted on Lazar's call. Mitigations: §7's
+  colourway row stays **owner-stated** and is explicitly barred from "VERIFIED (photos)"; the defect is
+  written into §8, `product-images.ts` and this entry; the frames are **replaced** when the neutral set
+  lands. A second, smaller downside: the frames are 640 px against 1333 px, so they are visibly soft
+  full-width on a high-density phone — **not** fixed by upscaling, which would invent pixels (`D-0-6`).
+- **Links:** `D-Y.03-7` · `D-0-6` · `facts.md` §7 / §8 · register #2 (open), #8 (narrowed)
+
+### D-Y.08-3 · 2026-09-29 · Product 03's second slot is filled via a separate slug-keyed map
+- **Status:** Accepted
+- **Decided by:** Claude Code, per the Y.08 brief.
+- **Context:** Only Product 03 has a second frame. `getProductImage` is depended on by the catalog card,
+  the product page and the Home showcase, so its shape could not change.
+- **Decision:** Add a **separate** `PRODUCT_SECOND_IMAGES` map keyed by slug with `test-baby-blue` as its
+  only entry, exposed as `getProductSecondImage(slug)`. Keyed by **slug, never index** (`D-Y.03-1`).
+  `getProductImage`'s signature is untouched, so `ProductCard` and `showcase.ts` needed no edit.
+- **Alternative rejected:** turning `ProductImage` into an array of frames per slug. Rejected — it would
+  have touched every existing call site including the showcase's slide source, for one product's benefit.
+- **Downside accepted:** **Product 03's page no longer visibly signals that the back / print-detail shot
+  is still owed.** Products 01 and 02 say so with a hatched placeholder in slot 2; Product 03 now looks
+  complete when it is not. The debt survives only in the registers and in `facts.md`, where a customer
+  never looks and a reader has to go looking. A second downside: the two maps can drift — a future frame
+  added to one and not the other is not caught by types, only by the tests added this phase.
+- **Links:** `D-Y.03-1` · `src/lib/product-images.ts` · register #2 (open)
+
+### D-Y.08-4 · 2026-09-29 · `baby-blue-01` is cropped to 4:5 above the legs, on Vladimir's instruction
+- **Status:** Accepted
+- **Decided by:** **Vladimir (owner), via Lazar, 2026-09-29**; recorded by Claude Code.
+- **Context:** The supplied `baby-blue-01.webp` is 640×800 — exactly 4:5, already cropped, unlike every
+  other frame on the project (1333×2000, 2:3).
+- **Decision:** Ship the file **exactly as supplied**, byte-for-byte. `objectPosition: "center"`, because
+  a 4:5 source in a 4:5 slot crops nothing. Do not re-crop, re-expand, or substitute an uncropped version.
+- **Alternative rejected:** requesting the uncropped original for consistency with the other two frames.
+  Rejected — the crop is the subject's own instruction about his own image, which is not Code's to revisit.
+- **Downside accepted:** the frame is **tighter than the other two**, so the three catalog cards are not
+  visually consistent — Product 03's subject fills more of its card. And because the crop is fixed at the
+  file level, the only way to reframe it later is to ask Vladimir, not to change a CSS value.
+- **Links:** `facts.md` §8 · `D-Y.08-7`
+
+### D-Y.08-5 · 2026-09-29 · One alt key serves both baby-blue frames
+- **Status:** Accepted
+- **Decided by:** Claude Code, per the Y.08 brief.
+- **Context:** The two frames show the same garment on two different people in the same venue. Every
+  existing alt string on the project describes **the garment**, not the scene.
+- **Decision:** One key, `Product.photoAltBabyBlue` — MK „Светлосина маица со црвен принт, носена.",
+  EN "Baby-blue t-shirt with red print, worn." — used by both entries.
+- **Alternative rejected:** two keys describing each scene separately. Rejected — it would have invented
+  descriptive detail about people (who they are, what they are doing) that `facts.md` does not carry, and
+  doubled the MK review surface for no gain to a customer deciding on a shirt.
+- **Downside accepted:** **a screen-reader user hears the same sentence twice** on Product 03's page, with
+  nothing to tell them the second photograph is a different image. That is a genuinely worse experience
+  than two accurate distinct descriptions would be, and it is the direct cost of refusing to invent.
+- **Links:** `Product.photoAltOchre` / `photoAltOffWhite` (the pattern) · `docs/i18n/mk-review-y08.md`
+
+### D-Y.08-6 · 2026-09-29 · Product 03 enters the Home showcase automatically (template-propagated)
+- **Status:** Accepted
+- **Decided by:** Claude Code, per the Y.08 brief — recorded because it is a **front-door** change caused
+  by a Catalog edit.
+- **Context:** `src/lib/showcase.ts` rule 1 selects slides on exactly one condition: the product has an
+  entry in `product-images.ts`. Adding `test-baby-blue` there put Product 03 on the Home page with **zero
+  code change** — the self-healing behaviour that rule was written for.
+- **Decision:** Let it propagate. The Home showcase now carries **three** slides in both locales.
+  `tests/home/showcase.test.ts` was updated: the old "never includes test-baby-blue" assertions are
+  replaced with (a) Product 03 **is** included, and (b) a slug with **no** entry (`test-no-photo`) is
+  **still skipped**, so the skip rule stays under test rather than being quietly deleted with the product
+  that used to exercise it.
+- **Alternative rejected:** gating the showcase on a separate opt-in list so Catalog edits cannot reach
+  Home. Rejected — it would defeat the self-healing property and add a second place to forget.
+- **Downside accepted:** **a Catalog-scoped change silently altered the front door.** Nobody asked for a
+  third slide; it appeared because of a one-line map entry. The next person adding a photograph will also
+  change Home without intending to, and the only warning is a comment in two files. The grey-shift of
+  `D-Y.08-2` is now on the **front page**, not just a product page.
+- **Links:** `D-2.21-*` · `D-2.25-23` · `src/lib/showcase.ts` · `tests/home/showcase.test.ts`
+
+### D-Y.08-7 · 2026-09-29 · Merge is gated on guardian consent for the new frame of Vladimir
+- **Status:** Accepted — **OPEN GATE, blocks merge**
+- **Decided by:** Claude Code, per the Y.08 brief; the consent itself is **Lazar's** to obtain.
+- **Context:** Permission **#5** in `facts.md` §8.1 (guardian consent for commercial use of Vladimir's
+  image) was given 2026-07-26 and recorded **for the July frames**. Vladimir is a minor; his face is
+  fully identifiable in `baby-blue-01`; the frame is used commercially on the catalog card, the product
+  page and the Home front door.
+- **Decision:** The PR opens but **must not be merged** until his parents confirm **this specific frame**
+  may be used commercially. Recorded in `facts.md` §8.1a, on the owed register, and at the top of the PR
+  description.
+- **Alternative rejected:** treating #5 as a standing licence covering any future photograph of Vladimir.
+  Rejected — #5 is consent for a publication, not a blanket release, and reading it wider is exactly the
+  kind of assumption that should not be made about a minor's likeness.
+- **Downside accepted:** the phase's code is finished and cannot ship on a consent conversation Code
+  cannot have. If the answer is no, `baby-blue-01` comes out and Product 03 falls back to a placeholder on
+  the card, slot 1 and the Home showcase — `baby-blue-02` (the adult model, permission #2) could still
+  carry the page alone, but that is a re-wiring, not a revert.
+- **Links:** `facts.md` §8.1 / §8.1a · Known Issue #4 · owed #71
+
+### D-Y.08-8 · 2026-09-29 · The supplied assets were in `~/Downloads`, not the repo; copied after verifying identity
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decision — **not** specified by the brief).
+- **Context:** Task 1 required both files to be present at `public/images/lifestyle/` and to stop with a
+  BLOCKED report if either was "missing or differs". Neither was in the repo. Both were found in
+  `~/Downloads` and verified **exactly** against the brief's table before anything was wired:
+  `baby-blue-01.webp` 640×800 / 90,910 bytes, `baby-blue-02.webp` 640×960 / 53,876 bytes, both real WebP.
+  SHA-256 recorded in the completion report; the copies in the repo hash identically to the originals.
+- **Decision:** Copy (not move) both into `public/images/lifestyle/` and continue, rather than file BLOCKED.
+- **Alternative rejected:** filing a BLOCKED report and stopping. Rejected — the stop rule exists to
+  prevent **substituting a different image**, and these are provably the supplied files at the exact
+  dimensions and byte counts specified; the only deviation was the directory they were dropped in.
+- **Downside accepted:** Code exercised judgment against the literal wording of a stop instruction. If the
+  intent was "stop until Lazar personally places the files", that intent was not honoured. The mitigation
+  is that identity is proven by byte count, pixel dimensions and hash rather than asserted, and this entry
+  and the completion report both surface the deviation rather than burying it.
+- **Links:** Y.08 brief Task 1 · completion report
+
+### D-Y.08-9 · 2026-09-29 · The local dev database was reset and re-seeded to run the suite honestly
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decision — **not** specified by the brief).
+- **Context:** `npm test` failed 15/186 on arrival with `drop_not_open` and `ECONNREFUSED`. The failures
+  reproduced **identically on a clean `main` worktree**, so they were pre-existing. Cause: `supabase/seed.sql`
+  creates drop windows with `now() - interval '1 day'`, and the local database had been seeded on
+  ~2026-08-27, so every seeded window had elapsed.
+- **Decision:** Start Colima + `supabase start`, then run **`supabase db reset`** — **local only, never
+  `--linked`** (`D-1.07-15`) — to re-seed against today, then `npm run sync:drop` (which reads `.env.local`,
+  verified to point at `127.0.0.1:54322`) to restore the config drop. Result: **186/186 pass**, including
+  the 10-orders-against-3-units oversell gate.
+- **Alternative rejected:** reporting "15 pre-existing failures, unrelated to this phase" and shipping.
+  Rejected — the DoD requires `npm test` to pass, and an unrunnable concurrency gate is exactly the test
+  this project most needs green before any change ships.
+- **Downside accepted:** a database action was taken that the brief did not authorise and that the project
+  file flags as dangerous in its `--linked` form. It touched **only** the local dev database (0 real
+  orders) and **no** repo file, but the general caution stands. A further local-only step was needed for
+  the render check — the seed's fixture drops were temporarily re-windowed into the past and `test-drop`
+  opened, so the catalog would resolve the three **real** products rather than the seed's `TEST — Tee`
+  fixtures. **Both were restored afterwards** (seed windows back to `now()-1d`/`now()+7d` and
+  `now()+7d`/`now()+14d`, `test-drop` back to its `src/config/drops.ts` window via `npm run sync:drop`),
+  and the full suite was re-run green **after** the restore, not before it. The residual risk is that this
+  machine's local database is now a reset one: any local state a previous session was relying on is gone.
+- **Links:** `D-1.07-15` · `supabase/seed.sql` · completion report
+
+### D-Y.08-10 · 2026-09-29 · Guardian consent for `baby-blue-01` is GIVEN; the `D-Y.08-7` merge gate is closed
+- **Status:** Accepted — **closes the gate opened by `D-Y.08-7`**
+- **Decided by:** **Vladimir's parents**, confirmed by **Petar (orchestrator) in session, 2026-09-29**;
+  recorded by Claude Code.
+- **Context:** `D-Y.08-7` held the Y.08 PR closed until the parents confirmed that the **new** frame of
+  Vladimir could be used commercially. Permission #5 (2026-07-26) covered the **July** frames only.
+- **Decision:** Record a **separate** permission row **5b** in `facts.md` §8.1a — GIVEN, 2026-09-29,
+  channel *his parents, confirmed by the orchestrator in session*, which is the identical channel by which
+  #5 itself was recorded. Fact/date/channel only; no names, no message text, no screenshots (`D-0-1`).
+  Owed **#71 CLOSED**. Merge unblocked.
+- **Alternative rejected:** folding the new consent into the existing #5 row as though #5 had always
+  covered it. Rejected — that would erase the distinction the gate existed to protect, and would leave no
+  record that a second, separate consent was ever sought for a second, separate photograph.
+- **Downside accepted:** the consent reaches the repo as an **operator's in-session report**, not as a
+  document Code ever saw — exactly as #5 did. The record is therefore only as good as that relay, and a
+  reader two years from now cannot audit it from the repo alone; the evidence lives with Lazar and Petar.
+  That is the deliberate cost of the PII rule (`D-0-1`) on a public repo, and it is the established
+  mechanism on this project, not a new shortcut.
+- **Links:** `D-Y.08-7` (gate, now closed) · `facts.md` §8.1a row 5b · owed #71 (closed), #74 (open)
+
+### D-Y.08-11 · 2026-09-29 · The backdrop/editorial question (a minor beside a drink) is NOT closed by the consent
+- **Status:** Accepted — **open item, deliberately not a blocker**
+- **Decided by:** Claude Code, recording the scope of what `D-Y.08-10` did and did not settle.
+- **Context:** Y.08 raised two separate things about `baby-blue-01`: (a) guardian consent for commercial
+  use of a minor's likeness, and (b) whether a frame showing **a minor beside a drink** is right for a
+  brand whose audience starts at 12 — a step beyond what permission **#4** was written to cover, since #4
+  was about the **adult** model. The operator answered (a). **(b) was not put to him separately and he did
+  not answer it.**
+- **Decision:** Treat (a) as closed and (b) as **still open**, carried as owed row **#74** rather than
+  quietly folded into the closed gate. Merge proceeds — (b) is a brand judgement, not a consent defect,
+  and is reversible by swapping the frame.
+- **Alternative rejected:** treating "merge" as an answer to both questions. Rejected — one instruction
+  answering a question that was never asked is exactly how a real concern disappears from a record. The
+  cheaper error is to leave a row open that turns out to be a non-issue.
+- **Downside accepted:** **the frame is live while the question is open.** If Vladimir or his parents
+  decide the drink is wrong for the brand, it will already have been on the catalog card, the product page
+  and the home page for however long the answer takes. Removal is a one-line revert plus a redeploy, but it
+  will not be removal from before it shipped.
+- **Links:** `D-Y.03-6` (permission #4's original wording) · `facts.md` §8.1a · owed #74
+
+### D-Y.08-12 · 2026-09-29 · Y.08 merged on Petar's instruction; no operator review is recorded on the PR
+- **Status:** Accepted
+- **Decided by:** **Petar (owner), 2026-09-29**, explicit instruction ("merge to main"); executed by
+  Claude Code.
+- **Context:** `D-0-3` waives the house automated-review gate and puts the review burden on the other
+  operator. Y.08 is **not** a 1.03/1.04 phase, so no fresh-session review was required. PR #43 was checked
+  immediately before merging: **`reviews: []`, `reviewDecision: ""` — GitHub records no review at all.**
+- **Decision:** Merge as instructed, and **record plainly that no review is on the record** — exactly as
+  `D-Y.06-10` did for PR #41 and `D-Y.07-7` for PR #42 — so nobody reading this history mistakes "merged"
+  for "reviewed".
+- **Alternative rejected:** holding the merge until a review is recorded. Rejected — the owner gave a
+  direct instruction and `D-0-3` makes review an operator matter, not Code's to gate.
+- **Downside accepted:** **the third consecutive PR to reach `main` with no second human on the diff.**
+  This one publishes an identifiable photograph of a minor to a commercial front page, which is a higher
+  consequence than Y.06's or Y.07's copy changes. Code verified the rendering, the tests and the registers,
+  but **Code checking its own work is not a second reader**, and the pattern is now a habit rather than an
+  exception. Cheap to fix if wrong: the imagery is a one-line map revert plus a redeploy.
+- **Links:** `D-0-3` · `D-Y.06-10` · `D-Y.07-7` · PR #43 · owed #72, #73, #74 (all open)
