@@ -121,7 +121,7 @@
     "orderingBody1": "When you order, the stock is reserved for 48 hours — not sold on the spot. We call you to confirm. If we can't reach you, the reservation lapses and the piece goes back on sale.",
     "orderingBody2": "Drops are limited and the stock is real — when it's gone, it's gone.",
     "pricesHeading": "Prices",
-    "pricesBody": "Prices are in Macedonian denars (MKD) and shown on the product page. That is the amount you pay the courier. On the English site we also show an approximate price in US dollars, for reference only. You always pay in denars.",
+    "pricesBody": "Prices are set in Macedonian denars (MKD). That is what you pay the courier. The English site shows prices in US dollars as an approximate guide, and each product page shows the exact amount in denars. You always pay in denars.",
     "noHeading": "What we don't do",
     "noBody": "No accounts, no saved cards, no subscriptions, no discount codes."
   },
@@ -207,7 +207,8 @@
     "photoAltOchre": "Ochre t-shirt with red print, worn.",
     "photoAltOffWhite": "Off-white t-shirt with red print, worn.",
     "photoAltBabyBlue": "Baby-blue t-shirt with red print, worn.",
-    "photoAltComposite": "Ochre and off-white t-shirts with red print, worn."
+    "photoAltComposite": "Ochre and off-white t-shirts with red print, worn.",
+    "amountDue": "You pay {amount} in cash on delivery."
   },
   "Cart": {
     "title": "Cart",

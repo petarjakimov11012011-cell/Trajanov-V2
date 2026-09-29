@@ -7,8 +7,7 @@ import {ArrowLeft, ArrowRight, Pause, Play} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
 import {StockBadge} from '@/components/drop/StockBadge';
 import {Placeholder} from '@/components/system/Placeholder';
-import {WithUsdApprox} from '@/components/system/WithUsdApprox';
-import {formatMkd} from '@/lib/format';
+import {DisplayPrice} from '@/components/system/DisplayPrice';
 import {showcaseSlides, wrapIndex} from '@/lib/showcase';
 import {cn} from '@/lib/utils';
 import type {DropView} from '@/lib/drop/state';
@@ -201,12 +200,13 @@ export function HomeShowcase({view}: {view: DropView | null}) {
                       {slideTitle(slide)}
                     </h3>
                     {slide.priceMkd != null ? (
-                      // EN adds "≈ $22" after the price, quieter; MK is untouched (D-Y.09-4).
-                      <WithUsdApprox amountMkd={slide.priceMkd} locale={locale}>
-                        <span className="text-price tabular font-semibold text-foreground">
-                          {formatMkd(slide.priceMkd, t('Common.currency'), locale)}
-                        </span>
-                      </WithUsdApprox>
+                      // EN shows "≈ $22" as the price in these same classes; MK is untouched (D-Y.10-2).
+                      <DisplayPrice
+                        amountMkd={slide.priceMkd}
+                        currency={t('Common.currency')}
+                        locale={locale}
+                        className="text-price tabular font-semibold text-foreground"
+                      />
                     ) : (
                       // Same fallback as ProductCard — a visible, logged placeholder, never a guess.
                       <Placeholder>{t('Placeholder.price')}</Placeholder>

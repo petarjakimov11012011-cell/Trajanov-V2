@@ -1,11 +1,10 @@
 import {useTranslations, useLocale} from 'next-intl';
 import {Link} from '@/i18n/navigation';
 import {cn} from '@/lib/utils';
-import {formatMkd} from '@/lib/format';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {getProductImage} from '@/lib/product-images';
 import {Placeholder} from '@/components/system/Placeholder';
-import {WithUsdApprox} from '@/components/system/WithUsdApprox';
+import {DisplayPrice} from '@/components/system/DisplayPrice';
 import {StockBadge} from '@/components/drop/StockBadge';
 import {SpotlightCard} from '@/components/product/SpotlightCard';
 import type {ProductView} from '@/types/drop';
@@ -72,12 +71,14 @@ export function ProductCard({product}: {product: ProductView}) {
         </h2>
 
         {product.priceMkd != null ? (
-          // EN adds "≈ $22" after the price; MK renders the price span exactly as before (D-Y.09-4).
-          <WithUsdApprox amountMkd={product.priceMkd} locale={locale}>
-            <span className="text-foreground text-small font-semibold tabular">
-              {formatMkd(product.priceMkd, t('Common.currency'), locale)}
-            </span>
-          </WithUsdApprox>
+          // EN shows "≈ $22" as the price in these same classes; MK renders the span exactly as before
+          // (D-Y.10-2). Dollars only here — the denar amount due lives on the product page (D-Y.10-4).
+          <DisplayPrice
+            amountMkd={product.priceMkd}
+            currency={t('Common.currency')}
+            locale={locale}
+            className="text-foreground text-small font-semibold tabular"
+          />
         ) : (
           <Placeholder>{t('Placeholder.price')}</Placeholder>
         )}

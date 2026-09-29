@@ -8,12 +8,12 @@ import {MKD_PER_USD, USD_RATE_DATE} from "../../src/config/currency";
 // rounded half-up, with the `≈` prefix that says "not a quote".
 
 describe("formatUsdApprox — EN gets an approximate whole-dollar reference", () => {
-  it("1199 MKD → ≈ $22 (the two rehearsal shirts)", () => {
+  it("1199 MKD → ≈ $22 (all three shirts)", () => {
     expect(formatUsdApprox(1199, "en")).toBe("≈ $22");
   });
 
-  it("1999 MKD → ≈ $37 (Product 03)", () => {
-    expect(formatUsdApprox(1999, "en")).toBe("≈ $37");
+  it("Product 03 is 1199 MKD since Y.10 (was 1999) → ≈ $22, like the other two shirts", () => {
+    expect(formatUsdApprox(1199, "en")).toBe("≈ $22");
   });
 
   it("200 MKD → ≈ $4 (the delivery cost)", () => {

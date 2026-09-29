@@ -8,13 +8,13 @@ import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {getProductImage, getProductSecondImage} from '@/lib/product-images';
 import {getProductCare} from '@/lib/product-care';
 import {Placeholder} from '@/components/system/Placeholder';
-import {WithUsdApprox} from '@/components/system/WithUsdApprox';
+import {DisplayPrice} from '@/components/system/DisplayPrice';
+import {AmountDue} from '@/components/product/AmountDue';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {ShippingNotice} from '@/components/system/ShippingNotice';
 import {StockBadge} from '@/components/drop/StockBadge';
 import {AddToCartPanel} from '@/components/product/AddToCartPanel';
 import {type BuyState} from '@/components/product/BuyButton';
-import {formatMkd} from '@/lib/format';
 import {getProductView, parsePreviewState} from '@/lib/drop/state';
 import {pageMetadata} from '@/lib/metadata';
 import {getPathname} from '@/i18n/navigation';
@@ -185,12 +185,17 @@ export default async function ProductPage({
             </h1>
             <div className="text-price tabular">
               {product.priceMkd != null ? (
-                // EN adds "≈ $22" after the price, at text-small; MK is untouched (D-Y.09-4).
-                <WithUsdApprox amountMkd={product.priceMkd} locale={locale}>
-                  <span className="text-foreground">
-                    {formatMkd(product.priceMkd, t('Common.currency'), locale)}
-                  </span>
-                </WithUsdApprox>
+                // EN shows "≈ $22" as the price in these same classes, then the denar amount due on a
+                // muted line under it (EN only — D-Y.10-2/4). MK renders the span exactly as before.
+                <>
+                  <DisplayPrice
+                    amountMkd={product.priceMkd}
+                    currency={t('Common.currency')}
+                    locale={locale}
+                    className="text-foreground"
+                  />
+                  <AmountDue amountMkd={product.priceMkd} locale={locale} />
+                </>
               ) : (
                 <Placeholder>{t('Placeholder.price')}</Placeholder>
               )}

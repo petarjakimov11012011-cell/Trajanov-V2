@@ -16,8 +16,8 @@
 // closes it (Task 7 → Task 12). When Vladimir supplies real names, fill nameMk/nameEn here and re-sync.
 //
 // PHASE Y.02 (D-Y.02-1/2): a THIRD product, "Product 03" (baby blue), is added below as a catalog stub —
-// owner-authorised out of order (Lazar, 2026-07-22) ahead of Y.01. Its price (1999 MKD) + sizes (S/M/L/XL)
-// are owner-VERIFIED (facts.md §7); its photo and real name are OWED, so it ships with the same
+// owner-authorised out of order (Lazar, 2026-07-22) ahead of Y.01. Its price + sizes (S/M/L/XL) are
+// owner-VERIFIED (facts.md §7) — price 1199 MKD since 2026-09-29 (was 1999, owner via Lazar, D-Y.10-1); its photo and real name are OWED, so it ships with the same
 // placeholders as the two above (its fabric/care is filled — see the Y.07 note below). It joins THIS
 // ended rehearsal drop (the only drop the catalog reads) so it renders browsable-but-not-buyable; it
 // is NOT assigned to any live/real drop — that is Y.01.
@@ -80,7 +80,7 @@ export const PRODUCTS: Readonly<Record<string, readonly ProductConfig[]>> = {
     },
     {
       // Product 03 — CATALOG STUB, baby blue (D-Y.02-1/2). A third colourway Vladimir has confirmed with
-      // a REAL price (1999 MKD) and REAL sizes (S/M/L/XL) — both owner-VERIFIED (facts.md §7). Its photo,
+      // a REAL price (1199 MKD — was 1999 until 2026-09-29, D-Y.10-1) and REAL sizes (S/M/L/XL) — both owner-VERIFIED (facts.md §7). Its photo,
       // and real customer-facing name are still OWED, so it ships exactly like the two above:
       // name_* = null → the UI renders the neutral slot "Производ 03" (sort_order 3 → "03"); no photo
       // column exists yet (D-1.06-3) → a visible placeholder. Its care copy is the same owner statement
@@ -91,7 +91,7 @@ export const PRODUCTS: Readonly<Record<string, readonly ProductConfig[]>> = {
       slug: "test-baby-blue",
       nameMk: null,
       nameEn: null,
-      priceMkd: 1999,
+      priceMkd: 1199,
       photoPath: null,
       careMk: "100% памук. Перење на 30\u00A0°C.",
       careEn: "100% cotton. Wash at 30\u00A0°C.",
