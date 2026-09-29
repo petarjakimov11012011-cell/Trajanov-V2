@@ -5938,7 +5938,7 @@ start at `D-2.01-6`.*
 - **Links:** `facts.md` §7 · placeholder register #7 (CLOSED) · `D-2.03` · `src/i18n/routing.ts` (untouched)
 
 ### D-Y.09-4 · 2026-09-29 · Approximate USD on the EN locale only; MKD stays the price
-- **Status:** Accepted — **Supersedes `D-2.01-8` in part** (its "MKD always / no currency conversion" clause)
+- **Status:** Accepted — **Superseded in part by `D-Y.10-2`** (2026-09-29; only its "the USD figure is shown next to the MKD price" clause — MKD remains the price and the amount paid) — **Supersedes `D-2.01-8` in part** (its "MKD always / no currency conversion" clause)
   and the 2026-07-18 `facts.md` §7 Currency wording ("the site renders MKD only, never USD").
 - **Decided by:** **Lazar, 2026-09-29** (show USD on the English site); settled with the orchestrator
   (MKD primary, USD as a reference beside it, EN only); executed by Claude Code.
@@ -6006,7 +6006,7 @@ start at `D-2.01-6`.*
 - **Links:** `D-Y.09-2` · `src/config/shipping.ts`
 
 ### D-Y.09-8 · 2026-09-29 · One shared `WithUsdApprox` wrapper; on MK it returns the price untouched
-- **Status:** Accepted
+- **Status:** Superseded by `D-Y.10-5` (2026-09-29 — the wrapper is replaced by `DisplayPrice`)
 - **Decided by:** Claude Code (executor).
 - **Context:** Three call sites render a price (`ProductCard`, `HomeShowcase`, the product page), each with
   its own MKD styling that must not change. The brief requires the dollar figure to be identical in weight
@@ -6123,3 +6123,106 @@ start at `D-2.01-6`.*
 - **Downside accepted:** the register carries a row that can only be closed after the fact, when a
   finding means a follow-up PR rather than a blocked merge.
 - **Links:** `D-Y.09-13` · owed #75
+
+### D-Y.10-1 · 2026-09-29 · Product 03 re-priced 1999 → 1199 MKD, out of order, NEXT unchanged
+- **Status:** Accepted
+- **Decided by:** Lazar (owner via Lazar — price and the out-of-order run), recorded by Claude Code.
+- **Context:** Product 03 (baby blue) was 1999 MKD (owner, 2026-07-22). The owner now prices it like the other
+  two shirts. Phase Y.10 runs ahead of the NEXT target (`/impeccable polish`), as Y.08 and Y.09 did.
+- **Decision:** 1199 MKD in `src/config/products.ts`, `facts.md` §7 (strike-and-date, not delete) and — after
+  merge and deploy, on Petar's explicit go — the hosted `products` row via one guarded `UPDATE` (Task 7). The
+  NEXT target on line 1 of `current-state.md` is unchanged; only the status text records Y.10.
+- **Alternative rejected:** changing the hosted price through `npm run sync:drop` by weakening or flagging off
+  Preflight 3 (price-after-open, `D-1.04-5`). Rejected — that refusal is correct for real drops and stays; one
+  guarded, read-back single-row statement is narrower than any change to the guard.
+- **Downside accepted:** between deploy and the hosted `UPDATE`, the live EN site shows Product 03 at "≈ $37"
+  from the old row; and the hosted price is changed outside the sync path, so the config and the DB agree only
+  because a person ran one statement.
+- **Links:** `D-1.04-5` · `D-Y.07-6` · `D-Y.02-1` · `facts.md` §7
+
+### D-Y.10-2 · 2026-09-29 · On EN the approximate dollar figure IS the displayed product price
+- **Status:** Accepted — **Supersedes `D-Y.09-4` in part** (only its "USD shown next to the MKD price" clause).
+- **Decided by:** Lazar + orchestrator (brief decision 2), implemented by Claude Code.
+- **Context:** Y.09 rendered "1,199 MKD ≈ $22" on every EN price. Lazar wants English visitors to see dollars.
+- **Decision:** At the catalog card, the Home showcase and the product page, EN renders only "≈ $22", in the
+  exact class list the MKD figure had at that call site (same size, weight, colour, `tabular`). MK is unchanged
+  and byte-identical to `main`. Delivery-cost prose ("200 MKD (≈ $4)"), structured data, emails and the DB are
+  unchanged (`D-Y.09-5`). MKD remains the price and the amount paid.
+- **Alternative rejected:** keeping Y.09's "1,199 MKD ≈ $22" pair. Rejected by the owner — the denar figure
+  reads as noise to the English audience on browse surfaces.
+- **Downside accepted:** the headline EN price is now a conversion at a hand-updated rate; when the rate goes
+  stale (owed #78) the error shows directly on the price, not on a muted footnote.
+- **Links:** `D-Y.09-4` · `D-Y.09-5` · owed #78
+
+### D-Y.10-3 · 2026-09-29 · The "≈" stays on every dollar price
+- **Status:** Accepted
+- **Decided by:** Orchestrator (brief decision 3).
+- **Decision:** EN prices read "≈ $22", never "$22". A test asserts no bare "$N" without "≈".
+- **Alternative rejected:** bare "$22". Rejected — it presents a converted figure as a set dollar price.
+- **Downside accepted:** a slightly less clean price for an English reader.
+- **Links:** `D-Y.10-2`
+
+### D-Y.10-4 · 2026-09-29 · The EN product page keeps the denar amount due under the price
+- **Status:** Accepted
+- **Decided by:** Orchestrator (brief decision 4), implemented by Claude Code.
+- **Context:** The customer pays the courier in denars, and the cart and checkout show no product price, so on
+  the English site the product page is the only place the denar amount could appear.
+- **Decision:** One muted `text-small` line directly under the EN product-page price: "You pay 1,199 MKD in cash
+  on delivery." (`Product.amountDue`, amount from `formatMkd`). Not on the card or the showcase. MK renders
+  nothing (the MK price already is the denar amount). Implemented as `src/components/product/AmountDue.tsx`.
+- **Alternative rejected:** dollars everywhere with no denar figure. Rejected — it would put an English-reading
+  customer on the doorstep owing an amount the site never showed them, on cash on delivery, under a minor's
+  brand name.
+- **Downside accepted:** the EN product page carries two figures, and the card/showcase show only a converted one.
+- **Links:** `D-Y.10-2`
+
+### D-Y.10-5 · 2026-09-29 · `WithUsdApprox` renamed to `DisplayPrice`; it renders the whole price span
+- **Status:** Accepted — **Supersedes `D-Y.09-8`.**
+- **Decided by:** Claude Code (own decision — the brief left the name and shape open).
+- **Decision:** `src/components/system/WithUsdApprox.tsx` → `src/components/system/DisplayPrice.tsx` (git mv).
+  It now takes `amountMkd`, `currency`, `locale` and the call site's `className`, and renders ONE span:
+  EN → "≈ $22", MK → `formatMkd(...)`. Each call site passes the exact class list its MKD span had on `main`,
+  so the MK markup is byte-identical (pinned by `tests/format/display-price.test.ts`, which renders the MK
+  output and compares it with the `main` markup, and pins each call site's class list in source).
+- **Alternative rejected:** keeping the children-wrapper API and swapping the child's text with
+  `cloneElement` on EN. Rejected — it hides a text replacement inside a wrapper whose JSX shows a denar figure,
+  which misleads a reader of the call site. Keeping the old name was rejected for the same reason: nothing is
+  "with" the USD any more.
+- **Downside accepted:** the three call sites' diff is larger than a pure behaviour swap, and the price class
+  list now lives in a prop string rather than on a visible span.
+- **Links:** `D-Y.09-8` · `src/_project-state/file-map.md`
+
+### D-Y.10-6 · 2026-09-29 · Amount-due line placed inside the price box; MK parity key kept without a convention
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decision).
+- **Decision:** `<AmountDue>` renders as a `<p>` inside the existing `div.text-price.tabular`, right after the
+  price span, so the MK markup of that div is untouched and the line sits directly under the price (not a
+  `gap-3` away). `text-small` overrides the inherited `text-price` size; `font-normal` pins the weight.
+  `Product.amountDue` exists in both catalogs; the i18n inventory (269 keys) and the parity test raised no flag
+  for an unrendered MK key, so no locale-specific-key convention was needed.
+- **Alternative rejected:** a sibling element after the price div. Rejected — it would sit 12 px below the
+  price at the same distance as the stock badge, and grouping it needed a wrapper that changes MK markup.
+- **Downside accepted:** the line inherits `tabular` from the price box (harmless — it only affects digits).
+- **Links:** `D-Y.10-4`
+
+### D-Y.10-7 · 2026-09-29 · `facts.md` USD-rate row amended too, not only the Currency paragraph
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decision).
+- **Decision:** Besides the Currency paragraph the brief named, the §7 *USD reference rate* row said the rate
+  renders "beside an MKD figure"; that phrase is struck and dated the same way and replaced with the Y.10 usage.
+- **Alternative rejected:** leaving the row as is. Rejected — `facts.md` would contradict the site.
+- **Downside accepted:** an edit to a row the brief did not list.
+- **Links:** `facts.md` §7
+
+### D-Y.10-8 · 2026-09-29 · Local database reset and re-synced twice to render the new price
+- **Status:** Accepted
+- **Decided by:** Claude Code (brief Task 6 authorised the local reset; the second run is my call).
+- **Decision:** `supabase db reset` (local, never `--linked`) + `npm run sync:drop` against `.env.local`
+  (verified 127.0.0.1). The first sync ran before the config edit landed and inserted 1999; I reset and synced
+  again, and read back `test-baby-blue|1199` locally. No hosted command was run.
+- **Alternative rejected:** a hand `UPDATE` on the local row. Rejected — a reset + sync reproduces how the
+  config reaches a database.
+- **Downside accepted:** the local seed's `test-open-drop` is live after a reset, so `/katalog`, `/en/catalog`
+  and Home render the seed products, not the three shirts; the three shirts' card and showcase prices can only
+  be seen on production after Task 7 (Task 11 covers it).
+- **Links:** `D-Y.08-9` · `D-1.07-15`
