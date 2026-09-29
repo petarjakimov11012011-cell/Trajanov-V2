@@ -8,9 +8,39 @@
 | **Operator** | Petar (session) · instruction from Lazar |
 | **Date** | 2026-09-29 |
 | **Branch** | `phase-Y.09-shipping-and-usd` (cut from `main` at `eab5333`) |
-| **PR** | [#44](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/44). **Open, NOT merged**, and it waits for Petar's review (`D-0-3`, owed #75) |
-| **Commits** | `6bafdf6` (formatter + config + their tests) → `c8fd281` (page, copy, rendering) → the docs/state commit that files this report |
+| **PR** | [#44](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/44) — **MERGED** `4e08020`, 2026-09-29, on Petar's instruction (`D-Y.09-13`) |
+| **Commits** | `6bafdf6` (formatter + config + their tests) → `c8fd281` (page, copy, rendering) → `ffbac24` (docs/state, this report) · merge `4e08020` · close-out commit on `main` recording the merge |
 | **Brief** | `briefs/Part-Y-Phase-09-Code.md` (supplied in session; committed so the reviewer can check the diff against it) |
+
+> ## ✅ CLOSE-OUT — merged and deployed, production verified
+>
+> **Merged on Petar's explicit instruction** ("merge to main", `D-Y.09-13`), operator-authorised per
+> `D-0-3`, with merge commit `4e08020` (the same method as PR #43). The branch was deleted and refs
+> pruned. Immediately before merging: Vercel preview **SUCCESS**, `mergeStateStatus: CLEAN`,
+> **`reviews: []` — GitHub records no review at all.** This is the **fourth consecutive** PR to reach
+> `main` that way, after #41, #42 and #43. Recorded plainly so nobody reads "merged" as "reviewed".
+> **Owed #75 is NOT passed.** Its condition was "a review recorded on the PR, not only a merge", so it
+> stays open as a **post-merge read** of `eab5333..4e08020` (`D-Y.09-14`).
+>
+> **Production VERIFIED on `https://www.trajanovv.com`** (the new copy was live about 45 s after the
+> merge):
+> - All 16 Task-9 URLs return **200**.
+> - EN catalog, all three EN product pages and the EN showcase read **1,199 MKD ≈ $22** / **1,999 MKD
+>   ≈ $37**.
+> - `/en/shipping-returns` and `/isporaka-i-vrakjanje`: h1 "Shipping" / „Испорака“, exactly **four**
+>   sections, "Delivery cost: 200 MKD (≈ $4)." / „Цена на достава: 200 ден.“, **zero** placeholders,
+>   last updated 29 September 2026.
+> - Terms prices text is live in both locales.
+> - FAQ answer 5 is **identical** in the visible list and the FAQPage JSON-LD, in both locales.
+> - The cart (checked in the browser with a sessionStorage-only line, then cleared) reads
+>   "200 MKD (≈ $4)" / „200 ден“, with the total still a placeholder.
+> - **Zero `$` and zero `≈` in visible text on every MK page.**
+> - No `{cost}` in visible text or JSON-LD. No Product JSON-LD.
+> - `llms.txt` reads "Shipping — How delivery works."
+>
+> **Still open after the merge:** #75 (post-merge read), #76 (a **real phone**; a desktop pane is not a
+> phone), #77 (native MK review), #78 (USD rate re-check). Known issue **#13**, the two stale claims, is
+> unchanged and live.
 
 ---
 
@@ -37,6 +67,8 @@
 | `D-Y.09-10` | The "no Placeholder on the Shipping page" test is a **source guard**. It asserts: no `<Placeholder`, exactly four `LegalSection`s in order, the removed keys gone, `LAST_UPDATED`. It does not render the page | Rendering the async server component under Vitest with `next-intl/server` mocked | A placeholder nested inside a child component would slip past it. Today no child renders one. The rendered HTML was checked by hand |
 | `D-Y.09-11` | For the render check I **moved the local seed drops' windows into the past** (local DB only, guarded to `127.0.0.1`), so the catalog shows the real three shirts like production. Then I ran `supabase db reset` + `npm run sync:drop` to restore the seed before the final test run | Checking the catalog against seed fixture prices (999 / 1,500) | A DB action the brief didn't authorise (like `D-Y.08-9`). It was local, reversed, and never `--linked` |
 | `D-Y.09-12` | **Two stale public claims found in passing are reported, NOT fixed** (§ 3) | Fixing them here (each is one line) | Both false statements stay live on production until a follow-up ships |
+| `D-Y.09-13` | Merge on Petar's instruction and record that **no review is on the PR** | Holding the merge until a review is recorded | **Fourth consecutive PR to `main` with no second human on the diff**, and this one puts a money figure in front of every customer |
+| `D-Y.09-14` | Owed **#75 stays OPEN** as a post-merge read of the diff, not marked passed | Closing it because the named reviewer gave the merge instruction | The row can only close after the fact; a finding now means a follow-up PR, not a blocked merge |
 
 Smaller choices, not logged separately. `HomeFaq` passes `{cost}` to **every** FAQ string through one translator (`faqText`), so the visible list and the JSON-LD cannot diverge (`D-2.11-5`); ICU ignores the value where there is no slot. The Shipping page's `params` type went from `{locale: string}` to `{locale: Locale}`, matching Home, so no cast was needed.
 
@@ -140,7 +172,7 @@ Rendered on the dev server against the local DB (real rehearsal drop, `D-Y.09-11
 | `git diff main` empty on every out-of-scope path, incl. `src/i18n/routing.ts` | ☑ (§ 4) |
 | build, lint, typecheck, test all pass | ☑ (§ 5) |
 | `facts.md`, `Decisions.md` (`D-Y.09-1…12`, `D-2.01-8` marked), `current-state.md`, `file-map.md` updated | ☑ |
-| PR open, not merged | ☑ #44 |
+| PR open, not merged | ☑ #44 opened unmerged as briefed, **then merged on Petar's instruction** (`D-Y.09-13`) and production-verified (see close-out) |
 
 Checked against `brand.md`: the dollar figure uses only tokens (`text-muted-foreground`, `text-small`, the spacing scale), with no hardcoded colour or size. Muted on ground is 7.9:1 in the ledger (WCAG AA 4.5), and the card surface is a hair lighter.
 
@@ -210,8 +242,8 @@ No secret was committed at any point on this branch.
 
 | Item | Waiting on | Owner |
 |---|---|---|
-| Merge of PR #44 | Petar's review (#75) | Petar |
-| Real-phone check (#76) | Merge + deploy | Lazar |
+| Post-merge read of the Y.09 diff (#75) | The other operator | Lazar / Petar |
+| Real-phone check (#76) | Now actionable — deployed 2026-09-29 | Lazar |
 | Native MK review (#77) | Reviewers | Lazar + Petar |
 | USD rate re-check (#78) | Before the first real drop | Lazar / Petar |
 | `llms.txt` "maximum of 2 units" + product-page „величини — примерок“ (Known issue #13) | A brief | Orchestrator |
@@ -230,6 +262,6 @@ No secret was committed at any point on this branch.
 | `current-state.md` — Known issues | ☑ #11 (silent on returns), #12 (USD drift), #13 (two stale claims) |
 | `file-map.md` — matches what is actually on disk | ☑ |
 | `00_stack-and-config.md` — new deps / pins / config | ☑ One row: no dependency; two hand-maintained constants |
-| `Decisions.md` — every § 2 entry appended | ☑ `D-Y.09-1…12`; `D-2.01-8` Status only |
+| `Decisions.md` — every § 2 entry appended | ☑ `D-Y.09-1…14`; `D-2.01-8` Status only |
 
 **`NEXT:` line I set:** unchanged: `NEXT: **[P2] `/impeccable polish` + the closing `/impeccable audit` — on a NEW branch (`D-2.25-26`).**`, with the Y.09 status text after it.

@@ -6089,3 +6089,37 @@ start at `D-2.01-6`.*
 - **Downside accepted:** **both false statements stay live** until a follow-up ships — one on a
   machine-readable file AI assistants read, one on every product page.
 - **Links:** `D-Y.06-3` · `facts.md` §7 · `src/components/product/AddToCartPanel.tsx`
+
+### D-Y.09-13 · 2026-09-29 · Y.09 merged on Petar's instruction; no review is recorded on the PR
+- **Status:** Accepted
+- **Decided by:** **Petar (operator), 2026-09-29**, explicit instruction ("merge to main"); executed by
+  Claude Code.
+- **Context:** The Y.09 brief said "Open the PR … Do not merge" and put "Petar reviews the PR before
+  merge (`D-0-3`)" on the owed register (#75). PR #44 was checked immediately before merging: Vercel
+  preview **SUCCESS**, `mergeStateStatus: CLEAN`, **`reviews: []`, `reviewDecision: ""` — GitHub records
+  no review at all.**
+- **Decision:** Merge as instructed (merge commit `4e08020`, same method as PR #43; branch deleted, refs
+  pruned), and **record plainly that no review is on the record** — as `D-Y.06-10`, `D-Y.07-7` and
+  `D-Y.08-12` did — so nobody reads "merged" as "reviewed".
+- **Alternative rejected:** holding the merge until a review is recorded on the PR. Rejected — the
+  operator gave a direct instruction, and `D-0-3` makes review an operator matter, not Code's to gate.
+- **Downside accepted:** **the fourth consecutive PR to reach `main` with no second human on the diff.**
+  This one puts a money figure in front of every customer (a delivery cost asked for at the door) and a
+  dollar figure beside every EN price. Code verified it against the brief, the tests and the rendered
+  pages, but **Code checking its own work is not a second reader.** Reversible: a revert of `4e08020`
+  plus a redeploy restores the previous copy.
+- **Links:** `D-0-3` · `D-Y.08-12` · PR #44 · owed #75
+
+### D-Y.09-14 · 2026-09-29 · Owed #75 stays OPEN as a post-merge read, not marked passed
+- **Status:** Accepted
+- **Decided by:** Claude Code (executor).
+- **Context:** Owed #75's pass condition was "a review recorded on the PR, not only a merge". The PR was
+  merged with no review recorded (`D-Y.09-13`).
+- **Decision:** #75 is **not** marked passed or struck. It is reworded to a **post-merge read of the diff**
+  (`git diff eab5333..4e08020`) by the other operator, still open.
+- **Alternative rejected:** closing #75 because the merge instruction came from Petar, the named reviewer.
+  Rejected — the instruction is not a record that the diff was read, and the row's own pass condition
+  rules that out.
+- **Downside accepted:** the register carries a row that can only be closed after the fact, when a
+  finding means a follow-up PR rather than a blocked merge.
+- **Links:** `D-Y.09-13` · owed #75

@@ -12,7 +12,7 @@ Last updated: **2026-07-29** · By: **Claude Code (Phase 2.25 merged — PR #40,
 
 ## Status
 
-**Phase Y.09 — Shipping page, delivery cost, approximate USD on EN (2026-09-29, PR #44 open).** New:
+**Phase Y.09 — Shipping page, delivery cost, approximate USD on EN (2026-09-29, PR #44 MERGED `4e08020`, live).** New:
 `src/config/currency.ts` (`MKD_PER_USD = 54.3` + `USD_RATE_DATE`, display-only, hand-updated — `D-Y.09-4`),
 `src/config/shipping.ts` (`DELIVERY_COST_MKD = 200`, `D-Y.09-2/7`),
 `src/components/system/WithUsdApprox.tsx` (EN-only `≈ $N` beside a price; returns the price untouched on MK —
