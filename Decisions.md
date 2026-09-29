@@ -5812,3 +5812,62 @@ start at `D-2.01-6`.*
   and the full suite was re-run green **after** the restore, not before it. The residual risk is that this
   machine's local database is now a reset one: any local state a previous session was relying on is gone.
 - **Links:** `D-1.07-15` · `supabase/seed.sql` · completion report
+
+### D-Y.08-10 · 2026-09-29 · Guardian consent for `baby-blue-01` is GIVEN; the `D-Y.08-7` merge gate is closed
+- **Status:** Accepted — **closes the gate opened by `D-Y.08-7`**
+- **Decided by:** **Vladimir's parents**, confirmed by **Petar (orchestrator) in session, 2026-09-29**;
+  recorded by Claude Code.
+- **Context:** `D-Y.08-7` held the Y.08 PR closed until the parents confirmed that the **new** frame of
+  Vladimir could be used commercially. Permission #5 (2026-07-26) covered the **July** frames only.
+- **Decision:** Record a **separate** permission row **5b** in `facts.md` §8.1a — GIVEN, 2026-09-29,
+  channel *his parents, confirmed by the orchestrator in session*, which is the identical channel by which
+  #5 itself was recorded. Fact/date/channel only; no names, no message text, no screenshots (`D-0-1`).
+  Owed **#71 CLOSED**. Merge unblocked.
+- **Alternative rejected:** folding the new consent into the existing #5 row as though #5 had always
+  covered it. Rejected — that would erase the distinction the gate existed to protect, and would leave no
+  record that a second, separate consent was ever sought for a second, separate photograph.
+- **Downside accepted:** the consent reaches the repo as an **operator's in-session report**, not as a
+  document Code ever saw — exactly as #5 did. The record is therefore only as good as that relay, and a
+  reader two years from now cannot audit it from the repo alone; the evidence lives with Lazar and Petar.
+  That is the deliberate cost of the PII rule (`D-0-1`) on a public repo, and it is the established
+  mechanism on this project, not a new shortcut.
+- **Links:** `D-Y.08-7` (gate, now closed) · `facts.md` §8.1a row 5b · owed #71 (closed), #74 (open)
+
+### D-Y.08-11 · 2026-09-29 · The backdrop/editorial question (a minor beside a drink) is NOT closed by the consent
+- **Status:** Accepted — **open item, deliberately not a blocker**
+- **Decided by:** Claude Code, recording the scope of what `D-Y.08-10` did and did not settle.
+- **Context:** Y.08 raised two separate things about `baby-blue-01`: (a) guardian consent for commercial
+  use of a minor's likeness, and (b) whether a frame showing **a minor beside a drink** is right for a
+  brand whose audience starts at 12 — a step beyond what permission **#4** was written to cover, since #4
+  was about the **adult** model. The operator answered (a). **(b) was not put to him separately and he did
+  not answer it.**
+- **Decision:** Treat (a) as closed and (b) as **still open**, carried as owed row **#74** rather than
+  quietly folded into the closed gate. Merge proceeds — (b) is a brand judgement, not a consent defect,
+  and is reversible by swapping the frame.
+- **Alternative rejected:** treating "merge" as an answer to both questions. Rejected — one instruction
+  answering a question that was never asked is exactly how a real concern disappears from a record. The
+  cheaper error is to leave a row open that turns out to be a non-issue.
+- **Downside accepted:** **the frame is live while the question is open.** If Vladimir or his parents
+  decide the drink is wrong for the brand, it will already have been on the catalog card, the product page
+  and the home page for however long the answer takes. Removal is a one-line revert plus a redeploy, but it
+  will not be removal from before it shipped.
+- **Links:** `D-Y.03-6` (permission #4's original wording) · `facts.md` §8.1a · owed #74
+
+### D-Y.08-12 · 2026-09-29 · Y.08 merged on Petar's instruction; no operator review is recorded on the PR
+- **Status:** Accepted
+- **Decided by:** **Petar (owner), 2026-09-29**, explicit instruction ("merge to main"); executed by
+  Claude Code.
+- **Context:** `D-0-3` waives the house automated-review gate and puts the review burden on the other
+  operator. Y.08 is **not** a 1.03/1.04 phase, so no fresh-session review was required. PR #43 was checked
+  immediately before merging: **`reviews: []`, `reviewDecision: ""` — GitHub records no review at all.**
+- **Decision:** Merge as instructed, and **record plainly that no review is on the record** — exactly as
+  `D-Y.06-10` did for PR #41 and `D-Y.07-7` for PR #42 — so nobody reading this history mistakes "merged"
+  for "reviewed".
+- **Alternative rejected:** holding the merge until a review is recorded. Rejected — the owner gave a
+  direct instruction and `D-0-3` makes review an operator matter, not Code's to gate.
+- **Downside accepted:** **the third consecutive PR to reach `main` with no second human on the diff.**
+  This one publishes an identifiable photograph of a minor to a commercial front page, which is a higher
+  consequence than Y.06's or Y.07's copy changes. Code verified the rendering, the tests and the registers,
+  but **Code checking its own work is not a second reader**, and the pattern is now a habit rather than an
+  exception. Cheap to fix if wrong: the imagery is a one-line map revert plus a redeploy.
+- **Links:** `D-0-3` · `D-Y.06-10` · `D-Y.07-7` · PR #43 · owed #72, #73, #74 (all open)
