@@ -5,6 +5,7 @@ import {formatMkd} from '@/lib/format';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {getProductImage} from '@/lib/product-images';
 import {Placeholder} from '@/components/system/Placeholder';
+import {WithUsdApprox} from '@/components/system/WithUsdApprox';
 import {StockBadge} from '@/components/drop/StockBadge';
 import {SpotlightCard} from '@/components/product/SpotlightCard';
 import type {ProductView} from '@/types/drop';
@@ -71,9 +72,12 @@ export function ProductCard({product}: {product: ProductView}) {
         </h2>
 
         {product.priceMkd != null ? (
-          <span className="text-foreground text-small font-semibold tabular">
-            {formatMkd(product.priceMkd, t('Common.currency'), locale)}
-          </span>
+          // EN adds "≈ $22" after the price; MK renders the price span exactly as before (D-Y.09-4).
+          <WithUsdApprox amountMkd={product.priceMkd} locale={locale}>
+            <span className="text-foreground text-small font-semibold tabular">
+              {formatMkd(product.priceMkd, t('Common.currency'), locale)}
+            </span>
+          </WithUsdApprox>
         ) : (
           <Placeholder>{t('Placeholder.price')}</Placeholder>
         )}

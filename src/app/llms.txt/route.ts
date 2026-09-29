@@ -32,7 +32,7 @@ const PAGE_META: Record<StaticHref, {label: string; section: 'pages' | 'legal'; 
   '/contact': {label: 'Contact', section: 'pages', note: 'Reach Trajanov by Instagram or phone.'},
   '/terms': {label: 'Terms', section: 'legal', note: 'Terms of sale — cash on delivery, North Macedonia only.'},
   '/privacy': {label: 'Privacy', section: 'legal', note: 'What order data is collected, and why.'},
-  '/shipping-returns': {label: 'Shipping & Returns', section: 'legal', note: 'How delivery and returns work.'},
+  '/shipping-returns': {label: 'Shipping', section: 'legal', note: 'How delivery works.'},
 };
 
 // Both-locale links for one route, as absolute URLs on SITE_URL.

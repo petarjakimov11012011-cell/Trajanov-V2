@@ -1,9 +1,11 @@
 'use client';
 
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
 import {Minus, Plus, X} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
 import {cn} from '@/lib/utils';
+import {DELIVERY_COST_MKD} from '@/config/shipping';
+import {formatMkdWithApproxUsd} from '@/lib/format';
 import {Placeholder} from '@/components/system/Placeholder';
 import {useCart} from './cart-store';
 
@@ -48,6 +50,8 @@ function IconBtn({
 export function CartView() {
   const t = useTranslations('Cart');
   const tp = useTranslations('Placeholder');
+  const tc = useTranslations('Common');
+  const locale = useLocale();
   const {cart, hydrated, setQty, remove, atCap} = useCart();
   const lines = cart.items;
 
@@ -184,7 +188,13 @@ export function CartView() {
         </div>
         <div className="flex items-center justify-between text-small">
           <span className="text-muted-foreground">{t('shipping')}</span>
-          <span className="text-muted-foreground">{t('shippingValue')}</span>
+          {/* The delivery cost, stated — from the one constant (D-Y.09-2). Display only: it is NOT added
+              to anything, and the cart still computes no total (D-Y.09-5). */}
+          <span className="text-muted-foreground">
+            {t('shippingValue', {
+              cost: formatMkdWithApproxUsd(DELIVERY_COST_MKD, tc('currency'), locale),
+            })}
+          </span>
         </div>
         <div className="border-border flex items-center justify-between border-t pt-4">
           <span className="font-display text-foreground font-bold">{t('total')}</span>

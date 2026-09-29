@@ -8,6 +8,7 @@ import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {getProductImage, getProductSecondImage} from '@/lib/product-images';
 import {getProductCare} from '@/lib/product-care';
 import {Placeholder} from '@/components/system/Placeholder';
+import {WithUsdApprox} from '@/components/system/WithUsdApprox';
 import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {ShippingNotice} from '@/components/system/ShippingNotice';
 import {StockBadge} from '@/components/drop/StockBadge';
@@ -184,9 +185,12 @@ export default async function ProductPage({
             </h1>
             <div className="text-price tabular">
               {product.priceMkd != null ? (
-                <span className="text-foreground">
-                  {formatMkd(product.priceMkd, t('Common.currency'), locale)}
-                </span>
+                // EN adds "≈ $22" after the price, at text-small; MK is untouched (D-Y.09-4).
+                <WithUsdApprox amountMkd={product.priceMkd} locale={locale}>
+                  <span className="text-foreground">
+                    {formatMkd(product.priceMkd, t('Common.currency'), locale)}
+                  </span>
+                </WithUsdApprox>
               ) : (
                 <Placeholder>{t('Placeholder.price')}</Placeholder>
               )}

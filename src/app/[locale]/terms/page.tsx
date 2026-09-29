@@ -12,7 +12,7 @@ import {
 
 // Last-updated date shown on the page (DoD). A fixed date, formatted per locale — not read from the
 // clock, so the static build stays deterministic. Bump it when the copy changes.
-const LAST_UPDATED = '2026-07-19';
+const LAST_UPDATED = '2026-09-29';
 
 export async function generateMetadata({
   params,
