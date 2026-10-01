@@ -6,9 +6,9 @@ import {useLocale, useTranslations} from 'next-intl';
 import {ArrowLeft, ArrowRight, Pause, Play} from 'lucide-react';
 import {Link} from '@/i18n/navigation';
 import {StockBadge} from '@/components/drop/StockBadge';
-import {Placeholder} from '@/components/system/Placeholder';
 import {DisplayPrice} from '@/components/system/DisplayPrice';
 import {showcaseSlides, wrapIndex} from '@/lib/showcase';
+import {visibleStock} from '@/lib/drop/display';
 import {cn} from '@/lib/utils';
 import type {DropView} from '@/lib/drop/state';
 
@@ -162,6 +162,9 @@ export function HomeShowcase({view}: {view: DropView | null}) {
         <div className="showcase-stack" aria-live={playing ? 'off' : 'polite'}>
           {slides.map((slide, i) => {
             const isActive = i === active;
+            // Stock only while it means something — the same rule as the cards (Y.11, brief decision
+            // 7): between drops „Последно спуштање" shows no badge at all.
+            const stockLevel = visibleStock(view?.state ?? null, slide.stock);
             return (
               <div
                 key={slide.slug}
@@ -199,7 +202,8 @@ export function HomeShowcase({view}: {view: DropView | null}) {
                     <h3 className="font-display text-h2 font-bold text-foreground text-balance">
                       {slideTitle(slide)}
                     </h3>
-                    {slide.priceMkd != null ? (
+                    {/* A missing price is omitted, as on ProductCard (Y.11, brief decision 3). */}
+                    {slide.priceMkd != null && (
                       // EN shows "≈ $22" as the price in these same classes; MK is untouched (D-Y.10-2).
                       <DisplayPrice
                         amountMkd={slide.priceMkd}
@@ -207,11 +211,8 @@ export function HomeShowcase({view}: {view: DropView | null}) {
                         locale={locale}
                         className="text-price tabular font-semibold text-foreground"
                       />
-                    ) : (
-                      // Same fallback as ProductCard — a visible, logged placeholder, never a guess.
-                      <Placeholder>{t('Placeholder.price')}</Placeholder>
                     )}
-                    <StockBadge level={slide.stock} remaining={slide.remaining} />
+                    {stockLevel && <StockBadge level={stockLevel} remaining={slide.remaining} />}
                     <Link
                       // Object form so next-intl emits the localised URL (/katalog/<slug> or
                       // /en/catalog/<slug>) — never hand-write the MK slug (D-2.01-2).

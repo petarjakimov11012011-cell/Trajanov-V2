@@ -10,9 +10,7 @@ const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost"]);
 
 const GUARDED = ["SUPABASE_DB_URL", "NEXT_PUBLIC_SUPABASE_URL"] as const;
 
-type GuardedEnv = Partial<Record<(typeof GUARDED)[number], string | undefined>>;
-
-export function assertLocalDbEnv(env: GuardedEnv): void {
+export function assertLocalDbEnv(env: Record<string, string | undefined>): void {
   for (const name of GUARDED) {
     const value = env[name];
     let host: string | null = null;

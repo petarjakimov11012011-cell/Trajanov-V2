@@ -3,22 +3,31 @@ import {Link} from '@/i18n/navigation';
 import {cn} from '@/lib/utils';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {getProductImage} from '@/lib/product-images';
-import {Placeholder} from '@/components/system/Placeholder';
 import {DisplayPrice} from '@/components/system/DisplayPrice';
 import {StockBadge} from '@/components/drop/StockBadge';
 import {SpotlightCard} from '@/components/product/SpotlightCard';
-import type {ProductView} from '@/types/drop';
+import {visibleStock} from '@/lib/drop/display';
+import type {DropState, ProductView} from '@/types/drop';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
 // Product card — available / low stock / sold out.
-// Sold-out is a permanent, non-interactive end state, not an edge case.
-// Name and price come from the DB; both fall back to a placeholder when OWED (facts.md §7), so a drop
-// with no real data yet renders exactly as the 1.02 design-system pass did.
-export function ProductCard({product}: {product: ProductView}) {
+// Sold-out is a permanent, non-interactive end state, not an edge case — inside a LIVE drop. Between
+// drops (ended, or no drop) the card shows no stock line at all and stays a link: the store is
+// browsable, not sold out (Y.11, brief decision 7; the rule is src/lib/drop/display.ts).
+// Name and price come from the DB. A missing name renders the neutral "Product 01" slot (brief decision
+// 4); a missing price is OMITTED — never a `[PLACEHOLDER: …]` marker on a customer page (decision 3).
+export function ProductCard({
+  product,
+  dropState,
+}: {
+  product: ProductView;
+  dropState: DropState | null;
+}) {
   const t = useTranslations();
   const locale = useLocale();
-  const soldOut = product.stock === 'sold-out';
+  const stock = visibleStock(dropState, product.stock);
+  const soldOut = stock === 'sold-out';
   const realName = locale === 'mk' ? product.nameMk : product.nameEn;
   const title = realName ?? `${t('Placeholder.productName')} ${pad2(product.index)}`;
 
@@ -35,7 +44,7 @@ export function ProductCard({product}: {product: ProductView}) {
     >
       <div className="relative">
         <PhotoSlot
-          label={t('Placeholder.productPhoto')}
+          label={t('Product.noPhoto')}
           muted={soldOut}
           image={
             photo && {
@@ -46,7 +55,7 @@ export function ProductCard({product}: {product: ProductView}) {
           }
         />
 
-        {product.stock === 'low' && (
+        {stock === 'low' && (
           <div className="absolute left-2 top-2">
             <StockBadge level="low" remaining={product.remaining} />
           </div>
@@ -70,7 +79,7 @@ export function ProductCard({product}: {product: ProductView}) {
           {title}
         </h2>
 
-        {product.priceMkd != null ? (
+        {product.priceMkd != null && (
           // EN shows "≈ $22" as the price in these same classes; MK renders the span exactly as before
           // (D-Y.10-2). Dollars only here — the denar amount due lives on the product page (D-Y.10-4).
           <DisplayPrice
@@ -79,24 +88,25 @@ export function ProductCard({product}: {product: ProductView}) {
             locale={locale}
             className="text-foreground text-small font-semibold tabular"
           />
-        ) : (
-          <Placeholder>{t('Placeholder.price')}</Placeholder>
         )}
 
-        <div className="pt-1">
-          {product.stock === 'in-stock' && <StockBadge level="in-stock" />}
-          {/* The low pill (near-black on red — 4.8:1, brand.md §3 ledger) instead of raw red text on the
-              surface card: red-on-surface only reaches 4.31:1 and fails WCAG 2.2 AA (Task 8). Same pill
-              the product detail page already uses. */}
-          {product.stock === 'low' && (
-            <StockBadge level="low" remaining={product.remaining} />
-          )}
-          {soldOut && (
-            <span className="text-soldout text-small font-semibold">
-              {t('Stock.soldOut')}
-            </span>
-          )}
-        </div>
+        {/* No stock line between drops (visibleStock → null), so no empty padded row either. */}
+        {stock && (
+          <div className="pt-1">
+            {stock === 'in-stock' && <StockBadge level="in-stock" />}
+            {/* The low pill (near-black on red — 4.8:1, brand.md §3 ledger) instead of raw red text on
+                the surface card: red-on-surface only reaches 4.31:1 and fails WCAG 2.2 AA (Task 8).
+                Same pill the product detail page already uses. */}
+            {stock === 'low' && (
+              <StockBadge level="low" remaining={product.remaining} />
+            )}
+            {soldOut && (
+              <span className="text-soldout text-small font-semibold">
+                {t('Stock.soldOut')}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

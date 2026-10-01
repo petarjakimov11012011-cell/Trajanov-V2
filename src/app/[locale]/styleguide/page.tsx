@@ -32,8 +32,8 @@ export async function generateMetadata({
 }
 
 // Local sample products — the styleguide is a design reference and needs each card state on demand
-// (in-stock / low / sold-out), which real drop data cannot guarantee. Null names/prices render the
-// neutral slot + price placeholder, exactly as a data-less real product would.
+// (in-stock / low / sold-out), which real drop data cannot guarantee. Null names render the neutral
+// slot and null prices are omitted, exactly as a data-less real product would (Y.11, brief decision 3).
 const SAMPLE_PRODUCTS: ProductView[] = [
   {
     slug: 'sg-in-stock',
@@ -195,7 +195,8 @@ export default function StyleguidePage() {
       <Section title={t('productCard')}>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {SAMPLE_PRODUCTS.map((p) => (
-            <ProductCard key={p.slug} product={p} />
+            // Shown as a LIVE drop so all three card states (available / low / sold out) render.
+            <ProductCard key={p.slug} product={p} dropState="live" />
           ))}
         </div>
       </Section>
@@ -205,6 +206,7 @@ export default function StyleguidePage() {
           <BuyButton state="default" />
           <BuyButton state="loading" />
           <BuyButton state="disabled" />
+          <BuyButton state="closed" />
           <BuyButton state="sold-out" />
         </div>
       </Section>

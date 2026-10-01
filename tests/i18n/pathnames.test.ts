@@ -28,6 +28,9 @@ function routePathnames(): string[] {
     const parent = (entry as unknown as {parentPath: string}).parentPath;
     const rel = relative(LOCALE_DIR, parent);
     const segments = rel.split(sep).filter(Boolean);
+    // A catch-all (`[...rest]`, Y.11) is not a page anyone links to — it only calls notFound() so an
+    // unknown path renders the localized 404. It has no slug to localise and is exempt here.
+    if (segments.some((segment) => segment.startsWith("[..."))) continue;
     out.push(segments.length === 0 ? "/" : "/" + segments.join("/"));
   }
   return out.sort();

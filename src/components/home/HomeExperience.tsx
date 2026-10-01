@@ -205,7 +205,7 @@ export function HomeExperience({view}: {view: DropView | null}) {
           </Hero>
           <div className="reveal-group grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {view.products.map((p) => (
-              <ProductCard key={p.slug} product={p} />
+              <ProductCard key={p.slug} product={p} dropState="live" />
             ))}
           </div>
         </section>

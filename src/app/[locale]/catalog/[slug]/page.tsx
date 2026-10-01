@@ -7,15 +7,13 @@ import {Link} from '@/i18n/navigation';
 import {PhotoSlot} from '@/components/system/PhotoSlot';
 import {getProductImage, getProductSecondImage} from '@/lib/product-images';
 import {getProductCare} from '@/lib/product-care';
-import {Placeholder} from '@/components/system/Placeholder';
 import {DisplayPrice} from '@/components/system/DisplayPrice';
 import {AmountDue} from '@/components/product/AmountDue';
-import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {ShippingNotice} from '@/components/system/ShippingNotice';
 import {StockBadge} from '@/components/drop/StockBadge';
 import {AddToCartPanel} from '@/components/product/AddToCartPanel';
-import {type BuyState} from '@/components/product/BuyButton';
 import {getProductView, parsePreviewState} from '@/lib/drop/state';
+import {buyStateFor, visibleStock} from '@/lib/drop/display';
 import {pageMetadata} from '@/lib/metadata';
 import {getPathname} from '@/i18n/navigation';
 import {SITE_URL} from '@/lib/site';
@@ -33,6 +31,12 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
 // columns of that same full-width column (~50vw); from 1024px the outer `lg:grid-cols-2` halves the
 // 1152px container first, so each slot is ~280px. If either grid changes, this changes with it.
 const PRODUCT_SLOT_SIZES = '(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw';
+
+// ONE photograph (Y.11, brief decision 8 — the empty second slot is omitted, not shown as a marker). It
+// takes the whole gallery column: ~536px at lg (half of the 1104px content box, less the gap), capped
+// at `max-w-md` (448px) from 640px so a tablet does not stack a 1,000px-tall photo above the buy path,
+// and the full column on a phone.
+const PRODUCT_SINGLE_SIZES = '(min-width: 1024px) 536px, (min-width: 640px) 448px, 100vw';
 
 // Per-locale title from the product's real name (or the neutral placeholder + index while names are
 // OWED); generic per-locale description; reciprocal hreflang for the SHARED product slug (D-2.01-2/5/6).
@@ -79,33 +83,35 @@ export default async function ProductPage({
   const t = await getTranslations();
   const locale = await getLocale();
 
-  const soldOut = product.stock === 'sold-out';
+  // What the page SAYS about stock and buying is the server's drop state through one rule
+  // (src/lib/drop/display.ts, brief decision 7): live → real stock; countdown → coming soon; ended or
+  // no drop → ordering is closed, no stock line, never "Sold out". create_order() still gates orders.
+  const stock = visibleStock(dropState, product.stock);
+  const soldOut = stock === 'sold-out';
+  const buyState = buyStateFor(dropState, product.stock);
   const realName = locale === 'mk' ? product.nameMk : product.nameEn;
   const title = realName ?? `${t('Placeholder.productName')} ${pad2(product.index)}`;
 
-  // Looked up by SLUG, never by position (D-Y.03-1). Null for Product 03 and for anything unphotographed.
+  // Looked up by SLUG, never by position (D-Y.03-1). The gallery shows REAL photographs only (brief
+  // decision 8): the second slot renders only where a second frame exists (Product 03 today). The first
+  // slot always renders; with no photograph at all it is a neutral "No photo yet" frame, never a marker.
   const photo = getProductImage(product.slug);
   const photo2 = getProductSecondImage(product.slug);
+  const photoAlt = (p: NonNullable<typeof photo>) => ({
+    src: p.src,
+    alt: t(p.altKey),
+    objectPosition: p.objectPosition,
+  });
 
   // Composition & care, also looked up by SLUG and never by position (D-Y.06-1) — a fabric claim landing
   // on the wrong colourway is a false material claim, not a cosmetic slip. `product` above is a
   // ProductView built from the DATABASE, which has no care column (that is Y.01, D-1.06-3), so the copy
-  // comes from `src/config/products.ts` beside it — the same shape as the photo lookup. Every entry is
-  // null today (facts.md §7 OWED; placeholder register #3/#9), so `careCopy` is null and the section
-  // renders the unchanged placeholder (D-Y.06-2).
+  // comes from `src/config/products.ts` beside it — the same shape as the photo lookup. All three shirts
+  // carry the owner's statement (facts.md §7, D-Y.07-1). A product with none gets NO section: omission
+  // states nothing false, where a `[PLACEHOLDER: …]` marker showed an internal note to customers (brief
+  // decision 3, superseding the null → placeholder branch of D-Y.06-2).
   const care = getProductCare(product.slug);
   const careCopy = (locale === 'mk' ? care?.mk : care?.en) ?? null;
-
-  // Buy state from the SERVER's drop state + stock (the 6 handover states — no new ones):
-  //  sold out → sold-out · pre-drop → disabled/"coming soon" · live → default · ended (with stock) →
-  //  sold-out (non-interactive; the drop is over — the closest of the available states).
-  const buyState: BuyState = soldOut
-    ? 'sold-out'
-    : dropState === 'countdown'
-      ? 'disabled'
-      : dropState === 'ended'
-        ? 'sold-out'
-        : 'default';
 
   // Product structured data (Task 5): a node is emitted ONLY once the product has a real name; while
   // names are placeholders (register #4) `productJsonLd` returns null and nothing ships. Price + MKD +
@@ -131,18 +137,15 @@ export default async function ProductPage({
         <ArrowLeft className="h-4 w-4" /> {t('Product.back')}
       </Link>
 
-      <PreviewNotice />
-
       {/* Buy path above the fold */}
       <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
         {/* BOTH slots are slug-keyed lookups, never positional (D-Y.03-1). The first takes the interim
             lifestyle frame when one exists (D-Y.03-7, extended to baby blue by D-Y.08-2); the second
-            takes a second frame only where one exists, which today is Product 03 alone (D-Y.08-3).
-            Products 01 and 02 keep a visible placeholder in slot 2 on purpose: their back /
-            print-detail shot is genuinely still owed (register #2), and the page should say so
-            rather than imply the set is complete. The cost of filling Product 03's second slot is
-            that its page no longer visibly signals the same debt — recorded in D-Y.08-3, and the
-            neutral set stays OWED for all three colourways. */}
+            renders only where a second frame exists, which today is Product 03 alone (D-Y.08-3).
+            Products 01 and 02 used to show a `[PLACEHOLDER: …]` slot 2 to signal that their back /
+            print-detail shot is owed; that was an internal note on a customer page, so the slot is now
+            omitted (Y.11, brief decision 8). The debt is unchanged and lives in placeholder register
+            #2 — the neutral set stays OWED for all three colourways. */}
         {/* One column below `sm:` (D-2.25-10, figures corrected by D-2.25-21). Two 4:5 slots side by
             side on a 320px phone measured 138×173 each — too small to judge a garment by, which is
             the only thing this page is for; one column makes each 288×360. The cost is real and
@@ -151,62 +154,59 @@ export default async function ProductPage({
             547.9 → 1107.4 (the ~19.5px locale offset is one extra wrapped line of `PreviewNotice`).
             So the buy path sits below two screens of scroll while the second slot is still a hatched
             placeholder (register #2). One `sm:` word reverses it. */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <PhotoSlot
-            label={t('Placeholder.productPhoto')}
-            muted={soldOut}
-            sizes={PRODUCT_SLOT_SIZES}
-            image={
-              photo && {
-                src: photo.src,
-                alt: t(photo.altKey),
-                objectPosition: photo.objectPosition,
-              }
-            }
-          />
-          <PhotoSlot
-            label={t('Placeholder.productPhoto')}
-            muted={soldOut}
-            sizes={PRODUCT_SLOT_SIZES}
-            image={
-              photo2 && {
-                src: photo2.src,
-                alt: t(photo2.altKey),
-                objectPosition: photo2.objectPosition,
-              }
-            }
-          />
-        </div>
+        {photo2 ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <PhotoSlot
+              label={t('Product.noPhoto')}
+              muted={soldOut}
+              sizes={PRODUCT_SLOT_SIZES}
+              image={photo && photoAlt(photo)}
+            />
+            <PhotoSlot
+              label={t('Product.noPhoto')}
+              muted={soldOut}
+              sizes={PRODUCT_SLOT_SIZES}
+              image={photoAlt(photo2)}
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3">
+            <PhotoSlot
+              label={t('Product.noPhoto')}
+              muted={soldOut}
+              sizes={PRODUCT_SINGLE_SIZES}
+              className="sm:max-w-md lg:max-w-none"
+              image={photo && photoAlt(photo)}
+            />
+          </div>
+        )}
 
         <div className="flex flex-col gap-5 lg:sticky lg:top-20">
           <div className="flex flex-col gap-3">
             <h1 className="font-display text-h1 text-foreground font-extrabold">
               {title}
             </h1>
-            <div className="text-price tabular">
-              {product.priceMkd != null ? (
-                // EN shows "≈ $22" as the price in these same classes, then the denar amount due on a
-                // muted line under it (EN only — D-Y.10-2/4). MK renders the span exactly as before.
-                <>
-                  <DisplayPrice
-                    amountMkd={product.priceMkd}
-                    currency={t('Common.currency')}
-                    locale={locale}
-                    className="text-foreground"
-                  />
-                  <AmountDue amountMkd={product.priceMkd} locale={locale} />
-                </>
-              ) : (
-                <Placeholder>{t('Placeholder.price')}</Placeholder>
-              )}
-            </div>
-            <div>
-              {product.stock === 'in-stock' && <StockBadge level="in-stock" />}
-              {product.stock === 'low' && (
-                <StockBadge level="low" remaining={product.remaining} />
-              )}
-              {soldOut && <StockBadge level="sold-out" />}
-            </div>
+            {/* A missing price is omitted, never marked (brief decision 3). */}
+            {product.priceMkd != null && (
+              <div className="text-price tabular">
+                {/* EN shows "≈ $22" as the price in these same classes, then the denar amount due on a
+                    muted line under it (EN only — D-Y.10-2/4). MK renders the span exactly as before. */}
+                <DisplayPrice
+                  amountMkd={product.priceMkd}
+                  currency={t('Common.currency')}
+                  locale={locale}
+                  className="text-foreground"
+                />
+                <AmountDue amountMkd={product.priceMkd} locale={locale} />
+              </div>
+            )}
+            {stock && (
+              <div>
+                {stock === 'in-stock' && <StockBadge level="in-stock" />}
+                {stock === 'low' && <StockBadge level="low" remaining={product.remaining} />}
+                {soldOut && <StockBadge level="sold-out" />}
+              </div>
+            )}
           </div>
 
           {/* MK-only shipping statement, in the buy panel ABOVE the Add-to-cart control so it is visible
@@ -225,18 +225,15 @@ export default async function ProductPage({
 
       {/* Detail below the fold */}
       <div className="border-border mt-8 grid gap-8 border-t pt-8 sm:grid-cols-2">
-        <section className="flex flex-col gap-2">
-          <h2 className="font-display text-foreground font-bold">
-            {t('Product.composition')}
-          </h2>
-          {/* Real copy is styled like the adjacent Shipping body, NOT like a placeholder — once it is a
-              fact off the label it should read as one. Null → the byte-identical placeholder (D-Y.06-2). */}
-          {careCopy ? (
+        {careCopy && (
+          <section className="flex flex-col gap-2">
+            <h2 className="font-display text-foreground font-bold">
+              {t('Product.composition')}
+            </h2>
+            {/* Styled like the adjacent Shipping body — a fact reads as one. */}
             <p className="text-muted-foreground text-small">{careCopy}</p>
-          ) : (
-            <Placeholder>{t('Placeholder.composition')}</Placeholder>
-          )}
-        </section>
+          </section>
+        )}
         <section className="flex flex-col gap-2">
           <h2 className="font-display text-foreground font-bold">
             {t('Product.shipping')}

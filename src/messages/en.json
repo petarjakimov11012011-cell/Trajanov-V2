@@ -182,6 +182,7 @@
     "add": "Add to cart",
     "adding": "Adding…",
     "comingSoon": "Coming soon",
+    "closed": "Ordering is closed",
     "soldOut": "Sold out",
     "viewProduct": "View",
     "added": "Added.",
@@ -193,6 +194,13 @@
     "countdownIntro": "The drop isn't open yet. Browse now; buying unlocks when the timer hits zero.",
     "ended": "This drop has ended.",
     "empty": "No active drop right now."
+  },
+  "NotFound": {
+    "eyebrow": "Error 404",
+    "h1": "This page doesn't exist.",
+    "body": "The link may be old or mistyped. Go to the catalog or the home page.",
+    "catalog": "Catalog",
+    "home": "Home"
   },
   "Product": {
     "back": "Back to catalog",
@@ -208,7 +216,8 @@
     "photoAltOffWhite": "Off-white t-shirt with red print, worn.",
     "photoAltBabyBlue": "Baby-blue t-shirt with red print, worn.",
     "photoAltComposite": "Ochre and off-white t-shirts with red print, worn.",
-    "amountDue": "You pay {amount} in cash on delivery."
+    "amountDue": "You pay {amount} in cash on delivery.",
+    "noPhoto": "No photo yet"
   },
   "Cart": {
     "title": "Cart",
@@ -268,12 +277,8 @@
     "skipToContent": "Skip to content"
   },
   "Placeholder": {
-    "productPhoto": "[PLACEHOLDER: product photo — Vladimir]",
     "productName": "Product",
-    "price": "[PLACEHOLDER: price MKD]",
-    "sizesSample": "sizes — sample, pending Vladimir",
-    "composition": "[PLACEHOLDER: composition & care — from the label]",
-    "notice": "Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase."
+    "price": "[PLACEHOLDER: price MKD]"
   },
   "Styleguide": {
     "title": "Design system",
