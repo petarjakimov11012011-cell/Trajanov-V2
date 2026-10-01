@@ -17,6 +17,26 @@ function breakdown(ms: number) {
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+type TimerParts = {days: number; hours: number; minutes: number; seconds: number};
+// Structural type for the `Drop` translator, so a plain createTranslator works in tests.
+type DropT = (key: 'days' | 'hours' | 'minutes' | 'seconds' | 'timerAria', values?: TimerParts | {count: number}) => string;
+
+/**
+ * The words around the digits (Y.11, Task 11). Labels agree with the number they sit under — 1 DAY /
+ * 2 DAYS, 1 ДЕН / 2 ДЕНА, 1 ЧАС / 2 ЧАСА — via ICU plurals in the catalogs; minutes and seconds keep
+ * their fixed abbreviations. The screen-reader text is full words ("2 days, 1 hour, …"), not the
+ * visual abbreviations a screen reader would spell out. Exported for the plural tests.
+ */
+export function timerText(t: DropT, parts: TimerParts) {
+  return {
+    days: t('days', {count: parts.days}),
+    hours: t('hours', {count: parts.hours}),
+    minutes: t('minutes'),
+    seconds: t('seconds'),
+    aria: t('timerAria', parts),
+  };
+}
+
 function Cell({
   value,
   label,
@@ -117,6 +137,7 @@ export function Countdown({
 
   const known = remaining !== null;
   const {days, hours, minutes, seconds, totalSec} = breakdown(remaining ?? 0);
+  const words = timerText(t, {days, hours, minutes, seconds});
   const underHour = known && totalSec > 0 && totalSec < 3600;
   const underMin = known && totalSec > 0 && totalSec < 60;
 
@@ -130,11 +151,7 @@ export function Countdown({
   return (
     <div
       role="timer"
-      aria-label={
-        known
-          ? `${days} ${t('days')} ${hours} ${t('hours')} ${minutes} ${t('minutes')} ${seconds} ${t('seconds')}`
-          : undefined
-      }
+      aria-label={known ? words.aria : undefined}
       className={cn(
         'font-display text-h1 md:text-countdown inline-flex flex-col items-center',
         className,
@@ -147,15 +164,15 @@ export function Countdown({
             'border-accent border-b-[1px] transition-colors duration-[var(--motion-fast)]',
         )}
       >
-        <Cell value={pad(days)} label={t('days')} accent={underMin} known={known} />
+        <Cell value={pad(days)} label={words.days} accent={underMin} known={known} />
         <Colon accent={underMin} />
-        <Cell value={pad(hours)} label={t('hours')} accent={underMin} known={known} />
+        <Cell value={pad(hours)} label={words.hours} accent={underMin} known={known} />
         <Colon accent={underMin} />
-        <Cell value={pad(minutes)} label={t('minutes')} accent={underMin} known={known} />
+        <Cell value={pad(minutes)} label={words.minutes} accent={underMin} known={known} />
         <Colon accent={underMin} />
         <Cell
           value={pad(seconds)}
-          label={t('seconds')}
+          label={words.seconds}
           accent={underHour}
           known={known}
         />

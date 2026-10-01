@@ -6,7 +6,7 @@ import {pageMetadata} from '@/lib/metadata';
 import {PHONE_DISPLAY, PHONE_TEL} from '@/lib/social';
 
 // Fixed last-updated date (see Terms page note).
-const LAST_UPDATED = '2026-07-19';
+const LAST_UPDATED = '2026-10-02';
 
 export async function generateMetadata({
   params,

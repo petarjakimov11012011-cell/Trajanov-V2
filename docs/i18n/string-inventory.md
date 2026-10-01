@@ -4,7 +4,7 @@
 > Source: `src/messages/mk.json` + `src/messages/en.json`. MK is the source language;
 > EN is a translation of it, not a paraphrase. For Phase 2.02 (native MK review).
 
-**Keys:** 269 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
+**Keys:** 273 (MK and EN key sets are identical — enforced by `tests/i18n/catalog-parity.test.ts`).
 
 The **Where** column is a static heuristic (see `scripts/i18n-inventory.ts`): it points at
 the file(s) that reference each key, to start a review — not an exhaustive render trace.
@@ -13,7 +13,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 |---|---|---|---|
 | `About.body1` | Trajanov е бренд за облека од Струмица, основан во 2026 година. Го води еден човек: Владимир Трајанов, основач и дизајнер. Тој е ученик во СОУ „Никола Карев“ во Струмица, на насока техничар за дизајн на облека. Нема тим. Брендот прави оверсајз унисекс маици. | Trajanov is a clothing brand from Strumica, founded in 2026. One person runs it: Vladimir Trajanov, founder and designer. He’s a student at SOU “Nikola Karev” in Strumica, training as a clothing design technician. No team. The brand makes oversized unisex t-shirts. | `src/app/[locale]/about/page.tsx` |
 | `About.body2` | Во јуни 2026, Владимир освои прво место на конкурс за дизајн на маица за средношколци од текстилните и модните училишта во Северна Македонија. Конкурсот го организираа Креативен ден, Божиловиќ продукција, СОУ „Таки Даскало“ и текстилната компанија ЕАМ од Штип, а трудовите ги оценуваше стручно жири од претставници на Креативен ден и ЕАМ. Целта беше учениците да ги покажат своите идеи и талент преку визуелен израз, и да добијат референца за професионалното портфолио. | In June 2026, Vladimir won first place in a t-shirt design competition for secondary-school students from the fashion and textile schools of North Macedonia. It was organised by Kreativen den, Božilović produkcija, SOU “Taki Daskalo” and the textile company EAM of Štip, and judged by a professional jury of representatives from Kreativen den and EAM. The aim was to let students show their ideas and talent through visual expression, and to give them a reference for a professional portfolio. | `src/app/[locale]/about/page.tsx` |
-| `About.body3` | Наградата беше 30 маици изработени со неговиот дизајн и посета на фабриката на ЕАМ. Trajanov продава во спуштања од 3 до 5 парчиња, со вистински и ограничени залихи. Испорака само низ Северна Македонија, плаќање со готовина при преземање. | The prize was 30 t-shirts made with his design, plus a visit to the EAM factory. Trajanov sells in drops of 3 to 5 pieces, with real, limited stock. Shipping within North Macedonia only, cash on delivery. | `src/app/[locale]/about/page.tsx` |
+| `About.body3` | Наградата беше 30 маици изработени со неговиот дизајн и посета на фабриката на ЕАМ. Trajanov продава во дропови од 3 до 5 производи, со вистински и ограничени залихи. Испорака само низ Северна Македонија, плаќање со готовина при преземање. | The prize was 30 t-shirts made with his design, plus a visit to the EAM factory. Trajanov sells in drops of 3 to 5 products, with real, limited stock. Shipping within North Macedonia only, cash on delivery. | `src/app/[locale]/about/page.tsx` |
 | `About.eyebrow` | Струмица · 2026 | Strumica · 2026 | `src/app/[locale]/about/page.tsx` |
 | `About.h1` | Еден бренд, еден дизајнер. | One brand, one designer. | `src/app/[locale]/about/page.tsx` |
 | `About.pressHeading` | Во печатот | In the press | `src/app/[locale]/about/page.tsx` |
@@ -24,11 +24,12 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Buy.add` | Додај во кошничка | Add to cart | `src/components/product/BuyButton.tsx` |
 | `Buy.added` | Додадено. | Added. | `src/components/product/AddToCartPanel.tsx` |
 | `Buy.adding` | Се додава… | Adding… | `src/components/product/BuyButton.tsx` |
+| `Buy.closed` | Нарачките се затворени | Ordering is closed | `src/components/product/AddToCartPanel.tsx`<br>`src/components/product/BuyButton.tsx` |
 | `Buy.comingSoon` | Наскоро | Coming soon | `src/components/product/BuyButton.tsx` |
 | `Buy.soldOut` | Распродадено | Sold out | `src/components/product/BuyButton.tsx` |
 | `Buy.viewCart` | Кон кошничката | View cart | `src/components/product/AddToCartPanel.tsx` |
 | `Buy.viewProduct` | Погледни | View | _(not found in source)_ |
-| `Cart.backToDrop` | Назад кон спуштањето | Back to the drop | `src/components/cart/CartView.tsx`<br>`src/components/checkout/CheckoutForm.tsx` |
+| `Cart.backToDrop` | Назад кон дропот | Back to the drop | `src/components/cart/CartView.tsx`<br>`src/components/checkout/CheckoutForm.tsx` |
 | `Cart.checkout` | Кон нарачка | Checkout | `src/components/cart/CartView.tsx` |
 | `Cart.codNote` | Плаќање со готовина при преземање. | Cash on delivery. | `src/components/cart/CartView.tsx` |
 | `Cart.decrease` | Намали количина | Decrease quantity | `src/components/cart/CartView.tsx` |
@@ -42,10 +43,10 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Cart.subtotal` | Меѓузбир | Subtotal | `src/components/cart/CartView.tsx` |
 | `Cart.title` | Кошничка | Cart | `src/app/[locale]/cart/page.tsx` |
 | `Cart.total` | Вкупно | Total | `src/components/cart/CartView.tsx` |
-| `Catalog.countdownIntro` | Спуштањето уште не е отворено. Разгледувај; купувањето се отклучува кога тајмерот ќе стигне нула. | The drop isn't open yet. Browse now; buying unlocks when the timer hits zero. | `src/app/[locale]/catalog/page.tsx` |
-| `Catalog.empty` | Нема активно спуштање во моментов. | No active drop right now. | `src/app/[locale]/catalog/page.tsx` |
-| `Catalog.ended` | Ова спуштање заврши. | This drop has ended. | `src/app/[locale]/catalog/page.tsx` |
-| `Catalog.live` | Спуштањето е во живо — залихите се вистински и ограничени. | The drop is live — stock is real and limited. | `src/app/[locale]/catalog/page.tsx` |
+| `Catalog.countdownIntro` | Дропот уште не е отворен. Разгледувај; купувањето се отклучува кога тајмерот ќе стигне до нула. | The drop isn't open yet. Browse now; buying unlocks when the timer hits zero. | `src/app/[locale]/catalog/page.tsx` |
+| `Catalog.empty` | Нема активен дроп во моментов. | No active drop right now. | `src/app/[locale]/catalog/page.tsx` |
+| `Catalog.ended` | Овој дроп заврши. | This drop has ended. | `src/app/[locale]/catalog/page.tsx` |
+| `Catalog.live` | Дропот е отворен — залихите се вистински и ограничени. | The drop is live — stock is real and limited. | `src/app/[locale]/catalog/page.tsx` |
 | `Catalog.title` | Каталог | Catalog | `src/app/[locale]/catalog/page.tsx` |
 | `Checkout.address` | Адреса | Address | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.botCheck` | Проверка дека не си робот | Confirm you're not a robot | _(not found in source)_ |
@@ -56,14 +57,14 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Checkout.errorRequired` | Ова поле е задолжително. | This field is required. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Checkout.name` | Име и презиме | Full name | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Checkout.note` | Белешка (по избор) | Note (optional) | `src/components/checkout/CheckoutForm.tsx` |
-| `Checkout.notePlaceholder` | Скала, спрат, ориентир… | Entrance, floor, landmark… | `src/components/checkout/CheckoutForm.tsx` |
+| `Checkout.notePlaceholder` | Влез, кат, ориентир… | Entrance, floor, landmark… | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.phone` | Телефон | Phone | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.placeOrder` | Нарачај | Place order | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.reserveNote` | Нарачката резервира залиха 48 часа. | Your order reserves stock for 48 hours. | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.summary` | Преглед на нарачката | Order summary | `src/components/checkout/CheckoutForm.tsx` |
 | `Checkout.title` | Нарачка | Checkout | `src/app/[locale]/checkout/page.tsx` |
 | `Checkout.verifying` | се проверува | verifying | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
-| `Common.currency` | ден | MKD | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/home/HomeFaq.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/AmountDue.tsx`<br>`src/components/product/ProductCard.tsx` |
+| `Common.currency` | ден | MKD | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/app/[locale]/terms/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/home/HomeFaq.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/AmountDue.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Common.languageEn` | EN | EN | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.languageMk` | МК | МК | `src/components/layout/LanguageSwitch.tsx` |
 | `Common.lastUpdated` | Последно ажурирано | Last updated | `src/app/[locale]/privacy/page.tsx`<br>`src/app/[locale]/shipping-returns/page.tsx`<br>`src/app/[locale]/terms/page.tsx` |
@@ -82,7 +83,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Contact.formSubject` | Наслов (по избор) | Subject (optional) | `src/components/contact/ContactForm.tsx` |
 | `Contact.h1` | Стапи во контакт. | Get in touch. | `src/app/[locale]/contact/page.tsx` |
 | `Contact.instagramLabel` | Инстаграм | Instagram | `src/app/[locale]/contact/page.tsx` |
-| `Contact.instagramNote` | Тука се објавуваат спуштањата. Ова е главниот канал. | Drops are announced here. This is the main channel. | `src/app/[locale]/contact/page.tsx` |
+| `Contact.instagramNote` | Тука се објавуваат дроповите. Ова е главниот канал. | Drops are announced here. This is the main channel. | `src/app/[locale]/contact/page.tsx` |
 | `Contact.intro` | Прати ни порака и ќе ти одговориме по е-пошта. | Send us a message and we'll reply by email. | `src/app/[locale]/contact/page.tsx` |
 | `Contact.phoneLabel` | Телефон | Phone | `src/app/[locale]/contact/page.tsx` |
 | `Contact.phoneNote` | Најбрзиот начин да добиеш одговор. | The fastest way to get an answer. | `src/app/[locale]/contact/page.tsx` |
@@ -93,25 +94,26 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Contact.sending` | Се испраќа… | Sending… | `src/components/contact/ContactForm.tsx` |
 | `Contact.success` | Пораката е испратена. Ќе ти одговориме на е-пошта. | Message sent. We'll reply to your email. | `src/components/contact/ContactForm.tsx` |
 | `Credit.builtBy` | Изработено од <link>Vertex Consulting</link> | Built by <link>Vertex Consulting</link> | `src/components/layout/SiteHeader.tsx` |
-| `Credit.opensInNewTab` | се отвора во нов прозорец | opens in a new tab | `src/components/layout/SiteHeader.tsx` |
-| `Drop.days` | ДЕНА | DAYS | `src/components/drop/Countdown.tsx` |
-| `Drop.ended` | Спуштањето заврши | Drop ended | `src/components/drop/DropBanner.tsx` |
+| `Credit.opensInNewTab` | се отвора во ново јазиче | opens in a new tab | `src/components/layout/SiteHeader.tsx` |
+| `Drop.days` | {count, plural, one {ДЕН} other {ДЕНА}} | {count, plural, one {DAY} other {DAYS}} | `src/components/drop/Countdown.tsx` |
+| `Drop.ended` | Дропот заврши | Drop ended | `src/components/drop/DropBanner.tsx` |
 | `Drop.endedFollow` | Следи {handle} за следното. | Follow {handle} for the next one. | `src/components/drop/DropBanner.tsx` |
-| `Drop.hours` | ЧАСА | HRS | `src/components/drop/Countdown.tsx` |
-| `Drop.live` | СПУШТАЊЕТО Е ВО ЖИВО | DROP IS LIVE | `src/components/drop/DropBanner.tsx` |
-| `Drop.liveNow` | Во живо сега | Live now | _(not found in source)_ |
+| `Drop.hours` | {count, plural, one {ЧАС} other {ЧАСА}} | {count, plural, one {HR} other {HRS}} | `src/components/drop/Countdown.tsx` |
+| `Drop.live` | ДРОПОТ Е ОТВОРЕН | DROP IS LIVE | `src/components/drop/DropBanner.tsx` |
+| `Drop.liveNow` | Отворено сега | Live now | _(not found in source)_ |
 | `Drop.minutes` | МИН | MIN | `src/components/drop/Countdown.tsx` |
-| `Drop.nextDrop` | Следно спуштање | Next drop | `src/components/drop/DropBanner.tsx` |
-| `Drop.remaining` | Преостануваат {count} | {count} left | `src/components/drop/DropBanner.tsx` |
+| `Drop.nextDrop` | Следниот дроп | Next drop | `src/components/drop/DropBanner.tsx` |
+| `Drop.remaining` | {count, plural, one {Преостанува #} other {Преостануваат #}} | {count} left | `src/components/drop/DropBanner.tsx` |
 | `Drop.seconds` | СЕК | SEC | `src/components/drop/Countdown.tsx` |
-| `Faq.a1` | Само додека трае спуштање. Меѓу спуштањата сè може да се разгледа, но ништо не може да се купи. Тајмерот на почетната страница покажува кога се отвора следното. | Only while a drop is on. Between drops you can look at everything, but nothing is buyable. The timer on the home page shows when the next one opens. | _(not found in source)_ |
+| `Drop.timerAria` | {days, plural, one {# ден} other {# дена}}, {hours, plural, one {# час} other {# часа}}, {minutes, plural, one {# минута} other {# минути}}, {seconds, plural, one {# секунда} other {# секунди}} | {days, plural, one {# day} other {# days}}, {hours, plural, one {# hour} other {# hours}}, {minutes, plural, one {# minute} other {# minutes}}, {seconds, plural, one {# second} other {# seconds}} | `src/components/drop/Countdown.tsx` |
+| `Faq.a1` | Само додека трае дроп. Меѓу дроповите нарачките се затворени, но сè може да се разгледа. За следниот дроп, следи го {handle} на Инстаграм. | Only during a drop. Between drops, ordering is closed, but you can still look at everything. Follow {handle} on Instagram for the next one. | _(not found in source)_ |
 | `Faq.a2` | Готовина при преземање, кога пратката ќе пристигне. Нема картички, нема банкарски трансфер, нема плаќање однапред. | Cash on delivery, when the package arrives. No cards, no bank transfer, no paying up front. | _(not found in source)_ |
 | `Faq.a3` | Колку што има на залиха. Нема ограничување по нарачка — залихата е вистинска и ограничена, па кога ќе се распродаде, готово е. | As many as are in stock. There's no per-order limit — the stock is real and limited, so once it's sold out, it's gone. | _(not found in source)_ |
 | `Faq.a4` | Само во Северна Македонија. Нема испорака во странство. | Within North Macedonia only. No international shipping. | _(not found in source)_ |
 | `Faq.a5` | Рок на достава: 3–5 работни дена. Цената на доставата е {cost}. Плаќаш готовина на врата. | Delivery takes 3 to 5 business days and costs {cost}. You pay cash at the door. | _(not found in source)_ |
 | `Faq.a6` | Нарачката ја резервира залихата 48 часа — не се продава веднаш. Те бараме телефонски за да ја потврдиме. Ако не те фатиме, резервацијата истекува и парчето се враќа во продажба. | Your order holds the stock for 48 hours — it isn't sold on the spot. We call you to confirm it. If we can't reach you, the hold expires and the piece goes back on sale. | _(not found in source)_ |
-| `Faq.a7` | Величините стојат на страницата на секое парче, заедно со тоа што е сè уште достапно. Маиците се оверсајз унисекс крој. Точни мерки во сантиметри сè уште не се објавени. | Sizes are listed on each piece's own page, along with what's still available. The t-shirts are an oversized unisex cut. Exact measurements in centimetres aren't published yet. | _(not found in source)_ |
-| `Faq.a8` | Секое спуштање е од 3 до 5 парчиња, во ограничен број. Кога ќе пишува „Распродадено“, навистина е распродадено — залихата се води на серверот, не на екранот. | Each drop is 3 to 5 pieces, in limited numbers. When it says "Sold out", it really is sold out — the stock is counted on the server, not on the screen. | _(not found in source)_ |
+| `Faq.a7` | Величините стојат на страницата на секое парче, а додека трае дроп, таму се гледа и што е сè уште достапно. Маиците се со оверсајз унисекс крој. Точни мерки во сантиметри сè уште не се објавени. | Each piece's page lists its sizes, and during a drop it shows which are still available. The t-shirts are an oversized unisex cut. Exact measurements in centimetres aren't published yet. | _(not found in source)_ |
+| `Faq.a8` | Секој дроп е од 3 до 5 производи, во ограничен број. Кога ќе пишува „Распродадено“, навистина е распродадено: секоја нарачка се брои веднаш штом ќе се направи. | Each drop is 3 to 5 products, in limited numbers. When it says "Sold out", it really is sold out: every order is counted the moment it's placed. | _(not found in source)_ |
 | `Faq.groupDelivery` | Достава | Delivery | _(not found in source)_ |
 | `Faq.groupOrdering` | Нарачка | Ordering | _(not found in source)_ |
 | `Faq.groupPieces` | Парчињата | The pieces | _(not found in source)_ |
@@ -133,8 +135,8 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Home.browseWhileWait` | Разгледај додека чекаш | Browse while you wait | _(not found in source)_ |
 | `Home.ctaCatalog` | Каталог | Catalog | `src/components/home/HomeExperience.tsx` |
 | `Home.ctaContact` | Контакт | Contact | `src/components/home/HomeExperience.tsx` |
-| `Home.eyebrow` | Следно спуштање | Next drop | _(not found in source)_ |
-| `Home.headline` | Кога тајмерот ќе стигне нула, спуштањето е во живо. | When the timer hits zero, the drop is live. | _(not found in source)_ |
+| `Home.eyebrow` | Следниот дроп | Next drop | _(not found in source)_ |
+| `Home.headline` | Кога тајмерот ќе стигне до нула, дропот е отворен за нарачки. | When the timer hits zero, the drop is live. | _(not found in source)_ |
 | `Home.opening` | Се отвора… | Opening… | `src/components/home/HomeExperience.tsx` |
 | `Home.sub` | Пронајди сродна, во свет продадени души. | Find a kindred soul, in a world full of sold souls. | `src/components/home/HomeExperience.tsx` |
 | `Home.tagline` | Наскоро. | Coming soon. | _(not found in source)_ |
@@ -143,21 +145,21 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Meta.aboutTitle` | За брендот — Trajanov | About — Trajanov | `src/app/[locale]/about/page.tsx` |
 | `Meta.cartDescription` | Парчињата што ги избра, пред нарачка. | The pieces you picked, before you order. | `src/app/[locale]/cart/page.tsx` |
 | `Meta.cartTitle` | Кошничка — Trajanov | Cart — Trajanov | `src/app/[locale]/cart/page.tsx` |
-| `Meta.catalogDescription` | Парчињата во активното спуштање. Вистински, ограничени залихи. | The pieces in the active drop. Real, limited stock. | `src/app/[locale]/catalog/page.tsx` |
+| `Meta.catalogDescription` | Оверсајз унисекс маици од Струмица, во дропови. Вистински, ограничени залихи. | Oversized unisex t-shirts from Strumica, sold in drops. Real, limited stock. | `src/app/[locale]/catalog/page.tsx` |
 | `Meta.catalogTitle` | Каталог — Trajanov | Catalog — Trajanov | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/app/[locale]/catalog/page.tsx` |
 | `Meta.checkoutDescription` | Внеси ги податоците за достава. Плаќање со готовина при преземање, испорака само во Северна Македонија. | Enter your delivery details. Cash on delivery, shipping within North Macedonia only. | `src/app/[locale]/checkout/page.tsx` |
 | `Meta.checkoutTitle` | Нарачка — Trajanov | Checkout — Trajanov | `src/app/[locale]/checkout/page.tsx` |
 | `Meta.contactDescription` | Стапи во контакт: прати порака или побарај нè по телефон и на Инстаграм. Струмица, Северна Македонија. | Get in touch: send a message, or reach us by phone and Instagram. Strumica, North Macedonia. | `src/app/[locale]/contact/page.tsx` |
 | `Meta.contactTitle` | Контакт — Trajanov | Contact — Trajanov | `src/app/[locale]/contact/page.tsx` |
-| `Meta.homeDescription` | Оверсајз унисекс маици од Струмица. Спуштања од 3 до 5 парчиња, вистински ограничени залихи, готовина при преземање. | Oversized unisex t-shirts from Strumica. Drops of 3 to 5 pieces, real limited stock, cash on delivery. | `src/app/[locale]/page.tsx` |
-| `Meta.homeTitle` | Trajanov — следно спуштање | Trajanov — next drop | `src/app/[locale]/page.tsx` |
+| `Meta.homeDescription` | Оверсајз унисекс маици од Струмица. Дропови од 3 до 5 производи, вистински ограничени залихи, готовина при преземање. | Oversized unisex t-shirts from Strumica. Drops of 3 to 5 products, real limited stock, cash on delivery. | `src/app/[locale]/page.tsx` |
+| `Meta.homeTitle` | Trajanov — следниот дроп | Trajanov — next drop | `src/app/[locale]/page.tsx` |
 | `Meta.privacyDescription` | Што собираме кога нарачуваш или ни пишуваш, и зошто. Без рекламни колачиња. | What we collect when you order or write to us, and why. No advertising cookies. | `src/app/[locale]/privacy/page.tsx` |
 | `Meta.privacyTitle` | Приватност — Trajanov | Privacy — Trajanov | `src/app/[locale]/privacy/page.tsx` |
 | `Meta.productDescription` | Оверсајз унисекс маица. Испорака само во Северна Македонија, готовина при преземање. | Oversized unisex t-shirt. Shipping within North Macedonia only, cash on delivery. | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Meta.shippingDescription` | Испорака само во Северна Македонија, плаќање готовина при преземање. Ако нешто не е во ред, јави се. | Shipping within North Macedonia only, cash on delivery. If something is wrong, call us. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `Meta.shippingTitle` | Испорака — Trajanov | Shipping — Trajanov | `src/app/[locale]/shipping-returns/page.tsx` |
-| `Meta.siteDescription` | Оверсајз унисекс маици од Струмица, во ограничени спуштања. | Oversized unisex t-shirts from Strumica, in limited drops. | `src/app/[locale]/layout.tsx` |
-| `Meta.siteTitle` | Trajanov — спуштања на облека | Trajanov — clothing drops | `src/app/[locale]/layout.tsx` |
+| `Meta.siteDescription` | Оверсајз унисекс маици од Струмица, во ограничени дропови. | Oversized unisex t-shirts from Strumica, in limited drops. | `src/app/[locale]/layout.tsx` |
+| `Meta.siteTitle` | Trajanov — дропови на облека | Trajanov — clothing drops | `src/app/[locale]/layout.tsx` |
 | `Meta.styleguideDescription` | Внатрешен преглед на дизајн-системот. | Internal design-system reference. | `src/app/[locale]/styleguide/page.tsx` |
 | `Meta.styleguideTitle` | Дизајн-систем — Trajanov | Design system — Trajanov | `src/app/[locale]/styleguide/page.tsx` |
 | `Meta.termsDescription` | Како тече нарачката: готовина при преземање, испорака само во Северна Македонија, резервација 48 часа. | How ordering works: cash on delivery, shipping within North Macedonia only, 48-hour reservation. | `src/app/[locale]/terms/page.tsx` |
@@ -174,11 +176,16 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Nav.privacy` | Приватност | Privacy | `src/components/layout/SiteFooter.tsx` |
 | `Nav.shipping` | Испорака | Shipping | `src/components/layout/SiteFooter.tsx` |
 | `Nav.terms` | Услови | Terms | `src/components/layout/SiteFooter.tsx` |
-| `Order.duplicatePhone` | Веќе имаш активна нарачка со овој број за ова спуштање. | You already have a live order with this number for this drop. | `src/components/checkout/CheckoutForm.tsx` |
+| `NotFound.body` | Линкот можеби е стар или погрешно напишан. Оди во каталогот или на почетната страница. | The link may be old or mistyped. Go to the catalog or the home page. | `src/app/[locale]/not-found.tsx` |
+| `NotFound.catalog` | Каталог | Catalog | `src/app/[locale]/not-found.tsx` |
+| `NotFound.eyebrow` | Грешка 404 | Error 404 | `src/app/[locale]/not-found.tsx` |
+| `NotFound.h1` | Оваа страница не постои. | This page doesn't exist. | `src/app/[locale]/not-found.tsx` |
+| `NotFound.home` | Почетна | Home | `src/app/[locale]/not-found.tsx` |
+| `Order.duplicatePhone` | Веќе имаш активна нарачка со овој број за овој дроп. | You already have a live order with this number for this drop. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.emptyCart` | Кошничката е празна. | Your cart is empty. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.genericError` | Нешто тргна наопаку. Пробај повторно. | Something went wrong. Try again. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
-| `Order.noDrop` | Нема активно спуштање во моментов. | No active drop right now. | _(not found in source)_ |
-| `Order.notOpen` | Спуштањето не е отворено во моментов. | The drop isn't open right now. | `src/components/checkout/CheckoutForm.tsx` |
+| `Order.noDrop` | Нема активен дроп во моментов. | No active drop right now. | _(not found in source)_ |
+| `Order.notOpen` | Дропот не е отворен во моментов. | The drop isn't open right now. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.priceMissing` | Грешка кај нас: нема поставена цена. Не наплативме ништо. Пробај подоцна. | Our mistake: no price is set. You weren't charged. Try later. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.protected` | Заштита од роботи. | Bot protection. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Order.quantityInvalid` | Провери ја количината во кошничката и обиди се повторно. | Check the quantity in your cart and try again. | `src/components/checkout/CheckoutForm.tsx` |
@@ -186,21 +193,17 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Order.soldOut` | Некој беше побрз. Последното парче штотуку замина. | Someone got there first. The last one just went. | `src/components/checkout/CheckoutForm.tsx` |
 | `Order.success` | Нарачка {orderNumber} е примена и резервирана 48 часа. Плаќаш со готовина при преземање — ќе те побараме телефонски за да ја потврдиме. | Order {orderNumber} received and reserved for 48 hours. You pay cash on delivery — we'll call you to confirm. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
 | `Order.turnstileFailed` | Проверката не помина. Пробај повторно. | That check didn't pass. Try again. | `src/components/checkout/CheckoutForm.tsx`<br>`src/components/contact/ContactForm.tsx` |
-| `Placeholder.composition` | [PLACEHOLDER: состав и нега — од етикетата] | [PLACEHOLDER: composition & care — from the label] | `src/app/[locale]/catalog/[slug]/page.tsx` |
-| `Placeholder.notice` | Преглед на дизајн-системот. Податоците за производите (назив, цена, величини, состав, фотографии) се примероци — вистинските ги внесува Владимир во подоцнежна фаза. | Design-system preview. Product data (name, price, sizes, composition, photos) is placeholder — the real values are entered by Vladimir in a later phase. | `src/components/system/PreviewNotice.tsx` |
-| `Placeholder.price` | [PLACEHOLDER: цена MKD] | [PLACEHOLDER: price MKD] | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/checkout/CheckoutForm.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
+| `Placeholder.price` | [PLACEHOLDER: цена MKD] | [PLACEHOLDER: price MKD] | `src/components/cart/CartView.tsx`<br>`src/components/checkout/CheckoutForm.tsx` |
 | `Placeholder.productName` | Производ | Product | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/cart/CartView.tsx`<br>`src/components/home/HomeShowcase.tsx`<br>`src/components/product/ProductCard.tsx` |
-| `Placeholder.productPhoto` | [PLACEHOLDER: фотографија — Владимир] | [PLACEHOLDER: product photo — Vladimir] | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/product/ProductCard.tsx` |
-| `Placeholder.sizesSample` | величини — примерок, се чекаат од Владимир | sizes — sample, pending Vladimir | `src/components/product/AddToCartPanel.tsx` |
 | `Privacy.abuseBody` | Бидејќи нарачувањето е бесплатно, чуваме еднонасочно хеширана верзија на твојата IP-адреса за да ограничиме колку нарачки доаѓаат од една врска. Суровата IP-адреса никогаш не се чува. | Because ordering is free, we store a one-way hashed form of your IP address to limit how many orders come from one connection. The raw IP is never stored. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.abuseHeading` | Заштита од злоупотреба | Anti-abuse | `src/app/[locale]/privacy/page.tsx` |
-| `Privacy.browserBody` | Кошничката живее во sessionStorage и исчезнува кога ќе го затвориш јазичето. Нема рекламни колачиња, нема пиксели за следење, нема аналитички колачиња, нема пиксели од социјални мрежи. | The cart lives in sessionStorage and disappears when you close the tab. No advertising cookies, no tracking pixels, no analytics cookies, no social pixels. | `src/app/[locale]/privacy/page.tsx` |
+| `Privacy.browserBody` | Кошничката останува во ова јазиче на прелистувачот и се брише кога ќе го затвориш. Нема рекламни колачиња, нема пиксели за следење, нема аналитички колачиња, нема пиксели од социјални мрежи. | The cart stays in this browser tab and clears when you close it. No advertising cookies, no tracking pixels, no analytics cookies, no social pixels. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.browserHeading` | Во твојот прелистувач | In your browser | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.collectBody` | Име, телефонски број, град, адреса и белешката ако ја пополниш. Тоа е сè што собира нарачката — при нарачка нема поле за е-пошта. | Name, phone number, city, address, and your note if you leave one. That's everything an order collects — ordering has no email field. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.collectHeading` | Што собираме кога нарачуваш | What we collect when you order | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.contactFormBody` | Ако ја користиш контакт-формата: име, е-пошта, наслов ако внесеш и самата порака. Сето тоа му стигнува на Владимир како е-пошта за да ти одговори — тоа е единствената употреба. Не се чува во базата на сајтот. | If you use the contact form: your name, email address, the subject if you add one, and the message itself. It reaches Vladimir as an email so he can reply — that's the only use. It isn't stored in the site's database. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.contactFormHeading` | Што собираме кога ни пишуваш | What we collect when you write to us | `src/app/[locale]/privacy/page.tsx` |
-| `Privacy.deleteBody` | Јави се телефонски и ќе ги избришеме. За порака пратена преку контакт-формата, доволен е и одговор во е-поштата. | Call us and we'll delete them. For a message sent through the contact form, a reply in the email thread works too. | `src/app/[locale]/privacy/page.tsx` |
+| `Privacy.deleteBody` | Јави се телефонски и ќе ги избришеме. За порака пратена преку контакт-формата, доволен е и одговор во е-поштата. | Call us and we'll delete your data. For a message sent through the contact form, a reply in the email thread works too. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.deleteHeading` | Како да ги избришеш податоците | How to delete your data | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.eyebrow` | Правно | Legal | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.h1` | Приватност | Privacy | `src/app/[locale]/privacy/page.tsx` |
@@ -213,11 +216,12 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Privacy.whoHeading` | Кој ги гледа | Who sees it | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.whyBody` | За да ти ја доставиме маицата и да те побараме телефонски за да ја потврдиме нарачката. Тоа е единствената употреба. | To deliver the shirt and to call you to confirm the order. That is the only use. | `src/app/[locale]/privacy/page.tsx` |
 | `Privacy.whyHeading` | Зошто | Why | `src/app/[locale]/privacy/page.tsx` |
-| `Product.amountDue` | Плаќате {amount} во готово при достава. | You pay {amount} in cash on delivery. | `src/components/product/AmountDue.tsx` |
+| `Product.amountDue` | Плаќаш {amount} по маица во готовина при преземање, плус {cost} за достава. | You pay {amount} per shirt in cash on delivery, plus {cost} for delivery. | `src/components/product/AmountDue.tsx` |
 | `Product.back` | Назад кон каталогот | Back to catalog | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Product.chooseSize` | Избери величина | Choose a size | `src/components/product/AddToCartPanel.tsx` |
 | `Product.composition` | Состав и нега | Composition & care | `src/app/[locale]/catalog/[slug]/page.tsx` |
 | `Product.details` | Детали | Details | _(not found in source)_ |
+| `Product.noPhoto` | Сè уште нема фотографија | No photo yet | `src/app/[locale]/catalog/[slug]/page.tsx`<br>`src/components/product/ProductCard.tsx` |
 | `Product.photoAltBabyBlue` | Светлосина маица со црвен принт, носена. | Baby-blue t-shirt with red print, worn. | `src/lib/product-images.ts` |
 | `Product.photoAltComposite` | Окер и крем-бели маици со црвен принт, носени. | Ochre and off-white t-shirts with red print, worn. | `src/components/home/HomeExperience.tsx` |
 | `Product.photoAltOchre` | Окер маица со црвен принт, носена. | Ochre t-shirt with red print, worn. | `src/components/home/HomeExperience.tsx`<br>`src/lib/product-images.ts` |
@@ -232,14 +236,14 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `ShippingReturns.deliveryTime` | Рок на достава: 3–5 работни дена. | Delivery time: 3–5 business days. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.eyebrow` | Правно | Legal | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.h1` | Испорака | Shipping | `src/app/[locale]/shipping-returns/page.tsx` |
-| `ShippingReturns.intro` | Каде испорачуваме, како плаќаш, колку чини доставата и кого да го викаш ако нешто тргне наопаку. | Where we ship, how you pay, what delivery costs, and who to call if something goes wrong. | `src/app/[locale]/shipping-returns/page.tsx` |
+| `ShippingReturns.intro` | Каде испорачуваме, како плаќаш, колку чини доставата и кому да се јавиш ако нешто тргне наопаку. | Where we ship, how you pay, what delivery costs, and who to call if something goes wrong. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.paymentBody` | Плаќаш готовина на курирот кога пратката ќе пристигне. | You pay the courier in cash when the parcel arrives. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.paymentHeading` | Плаќање при достава | Payment on delivery | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.problemBody` | Погрешна величина, оштетено пакување или пратката не пристигнала — јави се на телефонскиот број и Владимир ќе го среди директно. | Wrong size sent, damaged packaging, or the parcel never arrived — call the phone number and Vladimir will sort it out directly. | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.problemHeading` | Ако нешто не е во ред со нарачката | If something is wrong with your order | `src/app/[locale]/shipping-returns/page.tsx` |
 | `ShippingReturns.whereHeading` | Каде испорачуваме | Where we ship | `src/app/[locale]/shipping-returns/page.tsx` |
-| `Showcase.headingLast` | Последно спуштање | Last drop | `src/components/home/HomeShowcase.tsx` |
-| `Showcase.headingLive` | Ова спуштање | This drop | `src/components/home/HomeShowcase.tsx` |
+| `Showcase.headingLast` | Последниот дроп | Last drop | `src/components/home/HomeShowcase.tsx` |
+| `Showcase.headingLive` | Овој дроп | This drop | `src/components/home/HomeShowcase.tsx` |
 | `Showcase.next` | Следно парче | Next piece | `src/components/home/HomeShowcase.tsx` |
 | `Showcase.pause` | Паузирај | Pause | `src/components/home/HomeShowcase.tsx` |
 | `Showcase.play` | Пушти | Play | `src/components/home/HomeShowcase.tsx` |
@@ -253,7 +257,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Styleguide.buyButton` | Копче за купување | Buy button | `src/app/[locale]/styleguide/page.tsx` |
 | `Styleguide.colors` | Боја | Colour | `src/app/[locale]/styleguide/page.tsx` |
 | `Styleguide.countdown` | Одбројување | Countdown | `src/app/[locale]/styleguide/page.tsx` |
-| `Styleguide.dropBanner` | Банер за спуштање | Drop banner | `src/app/[locale]/styleguide/page.tsx` |
+| `Styleguide.dropBanner` | Банер за дроп | Drop banner | `src/app/[locale]/styleguide/page.tsx` |
 | `Styleguide.field` | Поле за нарачка | Checkout field | `src/app/[locale]/styleguide/page.tsx` |
 | `Styleguide.intro` | Секоја состојба од хендоверот, во живо и со токени од brand.md. | Every state from the handover, live, driven by brand.md tokens. | `src/app/[locale]/styleguide/page.tsx` |
 | `Styleguide.productCard` | Картичка за производ | Product card | `src/app/[locale]/styleguide/page.tsx` |
@@ -270,11 +274,11 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Terms.noBody` | Нема профили, нема зачувани картички, нема претплати, нема кодови за попуст. | No accounts, no saved cards, no subscriptions, no discount codes. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.noHeading` | Што не правиме | What we don't do | `src/app/[locale]/terms/page.tsx` |
 | `Terms.orderingBody1` | Кога нарачуваш, залихата се резервира 48 часа — не се продава веднаш. Те бараме телефонски за да ја потврдиме. Ако не те фатиме, резервацијата истекува и парчето се враќа во продажба. | When you order, the stock is reserved for 48 hours — not sold on the spot. We call you to confirm. If we can't reach you, the reservation lapses and the piece goes back on sale. | `src/app/[locale]/terms/page.tsx` |
-| `Terms.orderingBody2` | Спуштањата се ограничени и залихата е вистинска — кога ќе се распродаде, готово е. | Drops are limited and the stock is real — when it's gone, it's gone. | `src/app/[locale]/terms/page.tsx` |
+| `Terms.orderingBody2` | Дроповите се ограничени и залихата е вистинска — кога ќе се распродаде, готово е. | Drops are limited and the stock is real — when it's gone, it's gone. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.orderingHeading` | Како тече нарачката | How ordering works | `src/app/[locale]/terms/page.tsx` |
 | `Terms.paymentBody` | Плаќаш готовина при преземање, кога пратката ќе пристигне. Нема картички, нема банкарски трансфер, нема плаќање однапред. | You pay cash on delivery, when the parcel arrives. No cards, no bank transfer, no paying in advance. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.paymentHeading` | Плаќање | Payment | `src/app/[locale]/terms/page.tsx` |
-| `Terms.pricesBody` | Цените се во денари (MKD) и стојат на страницата на производот. Тоа е износот што му го плаќаш на курирот. На англиската верзија прикажуваме и приближна цена во долари, само за информација. Секогаш плаќаш во денари. | Prices are set in Macedonian denars (MKD). That is what you pay the courier. The English site shows prices in US dollars as an approximate guide, and each product page shows the exact amount in denars. You always pay in denars. | `src/app/[locale]/terms/page.tsx` |
+| `Terms.pricesBody` | Цените се во денари (MKD) и стојат на страницата на производот. Доставата чини {cost} и се додава на цената на маицата. И двете му ги плаќаш на курирот, во готовина. На англиската верзија прикажуваме и приближна цена во долари, само за информација. Секогаш плаќаш во денари. | Prices are set in Macedonian denars (MKD). The English site shows them in US dollars as an approximate guide, and each product page shows the exact denar price. Delivery costs {cost} on top of the shirt price. You pay both to the courier, in denars. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.pricesHeading` | Цени | Prices | `src/app/[locale]/terms/page.tsx` |
 | `Terms.sellerBody` | Trajanov го води Владимир Трајанов, од Струмица, Северна Македонија. Нема регистрирана фирма и нема продавница со адреса. Еден човек стои зад брендот. | Trajanov is run by Vladimir Trajanov, in Strumica, North Macedonia. There is no registered company and no shop with an address. One person stands behind the brand. | `src/app/[locale]/terms/page.tsx` |
 | `Terms.sellerHeading` | Од кого купуваш | Who you buy from | `src/app/[locale]/terms/page.tsx` |

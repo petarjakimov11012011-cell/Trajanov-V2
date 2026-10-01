@@ -85,7 +85,7 @@ describe.each(LOCALES)("ended drop (%s)", (locale) => {
     const start = html.indexOf('aria-labelledby="home-showcase-heading"');
     expect(start).toBeGreaterThan(-1);
     const text = visibleText(html.slice(start, html.indexOf("</section>", start)));
-    expect(text).toContain(locale === "mk" ? "Последно" : "Last drop");
+    expect(text).toContain(locale === "mk" ? "Последниот дроп" : "Last drop");
     for (const word of [s.soldOut, s.inStock, s.low]) {
       expect(text.includes(word), `home shows "${word}"`).toBe(false);
     }
