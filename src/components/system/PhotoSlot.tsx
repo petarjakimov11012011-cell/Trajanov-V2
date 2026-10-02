@@ -32,7 +32,8 @@ export function PhotoSlot({
   image,
   sizes = CATALOG_SIZES,
 }: {
-  /** Placeholder text. Shown only when there is no `image`; still required, as most slots are empty. */
+  /** Text for an empty slot, shown only when there is no `image` — a neutral customer-language gap
+   *  ("No photo yet"), never an internal note (Y.11, D-Y.11-3). */
   label: string;
   muted?: boolean;
   className?: string;
