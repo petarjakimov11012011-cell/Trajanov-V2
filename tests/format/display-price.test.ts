@@ -84,17 +84,28 @@ function renderAmountDue(locale: "mk" | "en", amountMkd = 1199) {
   );
 }
 
-describe("AmountDue — the denar amount under the EN product-page price", () => {
-  it("EN renders 'You pay 1,199 MKD in cash on delivery.'", () => {
-    expect(renderAmountDue("en")).toContain("You pay 1,199 MKD in cash on delivery.");
+describe("AmountDue — the shirt price and the delivery cost, under the product-page price", () => {
+  // Y.11 (brief Task 7): the line reads as the price of ONE shirt plus a separate delivery cost — never
+  // as an all-in amount — and it now renders in both locales (MK informal „Плаќаш"). It supersedes the
+  // Y.10 "EN only" rule in part (D-Y.10-4 → D-Y.11-n).
+  it("EN: per shirt, cash on delivery, plus 200 MKD for delivery", () => {
+    expect(renderAmountDue("en")).toContain(
+      "You pay 1,199 MKD per shirt in cash on delivery, plus 200 MKD for delivery.",
+    );
   });
 
-  it("EN renders it muted at text-small", () => {
-    expect(renderAmountDue("en")).toMatch(/class="[^"]*text-muted-foreground[^"]*text-small|class="[^"]*text-small[^"]*text-muted-foreground/);
+  it("MK: informal „Плаќаш“, dot grouping, plus 200 ден за достава", () => {
+    expect(renderAmountDue("mk")).toContain(
+      "Плаќаш 1.199 ден по маица во готовина при преземање, плус 200 ден за достава.",
+    );
   });
 
-  it("MK renders nothing at all", () => {
-    expect(renderAmountDue("mk")).toBe("");
+  it.each(["mk", "en"] as const)("%s renders it muted at text-small", (locale) => {
+    expect(renderAmountDue(locale)).toMatch(/class="[^"]*text-muted-foreground[^"]*text-small|class="[^"]*text-small[^"]*text-muted-foreground/);
+  });
+
+  it("no dollar figure on the MK line", () => {
+    expect(renderAmountDue("mk")).not.toContain("$");
   });
 
   it("only the product page renders it — the card and the showcase do not", () => {
@@ -103,8 +114,10 @@ describe("AmountDue — the denar amount under the EN product-page price", () =>
     expect(read(CALL_SITES.showcase.file)).not.toMatch(/AmountDue|amountDue/);
   });
 
-  it("Product.amountDue exists in both catalogs with the {amount} argument", () => {
-    expect(en.Product.amountDue).toBe("You pay {amount} in cash on delivery.");
-    expect(mk.Product.amountDue).toBe("Плаќате {amount} во готово при достава.");
+  it("Product.amountDue carries {amount} and {cost} in both catalogs", () => {
+    for (const msg of [en.Product.amountDue, mk.Product.amountDue]) {
+      expect(msg).toContain("{amount}");
+      expect(msg).toContain("{cost}");
+    }
   });
 });

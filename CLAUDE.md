@@ -70,8 +70,12 @@ comment, not in a test fixture, not in a `.env` file.**
   legal source.
 - **Nothing invented:** no testimonials, reviews, ratings, counts, awards, partners, team members,
   addresses, fabric claims, or social links that are not in `facts.md`.
-- Missing fact → ship a visible `[PLACEHOLDER: what's needed]` **and** log it in the placeholder
-  register. Never guess, never write plausible filler, never leave a placeholder unlogged.
+- Missing fact → never guess, never write plausible filler. **Customer pages never show internal
+  notes, the client's name as a task owner, "later phase", or `[PLACEHOLDER: …]` markup** (`D-Y.11-3`).
+  A missing fact is **omitted** (when omission states nothing false) or shown as a **neutral
+  customer-language gap** (e.g. "No photo yet"). Every such gap keeps its placeholder-register row
+  **OPEN** — never leave a gap unlogged — and the register must still reach zero before the first real
+  drop (`D-2.05-2`).
 - **AI-generated product imagery is prohibited (`D-0-6`).** Retouching real photos is fine.
 - If a page needs a fact we do not have to look finished, **the page is wrong, not the facts** —
   say so in the completion report.
@@ -83,8 +87,10 @@ comment, not in a test fixture, not in a `.env` file.**
 - Drop state (countdown / live / ended) is computed **on the server** from config. The browser is
   not the source of truth for whether a drop is open.
 - **Cash on delivery means ordering is free, so abuse is free.** Turnstile, rate limit by IP and by
-  phone, max 2 units per order, orders **reserve** stock rather than sell it (48h hold, then
-  released). None of these are optional.
+  phone, one live order per phone per drop, a 99-unit **sanity ceiling** per order (input validation,
+  not a business rule — `D-Y.06-4`), orders **reserve** stock rather than sell it (48h hold, then
+  released). None of these are optional. The 2-unit-per-order cap was **removed** by owner decision
+  (`D-Y.06-3`) — never restore it, and never state a unit limit in customer copy.
 - Any change to stock or reservation logic requires the concurrent-order test to pass: 10
   simultaneous orders against 3 units → exactly 3 succeed, 7 cleanly rejected.
 

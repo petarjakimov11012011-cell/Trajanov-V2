@@ -8,7 +8,7 @@ import {cn} from '@/lib/utils';
 // outside North Macedonia — a foreign visitor placing a cash-on-delivery order to an address nobody can
 // reach is a real, cheap-to-prevent failure, and the footer alone was not preventing it.
 //
-// Styled from brand.md tokens, matching the existing PreviewNotice / COD notice boxes in the 1.02
+// Styled from brand.md tokens, matching the COD notice box in the 1.02
 // handover — a deliberate notice, not a redesign.
 export function ShippingNotice({className}: {className?: string}) {
   const t = useTranslations('Common');

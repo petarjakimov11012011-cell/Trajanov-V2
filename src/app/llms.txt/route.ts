@@ -26,7 +26,7 @@ export const dynamic = 'force-static';
 // can never be silently omitted from llms.txt.
 type StaticHref = (typeof INDEXABLE_STATIC_HREFS)[number];
 const PAGE_META: Record<StaticHref, {label: string; section: 'pages' | 'legal'; note: string}> = {
-  '/': {label: 'Home', section: 'pages', note: 'The current drop — a countdown to the next one, the live drop, or the ended state.'},
+  '/': {label: 'Home', section: 'pages', note: 'The latest drop and whether ordering is open.'},
   '/catalog': {label: 'Catalog', section: 'pages', note: 'The products in the current drop.'},
   '/about': {label: 'About', section: 'pages', note: 'The brand and the 2026 competition win.'},
   '/contact': {label: 'Contact', section: 'pages', note: 'Reach Trajanov by Instagram or phone.'},
@@ -53,9 +53,9 @@ function section(which: 'pages' | 'legal'): string {
 function buildLlmsTxt(): string {
   return `# Trajanov
 
-> Trajanov is a clothing brand from Strumica, North Macedonia, founded in 2026 by Vladimir Trajanov — a secondary-school clothing-design student who won first place in a national t-shirt design competition organised by Kreativen den and EAM (June 2026). Trajanov makes oversized unisex t-shirts and sells them in limited drops: when a countdown ends, a small number of products go live against real, limited stock. Payment is cash on delivery only; orders ship within North Macedonia. The site is bilingual — Macedonian (default) and English.
+> Trajanov is a clothing brand from Strumica, North Macedonia, founded in 2026 by Vladimir Trajanov — a secondary-school clothing-design student who won first place in a national t-shirt design competition organised by Kreativen den and EAM (June 2026). Trajanov makes oversized unisex t-shirts and sells them in limited drops: a small number of products go on sale together, against real, limited stock. Payment is cash on delivery only; orders ship within North Macedonia. The site is bilingual — Macedonian (default) and English.
 
-Between drops the site is browsable but nothing is buyable, and a countdown marks the next one. Each drop is 3 to 5 products against real, limited stock, with a maximum of 2 units per order. There are no card payments — you pay the courier in cash on arrival — and delivery is within North Macedonia only.
+Between drops the site is browsable but ordering is closed; new drops are announced on Instagram (${INSTAGRAM_HANDLE}). Each drop is 3 to 5 products against real, limited stock. There are no card payments — you pay the courier in cash on arrival — and delivery is within North Macedonia only.
 
 ## Pages
 ${section('pages')}

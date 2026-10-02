@@ -27,7 +27,14 @@ const catalogs = {mk: flatten(mk as Record<string, unknown>), en: flatten(en as 
 const currency = {mk: mk.Common.currency, en: en.Common.currency};
 
 // Every key that states the delivery cost, and so must carry the `{cost}` slot.
-const COST_KEYS = ["ShippingReturns.deliveryBody", "Faq.a5", "Cart.shippingValue"] as const;
+// Y.11 adds the product page's amount-due line and the Terms prices paragraph (brief Task 7).
+const COST_KEYS = [
+  "ShippingReturns.deliveryBody",
+  "Faq.a5",
+  "Cart.shippingValue",
+  "Product.amountDue",
+  "Terms.pricesBody",
+] as const;
 
 describe("the delivery cost is never typed into copy", () => {
   it.each(["mk", "en"] as const)("no %s string contains the literal 200", (locale) => {
@@ -73,7 +80,8 @@ describe("{cost} interpolates to the formatted cost", () => {
     const t = createTranslator({locale, messages: locale === "mk" ? mk : en});
     const cost = formatMkdWithApproxUsd(DELIVERY_COST_MKD, currency[locale], locale);
     for (const key of COST_KEYS) {
-      const out = t(key as never, {cost} as never) as string;
+      // `amount` is the second slot Product.amountDue carries (Y.11); unused values are ignored by ICU.
+      const out = t(key as never, {cost, amount: "1"} as never) as string;
       expect(out, key).toContain(EXPECTED[locale]);
       expect(out, key).not.toContain("{cost}");
     }

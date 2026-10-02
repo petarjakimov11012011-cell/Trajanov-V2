@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import { assertLocalDbEnv } from "./helpers/local-db-guard";
 
 // Load local Supabase credentials into process.env for the DB/RLS suites. `.env.local` is written by
 // `supabase start` (gitignored) and holds the shared-default local keys — never real secrets.
@@ -22,3 +23,7 @@ for (const name of [
     throw new Error(`Missing ${name}. These tests require a running local Supabase stack.`);
   }
 }
+
+// Local only (Y.11, Task 3). loadEnvFile above does not override an exported variable, so a hosted URL
+// left in the shell would otherwise reach every DB suite. Refuse to run instead.
+assertLocalDbEnv(process.env);

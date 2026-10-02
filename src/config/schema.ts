@@ -40,8 +40,8 @@ export interface ProductConfig {
   /** Fabric/care copy read off the garment's label (OWED by Vladimir — facts.md §7; placeholder register
    *  #3/#9). Still NOT persisted — there is no DB column and the sync does not write one (that is Y.01,
    *  D-1.06-3) — but since Y.06 the product page DOES read it, by SLUG, through `src/lib/product-care.ts`
-   *  (D-Y.06-1). Non-null here → the real copy replaces the `[PLACEHOLDER: состав и нега]` block on
-   *  `/katalog/<slug>` and `/en/catalog/<slug>`; null → that placeholder, unchanged. So filling these in
+   *  (D-Y.06-1). Non-null here → the Composition & care section renders this copy on
+   *  `/katalog/<slug>` and `/en/catalog/<slug>`; null → no section at all (Y.11, D-Y.11-3). So filling these in
    *  publishes a consumer-protection claim on a live page and needs a DEPLOY, not a `npm run sync:drop`.
    *  Never guess a composition — it is a claim about what the customer is paying cash for at the door. */
   readonly careMk?: string | null;

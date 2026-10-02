@@ -3,6 +3,8 @@ import type {Locale} from 'next-intl';
 import {setRequestLocale, getTranslations, getFormatter} from 'next-intl/server';
 import {LegalPage, LegalSection} from '@/components/legal/LegalPage';
 import {pageMetadata} from '@/lib/metadata';
+import {DELIVERY_COST_MKD} from '@/config/shipping';
+import {formatMkdWithApproxUsd} from '@/lib/format';
 import {
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
@@ -12,7 +14,7 @@ import {
 
 // Last-updated date shown on the page (DoD). A fixed date, formatted per locale — not read from the
 // clock, so the static build stays deterministic. Bump it when the copy changes.
-const LAST_UPDATED = '2026-09-29';
+const LAST_UPDATED = '2026-10-02';
 
 export async function generateMetadata({
   params,
@@ -44,6 +46,9 @@ export default async function TermsPage({
   const t = await getTranslations('Terms');
   const tc = await getTranslations('Common');
   const format = await getFormatter();
+  // The prices paragraph states delivery as a separate amount (Y.11, Task 7), from the one constant —
+  // EN "200 MKD (≈ $4)", MK „200 ден", the same prose form as the Shipping page and the FAQ (D-Y.09-2).
+  const cost = formatMkdWithApproxUsd(DELIVERY_COST_MKD, tc('currency'), locale as Locale);
   const lastUpdated = `${tc('lastUpdated')}: ${format.dateTime(new Date(LAST_UPDATED), {
     day: 'numeric',
     month: 'long',
@@ -96,7 +101,7 @@ export default async function TermsPage({
       </LegalSection>
 
       <LegalSection heading={t('pricesHeading')}>
-        <p>{t('pricesBody')}</p>
+        <p>{t('pricesBody', {cost})}</p>
       </LegalSection>
 
       <LegalSection heading={t('noHeading')}>

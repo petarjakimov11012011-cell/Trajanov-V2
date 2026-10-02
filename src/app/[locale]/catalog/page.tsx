@@ -2,12 +2,13 @@ import type {Metadata} from 'next';
 import type {Locale} from 'next-intl';
 import {getTranslations} from 'next-intl/server';
 import {ProductCard} from '@/components/product/ProductCard';
-import {PreviewNotice} from '@/components/system/PreviewNotice';
 import {DevPreviewSwitch} from '@/components/system/DevPreviewSwitch';
 import {getActiveDropView, parsePreviewState} from '@/lib/drop/state';
 import {pageMetadata} from '@/lib/metadata';
 
-// Catalog grid — the active drop's pieces, read from the DB on every request (D-1.04-9).
+// Catalog grid — the active drop's pieces, read from the DB on every request (D-1.04-9). Each card is
+// told the drop state so it can say "ordering is closed" rather than "sold out" between drops (Y.11,
+// brief decision 7). The design-system preview banner is gone from here (brief decision 3).
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
@@ -46,7 +47,6 @@ export default async function CatalogPage({
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6">
-      <PreviewNotice />
       <div className="flex flex-col gap-2">
         <h1 className="font-display text-h1 text-foreground font-extrabold">
           {t('title')}
@@ -56,7 +56,7 @@ export default async function CatalogPage({
       {view && view.products.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {view.products.map((p) => (
-            <ProductCard key={p.slug} product={p} />
+            <ProductCard key={p.slug} product={p} dropState={view.state} />
           ))}
         </div>
       )}

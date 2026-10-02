@@ -34,8 +34,8 @@ export type ProductCare = {
 /**
  * Blank-safe read: an empty or whitespace-only config value is treated as "not supplied yet", not as
  * a real (empty) claim. Without this, a stray `careMk: ""` would render an empty Composition & care
- * section — which reads as "we checked and there is nothing to say" rather than as the honest
- * `[PLACEHOLDER: …]` the fact is still owed under.
+ * section — which reads as "we checked and there is nothing to say". Null means the section is not
+ * rendered at all (Y.11, D-Y.11-3) and the fact stays owed in the placeholder register.
  */
 function orNull(value: string | null | undefined): string | null {
   const trimmed = value?.trim();

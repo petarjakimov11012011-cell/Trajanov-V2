@@ -16,6 +16,10 @@ import type {SizeOption} from '@/types/drop';
 //
 // Y.06: the standing per-order-limit line under the button is GONE with the rule it stated (D-Y.06-3).
 // Only the 99-unit sanity ceiling remains, as inline feedback nobody will ever trigger.
+//
+// Y.11: the "sizes — sample, pending Vladimir" line is gone too. Sizes are VERIFIED (facts.md §7) and the
+// line was an internal note shown to customers (brief decision 3). When ordering is closed the size row
+// is `locked` — listed, not selectable, nothing struck through (brief decision 7).
 
 type Feedback = {kind: 'chooseSize' | 'cap' | 'added'} | null;
 
@@ -34,7 +38,6 @@ export function AddToCartPanel({
 }) {
   const t = useTranslations('Product');
   const tb = useTranslations('Buy');
-  const tp = useTranslations('Placeholder');
   const {add, atCap} = useCart();
   const [selected, setSelected] = useState<SizeOption | undefined>();
   const [busy, setBusy] = useState(false);
@@ -67,13 +70,13 @@ export function AddToCartPanel({
         <span className="text-small text-muted-foreground font-medium">{t('size')}</span>
         <SizePicker
           sizes={sizes}
+          locked={buyState === 'closed'}
           selected={selected?.label}
           onSelect={(size) => {
             setSelected(size);
             if (feedback?.kind === 'chooseSize') setFeedback(null);
           }}
         />
-        <span className="text-muted-foreground text-xs">{tp('sizesSample')}</span>
       </div>
 
       <div className="flex flex-col gap-2">

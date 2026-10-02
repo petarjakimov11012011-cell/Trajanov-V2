@@ -3,15 +3,18 @@
 import {useState} from 'react';
 import {useTranslations} from 'next-intl';
 import {cn} from '@/lib/utils';
+import type {BuyState} from '@/lib/drop/display';
 
-export type BuyState = 'default' | 'loading' | 'disabled' | 'sold-out';
+export type {BuyState};
 
 const base =
   'font-display inline-flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 py-3 text-base font-bold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-ground';
 
 /**
- * Buy button — the six handover states.
- *  default | (hover / focus are CSS) | loading | disabled (pre-drop) | sold-out
+ * Buy button — the six handover states, plus `closed` (Y.11, brief decision 7).
+ *  default | (hover / focus are CSS) | loading | disabled (pre-drop) | closed (between drops) | sold-out
+ * `closed` wears the handover's disabled (pre-drop) look with its own label: ordering is not open, and
+ * that is not the same claim as "sold out". Which state a product gets is src/lib/drop/display.ts.
  * Pass `state` to force one. Pass `onClick` to wire a real add-to-cart (the AddToCartPanel drives the
  * `loading` state itself). With no `onClick`, `default` runs a short fake loading transition on click
  * so the styleguide demo feels real.
@@ -29,14 +32,14 @@ export function BuyButton({
   const [busy, setBusy] = useState(false);
   const effective: BuyState = busy ? 'loading' : state;
 
-  if (effective === 'disabled') {
+  if (effective === 'disabled' || effective === 'closed') {
     return (
       <button
         type="button"
         disabled
         className={cn(base, 'bg-surface-2 text-muted-foreground cursor-not-allowed', className)}
       >
-        {t('comingSoon')}
+        {effective === 'closed' ? t('closed') : t('comingSoon')}
       </button>
     );
   }

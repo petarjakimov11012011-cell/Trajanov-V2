@@ -6,6 +6,7 @@ import {DELIVERY_COST_MKD} from '@/config/shipping';
 import {FAQ_GROUPS} from '@/lib/faq';
 import {formatMkdWithApproxUsd} from '@/lib/format';
 import {faqJsonLd} from '@/lib/seo/faq-jsonld';
+import {INSTAGRAM_HANDLE} from '@/lib/social';
 
 // Home FAQ (Phase 2.11) — a SERVER component: no 'use client', no state, no effects, no handlers.
 // Eight questions in three static group labels (D-2.11-2: no interactive tab row), rendered as native
@@ -23,8 +24,11 @@ export async function HomeFaq() {
   // The delivery cost (a5) is an ICU `{cost}` slot filled from the one constant (D-Y.09-2). Every answer
   // goes through this ONE translator — the visible list and the JSON-LD both — so the structured answer
   // can never carry a literal `{cost}` the page does not (D-2.11-5). Unused values are ignored by ICU.
+  // Answer 1 names the Instagram handle (facts.md §6) as where the next drop is announced — no timer
+  // promise, since between drops there may be no countdown at all (Y.11, Task 10). Same single
+  // translator, so the JSON-LD gets the handle too.
   const cost = formatMkdWithApproxUsd(DELIVERY_COST_MKD, tc('currency'), locale);
-  const faqText = (key: string) => t(key, {cost});
+  const faqText = (key: string) => t(key, {cost, handle: INSTAGRAM_HANDLE});
 
   return (
     <section
