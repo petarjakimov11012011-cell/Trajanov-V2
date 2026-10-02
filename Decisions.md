@@ -5313,7 +5313,7 @@ start at `D-2.01-6`.*
 - **Links:** `D-Y.03-1` · `D-1.06-3` · `src/lib/product-care.ts` · brief Task 1/2
 
 ### D-Y.06-2 · 2026-08-27 · While care copy is null the page renders TODAY'S placeholder, byte-identical
-- **Status:** Accepted
+- **Status:** Accepted — **Superseded in part by `D-Y.11-13`** (2026-10-02: null care copy now renders no section, not the placeholder)
 - **Decided by:** Lazar (pre-made in the brief); executed by Claude Code.
 - **Context:** `facts.md` §7 has fabric/composition/care as `UNVERIFIED — OWED (Vladimir)`. All six
   `careMk`/`careEn` values are null and stay null this phase.
@@ -6074,7 +6074,7 @@ start at `D-2.01-6`.*
 - **Links:** `D-Y.08-9` · `D-1.07-15` · `supabase/seed.sql` (untouched)
 
 ### D-Y.09-12 · 2026-09-29 · Two stale public claims found in passing are reported, NOT fixed
-- **Status:** Accepted
+- **Status:** Accepted — **RESOLVED 2026-10-02 by Phase Y.11** (both claims fixed: llms.txt unit limit removed, Task 10; "sizes — sample" line removed, Task 5 — `D-Y.11-3`)
 - **Decided by:** Claude Code (executor).
 - **Context:** While rendering, two pre-existing claims were found that contradict the record: (1)
   `src/app/llms.txt/route.ts` line 58 still says "a maximum of 2 units per order" — the cap was removed by
@@ -6163,7 +6163,7 @@ start at `D-2.01-6`.*
 - **Links:** `D-Y.10-2`
 
 ### D-Y.10-4 · 2026-09-29 · The EN product page keeps the denar amount due under the price
-- **Status:** Accepted
+- **Status:** Accepted — **Superseded in part by `D-Y.11-16`** (2026-10-02: the line now renders in both locales and states the delivery cost; "MK renders nothing" no longer holds)
 - **Decided by:** Orchestrator (brief decision 4), implemented by Claude Code.
 - **Context:** The customer pays the courier in denars, and the cart and checkout show no product price, so on
   the English site the product page is the only place the denar amount could appear.
@@ -6226,3 +6226,192 @@ start at `D-2.01-6`.*
   and Home render the seed products, not the three shirts; the three shirts' card and showcase prices can only
   be seen on production after Task 7 (Task 11 covers it).
 - **Links:** `D-Y.08-9` · `D-1.07-15`
+
+---
+
+## Phase Y.11 — Product 03 hosted price + honest display and wording (2026-10-02)
+
+### D-Y.11-1 · 2026-10-02 · Y.11 runs out of order ahead of NEXT; NEXT line text unchanged
+- **Status:** Accepted
+- **Decided by:** Lazar + orchestrator (brief decision 1).
+- **Context:** The live site showed Product 03 at the old price, internal notes to customers, and "Sold out" beside "In stock". NEXT is `/impeccable polish` (`D-2.25-26`).
+- **Decision:** Run Y.11 now; line 1 of `current-state.md` keeps its NEXT target and only the status text records Y.10/Y.11.
+- **Alternative rejected:** waiting for the polish phase. Rejected — the false statements were live.
+- **Downside accepted:** the polish/audit branch slips again; a fifth phase in a row runs ahead of NEXT.
+- **Links:** `D-2.25-26` · `D-Y.10-1`
+
+### D-Y.11-2 · 2026-10-02 · Hosted Product 03 price set to 1199 by the single guarded Y.10 Task 7 statement
+- **Status:** Accepted
+- **Decided by:** Lazar + orchestrator (brief decision 2); **Petar typed "go" in session**; executed by Claude Code.
+- **Context:** Y.10 merged (`cf77299`) and deployed; hosted `products.price_mkd` for `test-baby-blue` still read 1999, so live EN showed "≈ $37".
+- **Decision:** Preconditions read in a read-only transaction (no drop open — `test-drop` ended 2026-06-08; row `test-baby-blue | 1999`), then exactly `update products set price_mkd = 1199 where slug = 'test-baby-blue' and price_mkd = 1999 returning slug, price_mkd;` via `.env.hosted`'s `SUPABASE_DB_URL` (the hosted connection `sync:drop` uses), loaded into a subprocess only and never printed. **Returned exactly one row.** Separate read-only `select`: `test-baby-blue | 1199`, the other two rows unchanged, `orders` = 0. Production then showed ≈ $22 / "You pay 1,199 MKD in cash on delivery." / „1.199 ден" on all four price surfaces; routes are `no-store`, so no cache to clear. Owed #81 closed.
+- **Alternative rejected:** changing the price through `sync:drop` (Preflight 3 refuses — correctly) or any broader statement.
+- **Downside accepted:** config and DB agree only because a person ran one statement outside the sync path (as `D-Y.10-1` already accepted).
+- **Links:** `D-Y.10-1` · `D-Y.07-6` · owed #81
+
+### D-Y.11-3 · 2026-10-02 · Customer pages never show internal notes or `[PLACEHOLDER]` markup; CLAUDE.md rule rewritten
+- **Status:** Accepted — **amends the CLAUDE.md "Content truth" placeholder rule**
+- **Decided by:** Lazar + orchestrator (brief decision 3); CLAUDE.md wording by Claude Code (brief Task 14).
+- **Context:** The catalog and product pages showed "Design-system preview … entered by Vladimir in a later phase", a "sizes — sample, pending Vladimir" line, and `[PLACEHOLDER: product photo — Vladimir]` in an empty slot — internal notes, with the client named as a task owner.
+- **Decision:** Customer pages never show internal notes, the client's name as a task owner, "later phase", or `[PLACEHOLDER: …]` markup. A missing fact is omitted (when omission states nothing false) or shown as a neutral customer-language gap. Every such gap keeps its placeholder-register row OPEN; the register must still reach zero before the first real drop (`D-2.05-2` unchanged). CLAUDE.md now says exactly this. Enforced by `tests/pages/public-pages.test.ts`, which renders home, catalog, all three products, about, contact, terms, privacy, shipping and 404 in both locales and every drop state.
+- **Alternative rejected:** raw markers on public pages (the old rule).
+- **Downside accepted:** the site looks more finished than it is. A sync lock follows in Y.12; until then nobody syncs an open or future drop to hosted.
+- **Links:** `D-2.05-2` · `D-Y.09-12` · CLAUDE.md "Content truth"
+
+### D-Y.11-4 · 2026-10-02 · Product names stay the neutral "Product 01/02/03" / „Производ 01/02/03"
+- **Status:** Accepted
+- **Decided by:** Lazar + orchestrator (brief decision 4).
+- **Decision:** No real names until Vladimir supplies them; the neutral slot is not a marker under `D-Y.11-3`.
+- **Alternative rejected:** inventing names. Rejected — `facts.md` §10.
+- **Downside accepted:** the shirts still carry working names on a public store. Register #4/#10 stay OPEN.
+- **Links:** placeholder register #4, #10
+
+### D-Y.11-5 · 2026-10-02 · The MK word for "drop" is „дроп", everywhere
+- **Status:** Accepted
+- **Decided by:** Lazar + orchestrator (brief decision 5); applied by Claude Code.
+- **Decision:** „дроп / дропот / дропови / дроповите / следниот дроп / овој дроп" replace „спуштање" in every MK string — page copy, headings, browser-tab and share titles, the manifest description and the FAQ JSON-LD (which reads the same catalog). Every key touched is listed in `docs/i18n/mk-review-y11.md` §3.
+- **Alternative rejected:** keeping „спуштање". Rejected by the orchestrator.
+- **Downside accepted:** an anglicism on a Macedonian-default site, unconfirmed by a native reviewer until the review pack is signed (owed).
+- **Links:** `docs/i18n/mk-review-y11.md`
+
+### D-Y.11-6 · 2026-10-02 · MK slogan `Home.sub` is not changed; the candidate goes to the review pack only
+- **Status:** Accepted
+- **Decided by:** Lazar + orchestrator (brief decision 6).
+- **Decision:** `Home.sub` stays „Пронајди сродна, во свет продадени души." The candidate „Пронајди сродна душа во свет полн со продадени души." is in `mk-review-y11.md` §6, marked "awaiting Vladimir".
+- **Alternative rejected:** applying the grammatically complete candidate now. Rejected — it is the brand's own line and Vladimir's call.
+- **Downside accepted:** the front door keeps a line a native reviewer may read as incomplete.
+- **Links:** `docs/i18n/mk-review-y11.md` §6
+
+### D-Y.11-7 · 2026-10-02 · Ended / no drop: no stock badge or count, "Ordering is closed"; "Sold out" only at 0 stock in a live drop
+- **Status:** Accepted
+- **Decided by:** Lazar + orchestrator (brief decision 7); the rule's shape by Claude Code (`D-Y.11-14`).
+- **Context:** With `test-drop` ended, product pages said "In stock" above a "Sold out" button (the old mapping turned "ended" into the sold-out state).
+- **Decision:** One pure rule, `src/lib/drop/display.ts`: `buyStateFor(dropState, stock)` and `visibleStock(dropState, stock)`. Live → real stock and Add to cart unless sold out; countdown → "Coming soon"; ended or no drop → new `closed` state, "Ordering is closed" / „Нарачките се затворени", and no stock line. New key `Buy.closed`. `create_order()` gating unchanged.
+- **Alternative rejected:** keeping "Sold out" for ended drops. Rejected — false between drops, and it contradicted the stock badge.
+- **Downside accepted:** a drop that sells out completely is computed "ended" by `src/lib/drop/state.ts`, so its products now read "Ordering is closed", not "Sold out" — the sold-out signal is lost the moment the last unit goes.
+- **Links:** `D-Y.11-14` · `src/lib/drop/display.ts`
+
+### D-Y.11-8 · 2026-10-02 · The empty second photo slot on mustard and off-white is omitted
+- **Status:** Accepted
+- **Decided by:** Lazar + orchestrator (brief decision 8).
+- **Decision:** The product gallery shows real photographs only; the second slot renders only where a second frame exists (Product 03). Placeholder register #2 stays OPEN with a dated note.
+- **Alternative rejected:** the `[PLACEHOLDER: …]` slot (`D-Y.08-3` kept it on purpose to signal the debt).
+- **Downside accepted:** no product page now signals that its neutral front/back/print-detail set is still owed; that debt lives only in the register and `facts.md`.
+- **Links:** `D-Y.08-3` · `D-Y.11-15` · register #2
+
+### D-Y.11-9 · 2026-10-02 · Owed #79 (Petar reads the Y.10 diff) stays open as a post-merge read
+- **Status:** Accepted
+- **Decided by:** Claude Code (reconciliation, own decision).
+- **Context:** `current-state.md` said Y.10 was "PR OPEN, NOT MERGED"; git shows PR #45 merged at `cf77299` (2026-09-29 17:36 UTC) with `reviews: []`.
+- **Decision:** Record the merge; keep #79 OPEN as a post-merge read of `206fe1c..cf77299`, the `D-Y.09-14` precedent.
+- **Alternative rejected:** closing #79 because the merge was the operator's. Rejected — a merge is not a record that the diff was read.
+- **Downside accepted:** another row that can only be closed after the fact.
+- **Links:** `D-Y.09-14` · owed #79
+
+### D-Y.11-10 · 2026-10-02 · CLAUDE.md unit rule rewritten: no 2-unit cap, 99-unit sanity ceiling
+- **Status:** Accepted
+- **Decided by:** Orchestrator (brief Task 14, reconciliation rule); wording by Claude Code.
+- **Context:** CLAUDE.md still said "max 2 units per order", superseded by `D-Y.06-3/4`.
+- **Decision:** CLAUDE.md now lists one live order per phone per drop (`TR005`) and a 99-unit sanity ceiling, says the 2-unit cap was removed, and says never to restore it or state a unit limit in customer copy.
+- **Alternative rejected:** leaving the stale line. Rejected — it instructs every future session to restore a removed rule.
+- **Downside accepted:** none beyond a project-instructions edit.
+- **Links:** `D-Y.06-3` · `D-Y.06-4`
+
+### D-Y.11-11 · 2026-10-02 · Page-render test harness, and a local-only guard in tests/setup.ts
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decision — the brief asked for tests, not their shape).
+- **Decision:** (1) `tests/setup.ts` calls `assertLocalDbEnv(process.env)`: both `SUPABASE_DB_URL` and `NEXT_PUBLIC_SUPABASE_URL` must have hostname exactly `127.0.0.1` or `localhost`, and the error names the variable, never the URL. (2) `tests/helpers/harness/` renders real page components — async server components included — with `react-dom/static` `prerender` inside the real `NextIntlClientProvider` and catalogs, mocking only `next-intl/server` (via `createTranslator`), `server-only`, `@/i18n/navigation` (hrefs built from `routing.pathnames`) and `@/lib/drop/state` (a fixture of the committed drop).
+- **Alternative rejected:** source-only guards like `tests/pages/shipping-page.test.ts`. Rejected — they cannot prove what a page renders in a given drop state.
+- **Downside accepted:** the harness re-implements localized path building and drop fixtures; if `routing.ts` or `ProductView` changes shape, the harness must follow. The 404 status and Next's `noindex` are still only provable against a server (done in the render matrix).
+- **Links:** `tests/helpers/harness/` · `tests/setup-guard.test.ts`
+
+### D-Y.11-12 · 2026-10-02 · `PreviewNotice` deleted; four dead `Placeholder.*` keys removed
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decision).
+- **Context:** The brief: remove `PreviewNotice` from catalog and product pages, "keep it only where /styleguide uses it". The styleguide never used it.
+- **Decision:** Delete `src/components/system/PreviewNotice.tsx` and the now-unused keys `Placeholder.notice`, `Placeholder.sizesSample`, `Placeholder.productPhoto`, `Placeholder.composition` in both catalogs. `Placeholder.price` (cart/checkout, Y.12) and `Placeholder.productName` (the neutral name) stay. The page test keeps the old strings literally so they cannot return.
+- **Alternative rejected:** keeping an unused component and keys. Rejected — dead keys show as unlocated in the inventory and invite reuse.
+- **Downside accepted:** bringing the banner back for a design review means re-adding a component.
+- **Links:** `D-Y.11-3`
+
+### D-Y.11-13 · 2026-10-02 · Every customer-facing missing-fact branch omits or shows a neutral gap
+- **Status:** Accepted — **Supersedes `D-Y.06-2` in part**
+- **Decided by:** Claude Code (own decision — applying `D-Y.11-3` to branches the brief did not list).
+- **Context:** Besides the visible markers, three branches would print `[PLACEHOLDER: …]` the moment data went missing: a null price (card, product page, showcase), a product with no photo (card, product slot 1), and null care copy (product page; kept on purpose by `D-Y.06-2`/Y.07).
+- **Decision:** Null price → omitted. No photo → the hatched frame with "No photo yet" / „Сè уште нема фотографија" (new key `Product.noPhoto`). Null care → no Composition & care section. Tested with a harness product that has none of the three.
+- **Alternative rejected:** fixing only what renders today. Rejected — the next drop starts with nulls, and the markers would reappear on production on the first sync.
+- **Downside accepted:** a product page with no care copy no longer signals that the fact is owed; the register is the only record.
+- **Links:** `D-Y.06-2` · `D-Y.07-3` · `D-Y.11-3`
+
+### D-Y.11-14 · 2026-10-02 · How "closed" looks: disabled styling, locked sizes, colour photos, cards stay links
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decisions within brief decision 7).
+- **Decision:** `closed` uses the handover's disabled (pre-drop) look (`surface-2`, muted label) with its own label. The size row is `locked`: listed, all disabled, **none struck through** (a struck size says "sold out in this size"). Countdown never shows "Sold out" (`visibleStock` → null). Between drops, cards and product photos are **not** greyed and cards stay links (greying was the sold-out treatment). The Home showcase follows the same rule — no badge under „Последниот дроп".
+- **Alternative rejected:** a new visual state for `closed`; keeping struck sizes; keeping the sold-out greyscale between drops.
+- **Downside accepted:** `closed` and "Coming soon" look identical apart from the label; the showcase change goes beyond the brief's "product and catalog pages".
+- **Links:** `D-Y.11-7` · handover §5–§6
+
+### D-Y.11-15 · 2026-10-02 · One photograph takes the gallery column, capped at max-w-md on tablets
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decision).
+- **Decision:** With one photo the gallery is a single column: full width on a phone, `sm:max-w-md` (448px) from 640px, the whole column (~536px) from 1024px; `sizes` set to match. Two photos keep the old two-slot grid.
+- **Alternative rejected:** one photo in the left half of the two-column grid (an empty right half); full width on tablets (a ~1,000px-tall photo above the buy path).
+- **Downside accepted:** at desktop the single photo is 536×670 instead of 262×328 — bigger and higher on the page; sources are 1333px wide, so no upscaling.
+- **Links:** `D-Y.11-8` · `D-2.25-10`
+
+### D-Y.11-16 · 2026-10-02 · Amount-due line in both locales, per shirt, plus delivery in plain denars
+- **Status:** Accepted — **Supersedes `D-Y.10-4` in part**
+- **Decided by:** Orchestrator (brief Task 7: wording, both locales, MK „Плаќаш"); plain-MKD delivery on this line by Claude Code.
+- **Decision:** `Product.amountDue` = "You pay {amount} per shirt in cash on delivery, plus {cost} for delivery." / „Плаќаш {amount} по маица во готовина при преземање, плус {cost} за достава." Rendered under the price on every product page in both locales; `{cost}` from `DELIVERY_COST_MKD`. Both figures plain denars, EN included ("200 MKD", not "200 MKD (≈ $4)"). `Terms.pricesBody` gains the same `{cost}` (prose form, EN "200 MKD (≈ $4)"). Both keys added to the delivery-cost guard.
+- **Alternative rejected:** "(≈ $4)" on the amount-due line too. Rejected — the line exists to state what is handed over in denars (`D-Y.10-4`), and the brief's example omits it.
+- **Downside accepted:** EN shows the delivery cost two ways on two pages ("200 MKD" on the product page, "200 MKD (≈ $4)" elsewhere); MK shows the price twice at the top of the product page.
+- **Links:** `D-Y.10-4` · `D-Y.09-2`
+
+### D-Y.11-17 · 2026-10-02 · Localized 404: locale not-found + catch-all, root fallback via a pass-through root layout
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decision on mechanism).
+- **Decision:** `src/app/[locale]/not-found.tsx` (branded, in the locale layout, Catalog + Home buttons), `src/app/[locale]/[...rest]/page.tsx` calling `notFound()`, and a root fallback `src/app/not-found.tsx` (MK + EN, full document) under a pass-through `src/app/layout.tsx` — the pattern next-intl documents. Fonts moved unchanged to `src/app/fonts.ts` for sharing. The catch-all is exempt from the pathnames coverage test (it is not a linkable page). Next adds `noindex` to 404 responses itself; verified.
+- **Alternative rejected:** `global-not-found.js`. Rejected — experimental in Next 16 and needs a `next.config.ts` flag.
+- **Downside accepted:** a pass-through root layout above the real one, and the 404's `<title>` is the locale layout's default ("Trajanov — дропови на облека") because non-global not-found files cannot export metadata.
+- **Links:** Task 9
+
+### D-Y.11-18 · 2026-10-02 · Prices grouped by hand, not by runtime ICU
+- **Status:** Accepted
+- **Decided by:** Claude Code (mechanism; the requirement is brief Task 8).
+- **Decision:** `formatMkd` groups thousands with a regex: dot for MK, comma for EN, MK for an unknown locale. `formatUsdApprox` uses the same helper. Tests break `Number.prototype.toLocaleString` and `Intl.NumberFormat` and require identical output, including the client-rendered Home showcase.
+- **Alternative rejected:** `Intl.NumberFormat('mk-MK')` with a polyfill. Rejected — depends on ICU data again and adds weight.
+- **Downside accepted:** whole numbers only; a decimal price would need the helper extended.
+- **Links:** Task 8
+
+### D-Y.11-19 · 2026-10-02 · Plural keys: EN "HR/HRS", one full-word `Drop.timerAria`, EN `remaining` unchanged
+- **Status:** Accepted
+- **Decided by:** Claude Code (shapes; the plural cases are the brief's).
+- **Decision:** `Drop.days`/`Drop.hours` are ICU plurals (EN DAY/DAYS, HR/HRS; MK ДЕН/ДЕНА, ЧАС/ЧАСА). The screen-reader text is one new key, `Drop.timerAria`, with four plural arguments in full words. MK `Drop.remaining` is a plural („Преостанува #" / „Преостануваат #"); EN keeps "{count} left", which needs none. Wording comes from `timerText()` in `Countdown.tsx`.
+- **Alternative rejected:** four separate aria keys; a plural for EN "left".
+- **Downside accepted:** EN "HR" is an unusual abbreviation; MK follows the CLDR rule (21 ДЕН, 11 ДЕНА) — flagged for the native reviewer.
+- **Links:** Task 11 · `docs/i18n/mk-review-y11.md`
+
+### D-Y.11-20 · 2026-10-02 · Copy changes beyond the brief's list, all state-truth or follow-through
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decisions, listed for ratification).
+- **Decision:** (1) FAQ a7 (EN + MK): availability is shown "during a drop", since `D-Y.11-7` hides it between drops. (2) MK `Privacy.browserBody` mirrors the EN Task 13 change (no "sessionStorage"). (3) `Meta.catalogDescription` (both) lost a doubled "limited" in the humanizer pass. (4) `Drop.liveNow` (rendered nowhere) also lost „во живо". (5) `llms.txt` Home note and opening paragraph no longer mention a countdown; "go on sale together" replaces "go live when a countdown ends". (6) Terms and Privacy `LAST_UPDATED` → 2026-10-02. (7) `Styleguide.intro` keeps „во живо" (it means "live demo" on a dev page).
+- **Alternative rejected:** leaving these as found.
+- **Downside accepted:** a larger copy diff than the brief listed; every MK change is in the review pack.
+- **Links:** Tasks 10, 12, 13
+
+### D-Y.11-21 · 2026-10-02 · EN/MK interpolation parity is tested, not left to the inventory
+- **Status:** Accepted
+- **Decided by:** Claude Code (own decision).
+- **Context:** Task 15 asks for matching interpolation variables; `npm run i18n:inventory` checks keys and renders sites, not variables.
+- **Decision:** `tests/i18n/interpolation-parity.test.ts` parses ICU arguments (brace-depth, plural branches recursed) and rich-text tags in both catalogs and requires them equal per key.
+- **Alternative rejected:** extending `scripts/i18n-inventory.ts`. Rejected — a test fails the gate; a report does not.
+- **Downside accepted:** a hand-written ICU parser that handles this project's syntax, not all of ICU.
+- **Links:** Task 15
+
+### D-Y.11-22 · 2026-10-02 · Local database shifted for the render matrix, then reset and re-synced
+- **Status:** Accepted
+- **Decided by:** Claude Code (brief Task 16 authorised local-only state).
+- **Decision:** Locally only (host verified `127.0.0.1`), the seed's `test-open-drop` and `test-upcoming-drop` were moved into January 2026 so `test-drop` rendered in its real ended state with the three shirts, and `test-mustard-ochre` stock was set to 0 for the sold-out state. Afterwards: `supabase db reset` (never `--linked`) + `npm run sync:drop` against `.env.local`; `npm test` 403/403 on the restored database. No hosted command besides `D-Y.11-2`.
+- **Alternative rejected:** rendering the seed products, as Y.10 did (`D-Y.10-8`). Rejected — the three shirts' ended state is the default production state and had to be seen.
+- **Downside accepted:** a hand edit to local data, reversed by a reset.
+- **Links:** `D-Y.08-9` · `D-Y.10-8`
