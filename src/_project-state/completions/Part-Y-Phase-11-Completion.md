@@ -61,6 +61,7 @@ Past entries changed **only in Status**: `D-Y.06-2` (superseded in part by -13),
 - **`next-intl/navigation` cannot be imported in vitest.** Its ESM build imports `next/navigation` in a way plain Node rejects, so the test harness builds localized paths from `routing.pathnames` itself.
 - **The browser pane carried a `NEXT_LOCALE=en` cookie** (the trap Y.10 noted), which redirects `/nema-takva` to `/en/nema-takva`. I pinned the cookie per locale while rendering.
 - **The design hook flagged gradient text at `globals.css:698`.** That's the wordmark hover shine, an owner-level exception (`D-2.19-1`, `D-2.20-1`) in a file this phase did not touch. It's intentional and was left unchanged.
+- **Added after the report was first filed (2026-10-02, before merge): the Vercel preview build failed.** The log shows `next/font/google queries have exactly one entry` from the Rubik font module under `[locale]/layout.tsx`. Local and clean-clone (Node 24) builds both passed, so only Vercel reproduced it. I reverted the shared `src/app/fonts.ts`: the layout is byte-identical to `main` again, and the rare root 404 fallback uses the system font (`D-Y.11-23`). The decision count is now `D-Y.11-1…23`.
 - **Reconciliations (brief's rule):** `current-state.md` line 1 said Y.10 "PR OPEN, NOT MERGED", but git shows PR #45 merged at `cf77299`, so the status text was corrected (owed #79 stays open, `D-Y.11-9`). CLAUDE.md "max 2 units per order" was rewritten per `D-Y.06-3/4` (`D-Y.11-10`). Three code comments describing the removed placeholder branches were corrected (`schema.ts`, `product-care.ts`, `PhotoSlot.tsx`).
 - **The page needed no fact we don't have** to look finished. Removing the markers made it look *more* finished than it is (Known issue #15).
 
@@ -71,10 +72,10 @@ Past entries changed **only in Status**: `D-Y.06-2` (superseded in part by -13),
 | File | Added / Modified / Deleted |
 |---|---|
 | `src/lib/drop/display.ts` | Added |
-| `src/app/layout.tsx`, `src/app/not-found.tsx`, `src/app/fonts.ts` | Added |
+| `src/app/layout.tsx`, `src/app/not-found.tsx` | Added (`src/app/fonts.ts` was added, then deleted — `D-Y.11-23`) |
 | `src/app/[locale]/not-found.tsx`, `src/app/[locale]/[...rest]/page.tsx` | Added |
 | `src/components/system/PreviewNotice.tsx` | **Deleted** |
-| `src/app/[locale]/catalog/page.tsx`, `catalog/[slug]/page.tsx`, `terms/page.tsx`, `privacy/page.tsx`, `styleguide/page.tsx`, `layout.tsx` | Modified |
+| `src/app/[locale]/catalog/page.tsx`, `catalog/[slug]/page.tsx`, `terms/page.tsx`, `privacy/page.tsx`, `styleguide/page.tsx` | Modified (`[locale]/layout.tsx` net-unchanged after `D-Y.11-23`) |
 | `src/components/product/{ProductCard,AddToCartPanel,BuyButton,SizePicker,AmountDue}.tsx` | Modified |
 | `src/components/home/{HomeShowcase,HomeExperience,HomeFaq}.tsx`, `src/components/drop/Countdown.tsx` | Modified |
 | `src/components/system/{PhotoSlot,ShippingNotice}.tsx`, `src/config/schema.ts`, `src/lib/product-care.ts` | Modified (comments only) |

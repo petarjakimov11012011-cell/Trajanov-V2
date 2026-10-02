@@ -6368,7 +6368,7 @@ start at `D-2.01-6`.*
 - **Links:** `D-Y.10-4` · `D-Y.09-2`
 
 ### D-Y.11-17 · 2026-10-02 · Localized 404: locale not-found + catch-all, root fallback via a pass-through root layout
-- **Status:** Accepted
+- **Status:** Accepted — **Superseded in part by `D-Y.11-23`** (the shared `src/app/fonts.ts` is reverted)
 - **Decided by:** Claude Code (own decision on mechanism).
 - **Decision:** `src/app/[locale]/not-found.tsx` (branded, in the locale layout, Catalog + Home buttons), `src/app/[locale]/[...rest]/page.tsx` calling `notFound()`, and a root fallback `src/app/not-found.tsx` (MK + EN, full document) under a pass-through `src/app/layout.tsx` — the pattern next-intl documents. Fonts moved unchanged to `src/app/fonts.ts` for sharing. The catch-all is exempt from the pathnames coverage test (it is not a linkable page). Next adds `noindex` to 404 responses itself; verified.
 - **Alternative rejected:** `global-not-found.js`. Rejected — experimental in Next 16 and needs a `next.config.ts` flag.
@@ -6415,3 +6415,12 @@ start at `D-2.01-6`.*
 - **Alternative rejected:** rendering the seed products, as Y.10 did (`D-Y.10-8`). Rejected — the three shirts' ended state is the default production state and had to be seen.
 - **Downside accepted:** a hand edit to local data, reversed by a reset.
 - **Links:** `D-Y.08-9` · `D-Y.10-8`
+
+### D-Y.11-23 · 2026-10-02 · Fonts back inline in the locale layout; the root 404 fallback uses no next/font
+- **Status:** Accepted — **Supersedes `D-Y.11-17` in part** (only "fonts moved unchanged to `src/app/fonts.ts`")
+- **Decided by:** Claude Code, after reading the Vercel build log (Petar logged the CLI in, 2026-10-02).
+- **Context:** The PR #46 preview deployment `dpl_ACzXSPvb8LMxjmjYQNu4hJPkva6b` failed: `next/font/google queries have exactly one entry` in the Rubik font module, import trace `./src/app/[locale]/layout.tsx`. Local `next build` passed — also from a clean clone with `npm ci` on Node 24 — so the failure only reproduces on Vercel. The one font-related change on the branch was moving the `Rubik`/`Inter` `next/font/google` calls into a shared `src/app/fonts.ts` imported by both the locale layout and the root 404.
+- **Decision:** `src/app/[locale]/layout.tsx` restored **byte-identical to `main`** (`cf77299`), `src/app/fonts.ts` deleted, and `src/app/not-found.tsx` uses no `next/font` — its text falls back through `globals.css` (`--font-display`/`--font-body` → `ui-sans-serif, system-ui`).
+- **Alternative rejected:** calling `Rubik`/`Inter` a second time inside the root 404. Rejected — a second font call site is the same class of change that failed, and only a Vercel build could prove it safe.
+- **Downside accepted:** the root fallback (reached only by URLs with a file extension, e.g. `/missing.png`) renders in the system sans, not Rubik/Inter. The localized 404 every normal unknown path reaches is unaffected — it sits inside the locale layout with the brand fonts.
+- **Links:** `D-Y.11-17` · PR #46

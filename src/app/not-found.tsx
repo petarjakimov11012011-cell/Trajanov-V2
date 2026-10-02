@@ -1,6 +1,5 @@
 import mk from '@/messages/mk.json';
 import en from '@/messages/en.json';
-import {rubik, inter} from './fonts';
 import './globals.css';
 
 // Root 404 fallback (Phase Y.11, Task 9). Reached only by a URL that never enters a locale — e.g. a
@@ -8,6 +7,11 @@ import './globals.css';
 // otherwise be "missing.png" and its layout calls notFound(). With no locale to go on it is a full
 // document in Macedonian (the default language) with the English directly under it, both read from
 // the catalogs — no hardcoded copy. Next answers with HTTP 404 and adds `noindex` itself.
+//
+// No next/font here, on purpose (D-Y.11-23): sharing the Rubik/Inter `next/font/google` objects with the
+// locale layout failed Vercel's Turbopack build ("next/font/google queries have exactly one entry"), so
+// this rare fallback uses the CSS chain in globals.css — `--font-display`/`--font-body` fall back to
+// ui-sans-serif / system-ui when the Rubik/Inter variables are absent.
 //
 // Plain <a> links on purpose: there is no locale context here for the localized Link.
 const ctaBase =
@@ -22,7 +26,7 @@ const VERSIONS = [
 
 export default function RootNotFound() {
   return (
-    <html lang="mk" className={`${rubik.variable} ${inter.variable} h-full antialiased`}>
+    <html lang="mk" className="h-full antialiased">
       <body className="bg-ground text-foreground flex min-h-full flex-col">
         <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center gap-12 px-4 py-16 text-center sm:px-6">
           <span className="text-eyebrow text-muted-foreground font-medium uppercase tracking-[0.14em]">

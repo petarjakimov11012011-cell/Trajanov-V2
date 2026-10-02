@@ -1,4 +1,5 @@
 import type {Metadata} from 'next';
+import {Rubik, Inter} from 'next/font/google';
 import {notFound} from 'next/navigation';
 import {NextIntlClientProvider, hasLocale} from 'next-intl';
 import {getMessages, getTranslations} from 'next-intl/server';
@@ -10,7 +11,6 @@ import {siteJsonLd} from '@/lib/seo/site-jsonld';
 import {JsonLd} from '@/components/seo/JsonLd';
 import {SiteHeader} from '@/components/layout/SiteHeader';
 import {SiteFooter} from '@/components/layout/SiteFooter';
-import {rubik, inter} from '../fonts';
 import '../globals.css';
 
 // Per-locale default title + description, from the message catalog (Meta namespace) — no metadata
@@ -48,7 +48,22 @@ export async function generateMetadata({
   };
 }
 
-// The brand fonts (Rubik display, Inter body) live in ../fonts so the root 404 fallback can share them.
+// Display face — boxy, confident. Cyrillic subset requested so the build
+// fails loudly if the family ever drops MK glyph coverage (brand.md §4).
+const rubik = Rubik({
+  variable: '--font-rubik',
+  subsets: ['latin', 'cyrillic'],
+  weight: ['600', '700', '800'],
+  display: 'swap',
+});
+
+// Body — neutral, tabular numerals for prices and the countdown.
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
+});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({locale}));

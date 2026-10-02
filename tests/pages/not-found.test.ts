@@ -11,8 +11,6 @@ vi.mock("server-only", () => ({}));
 vi.mock("next-intl/server", () => import("../helpers/harness/next-intl-server"));
 vi.mock("@/i18n/navigation", () => import("../helpers/harness/navigation"));
 vi.mock("@/lib/drop/state", () => import("../helpers/harness/drop-state"));
-// next/font only runs inside Next's compiler; the root fallback imports the shared font objects.
-vi.mock("@/app/fonts", () => ({ rubik: { variable: "font-rubik" }, inter: { variable: "font-inter" } }));
 
 import LocaleNotFound from "@/app/[locale]/not-found";
 import CatchAll from "@/app/[locale]/[...rest]/page";
