@@ -1,6 +1,6 @@
 # Native MK review — Phase Y.11 (honest display, „дроп", plurals, 404)
 
-**For Lazar and Petar.** Phase Y.11 changed **37 Macedonian strings**, added **8** and
+**For Lazar and Petar.** Phase Y.11 changed **38 Macedonian strings** (37 in PR #46, plus `Drop.endedFollow` fixed after merge — see the last row of §3), added **8** and
 removed **4**. Macedonian is the source language, so this review is the one that catches a fault
 before it ships. The table below is generated from `git diff` of `src/messages/mk.json` between `main`
 (`cf77299`) and this branch — every changed MK string is in it, none is retyped by hand.
@@ -89,6 +89,7 @@ before it ships. The table below is generated from `git diff` of `src/messages/m
 | 35 | `Meta.homeTitle` | Trajanov — следно спуштање | Trajanov — следниот дроп | terminology |  Home browser tab title. | ☐ | ☐ | |
 | 36 | `Meta.homeDescription` | Оверсајз унисекс маици од Струмица. Спуштања од 3 до 5 парчиња, вистински ограничени залихи, готовина при преземање. | Оверсајз унисекс маици од Струмица. Дропови од 3 до 5 производи, вистински ограничени залихи, готовина при преземање. | terminology |  „дропови", „3 до 5 производи". Also the web-app manifest description now. | ☐ | ☐ | |
 | 37 | `Meta.catalogDescription` | Парчињата во активното спуштање. Вистински, ограничени залихи. | Оверсајз унисекс маици од Струмица, во дропови. Вистински, ограничени залихи. | style + terminology |  No "active drop" (brief Task 10). | ☐ | ☐ | |
+| 38 | `Drop.endedFollow` | Следи {handle} за следното. | Следи {handle} за следниот. | grammar | „Следи @trajanovv2026 за следниот.“ — agreement with masculine „дроп“; the neuter „следното“ agreed with the old „спуштање“. Missed by PR #46, fixed right after merge. | ☐ | ☐ | |
 
 ## 4. New strings
 

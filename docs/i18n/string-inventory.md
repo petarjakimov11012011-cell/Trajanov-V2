@@ -97,7 +97,7 @@ the file(s) that reference each key, to start a review — not an exhaustive ren
 | `Credit.opensInNewTab` | се отвора во ново јазиче | opens in a new tab | `src/components/layout/SiteHeader.tsx` |
 | `Drop.days` | {count, plural, one {ДЕН} other {ДЕНА}} | {count, plural, one {DAY} other {DAYS}} | `src/components/drop/Countdown.tsx` |
 | `Drop.ended` | Дропот заврши | Drop ended | `src/components/drop/DropBanner.tsx` |
-| `Drop.endedFollow` | Следи {handle} за следното. | Follow {handle} for the next one. | `src/components/drop/DropBanner.tsx` |
+| `Drop.endedFollow` | Следи {handle} за следниот. | Follow {handle} for the next one. | `src/components/drop/DropBanner.tsx` |
 | `Drop.hours` | {count, plural, one {ЧАС} other {ЧАСА}} | {count, plural, one {HR} other {HRS}} | `src/components/drop/Countdown.tsx` |
 | `Drop.live` | ДРОПОТ Е ОТВОРЕН | DROP IS LIVE | `src/components/drop/DropBanner.tsx` |
 | `Drop.liveNow` | Отворено сега | Live now | _(not found in source)_ |

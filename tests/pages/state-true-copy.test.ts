@@ -62,6 +62,16 @@ describe("drop size is 3 to 5 products (facts.md §7)", () => {
   });
 });
 
+describe("MK agrees with the masculine „дроп“ (D-Y.11-5)", () => {
+  it("the ended banner says „за следниот“ (the drop), not the neuter „следното“ left from „спуштање“", () => {
+    expect(mk.Drop.endedFollow).toBe("Следи {handle} за следниот.");
+  });
+
+  it("no MK string still says „спуштање“", () => {
+    expect(JSON.stringify(mk)).not.toMatch(/спушт|Спушт/);
+  });
+});
+
 describe("catalog meta description", () => {
   it("does not describe a drop as active", () => {
     expect(en.Meta.catalogDescription).not.toMatch(/active/i);

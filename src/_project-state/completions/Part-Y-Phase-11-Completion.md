@@ -8,7 +8,7 @@
 | **Operator** | Petar |
 | **Date** | 2026-10-02 |
 | **Branch** | `phase-Y.11-honest-display` |
-| **PR** | see the PR opened from this branch (not merged — Lazar reviews, Petar merges, `D-0-3`) |
+| **PR** | [#46](https://github.com/petarjakimov11012011-cell/Trajanov-V2/pull/46) — **merged** `b4f8719` on Petar's instruction, no review recorded (`D-Y.11-24`) |
 | **Brief** | `briefs/Part-Y-Phase-11-Code.md` (first commit, `ff68852`) |
 | **Commit range** | `ff68852..` the head of the branch (11 commits on `d04efe9`) |
 
@@ -62,6 +62,7 @@ Past entries changed **only in Status**: `D-Y.06-2` (superseded in part by -13),
 - **The browser pane carried a `NEXT_LOCALE=en` cookie** (the trap Y.10 noted), which redirects `/nema-takva` to `/en/nema-takva`. I pinned the cookie per locale while rendering.
 - **The design hook flagged gradient text at `globals.css:698`.** That's the wordmark hover shine, an owner-level exception (`D-2.19-1`, `D-2.20-1`) in a file this phase did not touch. It's intentional and was left unchanged.
 - **Added after the report was first filed (2026-10-02, before merge): the Vercel preview build failed.** The log shows `next/font/google queries have exactly one entry` from the Rubik font module under `[locale]/layout.tsx`. Local and clean-clone (Node 24) builds both passed, so only Vercel reproduced it. I reverted the shared `src/app/fonts.ts`: the layout is byte-identical to `main` again, and the rare root 404 fallback uses the system font (`D-Y.11-23`). The decision count is now `D-Y.11-1…23`.
+- **After merge (2026-10-02):** production read-back passed (owed #84 closed). It also caught one fault of mine that tests and the review-pack generator missed: MK `Drop.endedFollow` „за следното" kept the neuter agreement of „спуштање". It's fixed to „за следниот", with a test that also fails on any remaining „спушт". My replace pass had only searched strings containing the old word (`D-Y.11-24`).
 - **Reconciliations (brief's rule):** `current-state.md` line 1 said Y.10 "PR OPEN, NOT MERGED", but git shows PR #45 merged at `cf77299`, so the status text was corrected (owed #79 stays open, `D-Y.11-9`). CLAUDE.md "max 2 units per order" was rewritten per `D-Y.06-3/4` (`D-Y.11-10`). Three code comments describing the removed placeholder branches were corrected (`schema.ts`, `product-care.ts`, `PhotoSlot.tsx`).
 - **The page needed no fact we don't have** to look finished. Removing the markers made it look *more* finished than it is (Known issue #15).
 

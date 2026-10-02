@@ -6424,3 +6424,12 @@ start at `D-2.01-6`.*
 - **Alternative rejected:** calling `Rubik`/`Inter` a second time inside the root 404. Rejected — a second font call site is the same class of change that failed, and only a Vercel build could prove it safe.
 - **Downside accepted:** the root fallback (reached only by URLs with a file extension, e.g. `/missing.png`) renders in the system sans, not Rubik/Inter. The localized 404 every normal unknown path reaches is unaffected — it sits inside the locale layout with the brand fonts.
 - **Links:** `D-Y.11-17` · PR #46
+
+### D-Y.11-24 · 2026-10-02 · Y.11 merged on Petar's instruction; no review recorded; one MK slip fixed after merge
+- **Status:** Accepted
+- **Decided by:** **Petar (operator), 2026-10-02**, explicit instruction ("merge to main"); executed by Claude Code.
+- **Context:** The brief said "No merge — Petar merges after Lazar reviews". Checked immediately before merging: `reviews: []`; the first Vercel preview had **failed** (`D-Y.11-23`) — Code stopped, asked, and Petar chose to have the Vercel error found first; after the fix the preview was **Ready** and the PR `CLEAN` (Vercel + Vercel Preview Comments SUCCESS).
+- **Decision:** Merge PR #46 (merge commit `b4f8719`, 2026-10-02 14:46 UTC), delete the branch, wait for the production deploy (Ready), read production back (owed #84 closed). The read-back found one live fault from Y.11 itself: MK `Drop.endedFollow` still said „за следното" (neuter, agreeing with the old „спуштање"); fixed to „за следниот" with a test, and added to the review pack.
+- **Alternative rejected:** merging with the failed preview (production would have stayed on Y.10 with `main` ahead of it); waiting for Lazar's review (the operator's call, `D-0-3`).
+- **Downside accepted:** the **sixth** consecutive PR to land with no recorded review; owed #82 can only be closed after the fact. The MK slip was live on Home's ended banner between deploy and the fix.
+- **Links:** `D-0-3` · `D-Y.09-13` · `D-Y.11-5` · `D-Y.11-23` · owed #82, #84

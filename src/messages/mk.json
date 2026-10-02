@@ -171,7 +171,7 @@
     "live": "ДРОПОТ Е ОТВОРЕН",
     "remaining": "{count, plural, one {Преостанува #} other {Преостануваат #}}",
     "ended": "Дропот заврши",
-    "endedFollow": "Следи {handle} за следното.",
+    "endedFollow": "Следи {handle} за следниот.",
     "liveNow": "Отворено сега"
   },
   "Stock": {
